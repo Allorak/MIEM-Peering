@@ -1,0 +1,66 @@
+{
+    "name": "patools",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@emotion/react": "^11.4.1",
+        "@emotion/styled": "^11.3.0",
+        "@mui/icons-material": "^5.0.4",
+        "@mui/material": "^5.0.4",
+        "@reduxjs/toolkit": "^1.6.2",
+        "axios": "^0.23.0",
+        "bootstrap": "^5.1.3",
+        "connected-react-router": "6.9.1",
+        "history": "5.0.1",
+        "jquery": "^3.6.0",
+        "merge": "2.1.1",
+        "popper.js": "^1.16.1",
+        "react": "17.0.2",
+        "react-dom": "17.0.2",
+        "react-google-login": "^5.2.2",
+        "react-redux": "7.2.5",
+        "react-router": "5.2.1",
+        "react-router-dom": "^6.0.0-beta.6",
+        "react-scripts": "^4.0.3",
+        "reactstrap": "8.10.0",
+        "redux": "4.1.1",
+        "redux-thunk": "2.3.0",
+        "svgo": "2.7.0"
+    },
+    "devDependencies": {
+        "@types/history": "4.7.9",
+        "@types/jest": "27.0.2",
+        "@types/node": "16.11.0",
+        "@types/react": "17.0.30",
+        "@types/react-dom": "17.0.9",
+        "@types/react-redux": "7.1.19",
+        "@types/react-router": "5.1.17",
+        "@types/react-router-dom": "5.3.1",
+        "@types/reactstrap": "8.7.2",
+        "@typescript-eslint/parser": "^4.0.0",
+        "cross-env": "6.0.3",
+        "eslint": "^7.32.0",
+        "eslint-plugin-flowtype": "^3.13.0",
+        "eslint-plugin-import": "2.18.2",
+        "eslint-plugin-jsx-a11y": "6.2.3",
+        "eslint-plugin-react": "7.26.0",
+        "nan": "^2.15.0",
+        "typescript": "4.4.4"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "cross-env CI=true react-scripts test --env=jsdom",
+        "eject": "react-scripts eject",
+        "lint": "eslint ./src/**/*.ts ./src/**/*.tsx"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
+}
