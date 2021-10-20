@@ -8,6 +8,7 @@ import { useEffect } from 'react'
 import { fetchUserProfile } from '../../store/userProfile'
 import { Role } from '../role'
 import { Registration } from './registration'
+import { Box } from '@mui/system'
 
 
 
@@ -32,8 +33,8 @@ export function Private() {
   const userProfileIsLoading = useAppSelector(state => state.userProfile.isLoading)
   console.log(authPayload, 'auth')
   console.log(registrationProps?.email)
-  useEffect(()=>{
-    if (authPayload && authPayload.accessToken){
+  useEffect(() => {
+    if (authPayload && authPayload.accessToken) {
       fetchUserProfile()
     }
   }, [dispatch, authPayload])
@@ -49,15 +50,18 @@ export function Private() {
       />
     )
   }
- 
+
 
   if (!userProfileIsLoading && userProfilePayload?.role === 'teacher') {
     console.log('Private route return teacher Route')
     return (<>
-      <PrivateHeader />
-      <Routes>
-        <PrivateRoute path='*' element={<TeacherPrivate />} />
-      </Routes>
+
+      <Box>
+        <PrivateHeader />
+        <Routes>
+          <PrivateRoute path='*' element={<TeacherPrivate />} />
+        </Routes>
+      </Box>
     </>
     )
   }

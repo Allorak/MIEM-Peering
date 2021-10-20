@@ -9,20 +9,18 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 
 interface IProps {
-  id: string,
-  num: number,
-  title?: string,
-  onEdit(id: string): void,
-  onRemove(id: string): void,
-  onClone(id: string): void,
+  id: number,
+  title: string,
+  onEdit(id: number): void,
+  onRemove(id: number): void,
+  onClone(id: number): void,
 }
 
 const questionTx = 'В'
 
 export const AnswerBox: FC<IProps> = ({
   id,
-  num,
-  title = 'Вопрос',
+  title,
   children,
   onEdit,
   onRemove,
@@ -34,7 +32,7 @@ export const AnswerBox: FC<IProps> = ({
       <Box sx={styles.topContainer}>
         <Box sx={styles.container}>
           <Typography variant='body1'>
-            {`${questionTx}${num}`}
+            {`${questionTx}${id + 1}`}
           </Typography>
 
           <Typography variant='h5'>
@@ -47,35 +45,47 @@ export const AnswerBox: FC<IProps> = ({
             {children}
           </Box>
         </Box>
-        <Box sx={styles.bodyContainer}>
-          <Box sx={styles.container}>
-            <Box sx={styles.actionCOntainer}>
-              <Button variant='contained'
-                startIcon={<EditIcon />}
-                onClick={() => onEdit(id)}
-                sx={styles.actionBt}
-              >
-                Изменить
-              </Button>
+      </Box>
 
-              <Button variant='contained'
-                startIcon={<ContentCopyIcon />}
-                onClick={() => onClone(id)}
-                sx={styles.actionBt}
-              >
-                Создать копию
-              </Button>
-
-              <Button variant='contained'
-                startIcon={<DeleteIcon />}
-                onClick={() => onRemove(id)}
-                sx={styles.actionBt}
-              >
-                Удалить
-              </Button>
-            </Box>
+      <Box sx={styles.actionCOntainer}>
+        <Button variant='contained'
+          startIcon={<EditIcon />}
+          onClick={() => onEdit(id)}
+          sx={styles.actionBt}
+        >
+          <Box
+            component={'span'}
+            sx={styles.actionBtLabel}
+          >
+            {"Изменить"}
           </Box>
-        </Box>
+        </Button>
+
+        <Button variant='contained'
+          startIcon={<ContentCopyIcon />}
+          onClick={() => onClone(id)}
+          sx={styles.actionBt}
+        >
+          <Box
+            component={'span'}
+            sx={styles.actionBtLabel}
+          >
+            {"Создать копию"}
+          </Box>
+        </Button>
+
+        <Button variant='contained'
+          startIcon={<DeleteIcon />}
+          onClick={() => onRemove(id)}
+          sx={styles.actionBt}
+        >
+          <Box
+            component={'span'}
+            sx={styles.actionBtLabel}
+          >
+            {"Удалить"}
+          </Box>
+        </Button>
       </Box>
     </Box>
   )
@@ -86,10 +96,11 @@ const styles = {
     backgroundColor: 'common.white',
     width: '100%',
     borderRadius: '4px',
-    padding: '16px 0px 30px 0px'
+    padding: '16px 0px 0px 0px',
+    boxShadow: '0px 0px 3px 0px rgba(34, 60, 80, 0.2)'
   } as SxProps<Theme>,
   container: {
-    margin: '0px 25px 0px 25px'
+    margin: '0px 25px'
   } as SxProps<Theme>,
   topContainer: {
     borderBottom: theme => `solid 1px ${theme.palette.divider}`,
@@ -103,12 +114,34 @@ const styles = {
   } as SxProps<Theme>,
   actionBt: {
     lineHeight: '1',
-    padding: '8px',
-    fontSize: '12px'
+    padding: '8px 12px 8px 8px',
+    fontSize: '12px',
+    "& .MuiButton-startIcon": {
+      margin: "0px 4px 0px 0px"
+    },
+    "@media (max-width: 600px)": {
+      minWidth: "10px",
+      padding: '12px',
+      "& .MuiButton-startIcon": {
+        margin: "0px",
+      },
+    }
   } as SxProps<Theme>,
   actionCOntainer: {
+    padding: '10px 25px',
     display: 'flex',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    gap: "10px",
+
+  } as SxProps<Theme>,
+  actionBtLabel: {
+    "@media (max-width: 600px)": {
+      display: "none",
+      opacity: 0,
+      width: '0px',
+      height: '0px',
+      overflow: 'hidden'
+    }
   } as SxProps<Theme>,
 }
 

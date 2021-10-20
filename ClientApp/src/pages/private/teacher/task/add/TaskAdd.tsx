@@ -1,50 +1,91 @@
+import { FC, useCallback, useState } from "react"
 import { Box, SxProps, Theme } from "@mui/system"
-import { FC, useState } from "react"
+
 import { Subheader } from "../../../../../components/subheader"
+import { NewTaskMainInfo } from "./forms/NewTaskMainInfo"
+import { NewTaskAuthorForm } from "./forms/NewTaskAuthorForm"
+import { NewTaskPeerForm } from "./forms/NewTaskPeerForm"
+import { NewTaskSettings } from "./forms/NewTaskSettings"
 
+import { INewTask, INewTaskMainInfo, INewTaskState } from "../../../../../store/types"
 import * as globalStyles from "../../../../../const/styles"
-import { INewTaskState } from "../../../../../store/types"
 
-
-const states = [
-  'peer-form',
-  'author-form',
-  'settings'
-] as INewTaskState[]
 
 export const TaskAdd: FC = () => {
 
-  const [step, setStep] = useState(0)
   const [responses, setResponses] = useState<any>()
 
   return (
-    <Box sx={globalStyles.container}>
-      {/* workbox */}
-      {/* subheader */}
-      <Box sx={styles.header}>
-        <Subheader activeStep={states[step]} />
-      </Box>
 
-      <Box sx={styles.content}>
 
-      </Box>
+    <Box>
+      <NewTaskContent/>
     </Box>
+    
   )
 }
 
-const NewTaskContent: FC<{step: INewTaskState}> = () => {
+const NewTaskContent: FC = () => {
+  const [step, setStpep] = useState<INewTaskState>('main-info')
+  const [newTaskItem, setNewTaskItem] = useState<INewTask>(initialTask)
+
+  const setMainInfo = useCallback((mainInfo: INewTaskMainInfo) => {
+    setNewTaskItem(prev => ({
+      ...prev,
+      mainInfo
+    }))
+    setStpep('author-form')
+  }, [newTaskItem.mainInfo, step])
+
   return (
     <Box>
+      <Subheader activeStep={step} />
 
+      <Box sx={styles.stepsContainer}>
+        {step === 'main-info' && (
+          <NewTaskMainInfo
+            onSubmit={setMainInfo}
+          />
+        )}
+
+        {step === 'author-form' && (
+          <NewTaskAuthorForm
+          // onSubmit={setMainInfo}
+          />
+        )}
+
+        {step === 'peer-form' && (
+          <NewTaskPeerForm
+          // onSubmit={setMainInfo}
+          />
+        )}
+
+        {step === 'settings' && (
+          <NewTaskSettings
+          // onSubmit={setMainInfo}
+          />
+        )}
+      </Box>
     </Box>
   )
 }
 
 const styles = {
-  header: {
-    margin: '100px 0px 0px 0px'
+  stepsContainer: {
+    maxWidth: '1000px',
+    margin: '20px auto'
   } as SxProps<Theme>,
   content: {
     margin: '10x 0px 0px 0px'
   }
+}
+
+const initialTask: INewTask = {
+  mainInfo: {
+    title: ""
+  },
+  settings: {},
+  peerForm: {},
+  authorForm: {}
+
 }

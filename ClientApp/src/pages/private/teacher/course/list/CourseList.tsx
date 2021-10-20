@@ -39,44 +39,46 @@ export const TCourseList: FC = () => {
 
     return (<>
         <Box sx={constStyles.container}>
-            <WorkBox
-                error={error}
-                isLoading={isLoading}
-                isLock={isLock}
-            >
-                <Box sx={styles.topContainer}>
-                    <Typography
-                        variant='h6'
-                        sx={styles.title}
-                    >
-                        Все курсы
-                    </Typography>
+            <Box sx={styles.wrapper}>
+                <WorkBox
+                    error={error}
+                    isLoading={isLoading}
+                    isLock={isLock}
+                >
+                    <Box sx={styles.topContainer}>
+                        <Typography
+                            variant='h6'
+                            sx={styles.title}
+                        >
+                            Все курсы
+                        </Typography>
 
-                    <Button
-                        variant='contained'
-                        sx={styles.addBt}
-                        onClick={onAddNewCourse}
-                    >
-                        Добавить
-                    </Button>
-                </Box>
+                        <Button
+                            variant='contained'
+                            sx={styles.addBt}
+                            onClick={onAddNewCourse}
+                        >
+                            Добавить
+                        </Button>
+                    </Box>
 
-                <Box sx={styles.root}>
-                    {courses && (courses.length > 0) && (
-                        <List
-                            items={courses}
-                            renderItems={
-                                (course) =>
-                                    <CourseCard
-                                        onCourseSelect={onCourse}
-                                        key={course.id}
-                                        course={course}
-                                    />
-                            }
-                        />
-                    )}
-                </Box>
-            </WorkBox>
+                    <Box sx={styles.root}>
+                        {courses && (courses.length > 0) && (
+                            <List
+                                items={courses}
+                                renderItems={
+                                    (course) =>
+                                        <CourseCard
+                                            onCourseSelect={onCourse}
+                                            key={course.id}
+                                            course={course}
+                                        />
+                                }
+                            />
+                        )}
+                    </Box>
+                </WorkBox>
+            </Box>
         </Box>
 
         <AddCourse
@@ -87,6 +89,9 @@ export const TCourseList: FC = () => {
 }
 
 const styles = {
+    wrapper: {
+        margin: "50px 0px 0px 10px"
+    }as SxProps<Theme>,
     root: {
         display: 'flex',
         flexWrap: 'wrap',

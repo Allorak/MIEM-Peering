@@ -33,12 +33,34 @@ export const Subheader: FC<IProps> = ({
 
   return (
     <Box sx={styles.wrapper}>
-      {/* authform */}
+      {/* peer-form */}
+      <Box sx={activeStep === 'main-info' ? styles.contentContainer : { ...styles.contentContainer, ...styles.contentContainerInvisble }}>
+        <Typography variant={'h6'}
+          sx={activeStep === 'main-info' ? { ...styles.contentStep, ...styles.contentStepActive } : styles.contentStep}
+        >
+          {"1"}
+        </Typography>
+
+        <Typography variant={'h6'}
+          sx={activeStep === 'main-info' ? { ...styles.contentTitle, ...styles.contentTitleActive } : styles.contentTitle}
+        >
+          {"Основная информация"}
+        </Typography>
+      </Box>
+
+      <Box sx={styles.contentContainerInvisble}>
+        <ArrowForwardIosIcon
+          color='primary'
+          fontSize='small'
+        />
+      </Box>
+
+      {/* author-form */}
       <Box sx={activeStep === 'author-form' ? styles.contentContainer : { ...styles.contentContainer, ...styles.contentContainerInvisble }}>
         <Typography variant={'h6'}
           sx={activeStep === 'author-form' ? { ...styles.contentStep, ...styles.contentStepActive } : styles.contentStep}
         >
-          {"1"}
+          {"2"}
         </Typography>
 
         <Typography variant={'h6'}
@@ -55,11 +77,12 @@ export const Subheader: FC<IProps> = ({
         />
       </Box>
 
+      {/* peer-form */}
       <Box sx={activeStep === 'peer-form' ? styles.contentContainer : { ...styles.contentContainer, ...styles.contentContainerInvisble }}>
         <Typography variant={'h6'}
           sx={activeStep === 'peer-form' ? { ...styles.contentStep, ...styles.contentStepActive } : styles.contentStep}
         >
-          {"2"}
+          {"3"}
         </Typography>
 
         <Typography variant={'h6'}
@@ -76,11 +99,12 @@ export const Subheader: FC<IProps> = ({
         />
       </Box>
 
+      {/* settings */}
       <Box sx={activeStep === 'settings' ? styles.contentContainer : { ...styles.contentContainer, ...styles.contentContainerInvisble }}>
         <Typography variant={'h6'}
           sx={activeStep === 'settings' ? { ...styles.contentStep, ...styles.contentStepActive } : styles.contentStep}
         >
-          {"3"}
+          {"4"}
         </Typography>
 
         <Typography variant={'h6'}
@@ -88,13 +112,6 @@ export const Subheader: FC<IProps> = ({
         >
           {"Правила"}
         </Typography>
-      </Box>
-
-      <Box sx={styles.contentContainerInvisble}>
-        <ArrowForwardIosIcon
-          color='primary'
-          fontSize='small'
-        />
       </Box>
     </Box>
   )
@@ -106,18 +123,21 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'common.white',
+    gap: '10px',
     borderRadius: '4px',
     padding: '10px',
-    '@media (max-width: 700px)': {
+    '@media (max-width: 900px)': {
       justifyContent: 'flex-end'
     }
   } as SxProps<Theme>,
   contentContainer: {
-    display: 'flex-inline',
-    gap: '10px'
+    display: 'inline-flex',
+    gap: '10px',
+    justifyContent: 'center',
+    alignItems: 'center'
   } as SxProps<Theme>,
   contentContainerInvisble: {
-    '@media (max-width: 700px)': {
+    '@media (max-width: 900px)': {
       display: 'none',
       opacity: '0',
       top: '0px',
@@ -128,14 +148,20 @@ const styles = {
   } as SxProps<Theme>,
   contentStep: {
     color: 'common.black',
+    fontSize: '18px',
     fontWeight: '600',
-    padding: '0px 20px',
-    lineHeight: '20px',
+    width: '25px',
+    height: '25px',
+    lineHeight: '25px',
     backgroundColor: '#EFF1F2',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '5px'
   } as SxProps<Theme>,
   contentStepActive: {
     color: 'common.white',
-    backgroundColor: 'primary',
+    backgroundColor: 'primary.main',
   } as SxProps<Theme>,
   contentTitle: {
     color: palette.fill.grey,

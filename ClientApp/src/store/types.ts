@@ -122,4 +122,68 @@ export type ITaskItem = {
   description?: string
 }
 
-export type INewTaskState = 'author-form' | 'peer-form' | 'settings'
+export type INewTaskState = 'author-form' | 'peer-form' | 'settings' | 'main-info'
+
+export interface INewTask {
+  mainInfo: INewTaskMainInfo,
+  peerForm: INewTaskPeerForm,
+  authorForm: INewTaskAuthorForm,
+  settings: INewTaskSettings
+}
+export interface INewTaskMainInfo {
+  title: string
+  description?: string
+}
+
+export interface INewTaskAuthorForm {
+}
+
+export interface INewTaskPeerForm {
+
+}
+
+export interface INewTaskSettings {
+
+}
+
+export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
+
+type IParentQuestionRubric = {
+  id: number
+  title: string
+}
+
+export interface ITextQuestion extends IParentQuestionRubric {
+  type: IQuesttionTypes.TEXT
+}
+
+export interface IShortTextQuestion extends IParentQuestionRubric {
+  type: IQuesttionTypes.SHORT_TEXT
+}
+
+export interface IMultipleQuiestion extends IParentQuestionRubric {
+  type: IQuesttionTypes.MULTIPLE,
+  responses: IMultipleResponse[]
+}
+
+export interface ISelectRatingQuestion extends IParentQuestionRubric {
+  type: IQuesttionTypes.SELECT_RATE,
+  responses: number[]
+}
+
+export enum IQuesttionTypes {
+  TEXT = 'text',
+  MULTIPLE = 'multiple',
+  SELECT_RATE = 'select',
+  SHORT_TEXT = 'short-text',
+}
+
+export const defaultResponses = {
+  rates: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  multiple: ["Вариант 1"]
+}
+
+export interface IMultipleResponse {
+  id: number,
+  response: string
+}
