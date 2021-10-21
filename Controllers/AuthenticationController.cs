@@ -48,14 +48,14 @@ namespace patools.Controllers
         
         [Authorize]  
         [HttpPost("posttoken")]  
-        public String PostToken() 
+        public Object PostToken() 
         {  
             var identity = User.Identity as ClaimsIdentity;  
             if (identity != null) 
             {  
-                return "Valid"; 
+                return new { payload = new {userState =  "NEW"}, success = true};  
             }  
-            return "Invalid";  
+            return null;  
         } 
     }
 }
