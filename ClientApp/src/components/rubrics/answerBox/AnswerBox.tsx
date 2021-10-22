@@ -97,7 +97,8 @@ const styles = {
     width: '100%',
     borderRadius: '4px',
     padding: '16px 0px 0px 0px',
-    boxShadow: '0px 0px 3px 0px rgba(34, 60, 80, 0.2)'
+    boxShadow: '0px 0px 3px 0px rgba(34, 60, 80, 0.2)',
+    borderLeft: theme => `3px solid ${theme.palette.primary.main}`,
   } as SxProps<Theme>,
   container: {
     margin: '0px 25px'

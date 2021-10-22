@@ -33,15 +33,9 @@ export const PrivateHeader: FC = () => {
 const styles = {
     wrapper: {
         margin: '0px 0px 0px 0px',
-        '@media (max-width: 700px)': {
-            margin: '10px 0px 15px 0px'
-        },
         padding: '15px 20px',
         backgroundColor: 'common.white',
-        borderBottom: `1px solid ${palette.divider}`,
-        // position: 'fixed',
-        // zIndex: 1000,
-        // width: '100%'
+        borderBottom: `1px solid ${palette.divider}`
     } as SxProps<Theme>,
     root: {
         width: '100%',
@@ -50,7 +44,6 @@ const styles = {
         justifyContent: 'space-between'
     } as SxProps<Theme>,
     rightItem: {
-        // flex: '1 1 1088px',
         width: '100%',
         display: 'flex',
         justifyContent: 'space-between',

@@ -90,13 +90,13 @@ export const TCourseList: FC = () => {
 
 const styles = {
     wrapper: {
-        margin: "50px 0px 0px 10px"
-    }as SxProps<Theme>,
+        margin: "20px 0px"
+    } as SxProps<Theme>,
     root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: '20px',
+        display: "grid",
+        gridGap: "10px",
+        gridTemplateColumns: "repeat(auto-fill, minmax(255px, 1fr) )",
+
     } as SxProps<Theme>,
     topContainer: {
         display: 'flex',

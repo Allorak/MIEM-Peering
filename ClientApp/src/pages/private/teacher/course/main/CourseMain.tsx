@@ -87,7 +87,7 @@ export const CourseMain: FC = () => {
 const styles = {
     wrapper: {
         maxWidth: '1371px',
-        margin: '60px 0px 20px 0px',
+        margin: '20px 0px',
     } as SxProps<Theme>,
     root: {
         display: 'flex',

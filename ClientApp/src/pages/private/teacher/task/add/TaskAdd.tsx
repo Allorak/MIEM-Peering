@@ -73,7 +73,11 @@ const NewTaskContent: FC = () => {
 const styles = {
   stepsContainer: {
     maxWidth: '1000px',
-    margin: '20px auto'
+    margin: '0px auto',
+    padding: '20px 10px',
+    maxHeight: 'calc(100vh - 170px)',
+    overflowY: 'auto',
+    overflowX: 'hidden'
   } as SxProps<Theme>,
   content: {
     margin: '10x 0px 0px 0px'

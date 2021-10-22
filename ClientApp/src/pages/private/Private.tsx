@@ -8,7 +8,8 @@ import { useEffect } from 'react'
 import { fetchUserProfile } from '../../store/userProfile'
 import { Role } from '../role'
 import { Registration } from './registration'
-import { Box } from '@mui/system'
+import { Box, SxProps, Theme } from '@mui/system'
+import { palette } from '../../theme/colors'
 
 
 
@@ -54,26 +55,32 @@ export function Private() {
 
   if (!userProfileIsLoading && userProfilePayload?.role === 'teacher') {
     console.log('Private route return teacher Route')
-    return (<>
+    return (
 
-      <Box>
+      <Box sx={styles.wrapper}>
         <PrivateHeader />
-        <Routes>
-          <PrivateRoute path='*' element={<TeacherPrivate />} />
-        </Routes>
+        <Box sx={styles.body}>
+          <Routes>
+            <PrivateRoute path='*' element={<TeacherPrivate />} />
+          </Routes>
+        </Box>
       </Box>
-    </>
+
     )
   }
 
   if (!userProfileIsLoading && userProfilePayload?.role === 'student') {
     console.log('Private route return student Route')
-    return (<>
-      <PrivateHeader />
-      <Routes>
-        <PrivateRoute path='*' element={<StudentPrivate />} />
-      </Routes>
-    </>)
+    return (
+      <Box sx={styles.wrapper}>
+        <PrivateHeader />
+        <Box sx={styles.body}>
+          <Routes>
+            <PrivateRoute path='*' element={<StudentPrivate />} />
+          </Routes>
+        </Box>
+      </Box>
+    )
   }
   console.log('Private route return null')
   return (
@@ -90,3 +97,30 @@ function PrivateRoute(props: RouteProps): React.ReactElement {
   )
 }
 
+
+const styles = {
+  wrapper: {
+    height: '100vh',
+    overflow: 'hidden'
+  } as SxProps<Theme>,
+
+  body: {
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    maxHeight: 'calc(100vh - 80px)',
+    "&::-webkit-scrollbar": {
+      width: "5px",
+      height: "5px"
+    },
+
+    "&::-webkit-scrollbar-track": {
+      backgroundColor: "rgba(255, 255, 255, 0.1)",
+      borderRadius: "10px"
+    },
+
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: palette.fillLight.greyLight,
+      borderRadius: "10px"
+    },
+  } as SxProps<Theme>,
+}

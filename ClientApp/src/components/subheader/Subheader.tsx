@@ -124,11 +124,11 @@ const styles = {
     alignItems: 'center',
     backgroundColor: 'common.white',
     gap: '10px',
-    borderRadius: '4px',
     padding: '10px',
     '@media (max-width: 900px)': {
       justifyContent: 'flex-end'
-    }
+    },
+    borderBottom: `1px solid ${palette.divider}`
   } as SxProps<Theme>,
   contentContainer: {
     display: 'inline-flex',
