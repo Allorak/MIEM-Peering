@@ -148,9 +148,10 @@ export interface INewTaskSettings {
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
-type IParentQuestionRubric = {
+export type IParentQuestionRubric = {
   id: number
   title: string
+  required: boolean
 }
 
 export interface ITextQuestion extends IParentQuestionRubric {
@@ -168,7 +169,8 @@ export interface IMultipleQuiestion extends IParentQuestionRubric {
 
 export interface ISelectRatingQuestion extends IParentQuestionRubric {
   type: IQuesttionTypes.SELECT_RATE,
-  responses: number[]
+  maxValue: number,
+  minValue: number
 }
 
 export enum IQuesttionTypes {
@@ -180,7 +182,24 @@ export enum IQuesttionTypes {
 
 export const defaultResponses = {
   rates: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  multiple: ["Вариант 1"]
+  multiple: [
+    {
+      id: 0,
+      response: "Вариант 1"
+    },
+    {
+      id: 1,
+      response: "Вариант 2"
+    },
+    {
+      id: 3,
+      response: "Вариант 3"
+    },
+    {
+      id: 4,
+      response: "Вариант 4"
+    }
+  ] as IMultipleResponse[]
 }
 
 export interface IMultipleResponse {

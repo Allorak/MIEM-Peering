@@ -12,7 +12,7 @@ import { SxProps, Theme } from "@mui/system";
 
 
 interface IProps {
-  onSubmit(ipPassthrough: INewTaskMainInfo): void,
+  onSubmit(mainInfo: INewTaskMainInfo): void,
 }
 
 export const NewTaskMainInfo: FC<IProps> = ({

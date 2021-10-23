@@ -18,8 +18,9 @@ export const MultipleVisible: FC<IProps> = ({
       placement={"top"}
     >
       <Box>
-        {responses.map(item => (
+        {responses.map((item, index) => (
           <FormControlLabel
+            key={index}
             sx={styles.root}
             id={item.id.toString()}
             value={item.response}
