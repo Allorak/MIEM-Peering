@@ -63,98 +63,100 @@ export const NewTaskSettings: FC = () => {
   }, [setSettings])
   return (
     // grid
-    <LocalizationProvider dateAdapter={DateAdapter}>
-      <Box sx={styles.wrapper}>
-        <Box>
-          <Typography variant={'h6'}>
-            {"Период сдачи работ начинается"}
-          </Typography>
+    <Box>
+      <LocalizationProvider dateAdapter={DateAdapter}>
+        <Box sx={styles.wrapper}>
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период сдачи работ начинается"}
+            </Typography>
 
-          <Typography variant={'body1'}>
-            {"Выберите дату и время, когда открывается период сдачи"}
-          </Typography>
+            <Typography variant={'body1'}>
+              {"Выберите дату и время, когда открывается период сдачи"}
+            </Typography>
 
-          <MobileDatePicker
-            inputFormat="MM/dd/yyyy"
-            value={settingValue.submission.begin}
-            onChange={e => onDateChange(e, 0)}
-            renderInput={(params) =>
-              <TextField
-                variant={'outlined'}
-                sx={{minWidth: '0px'}}
-                {...params}
-              />
-            }
-          />
+            <MobileDatePicker
+              inputFormat="MM/dd/yyyy"
+              value={settingValue.submission.begin}
+              onChange={e => onDateChange(e, 0)}
+              renderInput={(params) =>
+                <TextField
+                  variant={'outlined'}
+                  sx={{ minWidth: '0px' }}
+                  {...params}
+                />
+              }
+            />
+          </Box>
+
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период сдачи работ заканчивается"}
+            </Typography>
+
+            <Typography variant={'body1'}>
+              {"Выберите дату и время окончания периода сдачи работ"}
+            </Typography>
+
+            <MobileDatePicker
+              inputFormat="MM/dd/yyyy"
+              value={settingValue.submission.end}
+              onChange={e => onDateChange(e, 1)}
+              renderInput={(params) =>
+                <TextField
+                  variant={'outlined'}
+                  {...params}
+                />
+              }
+            />
+          </Box>
+
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период проверки начинается"}
+            </Typography>
+
+            <Typography variant={'body1'}>
+              {"Выберите дату и время начала периода проверки"}
+            </Typography>
+
+            <MobileDatePicker
+              inputFormat="MM/dd/yyyy"
+              value={settingValue.review.begin}
+              onChange={e => onDateChange(e, 2)}
+              renderInput={(params) =>
+                <TextField
+                  variant={'outlined'}
+                  {...params}
+                />
+              }
+            />
+          </Box>
+
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период проверки заканчивается"}
+            </Typography>
+
+            <Typography variant={'body1'}>
+              {"Выберите дату и время закрытия периода проверки"}
+            </Typography>
+
+            <MobileDatePicker
+              inputFormat="MM/dd/yyyy"
+              value={settingValue.review.end}
+              onChange={e => onDateChange(e, 3)}
+              renderInput={(params) =>
+                <TextField
+                  variant={'outlined'}
+                  {...params}
+                />
+              }
+            />
+          </Box>
         </Box>
-
-        <Box>
-          <Typography variant={'h6'}>
-            {"Период сдачи работ заканчивается"}
-          </Typography>
-
-          <Typography variant={'body1'}>
-            {"Выберите дату и время окончания периода сдачи работ"}
-          </Typography>
-
-          <MobileDatePicker
-            inputFormat="MM/dd/yyyy"
-            value={settingValue.submission.end}
-            onChange={e => onDateChange(e, 1)}
-            renderInput={(params) =>
-              <TextField
-                variant={'outlined'}
-                {...params}
-              />
-            }
-          />
-        </Box>
-
-        <Box>
-          <Typography variant={'h6'}>
-            {"Период проверки начинается"}
-          </Typography>
-
-          <Typography variant={'body1'}>
-            {"Выберите дату и время начала периода проверки"}
-          </Typography>
-
-          <MobileDatePicker
-            inputFormat="MM/dd/yyyy"
-            value={settingValue.review.begin}
-            onChange={e => onDateChange(e, 2)}
-            renderInput={(params) =>
-              <TextField
-                variant={'outlined'}
-                {...params}
-              />
-            }
-          />
-        </Box>
-
-        <Box>
-          <Typography variant={'h6'}>
-            {"Период проверки заканчивается"}
-          </Typography>
-
-          <Typography variant={'body1'}>
-            {"Выберите дату и время закрытия периода проверки"}
-          </Typography>
-
-          <MobileDatePicker
-            inputFormat="MM/dd/yyyy"
-            value={settingValue.review.end}
-            onChange={e => onDateChange(e, 3)}
-            renderInput={(params) =>
-              <TextField
-                variant={'outlined'}
-                {...params}
-              />
-            }
-          />
-        </Box>
-      </Box>
-    </LocalizationProvider>
+      </LocalizationProvider>
+    </Box>
   )
 }
 
@@ -163,7 +165,12 @@ const styles = {
     display: "grid",
     gridGap: "10px",
     gridTemplateColumns: "repeat(auto-fill, minmax(255px, 1fr) )",
-    margin: "0px 0px 15px 0px",
+    margin: "0px 0px 50px 0px",
     padding: '2px',
-  } as SxProps<Theme>
+  } as SxProps<Theme>,
+  dateBox: {
+    backgroundColor: 'common.white',
+    borderRadius: '4px',
+    padding: '15px'
+  } as SxProps<Theme>,
 }
