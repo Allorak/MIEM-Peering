@@ -1,4 +1,5 @@
 import { SxProps, Theme } from "@mui/system";
+import { palette } from "../theme/colors";
 
 export const container: SxProps<Theme> = {
   maxWidth: '1400px',
@@ -13,4 +14,21 @@ export const formItemContainer: SxProps<Theme> = {
 export const submitBtContainer: SxProps<Theme> = {
   display: 'flex',
   justifyContent: 'flex-end'
+}
+
+export const scrollStyles = {
+  "&::-webkit-scrollbar": {
+    width: "5px",
+    height: "5px"
+  },
+
+  "&::-webkit-scrollbar-track": {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: "10px"
+  },
+
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: palette.fillLight.greyLight,
+    borderRadius: "10px"
+  }
 }

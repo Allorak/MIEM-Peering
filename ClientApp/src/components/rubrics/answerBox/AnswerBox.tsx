@@ -14,6 +14,7 @@ interface IProps {
   onEdit(id: number): void,
   onRemove(id: number): void,
   onClone(id: number): void,
+  required: boolean
 }
 
 const questionTx = 'В'
@@ -24,7 +25,8 @@ export const AnswerBox: FC<IProps> = ({
   children,
   onEdit,
   onRemove,
-  onClone
+  onClone,
+  required
 }) => {
 
   return (
@@ -35,7 +37,10 @@ export const AnswerBox: FC<IProps> = ({
             {`${questionTx}${id + 1}`}
           </Typography>
 
-          <Typography variant='h5'>
+          <Typography
+            variant='h5'
+            {...(required && { sx: styles.title })}
+          >
             {title}
           </Typography>
         </Box>
@@ -142,6 +147,18 @@ const styles = {
       width: '0px',
       height: '0px',
       overflow: 'hidden'
+    }
+  } as SxProps<Theme>,
+  title: {
+    position: 'relative',
+    display: 'inline',
+    ":after": {
+      content: "'*'",
+      position: 'absolute',
+      right: '-10px',
+      bottom: '12px',
+      lineHeight: '1',
+      color: "common.black"
     }
   } as SxProps<Theme>,
 }

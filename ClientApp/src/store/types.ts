@@ -127,7 +127,7 @@ export type INewTaskState = 'author-form' | 'peer-form' | 'settings' | 'main-inf
 export interface INewTask {
   mainInfo: INewTaskMainInfo,
   peerForm: INewTaskPeerForm,
-  authorForm: INewTaskAuthorForm,
+  authorForm: INewTaskPeerForm,
   settings: INewTaskSettings
 }
 export interface INewTaskMainInfo {
@@ -139,11 +139,18 @@ export interface INewTaskAuthorForm {
 }
 
 export interface INewTaskPeerForm {
-
+  rubrics: IQuestionRubrics
 }
 
 export interface INewTaskSettings {
-
+  submission: {
+    begin: Date | undefined
+    end: Date | undefined
+  },
+  review: {
+    begin: Date | undefined
+    end: Date | undefined
+  }
 }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
@@ -181,7 +188,10 @@ export enum IQuesttionTypes {
 }
 
 export const defaultResponses = {
-  rates: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  rateResponses: {
+    maxValue: 10,
+    minValue: 1
+  },
   multiple: [
     {
       id: 0,

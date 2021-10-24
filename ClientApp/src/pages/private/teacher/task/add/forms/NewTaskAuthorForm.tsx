@@ -10,17 +10,59 @@ import { MultipleVisible } from "../../../../../../components/rubrics/multiple";
 import { QuestionBox } from "../../../../../../components/rubrics/questionBox";
 import { ShortTextVisible } from "../../../../../../components/rubrics/shortText";
 import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
-import { defaultResponses, IMultipleQuiestion, IMultipleResponse, IQuestionRubrics, IQuesttionTypes, ISelectRatingQuestion, IShortTextQuestion, ITextQuestion } from "../../../../../../store/types";
+import { defaultResponses, IMultipleQuiestion, IQuestionRubrics, IQuesttionTypes, ISelectRatingQuestion, IShortTextQuestion, ITextQuestion } from "../../../../../../store/types";
 import { palette } from "../../../../../../theme/colors";
 import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
 import DeleteIcon from '@mui/icons-material/Delete';
 
-export const NewTaskAuthorForm: FC = () => {
+interface IProps {
+  rubrics: IQuestionRubrics,
+  onSubmit(questions: IQuestionRubrics): void
+}
 
-  const [questions, setQuestions] = useState<IQuestionRubrics>(initialQuestions)
-  const [currentQuestion, setCurrentQuestion] = useState<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion | undefined>()
+export const NewTaskAuthorForm: FC<IProps> = ({
+  rubrics,
+  onSubmit
+}) => {
+
+  const [questions, setQuestions] = useState<IQuestionRubrics>([])
+  const [currentQuestion, setCurrentQuestion] = useState<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>()
   const [popupStatus, setPopupStatus] = useState(false)
+
+  useEffect(() => {
+    setQuestions(() => {
+      return rubrics.map(rubric => {
+        switch (rubric.type) {
+          case IQuesttionTypes.TEXT:
+          case IQuesttionTypes.SHORT_TEXT:
+            return {
+              id: rubric.id,
+              title: rubric.title,
+              required: rubric.required,
+              type: rubric.type
+            }
+          case IQuesttionTypes.MULTIPLE:
+            return {
+              id: rubric.id,
+              title: rubric.title,
+              required: rubric.required,
+              type: rubric.type,
+              responses: rubric.responses.map(response => ({ ...response }))
+            }
+          case IQuesttionTypes.SELECT_RATE:
+            return {
+              id: rubric.id,
+              title: rubric.title,
+              required: rubric.required,
+              type: rubric.type,
+              minValue: rubric.minValue,
+              maxValue: rubric.maxValue
+            }
+        }
+      })
+    })
+  }, [rubrics])
 
   const onUpdate = useCallback((request: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion) => {
     if (currentQuestion) {
@@ -38,9 +80,13 @@ export const NewTaskAuthorForm: FC = () => {
         return prev
       })
     }
-    setPopupStatus(false)
-    setCurrentQuestion(undefined)
+    resetCurrentStatus()
   }, [popupStatus, setPopupStatus, currentQuestion, setCurrentQuestion])
+
+  const resetCurrentStatus = useCallback(() => {
+    setCurrentQuestion(undefined)
+    setPopupStatus(false)
+  }, [])
 
   const onEditQuestion = useCallback((id: number) => {
     const findQuestion = questions.find(question => question.id === id)
@@ -52,7 +98,12 @@ export const NewTaskAuthorForm: FC = () => {
       })
       setPopupStatus(true)
     }
-  }, [questions, setCurrentQuestion, currentQuestion])
+  }, [questions, setQuestions, currentQuestion, setPopupStatus, popupStatus, setCurrentQuestion])
+
+  const onAddQuestion = useCallback(() => {
+    setCurrentQuestion(undefined)
+    setPopupStatus(true)
+  }, [])
 
   const onCloneQuestion = useCallback((id: number) => {
     setQuestions(prev => {
@@ -101,9 +152,44 @@ export const NewTaskAuthorForm: FC = () => {
     })
   }, [setQuestions, questions])
 
+  const submitStep = useCallback(() => {
+    if (questions && questions.length > 0) {
+      const cloneQuestions = questions.map(rubric => {
+        switch (rubric.type) {
+          case IQuesttionTypes.TEXT:
+          case IQuesttionTypes.SHORT_TEXT:
+            return {
+              id: rubric.id,
+              title: rubric.title,
+              required: rubric.required,
+              type: rubric.type
+            }
+          case IQuesttionTypes.MULTIPLE:
+            return {
+              id: rubric.id,
+              title: rubric.title,
+              required: rubric.required,
+              type: rubric.type,
+              responses: rubric.responses.map(response => ({ ...response }))
+            }
+          case IQuesttionTypes.SELECT_RATE:
+            return {
+              id: rubric.id,
+              title: rubric.title,
+              required: rubric.required,
+              type: rubric.type,
+              minValue: rubric.minValue,
+              maxValue: rubric.maxValue
+            }
+        }
+      })
+      onSubmit(cloneQuestions)
+    }
+  }, [questions, rubrics])
+
   return (
     <Box sx={styles.questionContainer}>
-      {questions.length && (questions.map((question) => {
+      {questions.length > 0 && (questions.map((question) => {
         return (
           <AnswerBox
             id={question.id}
@@ -112,6 +198,7 @@ export const NewTaskAuthorForm: FC = () => {
             onClone={onCloneQuestion}
             onRemove={onRemoveQuestion}
             key={question.id}
+            required={question.required}
           >
             <QuestionBox>
               {question.type === IQuesttionTypes.SHORT_TEXT && (
@@ -129,9 +216,20 @@ export const NewTaskAuthorForm: FC = () => {
       <Button
         variant={'contained'}
         sx={styles.addBt}
+        onClick={onAddQuestion}
       >
         {"Добавить вопрос"}
       </Button>
+
+      <Box sx={globalStyles.submitBtContainer}>
+        <Button
+          type='button'
+          variant='contained'
+          onClick={submitStep}
+        >
+          {"Далее"}
+        </Button>
+      </Box>
 
       <UpdateQuestion
         question={currentQuestion}
@@ -157,7 +255,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   onSubmit
 }) => {
 
-  const { control, handleSubmit, formState, reset, setValue, getValues } = useForm<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>({
+  const { control, formState, reset, setValue, getValues } = useForm<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
@@ -168,6 +266,14 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     }
   })
 
+  useEffect(() => {
+    if (popupStatus) {
+      console.log(question, "QUEST")
+      reset(question ? { ...question } : { ...initialQuestion })
+      console.log(getValues('required'), "TYPE")
+    }
+  }, [reset, popupStatus])
+
   const { field: titleProps } = useController({ control, ...fields.titleAuthorProps })
   const { field: requiredProps } = useController({ control, ...fields.requiredProps })
   const { field: typeProps } = useController({ control, ...fields.typeProps })
@@ -175,14 +281,15 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   const { field: minValueProps } = useController({ control, ...fields.minAuthorProps })
   const { field: maxValueProps } = useController({ control, ...fields.maxAuthorProps })
 
-  useEffect(() => {
-    if (popupStatus) {
-      reset(question ?? initialQuestion)
-    }
-  }, [reset, popupStatus])
-
   const changeType = useCallback((type: IQuesttionTypes) => {
     setValue('type', type)
+    if (type === IQuesttionTypes.MULTIPLE && (!getValues('responses') || getValues('responses').length === 0)) {
+      setValue('responses', defaultResponses.multiple)
+    }
+    if (type === IQuesttionTypes.SELECT_RATE && (getValues('minValue') === undefined || getValues('maxValue') === undefined)) {
+      setValue('minValue', defaultResponses.rateResponses.minValue)
+      setValue('maxValue', defaultResponses.rateResponses.maxValue)
+    }
   }, [setValue])
 
   const changeRequired = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,7 +315,6 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   }, [getValues, setValue])
 
   const removeResponse = useCallback((id: number) => {
-    console.log(id)
     if (getValues('type') === IQuesttionTypes.MULTIPLE) {
       const cloneResponses = getValues('responses').map(response => ({ ...response }))
       if (cloneResponses && cloneResponses.length > 0) {
@@ -218,20 +324,18 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     }
   }, [getValues, setValue])
 
-  useEffect(() => {
-    console.log(formState.isValid, "error")
-  }, [formState])
-
-  const onFormSubmit = useCallback((request: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion) => {
-    console.log("asas")
+  const onFormSubmit = useCallback((event: React.FormEvent<HTMLElement>) => {
+    event.preventDefault()
+    const request = getValues()
     if (request.type === IQuesttionTypes.MULTIPLE) {
-      onSubmit({
-        id: request.id,
-        required: request.required,
-        type: IQuesttionTypes.MULTIPLE,
-        responses: request.responses.map(response => ({ ...response })),
-        title: request.title
-      })
+      if (request.responses && request.responses.length > 0)
+        onSubmit({
+          id: request.id,
+          required: request.required,
+          type: IQuesttionTypes.MULTIPLE,
+          responses: request.responses.map(response => ({ ...response })),
+          title: request.title
+        })
     }
 
     if (request.type === IQuesttionTypes.SHORT_TEXT) {
@@ -253,18 +357,17 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     }
 
     if (request.type === IQuesttionTypes.SELECT_RATE) {
-      onSubmit({
-        id: request.id,
-        required: request.required,
-        type: IQuesttionTypes.SELECT_RATE,
-        title: request.title,
-        minValue: request.minValue,
-        maxValue: request.maxValue
-      })
+      if (request.minValue && request.maxValue && request.maxValue - request.minValue > 0)
+        onSubmit({
+          id: request.id,
+          required: request.required,
+          type: IQuesttionTypes.SELECT_RATE,
+          title: request.title,
+          minValue: request.minValue,
+          maxValue: request.maxValue
+        })
     }
-  }, [])
-
-
+  }, [getValues, question])
 
   return (
     <Popup
@@ -274,7 +377,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     >
       <Box
         component={'form'}
-        onSubmit={handleSubmit(onFormSubmit)}
+        onSubmit={onFormSubmit}
       >
         <Box sx={styles.titleBox}>
           <InputLabel
@@ -405,7 +508,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
                 type={'number'}
                 InputProps={{
                   ...minValueProps,
-                  inputProps: { min: 1, max: 100 }
+                  inputProps: { min: 0, max: 100 }
 
                 }}
                 required
@@ -426,7 +529,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
                 autoComplete={'off'}
                 InputProps={{
                   ...maxValueProps,
-                  inputProps: { min: getValues('minValue') ? minValueProps.value + 1 : 1, max: 100 }
+                  inputProps: { min: minValueProps.value ? Number(Number(minValueProps.value) + Number(1)) : 1, max: 100 }
 
                 }}
                 {...(formState.errors.maxValue !== undefined && { error: true, helperText: formState.errors.maxValue.message })}
@@ -441,7 +544,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
             <Switch
               onChange={changeRequired}
               name="required"
-              value={requiredProps.value}
+              checked={requiredProps.value}
             />
           }
           label={"Обязательный вопрос"}
@@ -449,19 +552,17 @@ const UpdateQuestion: FC<IQuestionItem> = ({
         />
 
         <Box sx={globalStyles.submitBtContainer}>
-          
-        </Box>
-        <Button
+          <Button
             type='submit'
             variant='contained'
           >
             {question ? "Изменить" : "Добавить"}
           </Button>
+        </Box>
       </Box>
     </Popup>
   )
 }
-
 
 const styles = {
   questionContainer: {
@@ -512,7 +613,6 @@ const styles = {
   reqiredBox: {
     margin: "0px 0px 15px 0px"
   } as SxProps<Theme>,
-
   deleteBt: {
     lineHeight: '1',
     fontSize: '12px',
@@ -528,7 +628,6 @@ const styles = {
       backgroundColor: palette.hover.danger
     }
   } as SxProps<Theme>,
-
   multipleBox: {
     display: 'flex',
     flexDirection: 'column',
@@ -545,7 +644,6 @@ const styles = {
       backgroundColor: palette.hover.secondary
     }
   } as SxProps<Theme>,
-
   minMaxBox: {
     display: "grid",
     gridGap: "10px",
@@ -553,28 +651,11 @@ const styles = {
     margin: "15px 0px 15px 0px",
     padding: '2px',
   } as SxProps<Theme>,
-
 }
-
-const initialQuestions: IQuestionRubrics = [
-  {
-    id: 0,
-    title: "Mention something that your classmate did well 👍",
-    type: IQuesttionTypes.SHORT_TEXT,
-    required: true
-  },
-  {
-    id: 1,
-    title: "Mention something that your classmate could improve at 📝",
-    required: false,
-    type: IQuesttionTypes.MULTIPLE,
-    responses: defaultResponses.multiple
-  }
-]
 
 const initialQuestion: IShortTextQuestion = {
   id: 999,
-  title: "",
+  title: "Введите свой вопрос",
   type: IQuesttionTypes.SHORT_TEXT,
   required: false
 }
