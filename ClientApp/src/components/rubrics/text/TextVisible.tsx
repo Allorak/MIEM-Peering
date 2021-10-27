@@ -1,8 +1,9 @@
+import { FC } from "react";
 import { TextField, Tooltip } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
 
-export const ShortTextVisible: FC = () => {
+
+export const TextVisible: FC = () => {
   return (
     <Tooltip
       title={"Это всего лишь предварительный просмотр"}
@@ -13,7 +14,9 @@ export const ShortTextVisible: FC = () => {
         name={'name'}
         variant='outlined'
         disabled
-        label={"Краткий ответ"}
+        label={"Развернутый ответ"}
+        rows={3}
+        multiline
       />
     </Tooltip>
   )

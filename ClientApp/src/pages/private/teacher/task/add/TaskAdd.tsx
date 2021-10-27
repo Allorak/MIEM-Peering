@@ -7,7 +7,7 @@ import { NewTaskAuthorForm } from "./forms/NewTaskAuthorForm"
 import { NewTaskPeerForm } from "./forms/NewTaskPeerForm"
 import { NewTaskSettings } from "./forms/NewTaskSettings"
 
-import { INewTask, INewTaskAuthorForm, INewTaskMainInfo, INewTaskState, IQuestionRubrics, IQuesttionTypes } from "../../../../../store/types"
+import { INewTask, INewTaskAuthorForm, INewTaskMainInfo, INewTaskState, IQuestionRubrics, IQuestionTypes } from "../../../../../store/types"
 import * as globalStyles from "../../../../../const/styles"
 
 
@@ -133,14 +133,14 @@ const initialTask: INewTask = {
       {
         id: 0,
         title: "Write your work here 📝",
-        type: IQuesttionTypes.TEXT,
+        type: IQuestionTypes.TEXT,
         required: true
       },
       {
         id: 1,
         title: "Additional wishes when evaluating ☝",
         required: false,
-        type: IQuesttionTypes.SHORT_TEXT,
+        type: IQuestionTypes.SHORT_TEXT,
       }
     ]
   },
@@ -149,7 +149,7 @@ const initialTask: INewTask = {
       {
         id: 0,
         title: "Rate the work",
-        type: IQuesttionTypes.SELECT_RATE,
+        type: IQuestionTypes.SELECT_RATE,
         required: true,
         minValue: 0,
         maxValue: 10
@@ -157,13 +157,13 @@ const initialTask: INewTask = {
       {
         id: 1,
         title: "What is good about this work? 👍",
-        type: IQuesttionTypes.TEXT,
+        type: IQuestionTypes.TEXT,
         required: false,
       },
       {
         id: 2,
         title: "What's wrong with this work? 👎",
-        type: IQuesttionTypes.TEXT,
+        type: IQuestionTypes.TEXT,
         required: false,
       }
     ]

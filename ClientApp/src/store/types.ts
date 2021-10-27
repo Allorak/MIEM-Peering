@@ -162,25 +162,25 @@ export type IParentQuestionRubric = {
 }
 
 export interface ITextQuestion extends IParentQuestionRubric {
-  type: IQuesttionTypes.TEXT
+  type: IQuestionTypes.TEXT
 }
 
 export interface IShortTextQuestion extends IParentQuestionRubric {
-  type: IQuesttionTypes.SHORT_TEXT
+  type: IQuestionTypes.SHORT_TEXT
 }
 
 export interface IMultipleQuiestion extends IParentQuestionRubric {
-  type: IQuesttionTypes.MULTIPLE,
+  type: IQuestionTypes.MULTIPLE,
   responses: IMultipleResponse[]
 }
 
 export interface ISelectRatingQuestion extends IParentQuestionRubric {
-  type: IQuesttionTypes.SELECT_RATE,
+  type: IQuestionTypes.SELECT_RATE,
   maxValue: number,
   minValue: number
 }
 
-export enum IQuesttionTypes {
+export enum IQuestionTypes {
   TEXT = 'text',
   MULTIPLE = 'multiple',
   SELECT_RATE = 'select',

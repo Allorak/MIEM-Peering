@@ -1,20 +1,34 @@
-import { Button, FormControlLabel, Switch, TextField, Typography } from "@mui/material";
-import { SxProps, Theme } from "@mui/system";
-import { Box } from "@mui/material";
 import { FC, SetStateAction, useCallback, useEffect, useState } from "react";
 import { useController, useForm } from "react-hook-form";
+import { Button, FormControlLabel, Switch, TextField, Typography, Box } from "@mui/material";
+import { SxProps, Theme } from "@mui/system";
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import { InputLabel } from "../../../../../../components/inputLabel";
 import { Popup } from "../../../../../../components/popup";
 import { AnswerBox } from "../../../../../../components/rubrics/answerBox";
 import { MultipleVisible } from "../../../../../../components/rubrics/multiple";
+import { TextVisible } from "../../../../../../components/rubrics/text";
 import { QuestionBox } from "../../../../../../components/rubrics/questionBox";
 import { ShortTextVisible } from "../../../../../../components/rubrics/shortText";
+
 import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
-import { defaultResponses, IMultipleQuiestion, IQuestionRubrics, IQuesttionTypes, ISelectRatingQuestion, IShortTextQuestion, ITextQuestion } from "../../../../../../store/types";
 import { palette } from "../../../../../../theme/colors";
+
 import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
-import DeleteIcon from '@mui/icons-material/Delete';
+
+import {
+  defaultResponses,
+  IMultipleQuiestion,
+  IQuestionRubrics,
+  IQuestionTypes,
+  ISelectRatingQuestion,
+  IShortTextQuestion,
+  ITextQuestion
+} from "../../../../../../store/types";
+import { RatingScaleVisible } from "../../../../../../components/rubrics/ratingScale";
+
 
 interface IProps {
   rubrics: IQuestionRubrics,
@@ -34,15 +48,15 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     setQuestions(() => {
       return rubrics.map(rubric => {
         switch (rubric.type) {
-          case IQuesttionTypes.TEXT:
-          case IQuesttionTypes.SHORT_TEXT:
+          case IQuestionTypes.TEXT:
+          case IQuestionTypes.SHORT_TEXT:
             return {
               id: rubric.id,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type
             }
-          case IQuesttionTypes.MULTIPLE:
+          case IQuestionTypes.MULTIPLE:
             return {
               id: rubric.id,
               title: rubric.title,
@@ -50,7 +64,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               type: rubric.type,
               responses: rubric.responses.map(response => ({ ...response }))
             }
-          case IQuesttionTypes.SELECT_RATE:
+          case IQuestionTypes.SELECT_RATE:
             return {
               id: rubric.id,
               title: rubric.title,
@@ -92,7 +106,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     const findQuestion = questions.find(question => question.id === id)
     if (findQuestion) {
       setCurrentQuestion(() => {
-        if (findQuestion.type === IQuesttionTypes.MULTIPLE)
+        if (findQuestion.type === IQuestionTypes.MULTIPLE)
           return { ...findQuestion, responses: findQuestion.responses.map(item => ({ ...item })) }
         return { ...findQuestion }
       })
@@ -156,15 +170,15 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     if (questions && questions.length > 0) {
       const cloneQuestions = questions.map(rubric => {
         switch (rubric.type) {
-          case IQuesttionTypes.TEXT:
-          case IQuesttionTypes.SHORT_TEXT:
+          case IQuestionTypes.TEXT:
+          case IQuestionTypes.SHORT_TEXT:
             return {
               id: rubric.id,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type
             }
-          case IQuesttionTypes.MULTIPLE:
+          case IQuestionTypes.MULTIPLE:
             return {
               id: rubric.id,
               title: rubric.title,
@@ -172,7 +186,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               type: rubric.type,
               responses: rubric.responses.map(response => ({ ...response }))
             }
-          case IQuesttionTypes.SELECT_RATE:
+          case IQuestionTypes.SELECT_RATE:
             return {
               id: rubric.id,
               title: rubric.title,
@@ -201,12 +215,20 @@ export const NewTaskAuthorForm: FC<IProps> = ({
             required={question.required}
           >
             <QuestionBox>
-              {question.type === IQuesttionTypes.SHORT_TEXT && (
+              {question.type === IQuestionTypes.SHORT_TEXT && (
                 <ShortTextVisible />
               )}
 
-              {question.type === IQuesttionTypes.MULTIPLE && (
+              {question.type === IQuestionTypes.MULTIPLE && (
                 <MultipleVisible responses={question.responses} />
+              )}
+
+              {question.type === IQuestionTypes.TEXT && (
+                <TextVisible />
+              )}
+
+              {question.type === IQuestionTypes.SELECT_RATE && (
+                <RatingScaleVisible />
               )}
             </QuestionBox>
           </AnswerBox>
@@ -262,7 +284,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
       id: question?.id ?? 9999,
       title: question?.title ?? "",
       required: question?.required ?? false,
-      type: question?.type ?? IQuesttionTypes.SHORT_TEXT
+      type: question?.type ?? IQuestionTypes.SHORT_TEXT
     }
   })
 
@@ -281,12 +303,12 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   const { field: minValueProps } = useController({ control, ...fields.minAuthorProps })
   const { field: maxValueProps } = useController({ control, ...fields.maxAuthorProps })
 
-  const changeType = useCallback((type: IQuesttionTypes) => {
+  const changeType = useCallback((type: IQuestionTypes) => {
     setValue('type', type)
-    if (type === IQuesttionTypes.MULTIPLE && (!getValues('responses') || getValues('responses').length === 0)) {
+    if (type === IQuestionTypes.MULTIPLE && (!getValues('responses') || getValues('responses').length === 0)) {
       setValue('responses', defaultResponses.multiple)
     }
-    if (type === IQuesttionTypes.SELECT_RATE && (getValues('minValue') === undefined || getValues('maxValue') === undefined)) {
+    if (type === IQuestionTypes.SELECT_RATE && (getValues('minValue') === undefined || getValues('maxValue') === undefined)) {
       setValue('minValue', defaultResponses.rateResponses.minValue)
       setValue('maxValue', defaultResponses.rateResponses.maxValue)
     }
@@ -297,7 +319,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   }, [setValue])
 
   const responseChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, id: number) => {
-    if (getValues('type') === IQuesttionTypes.MULTIPLE) {
+    if (getValues('type') === IQuestionTypes.MULTIPLE) {
       const cloneResponses = getValues('responses').map(response => {
         return response.id === id ? { response: event.target.value, id: response.id } : response
       })
@@ -307,7 +329,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   }, [getValues, setValue])
 
   const addResponse = useCallback(() => {
-    if (getValues('type') === IQuesttionTypes.MULTIPLE) {
+    if (getValues('type') === IQuestionTypes.MULTIPLE) {
       const cloneResponses = getValues('responses').map((response, index) => ({ response: response.response, id: index }))
       cloneResponses.push({ id: cloneResponses[length - 1].id + 1, response: `Вариант ${cloneResponses.length + 1}` })
       setValue('responses', cloneResponses)
@@ -315,7 +337,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   }, [getValues, setValue])
 
   const removeResponse = useCallback((id: number) => {
-    if (getValues('type') === IQuesttionTypes.MULTIPLE) {
+    if (getValues('type') === IQuestionTypes.MULTIPLE) {
       const cloneResponses = getValues('responses').map(response => ({ ...response }))
       if (cloneResponses && cloneResponses.length > 0) {
         const newResponses = cloneResponses.filter(response => response.id !== id).map((response, index) => ({ response: response.response, id: index }))
@@ -327,41 +349,41 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   const onFormSubmit = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
     const request = getValues()
-    if (request.type === IQuesttionTypes.MULTIPLE) {
+    if (request.type === IQuestionTypes.MULTIPLE) {
       if (request.responses && request.responses.length > 0)
         onSubmit({
           id: request.id,
           required: request.required,
-          type: IQuesttionTypes.MULTIPLE,
+          type: IQuestionTypes.MULTIPLE,
           responses: request.responses.map(response => ({ ...response })),
           title: request.title
         })
     }
 
-    if (request.type === IQuesttionTypes.SHORT_TEXT) {
+    if (request.type === IQuestionTypes.SHORT_TEXT) {
       onSubmit({
         id: request.id,
         required: request.required,
-        type: IQuesttionTypes.SHORT_TEXT,
+        type: IQuestionTypes.SHORT_TEXT,
         title: request.title
       })
     }
 
-    if (request.type === IQuesttionTypes.TEXT) {
+    if (request.type === IQuestionTypes.TEXT) {
       onSubmit({
         id: request.id,
         required: request.required,
-        type: IQuesttionTypes.TEXT,
+        type: IQuestionTypes.TEXT,
         title: request.title
       })
     }
 
-    if (request.type === IQuesttionTypes.SELECT_RATE) {
+    if (request.type === IQuestionTypes.SELECT_RATE) {
       if (request.minValue && request.maxValue && request.maxValue - request.minValue > 0)
         onSubmit({
           id: request.id,
           required: request.required,
-          type: IQuesttionTypes.SELECT_RATE,
+          type: IQuestionTypes.SELECT_RATE,
           title: request.title,
           minValue: request.minValue,
           maxValue: request.maxValue
@@ -398,8 +420,8 @@ const UpdateQuestion: FC<IQuestionItem> = ({
 
         <Box sx={styles.typeActionBox}>
           <Box
-            sx={typeProps.value === IQuesttionTypes.MULTIPLE ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
-            onClick={() => changeType(IQuesttionTypes.MULTIPLE)}
+            sx={typeProps.value === IQuestionTypes.MULTIPLE ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
+            onClick={() => changeType(IQuestionTypes.MULTIPLE)}
           >
             <Typography
               variant={'h6'}
@@ -410,8 +432,8 @@ const UpdateQuestion: FC<IQuestionItem> = ({
           </Box>
 
           <Box
-            sx={typeProps.value === IQuesttionTypes.SHORT_TEXT ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
-            onClick={() => changeType(IQuesttionTypes.SHORT_TEXT)}
+            sx={typeProps.value === IQuestionTypes.SHORT_TEXT ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
+            onClick={() => changeType(IQuestionTypes.SHORT_TEXT)}
           >
             <Typography
               variant={'h6'}
@@ -422,8 +444,8 @@ const UpdateQuestion: FC<IQuestionItem> = ({
           </Box>
 
           <Box
-            sx={typeProps.value === IQuesttionTypes.TEXT ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
-            onClick={() => changeType(IQuesttionTypes.TEXT)}
+            sx={typeProps.value === IQuestionTypes.TEXT ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
+            onClick={() => changeType(IQuestionTypes.TEXT)}
           >
             <Typography
               variant={'h6'}
@@ -434,8 +456,8 @@ const UpdateQuestion: FC<IQuestionItem> = ({
           </Box>
 
           <Box
-            sx={typeProps.value === IQuesttionTypes.SELECT_RATE ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
-            onClick={() => changeType(IQuesttionTypes.SELECT_RATE)}
+            sx={typeProps.value === IQuestionTypes.SELECT_RATE ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
+            onClick={() => changeType(IQuestionTypes.SELECT_RATE)}
           >
             <Typography
               variant={'h6'}
@@ -446,7 +468,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
           </Box>
         </Box>
 
-        {typeProps.value === IQuesttionTypes.MULTIPLE && (
+        {typeProps.value === IQuestionTypes.MULTIPLE && (
           <Box
             sx={styles.multipleBox}
           >
@@ -496,7 +518,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
           </Box>
         )}
 
-        {typeProps.value === IQuesttionTypes.SELECT_RATE && (
+        {typeProps.value === IQuestionTypes.SELECT_RATE && (
           <Box sx={styles.minMaxBox}>
             <Box>
               <InputLabel
@@ -656,6 +678,6 @@ const styles = {
 const initialQuestion: IShortTextQuestion = {
   id: 999,
   title: "Введите свой вопрос",
-  type: IQuesttionTypes.SHORT_TEXT,
+  type: IQuestionTypes.SHORT_TEXT,
   required: false
 }
