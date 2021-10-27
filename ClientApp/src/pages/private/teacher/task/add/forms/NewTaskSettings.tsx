@@ -1,69 +1,40 @@
 //@ts-ignore
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import DateAdapter from '@mui/lab/AdapterDateFns';
 import ruLocale from "date-fns/locale/ru";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { LocalizationProvider, MobileDatePicker } from "@mui/lab";
 import { INewTaskSettings } from "../../../../../../store/types";
 import { SxProps, Theme } from "@mui/system";
+import { Controller, useController, useForm } from "react-hook-form";
+import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
+import * as fields from "../formFields"
+import { InputLabel } from "../../../../../../components/inputLabel";
+import * as globalStyles from "../../../../../../const/styles";
 
-export const NewTaskSettings: FC = () => {
+interface IProps {
+  onSubmit(questions: INewTaskSettings): void
+}
 
-  const [settingValue, setSettings] = useState<INewTaskSettings>({
-    submission: {
-      begin: new Date(),
-      end: new Date()
-    },
-    review: {
-      begin: new Date(),
-      end: new Date()
+export const NewTaskSettings: FC<IProps> = ({onSubmit}) => {
+
+  const { control, formState, handleSubmit } = useForm<INewTaskSettings>({
+    mode: FormValidateMode,
+    reValidateMode: FormReValidateMode,
+    defaultValues: {
+      ...initialValue
     }
-  } as INewTaskSettings)
+  })
 
-  const onDateChange = useCallback((newValue: Date | null | undefined, state: number) => {
-    console.log(newValue?.getDate(), 'value')
-    if (newValue)
-      switch (state) {
-        case 0:
-          setSettings(prev => ({
-            ...prev,
-            submission: {
-              begin: newValue,
-              end: prev.submission.end
-            }
-          }))
-          break
-        case 1:
-          setSettings(prev => ({
-            ...prev,
-            submission: {
-              end: newValue,
-              begin: prev.submission.begin
-            }
-          }))
-          break
-        case 2:
-          setSettings(prev => ({
-            ...prev,
-            review: {
-              begin: newValue,
-              end: prev.review.end
-            }
-          }))
-          break
-        case 3:
-          setSettings(prev => ({
-            ...prev,
-            review: {
-              end: newValue,
-              begin: prev.review.begin
-            }
-          }))
-          break
-      }
-  }, [setSettings])
+  const { field: maxSubmissionProps } = useController({ control, ...fields.maxSubmissionProps })
+
+
   return (
-    <Box sx={styles.container}>
+    <Box
+      sx={styles.container}
+      component={'form'}
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <Box sx={styles.wrapper}>
         <Box sx={styles.dateBox}>
           <Typography variant={'h6'}>
@@ -77,24 +48,30 @@ export const NewTaskSettings: FC = () => {
           <LocalizationProvider dateAdapter={DateAdapter}
             locale={ruLocale}
           >
-            <MobileDatePicker
-              inputFormat="dd.MM.yyyy"
-              value={settingValue.submission.begin}
-              onChange={e => onDateChange(e, 0)}
-              rightArrowButtonText={'Следующий месяц'}
-              disablePast
-              disableCloseOnSelect={false}
-              toolbarTitle={false}
-              toolbarPlaceholder={false}
-              okText={"Выбрать"}
-              cancelText={"Отменить"}
-              renderInput={(params) =>
-                <TextField
-                  variant={'outlined'}
-                  sx={{ minWidth: '0px' }}
-                  {...params}
+            <Controller
+              control={control}
+              name={'sBegin'}
+              rules={fields.dateRules}
+              render={({ field: { ref, ...rest } }) => (
+                <MobileDatePicker
+                  inputFormat="dd.MM.yyyy"
+                  rightArrowButtonText={'Следующий месяц'}
+                  disablePast
+                  disableCloseOnSelect={false}
+                  toolbarTitle={false}
+                  toolbarPlaceholder={false}
+                  okText={"Выбрать"}
+                  cancelText={"Отменить"}
+                  {...rest}
+                  renderInput={(params) =>
+                    <TextField
+                      variant={'outlined'}
+                      sx={{ minWidth: '0px' }}
+                      {...params}
+                    />
+                  }
                 />
-              }
+              )}
             />
           </LocalizationProvider>
         </Box>
@@ -111,24 +88,30 @@ export const NewTaskSettings: FC = () => {
           <LocalizationProvider dateAdapter={DateAdapter}
             locale={ruLocale}
           >
-            <MobileDatePicker
-              inputFormat="dd.MM.yyyy"
-              value={settingValue.submission.end}
-              onChange={e => onDateChange(e, 1)}
-              rightArrowButtonText={'Следующий месяц'}
-              disablePast
-              disableCloseOnSelect={false}
-              toolbarTitle={false}
-              toolbarPlaceholder={false}
-              okText={"Выбрать"}
-              cancelText={"Отменить"}
-              renderInput={(params) =>
-                <TextField
-                  variant={'outlined'}
-                  sx={{ minWidth: '0px' }}
-                  {...params}
+            <Controller
+              control={control}
+              name={'sEnd'}
+              rules={fields.dateRules}
+              render={({ field: { ref, ...rest } }) => (
+                <MobileDatePicker
+                  inputFormat="dd.MM.yyyy"
+                  rightArrowButtonText={'Следующий месяц'}
+                  disablePast
+                  disableCloseOnSelect={false}
+                  toolbarTitle={false}
+                  toolbarPlaceholder={false}
+                  okText={"Выбрать"}
+                  cancelText={"Отменить"}
+                  {...rest}
+                  renderInput={(params) =>
+                    <TextField
+                      variant={'outlined'}
+                      sx={{ minWidth: '0px' }}
+                      {...params}
+                    />
+                  }
                 />
-              }
+              )}
             />
           </LocalizationProvider>
         </Box>
@@ -145,24 +128,30 @@ export const NewTaskSettings: FC = () => {
           <LocalizationProvider dateAdapter={DateAdapter}
             locale={ruLocale}
           >
-            <MobileDatePicker
-              inputFormat="dd.MM.yyyy"
-              value={settingValue.review.begin}
-              onChange={e => onDateChange(e, 2)}
-              rightArrowButtonText={'Следующий месяц'}
-              disablePast
-              disableCloseOnSelect={false}
-              toolbarTitle={false}
-              toolbarPlaceholder={false}
-              okText={"Выбрать"}
-              cancelText={"Отменить"}
-              renderInput={(params) =>
-                <TextField
-                  variant={'outlined'}
-                  sx={{ minWidth: '0px' }}
-                  {...params}
+            <Controller
+              control={control}
+              name={'rBegin'}
+              rules={fields.dateRules}
+              render={({ field: { ref, ...rest } }) => (
+                <MobileDatePicker
+                  inputFormat="dd.MM.yyyy"
+                  rightArrowButtonText={'Следующий месяц'}
+                  disablePast
+                  disableCloseOnSelect={false}
+                  toolbarTitle={false}
+                  toolbarPlaceholder={false}
+                  okText={"Выбрать"}
+                  cancelText={"Отменить"}
+                  {...rest}
+                  renderInput={(params) =>
+                    <TextField
+                      variant={'outlined'}
+                      sx={{ minWidth: '0px' }}
+                      {...params}
+                    />
+                  }
                 />
-              }
+              )}
             />
           </LocalizationProvider>
         </Box>
@@ -179,30 +168,69 @@ export const NewTaskSettings: FC = () => {
           <LocalizationProvider dateAdapter={DateAdapter}
             locale={ruLocale}
           >
-            <MobileDatePicker
-              inputFormat="dd.MM.yyyy"
-              value={settingValue.review.end}
-              onChange={e => onDateChange(e, 3)}
-              rightArrowButtonText={'Следующий месяц'}
-              disablePast
-              disableCloseOnSelect={false}
-              toolbarTitle={false}
-              toolbarPlaceholder={false}
-              okText={"Выбрать"}
-              cancelText={"Отменить"}
-              renderInput={(params) =>
-                <TextField
-                  variant={'outlined'}
-                  sx={{ minWidth: '0px' }}
-                  {...params}
+            <Controller
+              control={control}
+              name={'rEnd'}
+              rules={fields.dateRules}
+              render={({ field: { ref, ...rest } }) => (
+                <MobileDatePicker
+                  inputFormat="dd.MM.yyyy"
+                  rightArrowButtonText={'Следующий месяц'}
+                  disablePast
+                  disableCloseOnSelect={false}
+                  toolbarTitle={false}
+                  toolbarPlaceholder={false}
+                  okText={"Выбрать"}
+                  cancelText={"Отменить"}
+                  {...rest}
+                  renderInput={(params) =>
+                    <TextField
+                      variant={'outlined'}
+                      sx={{ minWidth: '0px' }}
+                      {...params}
+                    />
+                  }
                 />
-              }
+              )}
             />
           </LocalizationProvider>
         </Box>
+
+        <Box sx={styles.dateBox}>
+          <Box>
+            <InputLabel
+              title={"Количество проверок (мин):"} />
+
+            <TextField
+              type={'number'}
+              InputProps={{ ...maxSubmissionProps, inputProps: { min: 0 } }}
+              required
+              variant={'outlined'}
+              autoComplete={'off'}
+              {...(formState.errors.maxSubmission !== undefined && { error: true, helperText: formState.errors.maxSubmission.message })}
+            />
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={globalStyles.submitBtContainer}>
+        <Button
+          type='submit'
+          variant='contained'
+        >
+          {"Создать задание"}
+        </Button>
       </Box>
     </Box>
   )
+}
+
+const initialValue: INewTaskSettings = {
+  sBegin: new Date(),
+  sEnd: new Date(new Date().setDate(new Date().getDate() + 1)),
+  rBegin: new Date(new Date().setDate(new Date().getDate() + 3)),
+  rEnd: new Date(new Date().setDate(new Date().getDate() + 4)),
+  maxSubmission: 2
 }
 
 const styles = {
@@ -219,6 +247,9 @@ const styles = {
   dateBox: {
     backgroundColor: 'common.white',
     borderRadius: '4px',
-    padding: '15px'
+    padding: '15px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between'
   } as SxProps<Theme>,
 }

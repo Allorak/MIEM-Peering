@@ -143,14 +143,11 @@ export interface INewTaskPeerForm {
 }
 
 export interface INewTaskSettings {
-  submission: {
-    begin: Date | undefined
-    end: Date | undefined
-  },
-  review: {
-    begin: Date | undefined
-    end: Date | undefined
-  }
+  sBegin: Date | undefined
+  sEnd: Date | undefined
+  rBegin: Date | undefined
+  rEnd: Date | undefined
+  maxSubmission: number
 }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>

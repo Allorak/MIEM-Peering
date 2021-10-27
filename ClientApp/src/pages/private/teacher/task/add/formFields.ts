@@ -1,6 +1,6 @@
-import { UseControllerProps } from "react-hook-form";
+import { RegisterOptions, UseControllerProps } from "react-hook-form";
 import { InputRules } from "../../../../../const/inputRules";
-import { INewTaskMainInfo, IParentQuestionRubric, ITextQuestion, IShortTextQuestion, IMultipleQuiestion, ISelectRatingQuestion } from "../../../../../store/types";
+import { INewTaskMainInfo, IParentQuestionRubric, ITextQuestion, IShortTextQuestion, IMultipleQuiestion, ISelectRatingQuestion, INewTaskSettings } from "../../../../../store/types";
 
 export const titleProps: UseControllerProps<INewTaskMainInfo, "title"> = ({
   name: "title",
@@ -71,3 +71,25 @@ export const maxAuthorProps: UseControllerProps<ITextQuestion | IShortTextQuesti
     }
   },
 })
+
+export const dateRules: RegisterOptions = {
+  required: {
+    value: true,
+    message: "Это обязательное поле"
+  }
+}
+
+export const maxSubmissionProps: UseControllerProps<INewTaskSettings, "maxSubmission"> = ({
+  name: "maxSubmission",
+  rules: {
+    required: {
+      value: true,
+      message: "Это обязательное поле"
+    },
+    min: {
+      value: 2,
+      message: "Минимальное значение 3"
+    }
+  },
+})
+

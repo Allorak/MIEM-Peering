@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { Box, SxProps, Theme } from "@mui/system"
 
 import { Subheader } from "../../../../../components/subheader"
@@ -7,7 +7,7 @@ import { NewTaskAuthorForm } from "./forms/NewTaskAuthorForm"
 import { NewTaskPeerForm } from "./forms/NewTaskPeerForm"
 import { NewTaskSettings } from "./forms/NewTaskSettings"
 
-import { INewTask, INewTaskAuthorForm, INewTaskMainInfo, INewTaskState, IQuestionRubrics, IQuestionTypes } from "../../../../../store/types"
+import { INewTask, INewTaskAuthorForm, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes } from "../../../../../store/types"
 import * as globalStyles from "../../../../../const/styles"
 
 
@@ -60,6 +60,17 @@ const NewTaskContent: FC = () => {
 
   }, [step, newTaskItem])
 
+  useEffect(() => {
+    console.log(newTaskItem)
+  }, [newTaskItem])
+  
+  const setSettings = useCallback((response: INewTaskSettings) => {
+    setNewTaskItem(prev => ({
+      ...prev,
+      settings: response
+    }))
+  }, [step, newTaskItem])
+
   return (
     <Box>
       <Subheader activeStep={step} />
@@ -88,7 +99,7 @@ const NewTaskContent: FC = () => {
 
           {step === 'settings' && (
             <NewTaskSettings
-            // onSubmit={setMainInfo}
+            onSubmit={setSettings}
             />
           )}
         </Box>
@@ -119,14 +130,11 @@ const initialTask: INewTask = {
     title: ""
   },
   settings: {
-    submission: {
-      begin: undefined,
-      end: undefined
-    },
-    review: {
-      begin: undefined,
-      end: undefined
-    }
+    sBegin: new Date(),
+    sEnd: new Date(),
+    rBegin: new Date(),
+    rEnd: new Date(),
+    maxSubmission: 0
   },
   authorForm: {
     rubrics: [
