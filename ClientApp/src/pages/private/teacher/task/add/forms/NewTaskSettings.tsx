@@ -1,33 +1,36 @@
 //@ts-ignore
-import { Box, Button, TextField, Typography } from "@mui/material";
-import DateAdapter from '@mui/lab/AdapterDateFns';
-import ruLocale from "date-fns/locale/ru";
-import { FC, useCallback, useEffect, useState } from "react";
-import { LocalizationProvider, MobileDatePicker } from "@mui/lab";
-import { INewTaskSettings } from "../../../../../../store/types";
-import { SxProps, Theme } from "@mui/system";
+import { FC } from "react";
 import { Controller, useController, useForm } from "react-hook-form";
-import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
-import * as fields from "../formFields"
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { SxProps, Theme } from "@mui/system";
+import DateAdapter from '@mui/lab/AdapterDateFns';
+import { LocalizationProvider, MobileDatePicker, TimePicker } from "@mui/lab";
+import ruLocale from "date-fns/locale/ru";
+
 import { InputLabel } from "../../../../../../components/inputLabel";
+
+import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
+import { INewTaskSettings } from "../../../../../../store/types";
+
+import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
+
 
 interface IProps {
   onSubmit(questions: INewTaskSettings): void
 }
 
-export const NewTaskSettings: FC<IProps> = ({onSubmit}) => {
+export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
 
   const { control, formState, handleSubmit } = useForm<INewTaskSettings>({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
-      ...initialValue
+      ...initialValue()
     }
   })
 
   const { field: maxSubmissionProps } = useController({ control, ...fields.maxSubmissionProps })
-
 
   return (
     <Box
@@ -53,24 +56,41 @@ export const NewTaskSettings: FC<IProps> = ({onSubmit}) => {
               name={'sBegin'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
-                <MobileDatePicker
-                  inputFormat="dd.MM.yyyy"
-                  rightArrowButtonText={'Следующий месяц'}
-                  disablePast
-                  disableCloseOnSelect={false}
-                  toolbarTitle={false}
-                  toolbarPlaceholder={false}
-                  okText={"Выбрать"}
-                  cancelText={"Отменить"}
-                  {...rest}
-                  renderInput={(params) =>
-                    <TextField
-                      variant={'outlined'}
-                      sx={{ minWidth: '0px' }}
-                      {...params}
+                <Box sx={styles.fieldsContainer}>
+                  <Box sx={styles.datePicker}>
+                    <MobileDatePicker
+                      inputFormat="dd.MM.yyyy"
+                      rightArrowButtonText={'Следующий месяц'}
+                      disablePast
+                      disableCloseOnSelect={false}
+                      toolbarTitle={false}
+                      toolbarPlaceholder={false}
+                      okText={"Выбрать"}
+                      cancelText={"Отменить"}
+                      OpenPickerButtonProps={{ itemScope: true }}
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
                     />
-                  }
-                />
+                  </Box>
+                  <Box sx={styles.timePicker}>
+                    <TimePicker
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
+                    />
+                  </Box>
+                </Box>
               )}
             />
           </LocalizationProvider>
@@ -93,24 +113,41 @@ export const NewTaskSettings: FC<IProps> = ({onSubmit}) => {
               name={'sEnd'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
-                <MobileDatePicker
-                  inputFormat="dd.MM.yyyy"
-                  rightArrowButtonText={'Следующий месяц'}
-                  disablePast
-                  disableCloseOnSelect={false}
-                  toolbarTitle={false}
-                  toolbarPlaceholder={false}
-                  okText={"Выбрать"}
-                  cancelText={"Отменить"}
-                  {...rest}
-                  renderInput={(params) =>
-                    <TextField
-                      variant={'outlined'}
-                      sx={{ minWidth: '0px' }}
-                      {...params}
+                <Box sx={styles.fieldsContainer}>
+                  <Box sx={styles.datePicker}>
+                    <MobileDatePicker
+                      inputFormat="dd.MM.yyyy"
+                      rightArrowButtonText={'Следующий месяц'}
+                      disablePast
+                      disableCloseOnSelect={false}
+                      toolbarTitle={false}
+                      toolbarPlaceholder={false}
+                      okText={"Выбрать"}
+                      cancelText={"Отменить"}
+                      OpenPickerButtonProps={{ itemScope: true }}
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
                     />
-                  }
-                />
+                  </Box>
+                  <Box sx={styles.timePicker}>
+                    <TimePicker
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
+                    />
+                  </Box>
+                </Box>
               )}
             />
           </LocalizationProvider>
@@ -133,24 +170,41 @@ export const NewTaskSettings: FC<IProps> = ({onSubmit}) => {
               name={'rBegin'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
-                <MobileDatePicker
-                  inputFormat="dd.MM.yyyy"
-                  rightArrowButtonText={'Следующий месяц'}
-                  disablePast
-                  disableCloseOnSelect={false}
-                  toolbarTitle={false}
-                  toolbarPlaceholder={false}
-                  okText={"Выбрать"}
-                  cancelText={"Отменить"}
-                  {...rest}
-                  renderInput={(params) =>
-                    <TextField
-                      variant={'outlined'}
-                      sx={{ minWidth: '0px' }}
-                      {...params}
+                <Box sx={styles.fieldsContainer}>
+                  <Box sx={styles.datePicker}>
+                    <MobileDatePicker
+                      inputFormat="dd.MM.yyyy"
+                      rightArrowButtonText={'Следующий месяц'}
+                      disablePast
+                      disableCloseOnSelect={false}
+                      toolbarTitle={false}
+                      toolbarPlaceholder={false}
+                      okText={"Выбрать"}
+                      cancelText={"Отменить"}
+                      OpenPickerButtonProps={{ itemScope: true }}
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
                     />
-                  }
-                />
+                  </Box>
+                  <Box sx={styles.timePicker}>
+                    <TimePicker
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
+                    />
+                  </Box>
+                </Box>
               )}
             />
           </LocalizationProvider>
@@ -173,24 +227,41 @@ export const NewTaskSettings: FC<IProps> = ({onSubmit}) => {
               name={'rEnd'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
-                <MobileDatePicker
-                  inputFormat="dd.MM.yyyy"
-                  rightArrowButtonText={'Следующий месяц'}
-                  disablePast
-                  disableCloseOnSelect={false}
-                  toolbarTitle={false}
-                  toolbarPlaceholder={false}
-                  okText={"Выбрать"}
-                  cancelText={"Отменить"}
-                  {...rest}
-                  renderInput={(params) =>
-                    <TextField
-                      variant={'outlined'}
-                      sx={{ minWidth: '0px' }}
-                      {...params}
+                <Box sx={styles.fieldsContainer}>
+                  <Box sx={styles.datePicker}>
+                    <MobileDatePicker
+                      inputFormat="dd.MM.yyyy"
+                      rightArrowButtonText={'Следующий месяц'}
+                      disablePast
+                      disableCloseOnSelect={false}
+                      toolbarTitle={false}
+                      toolbarPlaceholder={false}
+                      okText={"Выбрать"}
+                      cancelText={"Отменить"}
+                      OpenPickerButtonProps={{ itemScope: true }}
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
                     />
-                  }
-                />
+                  </Box>
+                  <Box sx={styles.timePicker}>
+                    <TimePicker
+                      {...rest}
+                      renderInput={(params) =>
+                        <TextField
+                          variant={'outlined'}
+                          sx={{ minWidth: '0px' }}
+                          {...params}
+                        />
+                      }
+                    />
+                  </Box>
+                </Box>
               )}
             />
           </LocalizationProvider>
@@ -225,12 +296,20 @@ export const NewTaskSettings: FC<IProps> = ({onSubmit}) => {
   )
 }
 
-const initialValue: INewTaskSettings = {
-  sBegin: new Date(),
-  sEnd: new Date(new Date().setDate(new Date().getDate() + 1)),
-  rBegin: new Date(new Date().setDate(new Date().getDate() + 3)),
-  rEnd: new Date(new Date().setDate(new Date().getDate() + 4)),
-  maxSubmission: 2
+const initialValue = (): INewTaskSettings => {
+  const taskSettings = {
+    sBegin: new Date(),
+    sEnd: new Date(new Date().setDate(new Date().getDate() + 1)),
+    rBegin: new Date(new Date().setDate(new Date().getDate() + 3)),
+    rEnd: new Date(new Date().setDate(new Date().getDate() + 4)),
+    maxSubmission: 2
+  }
+
+  taskSettings.sBegin.setHours(23, 59, 0)
+  taskSettings.sEnd.setHours(23, 59, 0)
+  taskSettings.rBegin.setHours(23, 59, 0)
+  taskSettings.rEnd.setHours(23, 59, 0)
+  return taskSettings
 }
 
 const styles = {
@@ -251,5 +330,16 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between'
+  } as SxProps<Theme>,
+  fieldsContainer: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '5px'
+  } as SxProps<Theme>,
+  datePicker: {
+    flex: '1'
+  } as SxProps<Theme>,
+  timePicker: {
+    flex: '1 0 120px'
   } as SxProps<Theme>,
 }
