@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -10,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;    
 using System.Text;   
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace patools
 {
@@ -78,9 +80,8 @@ namespace patools
 
         private void SetupJWTServices(IServiceCollection services)  
         {  
-            string key = "M13m_S3cr3T-t0k3N"; //this should be same which is used while creating token      
-            var issuer = "http://localhost:5000";  //this should be same which is used while creating token  
-  
+            string key = "M13m_S3cr3T-t0k3N"; //this should be same which is used while creating token 
+            List<string> issuers = new List<string>(){"http://localhost:5000","auth.google.com"};
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)  
           .AddJwtBearer(options =>  
           {  
@@ -89,8 +90,8 @@ namespace patools
                   ValidateIssuer = true,  
                   ValidateAudience = true,  
                   ValidateIssuerSigningKey = true,  
-                  ValidIssuer = issuer,  
-                  ValidAudience = issuer,  
+                  ValidIssuers = issuers,  
+                  ValidAudiences = issuers,  
                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))  
               };  
   
@@ -107,5 +108,6 @@ namespace patools
               };  
           });  
         }  
+
     }
 }
