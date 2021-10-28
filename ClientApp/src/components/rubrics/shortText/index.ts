@@ -1,0 +1,1 @@
+export { ShortTextVisible } from "./ShortTextVisible";

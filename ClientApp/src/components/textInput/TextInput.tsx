@@ -1,20 +1,13 @@
+import { FC } from "react"
 import { BaseTextFieldProps, TextField } from "@mui/material"
 import { SxProps, Theme } from "@mui/system"
-import { FC } from "react"
 
-interface IProps extends Omit<BaseTextFieldProps, 'variant'> {
+interface IProps extends Omit<BaseTextFieldProps, 'variant'> { }
 
-}
-
-export const TextInput: FC<IProps> = ({
-
-    ...props
-
-}) => {
+export const TextInput: FC<IProps> = ({ ...props }) => {
     return (
         <TextField
             variant={'outlined'}
-            
             sx={styles.root}
             {...props}
         />
@@ -40,6 +33,5 @@ const styles = {
             padding: '18px 16px 16px 16px'
         },
         width: '100%'
-        
     } as SxProps<Theme>,
 }

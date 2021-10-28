@@ -7,6 +7,7 @@ import { Box } from '@mui/system'
 import { Wrapper } from '../../../components/wrapper'
 import { TCourseList as CourseList } from './course/list'
 import { CourseMain } from './course/main'
+import { TaskAdd } from './task/add'
 
 
 
@@ -51,7 +52,7 @@ export function TeacherPrivate() {
             <Routes>
                 <Route path={paths.teacher.main} element={<CourseList />} />
                 <Route path={paths.teacher.courses.course} element={<CourseMain />} />
-                {/* выбор пирингового задания */}
+                <Route path={paths.teacher.task.add} element={<TaskAdd />} />
             </Routes>
         </Box>
 

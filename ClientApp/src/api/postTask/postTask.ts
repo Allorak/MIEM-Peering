@@ -1,22 +1,25 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
-import { INewCourseRequest } from '../../store/types'
 import { mock } from './mock'
 
 
-export const postNewCourse = async (payload: IRequestData): Promise<IResponse<IResponseData>> => {
+export const postTask = async ({
+  accessToken,
+  courseId,
+  task
+}: IRequestData): Promise<IResponse<IResponseData>> => {
 
   const isMock = true
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/course/create`,
+    url: `/api/v1/courses/${courseId}/task/create`,
     headers: {
-      'Authorization': `Bearer ${payload.accessToken}`,
+      'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
     },
-    data: payload,
+    data: task
   }
 
   if (isMock) {

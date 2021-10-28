@@ -1,19 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IGAuthCheckUser, IError, ICourses, ITaskItem } from '../types';
+import { IGAuthCheckUser, IError, ICourses, ITaskItem, INewTaskResponse } from '../types';
 
 
 export interface ITaskState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: Array<ITaskItem>
+  payload: Array<ITaskItem>,
+  newTaskPayload: INewTaskResponse | undefined
 }
 
 const initialState: ITaskState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as Array<ITaskItem>
+  payload: {} as Array<ITaskItem>,
+  newTaskPayload: undefined
 };
 
 export const tasks = createSlice({
@@ -34,6 +36,28 @@ export const tasks = createSlice({
     },
 
     fetchFailed: (state, { payload }: PayloadAction<IError>) => {
+      state.isLoading = false
+      state.error = payload
+      state.isLock = false
+    },
+    createReset: (state) => {
+      state.isLoading = false
+      state.isLock = false
+      state.error = undefined
+      state.newTaskPayload = undefined
+    },
+    createStarted: (state) => {
+      state.isLoading = true
+      state.isLock = true
+      state.error = undefined
+    },
+    createSuccess:  (state, { payload }: PayloadAction<INewTaskResponse>) => {
+      state.isLoading = false
+      state.error = undefined
+      state.isLock = false
+      state.newTaskPayload = payload
+    },
+    createError: (state, { payload }: PayloadAction<IError>) => {
       state.isLoading = false
       state.error = payload
       state.isLock = false
