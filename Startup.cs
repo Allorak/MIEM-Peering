@@ -81,7 +81,7 @@ namespace patools
         private void SetupJWTServices(IServiceCollection services)  
         {  
             string key = "M13m_S3cr3T-t0k3N"; //this should be same which is used while creating token 
-            List<string> issuers = new List<string>(){"http://localhost:5000","auth.google.com"};
+            List<string> issuers = new List<string>(){"http://localhost:5000","accounts.google.com"};
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)  
           .AddJwtBearer(options =>  
           {  
