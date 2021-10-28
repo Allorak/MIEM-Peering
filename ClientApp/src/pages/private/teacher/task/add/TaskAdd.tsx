@@ -1,31 +1,34 @@
 import { FC, useCallback, useEffect, useState } from "react"
+import { useNavigate, generatePath } from "react-router-dom";
 import { Box, SxProps, Theme } from "@mui/system"
 
 import { Subheader } from "../../../../../components/subheader"
 import { NewTaskMainInfo } from "./forms/NewTaskMainInfo"
 import { NewTaskAuthorForm } from "./forms/NewTaskAuthorForm"
-import { NewTaskPeerForm } from "./forms/NewTaskPeerForm"
 import { NewTaskSettings } from "./forms/NewTaskSettings"
 
-import { INewTask, INewTaskAuthorForm, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes } from "../../../../../store/types"
+import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes } from "../../../../../store/types"
+
+import { actions, createTasks } from "../../../../../store/tasks"
+
 import * as globalStyles from "../../../../../const/styles"
+import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
+import { WorkBox } from "../../../../../components/workBox"
+import { paths } from "../../../../../app/constants/paths";
+import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
 
 
 export const TaskAdd: FC = () => {
 
-  const [responses, setResponses] = useState<any>()
+  const dispatch = useAppDispatch()
+  const history = useNavigate()
+  const { location, path: pathT } = usePrivatePathT()
 
-  return (
+  const isLoading = useAppSelector(state => state.tasks.isLoading)
+  const isLock = useAppSelector(state => state.tasks.isLock)
+  const error = useAppSelector(state => state.tasks.error)
+  const newTaskPayload = useAppSelector(state => state.tasks.newTaskPayload)
 
-
-    <Box>
-      <NewTaskContent />
-    </Box>
-
-  )
-}
-
-const NewTaskContent: FC = () => {
   const [step, setStpep] = useState<INewTaskState>('main-info')
   const [newTaskItem, setNewTaskItem] = useState<INewTask>(initialTask)
 
@@ -61,18 +64,30 @@ const NewTaskContent: FC = () => {
   }, [step, newTaskItem])
 
   useEffect(() => {
-    console.log(newTaskItem)
-  }, [newTaskItem])
-  
+    dispatch(actions.createReset())
+    console.log("Reset")
+  }, [dispatch])
+
   const setSettings = useCallback((response: INewTaskSettings) => {
-    setNewTaskItem(prev => ({
-      ...prev,
-      settings: response
-    }))
-  }, [step, newTaskItem])
+    if (pathT && pathT.courseId)
+      dispatch(createTasks({
+        ...newTaskItem,
+        settings: response
+      }, pathT.courseId))
+  }, [step, newTaskItem, pathT])
+
+  if (newTaskPayload && newTaskPayload.newTaskId
+    && pathT && pathT.courseId) {
+    history(generatePath(paths.teacher.task.main, { courseId: pathT.courseId, taskId: newTaskPayload.newTaskId }))
+    dispatch(actions.createReset())
+  }
 
   return (
-    <Box>
+    <WorkBox
+      isLoading={isLoading}
+      isLock={isLock}
+      error={error}
+    >
       <Subheader activeStep={step} />
 
       <Box sx={styles.stepsContainer}>
@@ -99,12 +114,12 @@ const NewTaskContent: FC = () => {
 
           {step === 'settings' && (
             <NewTaskSettings
-            onSubmit={setSettings}
+              onSubmit={setSettings}
             />
           )}
         </Box>
       </Box>
-    </Box>
+    </WorkBox>
   )
 }
 

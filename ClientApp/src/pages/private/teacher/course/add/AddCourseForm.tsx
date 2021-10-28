@@ -40,7 +40,6 @@ export const AddCourseForm: FC = () => {
                 }
             }
         }
-        console.log('Errors:', errors)
     }
 
     const onFieldBlur = (name: string, value: string) => {

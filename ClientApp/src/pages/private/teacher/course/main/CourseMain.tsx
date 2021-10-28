@@ -9,7 +9,7 @@ import { useNavigate, generatePath } from "react-router-dom"
 import { paths } from "../../../../../app/constants/paths";
 import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { fetchTasks } from "../../../../../store/tasks/thunks/tasks";
+import { fetchTasks } from "../../../../../store/tasks/thunks/fetchTasks";
 import * as constStyles from '../../../../../const/styles'
 
 

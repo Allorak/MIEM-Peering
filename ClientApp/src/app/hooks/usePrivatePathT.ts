@@ -22,7 +22,8 @@ export const usePrivatePathT = (): IUsePrivatePathResult => {
 
   const path = matchPath('t/course/:courseId', location.pathname)
     ?? matchPath('t/course/:courseId/main', location.pathname)
-    ?? matchPath('t/course/:courseId/task', location.pathname)
+    ?? matchPath('t/course/:courseId/task', location.pathname)    
+    ?? matchPath('/t/course/:courseId/task/add', location.pathname)
     ?? matchPath('t/course/:courseId/task/:taskId', location.pathname)
     
   const courseId = path?.params?.courseId

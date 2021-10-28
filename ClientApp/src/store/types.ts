@@ -130,6 +130,10 @@ export interface INewTask {
   authorForm: INewTaskPeerForm,
   settings: INewTaskSettings
 }
+
+export type INewTaskResponse = {
+  newTaskId: string
+}
 export interface INewTaskMainInfo {
   title: string
   description?: string

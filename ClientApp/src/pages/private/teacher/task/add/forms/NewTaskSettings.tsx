@@ -284,7 +284,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
         </Box>
       </Box>
 
-      <Box sx={globalStyles.submitBtContainer}>
+      <Box sx={{...globalStyles.submitBtContainer, my: "15px"}}>
         <Button
           type='submit'
           variant='contained'
@@ -309,6 +309,7 @@ const initialValue = (): INewTaskSettings => {
   taskSettings.sEnd.setHours(23, 59, 0)
   taskSettings.rBegin.setHours(23, 59, 0)
   taskSettings.rEnd.setHours(23, 59, 0)
+  
   return taskSettings
 }
 
@@ -337,7 +338,7 @@ const styles = {
     gap: '5px'
   } as SxProps<Theme>,
   datePicker: {
-    flex: '1'
+    flex: '0 1 100%'
   } as SxProps<Theme>,
   timePicker: {
     flex: '1 0 120px'

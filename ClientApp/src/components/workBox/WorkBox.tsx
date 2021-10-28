@@ -24,11 +24,32 @@ export const WorkBox: FC<IProps> = ({
         )
     }
 
+    if (error)
+        console.log("WorkBox Error:", error)
+
+    if (isLoading && isLock) {
+        return (
+            <Box>
+                <Box sx={styles.root}>
+                    <CircularProgress sx={styles.progress} />
+                    <Typography variant='h6'
+                        sx={{ color: "common.white" }}
+                    >
+                        Загрузка...
+                    </Typography>
+                </Box>
+                {children}
+            </Box>
+        )
+    }
+
     if (isLoading) {
         return (
             <Box sx={styles.root}>
                 <CircularProgress sx={styles.progress} />
-                <Typography variant='h6'>
+                <Typography variant='h6'
+                    sx={{ color: "common.white" }}
+                >
                     Загрузка...
                 </Typography>
             </Box>
@@ -54,7 +75,7 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 5001,
-        backgroundColor: 'rgba(0,0,0, 0.4)'
+        backgroundColor: 'rgba(0,0,0, 0.77)'
     } as SxProps<Theme>,
 
 
