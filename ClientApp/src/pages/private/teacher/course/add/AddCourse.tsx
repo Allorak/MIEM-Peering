@@ -1,10 +1,13 @@
 import { FC, SetStateAction, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { useNavigate, generatePath } from "react-router-dom";
+
 import { Popup } from "../../../../../components/popup";
 import { AddCourseForm } from "./AddCourseForm";
+
+import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { actions } from '../../../../../store/addCourse';
-import { useNavigate, generatePath } from "react-router-dom";
 import { paths } from "../../../../../app/constants/paths";
+
 
 interface IProps {
     popupOpen: boolean,
@@ -12,6 +15,7 @@ interface IProps {
 }
 
 export const AddCourse: FC<IProps> = ({ popupOpen, onCloseHandler }) => {
+    
     const dispatch = useAppDispatch()
     const loading = useAppSelector(state => state.newCourse.isLoading)
     const errorState = useAppSelector(state => state.newCourse.error)

@@ -8,6 +8,9 @@ import { useEffect } from 'react'
 import { fetchUserProfile } from '../../store/userProfile'
 import { Role } from '../role'
 import { Registration } from './registration'
+import { Box, SxProps, Theme } from '@mui/system'
+import { palette } from '../../theme/colors'
+import * as globalStyles from "../../const/styles"
 
 
 
@@ -32,8 +35,8 @@ export function Private() {
   const userProfileIsLoading = useAppSelector(state => state.userProfile.isLoading)
   console.log(authPayload, 'auth')
   console.log(registrationProps?.email)
-  useEffect(()=>{
-    if (authPayload && authPayload.accessToken){
+  useEffect(() => {
+    if (authPayload && authPayload.accessToken) {
       fetchUserProfile()
     }
   }, [dispatch, authPayload])
@@ -49,27 +52,36 @@ export function Private() {
       />
     )
   }
- 
+
 
   if (!userProfileIsLoading && userProfilePayload?.role === 'teacher') {
     console.log('Private route return teacher Route')
-    return (<>
-      <PrivateHeader />
-      <Routes>
-        <PrivateRoute path='*' element={<TeacherPrivate />} />
-      </Routes>
-    </>
+    return (
+
+      <Box sx={styles.wrapper}>
+        <PrivateHeader />
+        <Box sx={styles.body}>
+          <Routes>
+            <PrivateRoute path='*' element={<TeacherPrivate />} />
+          </Routes>
+        </Box>
+      </Box>
+
     )
   }
 
   if (!userProfileIsLoading && userProfilePayload?.role === 'student') {
     console.log('Private route return student Route')
-    return (<>
-      <PrivateHeader />
-      <Routes>
-        <PrivateRoute path='*' element={<StudentPrivate />} />
-      </Routes>
-    </>)
+    return (
+      <Box sx={styles.wrapper}>
+        <PrivateHeader />
+        <Box sx={styles.body}>
+          <Routes>
+            <PrivateRoute path='*' element={<StudentPrivate />} />
+          </Routes>
+        </Box>
+      </Box>
+    )
   }
   console.log('Private route return null')
   return (
@@ -86,3 +98,17 @@ function PrivateRoute(props: RouteProps): React.ReactElement {
   )
 }
 
+
+const styles = {
+  wrapper: {
+    height: '100vh',
+    overflow: 'hidden'
+  } as SxProps<Theme>,
+
+  body: {
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    maxHeight: 'calc(100vh - 80px)',
+    ...globalStyles.scrollStyles,
+  } as SxProps<Theme>,
+}

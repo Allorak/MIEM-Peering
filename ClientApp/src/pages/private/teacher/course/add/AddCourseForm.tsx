@@ -4,6 +4,7 @@ import { FC, useCallback, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { InputLabel } from "../../../../../components/inputLabel";
 import { addCourse } from "../../../../../store/addCourse/thunks/addCourse";
+import * as globalStyles from "../../../../../const/styles";
 
 interface ICourseItem {
     name: string
@@ -39,7 +40,6 @@ export const AddCourseForm: FC = () => {
                 }
             }
         }
-        console.log('Errors:', errors)
     }
 
     const onFieldBlur = (name: string, value: string) => {
@@ -120,11 +120,10 @@ export const AddCourseForm: FC = () => {
                 />
             </Box>
             
-            <Box sx={styles.submitBt}>
+            <Box sx={globalStyles.submitBtContainer}>
                 <Button
                     type='submit'
                     variant='contained'
-                    // disabled={errors.name !== "" && errors.subject !== ""}
                 >
                     Создать курс
                 </Button>
@@ -140,10 +139,6 @@ const styles = {
     formItemContainer: {
         margin: '0px 0px 10px 0px',
 
-    } as SxProps<Theme>,
-    submitBt: {
-        display: 'flex',
-        justifyContent: 'flex-end',
     } as SxProps<Theme>,
 }
 
