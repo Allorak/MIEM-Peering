@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using patools.Models;
+using patools.Controllers;
 
 namespace patools
 {
@@ -18,7 +19,7 @@ namespace patools
 
             PAToolsContext db = new PAToolsContext();
             db.Database.EnsureCreated();
-
+            InitializeDB(db);
             host.Run();
         }
 
@@ -28,5 +29,26 @@ namespace patools
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+        
+        public static void InitializeDB(PAToolsContext db)
+        {
+            if(db.Users.Any())
+                return;
+
+            var users = new List<User>
+            {
+                new User
+                {
+                    ID = Guid.NewGuid(),
+                    Fullname = "Моисеев Михаил",
+                    Status = UserStatuses.Student,
+                    Email = "mvmoiseev@miem.hse.ru",
+                    Password = "12343123"
+                }
+            };
+            
+            db.Users.AddRange(users);
+            db.SaveChanges();
+        }
     }
 }

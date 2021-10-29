@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;   
 using System.Threading.Tasks;
 using System;
+using patools.Models;
 
 namespace patools
 {
@@ -27,7 +28,7 @@ namespace patools
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
+            services.AddDbContext<PAToolsContext>();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
