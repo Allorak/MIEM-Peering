@@ -14,8 +14,12 @@ export const paths = {
       course: '/t/course/:courseId/main'
     },
     task: {
-      main: '/t/course/:courseId/task/:taskId/main',
+      main: '/t/course/:courseId/task/:taskId/main', // TO DO страница статистики
       add: '/t/course/:courseId/task/add'
+    },
+    dashboard: {
+      statistics: '/t/task/:taskId/statistics',
+      
     }
 
   },

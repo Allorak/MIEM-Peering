@@ -35,6 +35,11 @@ export type IPath = {
   taskId?: string
 }
 
+export type IPathDashboard = {
+  taskId?: string,
+  activeMenuId?: string
+}
+
 export type IGAuthCheckUser = {
   userState: 'NEW' | 'REGISTERED'
 }
