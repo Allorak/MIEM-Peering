@@ -6,11 +6,12 @@ import { Logo } from "../logo";
 import { Navbar } from "../navbar";
 import { UserAcc } from "../userIco";
 import * as constStyles from "../../const/styles"
+import { palette } from "../../theme/colors";
 
 export const PrivateHeader: FC = () => {
     return (
         <Box sx={styles.wrapper}>
-            <Box sx={constStyles.container}>
+            {/* <Box sx={constStyles.container}> */}
                 <Box sx={styles.root}>
                     <Box sx={styles.logoContainer}>
                         <Logo />
@@ -23,7 +24,7 @@ export const PrivateHeader: FC = () => {
                             <UserAcc />
                         </Box>
                     </Box>
-                </Box>
+                {/* </Box> */}
             </Box>
         </Box>
     )
@@ -31,10 +32,10 @@ export const PrivateHeader: FC = () => {
 
 const styles = {
     wrapper: {
-        margin: '40px 0px 55px 0px',
-        '@media (max-width: 700px)': {
-            margin: '10px 0px 15px 0px'
-        }
+        margin: '0px 0px 0px 0px',
+        padding: '15px 20px',
+        backgroundColor: 'common.white',
+        borderBottom: `1px solid ${palette.divider}`
     } as SxProps<Theme>,
     root: {
         width: '100%',
@@ -43,7 +44,6 @@ const styles = {
         justifyContent: 'space-between'
     } as SxProps<Theme>,
     rightItem: {
-        // flex: '1 1 1088px',
         width: '100%',
         display: 'flex',
         justifyContent: 'space-between',

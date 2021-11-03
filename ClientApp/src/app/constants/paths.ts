@@ -10,17 +10,18 @@ export const paths = {
   },
   teacher: {
     main: '/t/course',
-    courses: {  
+    courses: {
       course: '/t/course/:courseId/main'
     },
     task: {
-      main: '/t/course/:courseId/task/:taskId/main'
+      main: '/t/course/:courseId/task/:taskId/main',
+      add: '/t/course/:courseId/task/add'
     }
-    
+
   },
   student: {
     main: '/st/course',
-    courses: {  
+    courses: {
       course: '/st/course/:courseId/main'
     },
   }

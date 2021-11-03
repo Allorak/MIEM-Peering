@@ -122,4 +122,98 @@ export type ITaskItem = {
   description?: string
 }
 
-export type INewTaskState = 'author-form' | 'peer-form' | 'settings'
+export type INewTaskState = 'author-form' | 'peer-form' | 'settings' | 'main-info'
+
+export interface INewTask {
+  mainInfo: INewTaskMainInfo,
+  peerForm: INewTaskPeerForm,
+  authorForm: INewTaskPeerForm,
+  settings: INewTaskSettings
+}
+
+export type INewTaskResponse = {
+  newTaskId: string
+}
+export interface INewTaskMainInfo {
+  title: string
+  description?: string
+}
+
+export interface INewTaskAuthorForm {
+}
+
+export interface INewTaskPeerForm {
+  rubrics: IQuestionRubrics
+}
+
+export interface INewTaskSettings {
+  sBegin: Date | undefined
+  sEnd: Date | undefined
+  rBegin: Date | undefined
+  rEnd: Date | undefined
+  maxSubmission: number
+}
+
+export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
+
+export type IParentQuestionRubric = {
+  id: number
+  title: string
+  required: boolean
+}
+
+export interface ITextQuestion extends IParentQuestionRubric {
+  type: IQuestionTypes.TEXT
+}
+
+export interface IShortTextQuestion extends IParentQuestionRubric {
+  type: IQuestionTypes.SHORT_TEXT
+}
+
+export interface IMultipleQuiestion extends IParentQuestionRubric {
+  type: IQuestionTypes.MULTIPLE,
+  responses: IMultipleResponse[]
+}
+
+export interface ISelectRatingQuestion extends IParentQuestionRubric {
+  type: IQuestionTypes.SELECT_RATE,
+  maxValue: number,
+  minValue: number
+}
+
+export enum IQuestionTypes {
+  TEXT = 'text',
+  MULTIPLE = 'multiple',
+  SELECT_RATE = 'select',
+  SHORT_TEXT = 'short-text',
+}
+
+export const defaultResponses = {
+  rateResponses: {
+    maxValue: 10,
+    minValue: 1
+  },
+  multiple: [
+    {
+      id: 0,
+      response: "Вариант 1"
+    },
+    {
+      id: 1,
+      response: "Вариант 2"
+    },
+    {
+      id: 3,
+      response: "Вариант 3"
+    },
+    {
+      id: 4,
+      response: "Вариант 4"
+    }
+  ] as IMultipleResponse[]
+}
+
+export interface IMultipleResponse {
+  id: number,
+  response: string
+}

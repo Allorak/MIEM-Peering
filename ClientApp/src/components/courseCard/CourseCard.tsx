@@ -80,7 +80,6 @@ const styles = {
         backgroundColor: theme => theme.palette.common.white,
         borderRadius: '4px',
         borderLeft: theme => `3px solid ${theme.palette.primary.main}`,
-        width: '255px',
         transition: 'all 0.3s',
         ":hover": {
             cursor: 'pointer',
