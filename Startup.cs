@@ -90,7 +90,7 @@ namespace patools
                   ValidateIssuer = true,  
                   ValidateAudience = true,  
                   ValidateIssuerSigningKey = true,  
-                  ValidIssuers = issuers,  
+                  ValidIssuers = issuers,
                   ValidAudiences = issuers,  
                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))  
               };  
