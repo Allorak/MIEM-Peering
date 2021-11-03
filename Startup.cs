@@ -6,6 +6,15 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;    
+using Microsoft.AspNetCore.Authentication.JwtBearer;    
+using System.Text;   
+using System.Threading.Tasks;
+<<<<<<< HEAD
+using System;
+using patools.Models;
+=======
+>>>>>>> dev
 
 namespace patools
 {
@@ -21,8 +30,9 @@ namespace patools
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            SetupJWTServices(services);
             services.AddControllersWithViews();
-
+            services.AddDbContext<PAToolsContext>();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -50,6 +60,9 @@ namespace patools
 
             app.UseRouting();
 
+            app.UseAuthentication();  
+            app.UseAuthorization(); 
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -67,5 +80,37 @@ namespace patools
                 }
             });
         }
+
+        private void SetupJWTServices(IServiceCollection services)  
+        {  
+            string key = "M13m_S3cr3T-t0k3N"; //this should be same which is used while creating token      
+            var issuer = "http://localhost:5000";  //this should be same which is used while creating token  
+  
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)  
+          .AddJwtBearer(options =>  
+          {  
+              options.TokenValidationParameters = new TokenValidationParameters  
+              {  
+                  ValidateIssuer = true,  
+                  ValidateAudience = true,  
+                  ValidateIssuerSigningKey = true,  
+                  ValidIssuer = issuer,  
+                  ValidAudience = issuer,  
+                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))  
+              };  
+  
+              options.Events = new JwtBearerEvents  
+              {  
+                  OnAuthenticationFailed = context =>  
+                  {  
+                      if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))  
+                      {  
+                          context.Response.Headers.Add("Token-Expired", "true");  
+                      }  
+                      return Task.CompletedTask;  
+                  }  
+              };  
+          });  
+        }  
     }
 }

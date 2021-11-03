@@ -32,11 +32,11 @@ export const Login: FC = () => {
 
     const onGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ('accessToken' in response) {
-            console.log(response.profileObj, "Google response")
+            console.log(response, "Google response")
             console.log(response.accessToken, 'Google access token')
             dispatch(fetchGAuth({
                 email: response.profileObj.email,
-                gAccessToken: response.accessToken,
+                gAccessToken: response.tokenId,
                 imageUrl: response.profileObj.imageUrl.toString(),
                 firstName: response.profileObj.givenName,
                 lastName: response.profileObj.familyName
