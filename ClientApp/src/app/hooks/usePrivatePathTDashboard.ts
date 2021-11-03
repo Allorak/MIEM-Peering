@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useLocation, matchPath, NavigateProps } from 'react-router-dom'
 import { generatePath } from 'react-router'
 import type { Location } from 'history'
-import { IPathDashboard } from '../../store/types'
+import { IMenuTitles, IPathDashboard } from '../../store/types'
 import { paths } from '../constants/paths'
 
 
@@ -21,8 +21,8 @@ export const usePrivatePathTDashboard = (): IUsePrivatePathResult => {
   }
 
   const path = matchPath('t/task/:taskId/*', location.pathname)
-    ?? matchPath('t/task/:taskId/:activeMenuTopId', location.pathname)
-    
+    ?? matchPath('t/task/:taskId/:activeMenu/*', location.pathname)
+
   const taskId = path?.params?.taskId
   const activeMenuId = path?.params?.activeMenuId
 
@@ -41,11 +41,25 @@ export const usePrivatePathTDashboard = (): IUsePrivatePathResult => {
     }
   }
 
+  const activeMenu = convertActiveMenu(activeMenuId)
+
   return {
     location,
     path: {
       taskId,
-      activeMenuId
+      activeMenuId: activeMenu
     },
+  }
+}
+
+const convertActiveMenu = (activeMenuId: string | undefined) => {
+  switch (activeMenuId) {
+    case "overview": return IMenuTitles.OVERVIEW
+    case "grades": return IMenuTitles.GRADES
+    case "export": return IMenuTitles.EXPORT
+    case "experts": return IMenuTitles.EXPERTS
+    case "works": return IMenuTitles.WORKS
+    case "checkings": return IMenuTitles.CHECKINGS
+    default: return undefined
   }
 }

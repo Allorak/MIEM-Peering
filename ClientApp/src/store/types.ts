@@ -37,7 +37,7 @@ export type IPath = {
 
 export type IPathDashboard = {
   taskId?: string,
-  activeMenuId?: string
+  activeMenuId?: IMenuTitles
 }
 
 export type IGAuthCheckUser = {
@@ -221,4 +221,20 @@ export const defaultResponses = {
 export interface IMultipleResponse {
   id: number,
   response: string
+}
+
+
+export type IMenu = {
+  title: IMenuTitles,
+  path: string
+}
+
+export enum IMenuTitles {
+  OVERVIEW = 'Обзор',
+  WORKS = 'Работы',
+  CHECKINGS = 'Проверки',
+  EXPERTS = 'Эксперты',
+  GRADES = 'Успеваемость',
+  EXPORT = 'Экспорт'
+  
 }

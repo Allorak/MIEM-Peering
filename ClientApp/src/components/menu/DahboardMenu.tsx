@@ -1,0 +1,128 @@
+import { FC } from "react";
+import { NavLink as RouterLink } from 'react-router-dom'
+import { Link, Typography } from "@mui/material";
+import { Box, SxProps, Theme } from "@mui/system";
+import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+
+import { Overview } from "../icons/Overview";
+import { Works } from "../icons/Works";
+import { Experts } from "../icons/Experts";
+import { Grades } from "../icons/Grades";
+
+import { IMenu, IMenuTitles } from "../../store/types";
+import { palette } from "../../theme/colors";
+
+
+interface IProps {
+  items: IMenu[],
+  activeMenu?: IMenuTitles
+}
+
+export const DashboardMenu: FC<IProps> = ({
+  items,
+  activeMenu
+}) => {
+  return (
+    <Box sx={styles.container}>
+      {items.map(item => (
+        <MenuItem
+          item={item}
+          isActive={activeMenu ? activeMenu === item.title : false}
+        />
+      ))}
+    </Box>
+  )
+}
+
+const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
+  item,
+  isActive
+}) => {
+
+  const MenuIcon: FC<{ objectType: IMenuTitles }> = ({ objectType }) => {
+    switch (objectType) {
+      case IMenuTitles.OVERVIEW:
+        return (<Overview color={"inherit"} />)
+      case IMenuTitles.WORKS:
+        return (<Works color={"inherit"} />)
+      case IMenuTitles.EXPERTS:
+        return (<Experts color={"inherit"} />)
+      case IMenuTitles.GRADES:
+        return (<Grades color={"inherit"} />)
+      case IMenuTitles.CHECKINGS:
+        return (
+          <AssignmentTurnedInOutlinedIcon
+            color={'inherit'}
+            fontSize={'inherit'}
+          />
+        )
+      case IMenuTitles.EXPORT:
+        return (
+          <ArrowCircleUpIcon
+            color={'inherit'}
+            fontSize={'inherit'}
+          />
+        )
+      default: return null
+    }
+  }
+
+  return (
+    <Link
+      to={item.path}
+      component={RouterLink}
+      sx={{ ...styles.generalMenu, ...(isActive ? styles.activeMenu : styles.unActiveMenu) }}
+    >
+      <Box sx={styles.iconContainer}>
+        <MenuIcon objectType={item.title} />
+      </Box>
+
+      <Typography
+        variant={"h6"}
+        color={"inherit"}
+      >
+        {item.title}
+      </Typography>
+
+    </Link>
+  )
+}
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px'
+  } as SxProps<Theme>,
+  activeMenu: {
+    backgroundColor: palette.active.primary,
+    width: '100%',
+    color: 'common.white'
+  } as SxProps<Theme>,
+  unActiveMenu: {
+    color: '#A4ADC8',
+    ":hover": {
+      border: `1px solid ${palette.divider}`
+    }
+  } as SxProps<Theme>,
+  generalMenu: {
+    width: "100%",
+    height: "54px",
+    display: "flex",
+    padding: "0px 10px 0px 30px",
+    alignItems: "center",
+    gap: "19px",
+    borderRadius: '4px',
+    //медиазапрос
+  } as SxProps<Theme>,
+  iconContainer: {
+    color: "inherit",
+    width: "25px",
+    display: "flex",
+    overflow: "hidden",
+    justifyContent: "center",
+    fontSize: "25px"
+  } as SxProps<Theme>,
+
+}

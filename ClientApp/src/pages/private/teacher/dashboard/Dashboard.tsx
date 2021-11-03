@@ -6,6 +6,8 @@ import { SxProps } from "@mui/system";
 import { usePrivatePathTDashboard } from "../../../../app/hooks/usePrivatePathTDashboard";
 
 import { paths } from "../../../../app/constants/paths";
+import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
+import { IMenu, IMenuTitles } from '../../../../store/types';
 
 
 export const Dashboard: FC = () => {
@@ -15,7 +17,7 @@ export const Dashboard: FC = () => {
     path
   } = usePrivatePathTDashboard()
 
-  const pathToMainDashboard = generatePath(paths.teacher.dashboard.statistics, {taskId: path?.taskId})
+  const pathToMainDashboard = generatePath(paths.teacher.dashboard.overview, {taskId: path?.taskId})
 
   // создать стэйт курса если нет то подиспатчить
 
@@ -45,7 +47,10 @@ export const Dashboard: FC = () => {
     <Box sx={styles.container}>
       <Box sx={styles.gridWrapper}>
         <Box sx={styles.leftContainer}>
-          {/* left-menu */}
+          <DashboardMenu
+            activeMenu={path.activeMenuId}
+            items={menuItems}
+          />
         </Box>
 
         {/* right */}
@@ -90,3 +95,30 @@ const styles = {
     overflowY: 'auto',
   } as SxProps<Theme>,
 }
+
+const menuItems = [
+  {
+    title: IMenuTitles.CHECKINGS,
+    path: paths.teacher.dashboard.checkings
+  },
+  {
+    title: IMenuTitles.GRADES,
+    path: paths.teacher.dashboard.grades
+  },
+  {
+    title: IMenuTitles.EXPORT,
+    path: paths.teacher.dashboard.export
+  },
+  {
+    title: IMenuTitles.OVERVIEW,
+    path: paths.teacher.dashboard.overview
+  },
+  {
+    title: IMenuTitles.WORKS,
+    path: paths.teacher.dashboard.works
+  },
+  {
+    title: IMenuTitles.EXPERTS,
+    path: paths.teacher.dashboard.experts
+  }
+] as IMenu[]
