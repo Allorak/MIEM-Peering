@@ -4,6 +4,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace patools.Models
 {
+    public enum Subjects
+    {
+        EnglishLanguage = 0,
+        MachineLearning = 1,
+        LinearAlgebra = 2,
+        Programming = 3,
+        Chemistry = 4,
+        Physics = 5,
+        RussianLiterature = 6
+    }
     public class Course
     {
         public Guid ID { get; set; }
@@ -24,7 +34,7 @@ namespace patools.Models
         public User Teacher { get; set; }
 
         [Required]
-        public Subject Subject { get; set; }
+        public Subjects Subject { get; set; }
 
         public List<Task> Tasks { get; set; }
         public List<CourseUser> CourseUsers { get; set; }

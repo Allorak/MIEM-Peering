@@ -6,8 +6,9 @@ namespace patools.Models
 {
     public enum Types
     {
-        LongAnswer,
-        MultipleChoices
+        LongAnswer = 0,
+        ShortAnswer = 1,
+        MultipleChoices = 2
     }
 
     public class Question

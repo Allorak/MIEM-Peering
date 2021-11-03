@@ -6,9 +6,9 @@ namespace patools.Models
 {
     public enum TaskState 
     { 
-        Assigned,
-        Checking,
-        Graded
+        Assigned = 0,
+        Checking = 1,
+        Graded = 2
     }
 
     public class TaskUser

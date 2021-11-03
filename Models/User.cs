@@ -6,9 +6,9 @@ namespace patools.Models
 {
     public enum UserStatuses
     {
-        Student,
-        Teacher,
-        Expert
+        Student = 0,
+        Teacher = 1,
+        Expert = 2
     }
 
     public class User
@@ -34,7 +34,6 @@ namespace patools.Models
         [DataType(DataType.ImageUrl)]
         public string ImageUrl { get; set; }
 
-        [Required]
         [MinLength(8)]
         [MaxLength(50)]
         public string Password { get; set; }
