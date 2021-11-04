@@ -6,6 +6,8 @@ import { mock } from './mock'
 
 export const postGUserCheck = async (payload: IRequestData): Promise<IResponse<IResponseData>> => {
 
+  const isMock = true
+
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
     url: `posttoken`, //сделать api
@@ -17,6 +19,11 @@ export const postGUserCheck = async (payload: IRequestData): Promise<IResponse<I
   }
 
   // Типизация Response
+
+  if (isMock) {
+    const response = await mock(requestConfig)
+    return response
+  }
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   console.log(response.data, "DATA")
