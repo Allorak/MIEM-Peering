@@ -10,11 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;    
 using System.Text;   
 using System.Threading.Tasks;
-<<<<<<< HEAD
 using System;
 using patools.Models;
-=======
->>>>>>> dev
 
 namespace patools
 {
@@ -107,7 +104,7 @@ namespace patools
                       {  
                           context.Response.Headers.Add("Token-Expired", "true");  
                       }  
-                      return Task.CompletedTask;  
+                      return System.Threading.Tasks.Task.CompletedTask;  
                   }  
               };  
           });  
