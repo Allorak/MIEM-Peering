@@ -21,7 +21,7 @@ export const Grades: FC<IProps> = memo(({ svgColor = "white", ...props }) => {
       />
       <path
         fillRule="evenodd"
-        clip-rule="evenodd"
+        clipRule="evenodd"
         d="M17.5 2H5.5C4.67157 2 4 2.67157 4 3.5V18.5C4 19.3284 4.67157 20 5.5 20H17.5C19.433 20 21 18.433 21 16.5V5.5C21 3.567 19.433 2 17.5 2ZM5 3.5C5 3.22386 5.22386 3 5.5 3H17.5C18.8807 3 20 4.11929 20 5.5V16.5C20 17.8807 18.8807 19 17.5 19H5.5C5.22386 19 5 18.7761 5 18.5V3.5Z"
         fill={svgColor}
       />

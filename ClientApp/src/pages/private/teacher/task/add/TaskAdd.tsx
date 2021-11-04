@@ -78,7 +78,7 @@ export const TaskAdd: FC = () => {
 
   if (newTaskPayload && newTaskPayload.newTaskId
     && pathT && pathT.courseId) {
-    history(generatePath(paths.teacher.task.main, { courseId: pathT.courseId, taskId: newTaskPayload.newTaskId }))
+    history(generatePath(paths.teacher.dashboard.overview, { taskId: newTaskPayload.newTaskId }))
     dispatch(actions.createReset())
   }
 

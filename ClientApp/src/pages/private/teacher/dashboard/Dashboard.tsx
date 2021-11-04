@@ -1,13 +1,19 @@
 import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
 import { FC } from "react";
-import { Theme, Box } from "@mui/material";
+import { Theme, Box, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import { usePrivatePathTDashboard } from "../../../../app/hooks/usePrivatePathTDashboard";
 
-import { paths } from "../../../../app/constants/paths";
+
 import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
 import { IMenu, IMenuTitles } from '../../../../store/types';
+import { paths } from "../../../../app/constants/paths";
+
+import { CourseMain } from '../course/main';
+import { Overview } from './Overview';
+
+import * as globalStyles from "../../../../const/styles"
 
 
 export const Dashboard: FC = () => {
@@ -17,7 +23,7 @@ export const Dashboard: FC = () => {
     path
   } = usePrivatePathTDashboard()
 
-  const pathToMainDashboard = generatePath(paths.teacher.dashboard.overview, {taskId: path?.taskId})
+  const pathToMainDashboard = generatePath(paths.teacher.dashboard.overview, { taskId: path?.taskId })
 
   // создать стэйт курса если нет то подиспатчить
 
@@ -43,21 +49,42 @@ export const Dashboard: FC = () => {
     />
   }
 
+  const menuItemsP = menuItems.map(item => ({ title: item.title, path: generatePath(item.path, { taskId: path.taskId }) })) as IMenu[]
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.gridWrapper}>
         <Box sx={styles.leftContainer}>
+          <Typography variant={"h5"} marginBottom={"30px"}>
+            {"Меню"}
+          </Typography>
+
           <DashboardMenu
             activeMenu={path.activeMenuId}
-            items={menuItems}
+            items={menuItemsP}
           />
         </Box>
 
-        {/* right */}
         <Box sx={styles.rightContainer}>
-          {/* right-wrapper */}
-          <Box>
+          <Typography
+            variant={"h5"}
+            marginBottom={"30px"}
+            color={"#273AB5"}
+          >
+            {menuItemsP.find(item => item.title === path.activeMenuId)?.title}
+          </Typography>
 
+          <Box sx={styles.rightContainerWrapper}>
+            <Box marginRight={"15px"}>
+              <Routes>
+                <Route path={paths.teacher.dashboard.overview} element={<Overview />} />
+                <Route path={paths.teacher.dashboard.experts} element={<CourseMain />} />
+                <Route path={paths.teacher.dashboard.export} element={<CourseMain />} />
+                <Route path={paths.teacher.dashboard.grades} element={<CourseMain />} />
+                <Route path={paths.teacher.dashboard.works} element={<CourseMain />} />
+                <Route path={paths.teacher.dashboard.checkings} element={<CourseMain />} />
+              </Routes>
+            </Box>
           </Box>
         </Box>
 
@@ -68,15 +95,15 @@ export const Dashboard: FC = () => {
 
 const styles = {
   container: {
-    maxWidth: "1400px"
+    maxWidth: "1800px",
+    margin: "0 auto",
   } as SxProps<Theme>,
 
   gridWrapper: {
     display: 'grid',
-    marginBottom: "8px",
-    gridTemplateColumns: '20% 80%',
+    margin: "30px 0px 8px 15px",
+    gridTemplateColumns: '15% 85%',
     gridTemplateAreas: ' "leftContainer rightContainer"',
-    overflow: 'hidden',
     height: '100%',
   } as SxProps<Theme>,
 
@@ -84,7 +111,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gridArea: 'leftContainer',
-    px: 3,
     overflowY: 'auto',
   } as SxProps<Theme>,
 
@@ -93,22 +119,17 @@ const styles = {
     flexDirection: 'column',
     gridArea: 'rightContainer',
     overflowY: 'auto',
+    maxWidth: "100%",
+    margin: "0px 0px 0px 25px",
+  } as SxProps<Theme>,
+  rightContainerWrapper: {
+    maxHeight: "calc(100vh - 183px)",
+    overflowY: "auto",
+    ...globalStyles.scrollStyles
   } as SxProps<Theme>,
 }
 
 const menuItems = [
-  {
-    title: IMenuTitles.CHECKINGS,
-    path: paths.teacher.dashboard.checkings
-  },
-  {
-    title: IMenuTitles.GRADES,
-    path: paths.teacher.dashboard.grades
-  },
-  {
-    title: IMenuTitles.EXPORT,
-    path: paths.teacher.dashboard.export
-  },
   {
     title: IMenuTitles.OVERVIEW,
     path: paths.teacher.dashboard.overview
@@ -118,7 +139,19 @@ const menuItems = [
     path: paths.teacher.dashboard.works
   },
   {
+    title: IMenuTitles.CHECKINGS,
+    path: paths.teacher.dashboard.checkings
+  },
+  {
     title: IMenuTitles.EXPERTS,
     path: paths.teacher.dashboard.experts
-  }
+  },
+  {
+    title: IMenuTitles.GRADES,
+    path: paths.teacher.dashboard.grades
+  },
+  {
+    title: IMenuTitles.EXPORT,
+    path: paths.teacher.dashboard.export
+  },
 ] as IMenu[]

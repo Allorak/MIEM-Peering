@@ -1,7 +1,6 @@
-import { useMemo } from 'react'
-import { useLocation, matchPath, NavigateProps } from 'react-router-dom'
-import { generatePath } from 'react-router'
+import { useLocation, matchPath } from 'react-router-dom'
 import type { Location } from 'history'
+
 import { IMenuTitles, IPathDashboard } from '../../store/types'
 import { paths } from '../constants/paths'
 
@@ -20,11 +19,11 @@ export const usePrivatePathTDashboard = (): IUsePrivatePathResult => {
     }
   }
 
-  const path = matchPath('t/task/:taskId/*', location.pathname)
-    ?? matchPath('t/task/:taskId/:activeMenu/*', location.pathname)
+  const path = matchPath('/t/task/:taskId/:activeMenu', location.pathname)
+    ?? matchPath('/t/task/:taskId/*', location.pathname)
 
   const taskId = path?.params?.taskId
-  const activeMenuId = path?.params?.activeMenuId
+  const activeMenuId = path?.params?.activeMenu
 
   if (!taskId) {
     return {

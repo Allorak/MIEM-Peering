@@ -27,6 +27,7 @@ export const DashboardMenu: FC<IProps> = ({
     <Box sx={styles.container}>
       {items.map(item => (
         <MenuItem
+          key={item.title}
           item={item}
           isActive={activeMenu ? activeMenu === item.title : false}
         />
@@ -43,13 +44,13 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
   const MenuIcon: FC<{ objectType: IMenuTitles }> = ({ objectType }) => {
     switch (objectType) {
       case IMenuTitles.OVERVIEW:
-        return (<Overview color={"inherit"} />)
+        return (<Overview svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.WORKS:
-        return (<Works color={"inherit"} />)
+        return (<Works svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.EXPERTS:
-        return (<Experts color={"inherit"} />)
+        return (<Experts svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.GRADES:
-        return (<Grades color={"inherit"} />)
+        return (<Grades svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.CHECKINGS:
         return (
           <AssignmentTurnedInOutlinedIcon
@@ -84,7 +85,6 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
       >
         {item.title}
       </Typography>
-
     </Link>
   )
 }
@@ -97,23 +97,22 @@ const styles = {
   } as SxProps<Theme>,
   activeMenu: {
     backgroundColor: palette.active.primary,
-    width: '100%',
     color: 'common.white'
   } as SxProps<Theme>,
   unActiveMenu: {
     color: '#A4ADC8',
     ":hover": {
-      border: `1px solid ${palette.divider}`
+      textDecoration: "underline"
     }
   } as SxProps<Theme>,
   generalMenu: {
-    width: "100%",
     height: "54px",
     display: "flex",
     padding: "0px 10px 0px 30px",
     alignItems: "center",
     gap: "19px",
     borderRadius: '4px',
+    textDecoration: 'none'
     //медиазапрос
   } as SxProps<Theme>,
   iconContainer: {
