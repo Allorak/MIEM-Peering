@@ -11,7 +11,7 @@ export const postNewCourse = async (payload: IRequestData): Promise<IResponse<IR
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/add-course`,
+    url: `/api/v1/course/create`,
     headers: {
       'Authorization': `Bearer ${payload.accessToken}`,
       'Accept-Language': 'ru',

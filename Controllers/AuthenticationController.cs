@@ -6,19 +6,19 @@ using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;  
 using System.Security.Claims;
 using System.Text;
-
+using Microsoft.AspNetCore.Authorization;
+using patools.Models;
 namespace patools.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class AuthenticationController : Controller
+    public class AuthenticationController : ControllerBase
     {
+        private readonly PAToolsContext _context;
 
-        private readonly ILogger<AuthenticationController> _logger;
-
-        public AuthenticationController(ILogger<AuthenticationController> logger)
+        public AuthenticationController(PAToolsContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
         [HttpGet("gettoken")]    
@@ -28,13 +28,13 @@ namespace patools.Controllers
             var issuer = "http://localhost:5000";  
         
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));    
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);    
-        
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);  
+            
             var permClaims = new List<Claim>();    
             permClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));    
             permClaims.Add(new Claim("valid", "1"));    
             permClaims.Add(new Claim("userid", "1"));    
-            permClaims.Add(new Claim("name", "bilal"));    
+            permClaims.Add(new Claim("email", "abc@gmail.com"));    
         
             var token = new JwtSecurityToken(issuer, //Issure    
                             issuer,  //Audience    

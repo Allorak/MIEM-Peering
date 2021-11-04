@@ -11,7 +11,12 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;    
 using System.Text;   
 using System.Threading.Tasks;
+<<<<<<< HEAD
 using System.Collections.Generic;
+=======
+using System;
+using patools.Models;
+>>>>>>> 41fe42c4fdfcd5c8df49aceda55f9336e317d0c1
 
 namespace patools
 {
@@ -29,7 +34,7 @@ namespace patools
         {
             SetupJWTServices(services);
             services.AddControllersWithViews();
-
+            services.AddDbContext<PAToolsContext>();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -103,7 +108,7 @@ namespace patools
                       {  
                           context.Response.Headers.Add("Token-Expired", "true");  
                       }  
-                      return Task.CompletedTask;  
+                      return System.Threading.Tasks.Task.CompletedTask;  
                   }  
               };  
           });  

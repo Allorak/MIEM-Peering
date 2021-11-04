@@ -40,8 +40,9 @@ const styles = {
         padding: '20px',
         borderRadius: '4px',
         width: '100%',
+        boxShadow: '5px 5px 14px -9px rgba(34, 60, 80, 0.2)',
         ":hover": {
-            cursor: 'pointer',
+            cursor: 'pointer'
         }
     } as SxProps<Theme>,
     taskTitle: {

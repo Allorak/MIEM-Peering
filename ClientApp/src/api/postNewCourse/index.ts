@@ -1,8 +1,7 @@
 import { ICourse, INewCourseRequest } from "../../store/types";
 
 export interface IRequestData extends INewCourseRequest {
-    accessToken: string,
-    userEmail: string
+    accessToken: string
 }
 
 

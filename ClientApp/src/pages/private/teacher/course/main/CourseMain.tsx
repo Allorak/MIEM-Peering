@@ -9,68 +9,75 @@ import { useNavigate, generatePath } from "react-router-dom"
 import { paths } from "../../../../../app/constants/paths";
 import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { fetchTasks } from "../../../../../store/tasks/thunks/tasks";
+import { fetchTasks } from "../../../../../store/tasks/thunks/fetchTasks";
+import * as constStyles from '../../../../../const/styles'
 
 
 
 export const CourseMain: FC = () => {
     const dispatch = useAppDispatch()
     const history = useNavigate()
-    const { path, location } = usePrivatePathT()
+    const { path } = usePrivatePathT()
     const isLoading = useAppSelector(state => state.tasks.isLoading)
     const error = useAppSelector(state => state.tasks.error)
     const tasks = useAppSelector(state => state.tasks.payload)
-    
+
 
     useEffect(() => {
         if (path?.courseId)
-        dispatch(fetchTasks(path.courseId))
+            dispatch(fetchTasks(path.courseId))
     }, [dispatch])
 
     const onTaskClick = (id: string) => {
         console.log("Task clicked:", id)
         if (path?.courseId) {
-            console.log(generatePath(paths.teacher.task.main, { courseId: path.courseId, taskId: id }))
-            history(
-                generatePath(paths.teacher.task.main, { courseId: path.courseId, taskId: id })
-            )
+            const taskPath = generatePath(paths.teacher.task.main, { courseId: path.courseId, taskId: id })
+            history(taskPath)
         }
+    }
 
+    const onAddTask = () => {
+        if (path?.courseId) {
+            const newTaskPath = generatePath(paths.teacher.task.add, { courseId: path.courseId })
+            history(newTaskPath)
+        }
     }
 
     return (<>
-        <Box sx={styles.container}>
-            <WorkBox
-                error={error}
-                isLoading={isLoading}
-                
-            >
-                <Box sx={styles.topContainer}>
-                    <Typography
-                        variant='h6'
-                        sx={styles.title}
-                    >
-                        Задания
-                    </Typography>
-                    <Button
-                        variant='contained'
-                        sx={styles.addBt}
-                    // onClick={onAddNewCourse}
-                    >
-                        Добавить
-                    </Button>
-                </Box>
-                <Box sx={styles.root}>
-                    {tasks && (tasks.length > 0) && (
-                        <List
-                            items={tasks}
-                            renderItems={
-                                (task) => <TaskCard task={task} onClick={onTaskClick} key={task.id} />
-                            }
-                        />
-                    )}
-                </Box>
-            </WorkBox>
+        <Box sx={constStyles.container}>
+            <Box sx={styles.wrapper}>
+                <WorkBox
+                    error={error}
+                    isLoading={isLoading}
+
+                >
+                    <Box sx={styles.topContainer}>
+                        <Typography
+                            variant='h6'
+                            sx={styles.title}
+                        >
+                            Задания
+                        </Typography>
+                        <Button
+                            variant='contained'
+                            sx={styles.addBt}
+                            onClick={onAddTask}
+                        >
+                            Добавить
+                        </Button>
+                    </Box>
+                    <Box sx={styles.root}>
+                        {tasks && (tasks.length > 0) && (
+                            <List
+                                items={tasks}
+                                renderItems={
+                                    (task) => <TaskCard task={task} onClick={onTaskClick} key={task.id} />
+                                }
+                            />
+                        )}
+                    </Box>
+                </WorkBox>
+            </Box>
         </Box>
         {/* <AddCourse popupOpen={newCourse} /> */}
         {/* добаление задания */}
@@ -78,9 +85,9 @@ export const CourseMain: FC = () => {
 }
 
 const styles = {
-    container: {
+    wrapper: {
         maxWidth: '1371px',
-        margin: '60px auto 20px auto',
+        margin: '20px 0px',
     } as SxProps<Theme>,
     root: {
         display: 'flex',
