@@ -4,19 +4,17 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks'
 import { usePrivatePathT } from '../../../app/hooks/usePrivatePathT'
 import { paths } from '../../../app/constants/paths'
 import { Box } from '@mui/system'
-import { Wrapper } from '../../../components/wrapper'
 import { TCourseList as CourseList } from './course/list'
 import { CourseMain } from './course/main'
 import { TaskAdd } from './task/add'
+import { Dashboard } from './dashboard/Dashboard'
 
 
 
 export function TeacherPrivate() {
-    const dispatch = useAppDispatch()
     console.log('Teacher private')
     const {
         location,
-        path
     } = usePrivatePathT()
 
 
@@ -53,6 +51,7 @@ export function TeacherPrivate() {
                 <Route path={paths.teacher.main} element={<CourseList />} />
                 <Route path={paths.teacher.courses.course} element={<CourseMain />} />
                 <Route path={paths.teacher.task.add} element={<TaskAdd />} />
+                <Route path={"*"} element={<Dashboard />} />
             </Routes>
         </Box>
 
