@@ -10,11 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;    
 using System.Text;   
 using System.Threading.Tasks;
-<<<<<<< HEAD
-using System;
-using patools.Models;
-=======
->>>>>>> dev
 
 namespace patools
 {
