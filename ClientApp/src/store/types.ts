@@ -159,6 +159,8 @@ export interface INewTaskSettings {
   maxSubmission: number
 }
 
+export interface IDeadlines extends Omit<INewTaskSettings, 'maxSubmission'>{}
+
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
 export type IParentQuestionRubric = {
