@@ -11,12 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;    
 using System.Text;   
 using System.Threading.Tasks;
-<<<<<<< HEAD
 using System.Collections.Generic;
-=======
 using System;
 using patools.Models;
->>>>>>> 41fe42c4fdfcd5c8df49aceda55f9336e317d0c1
 
 namespace patools
 {
@@ -64,6 +61,7 @@ namespace patools
 
             app.UseAuthentication();  
             app.UseAuthorization(); 
+            //app.UseGoogleAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
@@ -87,31 +85,43 @@ namespace patools
         {  
             string key = "M13m_S3cr3T-t0k3N"; //this should be same which is used while creating token 
             List<string> issuers = new List<string>(){"http://localhost:5000","accounts.google.com"};
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)  
-          .AddJwtBearer(options =>  
-          {  
-              options.TokenValidationParameters = new TokenValidationParameters  
-              {  
-                  ValidateIssuer = true,  
-                  ValidateAudience = true,  
-                  ValidateIssuerSigningKey = true,  
-                  ValidIssuers = issuers,
-                  ValidAudiences = issuers,  
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))  
-              };  
-  
-              options.Events = new JwtBearerEvents  
-              {  
-                  OnAuthenticationFailed = context =>  
-                  {  
-                      if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))  
-                      {  
-                          context.Response.Headers.Add("Token-Expired", "true");  
-                      }  
-                      return System.Threading.Tasks.Task.CompletedTask;  
-                  }  
-              };  
-          });  
+            IConfigurationSection googleAuthNSection = Configuration.GetSection("Authentication:Google");
+            List<string> audiences = new List<string>(){"http://localhost:5000",$"{googleAuthNSection["ClientId"]}"};
+            services.AddAuthentication()  
+            /*.AddJwtBearer(options =>  
+            {  
+                options.SaveToken = true;
+
+                options.TokenValidationParameters = new TokenValidationParameters  
+                {  
+                    ValidateIssuer = true,  
+                    ValidateAudience = true,  
+                    ValidateIssuerSigningKey = true,  
+                    ValidIssuers = issuers,
+                    ValidAudiences = audiences,  
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))  
+                };  
+    
+                options.Events = new JwtBearerEvents  
+                {  
+                    OnAuthenticationFailed = context =>  
+                    {  
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))  
+                        {  
+                            context.Response.Headers.Add("Token-Expired", "true");  
+                        }  
+                        return System.Threading.Tasks.Task.CompletedTask;  
+                    }  
+                };  
+            })*/
+            .AddGoogle(options =>
+            {
+                IConfigurationSection googleAuthNSection =
+                    Configuration.GetSection("Authentication:Google");
+
+                options.ClientId = googleAuthNSection["ClientId"];
+                options.ClientSecret = googleAuthNSection["ClientSecret"];
+            });  
         }  
 
     }

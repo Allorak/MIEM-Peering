@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
+using Google.Apis.Auth;
 using Microsoft.IdentityModel.Tokens;    
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -45,22 +47,22 @@ namespace patools.Controllers
             return new { data = jwt_token };    
         }
 
-        [HttpPost("posttoken")]  
-        public Object PostToken() 
+        [AllowAnonymous]
+        [HttpPost("googleauth/{token}")]  
+        public async System.Threading.Tasks.Task<IActionResult> PostToken([FromRoute]string token) 
         {  
-            if (User.Identity.IsAuthenticated) 
-            {  
-                var identity = User.Identity as ClaimsIdentity;  
-                if (identity != null) 
-                {  
-                    IEnumerable < Claim > claims = identity.Claims; 
-                }  
-                return new Response(new {userState = "NEW"});
-            } 
-            else 
-            {  
-                return new Response("Unauthorized");  
-            }   
+            try
+            {
+                var googleUser = await GoogleJsonWebSignature.ValidateAsync(token, new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new[] {"232154519390-nlp3m4fjjeosrvo8gld3l6lo7cd2v3na.apps.googleusercontent.com"}
+                });
+                return Ok(new Response(new {userState = "NEW"}));
+            }
+            catch(Exception e)
+            {
+                return Ok(new Response("Unauthorized"));  
+            }
         } 
     }
 }
