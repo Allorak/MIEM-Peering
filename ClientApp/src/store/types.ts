@@ -238,5 +238,10 @@ export enum IMenuTitles {
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
   EXPORT = 'Экспорт'
-  
+}
+
+export type IStatusBar = {
+  total: number,
+  submissions: number,
+  review: number
 }
