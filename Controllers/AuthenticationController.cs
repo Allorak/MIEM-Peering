@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using patools.Models;
+using System.Linq;
 namespace patools.Controllers
 {
     [Route("api")]
@@ -47,7 +48,6 @@ namespace patools.Controllers
             return new { data = jwt_token };    
         }
 
-        [AllowAnonymous]
         [HttpPost("googleauth/{token}")]  
         public async System.Threading.Tasks.Task<IActionResult> PostToken([FromRoute]string token) 
         {  
@@ -57,11 +57,15 @@ namespace patools.Controllers
                 {
                     Audience = new[] {"232154519390-nlp3m4fjjeosrvo8gld3l6lo7cd2v3na.apps.googleusercontent.com"}
                 });
-                return Ok(new Response(new {userState = "NEW"}));
+                var users = _context.Users.Where(u => u.Email == googleUser.Email);
+                if(users.Any())
+                    return Ok(new Response(true, users.First(), "REGISTERED"));
+                else
+                    return Ok(new Response(true, "NEW"));
             }
             catch(Exception e)
             {
-                return Ok(new Response("Unauthorized"));  
+                return Ok(new Response(false, $"Unauthorized"));  
             }
         } 
     }

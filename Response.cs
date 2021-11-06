@@ -4,20 +4,27 @@ namespace patools
     {
         public bool Success { get; private set; }
         public object Payload { get; private set; }
-        public string FailureMessage { get; private set; }
+        public string Message { get; private set; }
 
         public Response(object payload)
         {
            Success = true;
            Payload = payload;
-           FailureMessage = null;
+           Message = null;
         }
 
-        public Response(string failureMessage)
+        public Response(bool success, string message)
         { 
-            Success = false;
+            Success = success;
             Payload = null;
-            FailureMessage = failureMessage;
+            Message = message;
+        }
+
+        public Response(bool success, object payload, string message)
+        {
+            Success = success;
+            Payload = payload;
+            Message = message;
         }
     }
 
