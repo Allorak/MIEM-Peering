@@ -245,3 +245,9 @@ export type IStatusBar = {
   submissions: number,
   review: number
 }
+
+export type IOverview = {
+  statistics: IStatusBar,
+  deadlines: IDeadlines,
+  grades: number[]
+}

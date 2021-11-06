@@ -1,78 +1,110 @@
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import {
   XYPlot,
   HorizontalGridLines,
   XAxis,
   YAxis,
-  LineSeries,
-  VerticalGridLines
+  VerticalGridLines,
+  LineMarkSeries
 } from 'react-vis';
 import { Box, SxProps, Theme } from "@mui/system"
 
 import { Deadlines } from "../../../../../components/deadlines"
 import { StatusBar } from "../../../../../components/statusBar"
 
-import { IDeadlines, IStatusBar } from "../../../../../store/types"
 import { Typography } from "@mui/material";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+
+import { palette } from "../../../../../theme/colors";
+
+import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
+
+import { fetchOverview } from "../../../../../store/overview";
 
 
 export const Overview: FC = () => {
 
-  const data = [] as Array<{ y: number, x: number }>
+  const dispatch = useAppDispatch()
+  const { path } = usePrivatePathTDashboard()
 
-  for (let i = 1; i < 160; i++) {
-    data.push({ y: Math.random() * (10 - 0) + 0, x: i })
-  }
+  const status = useAppSelector(state => state.overview.isLoading)
+  const error = useAppSelector(state => state.overview.error)
+  const payload = useAppSelector(state => state.overview.payload)
+
+  useEffect(() => {
+    if (path && path.taskId)
+      dispatch(fetchOverview(path.taskId))
+  }, [])
+
+  const graphData = payload.grades?.map((grade, index) => ({ x: index, y: grade }))
 
   return (
     <DashboardWorkBox
-      isLoading={false}
+      isLoading={status}
+      error={error}
     >
-      <Deadlines {...fake} />
+      {payload && (
+        <>
+          <Deadlines {...payload.deadlines} />
 
-      <Box sx={styles.gridWrapper}>
-        <Box sx={styles.statusbarBox}>
-          <StatusBar {...statusData} />
-        </Box>
+          <Box sx={styles.gridWrapper}>
+            <Box sx={styles.statusbarBox}>
+              <StatusBar {...payload.statistics} />
+            </Box>
 
-        <Box sx={styles.graphBox}>
-          <Box m={"15px"}>
-            <Typography variant={"h6"} margin={"0px 0px 10px 0px"}>
-              {"График успеваемости"}
-            </Typography>
+            <Box sx={styles.graphBox}
+              onTouchMove={(e) => e.preventDefault()}
+            >
+              <Box m={"15px"}>
+                <Typography
+                  variant={"h6"}
+                  margin={"0px 0px 10px 0px"}
+                >
+                  {"График успеваемости"}
+                </Typography>
 
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <Box sx={{ overflowY: "auto" }}>
-                <XYPlot height={300} width={970} xType="linear" >
-                  <HorizontalGridLines />
-                  <VerticalGridLines />
-                  <YAxis title="- оценки" />
-                  <XAxis title="- № работы" />
-                  <LineSeries
-                    data={data}
-                  />
-                </XYPlot>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Box
+                    sx={{
+                      overflowY: "auto"
+                    }}
+                  >
+                    <XYPlot
+                      height={300}
+                      width={970}
+                      xType="linear"
+                      onTouchMove={(e) => e.preventDefault()}
+                    >
+                      <HorizontalGridLines />
+                      <VerticalGridLines />
+                      <YAxis title="- оценки" />
+                      <XAxis title="- № работы" />
+                      <LineMarkSeries
+                        style={{
+                          strokeWidth: '1px'
+                        }}
+                        lineStyle={{ stroke: palette.fill.secondary }}
+                        markStyle={{ fill: palette.fill.primary, strokeWidth: "0px" }}
+                        data={graphData}
+                      />
+
+                    </XYPlot>
+                  </Box>
+                </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
-      </Box>
+        </>
+      )}
+
     </DashboardWorkBox>
   )
-}
-
-const fake: IDeadlines = {
-  sBegin: new Date(),
-  sEnd: new Date(),
-  rBegin: new Date(),
-  rEnd: new Date()
-}
-
-const statusData: IStatusBar = {
-  submissions: 50,
-  total: 150,
-  review: 140
 }
 
 const styles = {

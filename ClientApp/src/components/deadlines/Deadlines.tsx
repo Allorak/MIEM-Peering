@@ -13,7 +13,6 @@ export const Deadlines: FC<IDeadlines> = ({
   rEnd,
 }) => {
 
-  console.log(sEnd!.toLocaleTimeString(), "SSS")
   return (
     <Box sx={styles.wrapper}>
       <Box sx={styles.cardsWrapper}>
