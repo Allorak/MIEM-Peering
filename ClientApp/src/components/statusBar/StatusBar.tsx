@@ -25,7 +25,7 @@ export const StatusBar: FC<IProps> = ({
 
         <Box sx={styles.progressContainer}>
           <Typography
-            variant={"h5"}
+            variant={"h6"}
             sx={styles.progressText}
           >
             {`${submissions} из ${total}`}
@@ -44,7 +44,7 @@ export const StatusBar: FC<IProps> = ({
         </Typography>
         <Box sx={styles.progressContainer}>
           <Typography
-            variant={"h5"}
+            variant={"h6"}
             sx={styles.progressText}
           >
             {`${review} из ${total}`}
