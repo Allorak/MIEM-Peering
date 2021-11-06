@@ -159,6 +159,8 @@ export interface INewTaskSettings {
   maxSubmission: number
 }
 
+export interface IDeadlines extends Omit<INewTaskSettings, 'maxSubmission'>{}
+
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
 export type IParentQuestionRubric = {
@@ -236,5 +238,16 @@ export enum IMenuTitles {
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
   EXPORT = 'Экспорт'
-  
+}
+
+export type IStatusBar = {
+  total: number,
+  submissions: number,
+  review: number
+}
+
+export type IOverview = {
+  statistics: IStatusBar,
+  deadlines: IDeadlines,
+  grades: number[]
 }
