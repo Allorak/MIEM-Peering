@@ -35,6 +35,7 @@ export const StatusBar: FC<IProps> = ({
             value={submissionPercentage}
             variant={"determinate"}
             sx={styles.linearProgress}
+            color={submissionPercentage < 15 ? "error" :  submissionPercentage < 30 ? "warning" : submissionPercentage < 70 ? "info" : "success"}
           />
         </Box>
 
@@ -53,7 +54,7 @@ export const StatusBar: FC<IProps> = ({
             value={reviewPercentage}
             variant={"determinate"}
             sx={styles.linearProgress}
-            color={"secondary"}
+            color={reviewPercentage < 15 ? "error" :  reviewPercentage < 30 ? "warning" : reviewPercentage < 70 ? "info" : "success"}
           />
         </Box>
       </Box>
