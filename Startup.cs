@@ -29,7 +29,6 @@ namespace patools
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            SetupJWTServices(services);
             services.AddControllersWithViews();
             services.AddDbContext<PAToolsContext>();
             // In production, the React files will be served from this directory
@@ -61,7 +60,6 @@ namespace patools
 
             app.UseAuthentication();  
             app.UseAuthorization(); 
-            //app.UseGoogleAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
@@ -81,48 +79,6 @@ namespace patools
             });
         }
 
-        private void SetupJWTServices(IServiceCollection services)  
-        {  
-            string key = "M13m_S3cr3T-t0k3N"; //this should be same which is used while creating token 
-            List<string> issuers = new List<string>(){"http://localhost:5000","accounts.google.com"};
-            IConfigurationSection googleAuthNSection = Configuration.GetSection("Authentication:Google");
-            List<string> audiences = new List<string>(){"http://localhost:5000",$"{googleAuthNSection["ClientId"]}"};
-            services.AddAuthentication()  
-            /*.AddJwtBearer(options =>  
-            {  
-                options.SaveToken = true;
-
-                options.TokenValidationParameters = new TokenValidationParameters  
-                {  
-                    ValidateIssuer = true,  
-                    ValidateAudience = true,  
-                    ValidateIssuerSigningKey = true,  
-                    ValidIssuers = issuers,
-                    ValidAudiences = audiences,  
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))  
-                };  
-    
-                options.Events = new JwtBearerEvents  
-                {  
-                    OnAuthenticationFailed = context =>  
-                    {  
-                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))  
-                        {  
-                            context.Response.Headers.Add("Token-Expired", "true");  
-                        }  
-                        return System.Threading.Tasks.Task.CompletedTask;  
-                    }  
-                };  
-            })*/
-            .AddGoogle(options =>
-            {
-                IConfigurationSection googleAuthNSection =
-                    Configuration.GetSection("Authentication:Google");
-
-                options.ClientId = googleAuthNSection["ClientId"];
-                options.ClientSecret = googleAuthNSection["ClientSecret"];
-            });  
-        }  
 
     }
 }
