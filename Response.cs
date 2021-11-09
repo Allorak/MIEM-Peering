@@ -1,31 +1,29 @@
 namespace patools
 {
-    public class Response
+    public abstract class Response
     {
-        public bool Success { get; private set; }
-        public object Payload { get; private set; }
-        public string Message { get; private set; }
+        public bool Success { get; protected set; }
+        public object Payload { get; protected set; }
+        public object Error { get; protected set; }
+    }
 
-        public Response(object payload)
+    public class FailedResponse : Response
+    {
+        public FailedResponse(object error)
         {
-           Success = true;
-           Payload = payload;
-           Message = null;
-        }
-
-        public Response(bool success, string message)
-        { 
-            Success = success;
+            Success = false;
             Payload = null;
-            Message = message;
-        }
-
-        public Response(bool success, object payload, string message)
-        {
-            Success = success;
-            Payload = payload;
-            Message = message;
+            Error = error;
         }
     }
 
+    public class SuccessfulResponse : Response
+    {
+        public SuccessfulResponse(object payload)
+        {
+            Success = true;
+            Payload = payload;
+            Error = null;
+        }
+    }
 }

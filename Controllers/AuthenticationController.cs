@@ -59,13 +59,16 @@ namespace patools.Controllers
                 });
                 var users = _context.Users.Where(u => u.Email == googleUser.Email);
                 if(users.Any())
-                    return Ok(new Response(true, users.First(), "REGISTERED"));
+                {
+                    object user = users.First();
+                    return Ok(new SuccessfulResponse(new {status = "REGISTERED", user}));
+                }
                 else
-                    return Ok(new Response(true, "NEW"));
+                    return Ok(new SuccessfulResponse(new {status = "NEW"}));
             }
             catch(Exception e)
             {
-                return Ok(new Response(false, $"Unauthorized"));  
+                return Ok(new FailedResponse(new {code = 401, message = "Unauthorized"}));  
             }
         } 
     }
