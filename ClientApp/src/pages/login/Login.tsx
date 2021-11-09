@@ -48,7 +48,7 @@ export const Login: FC = () => {
         console.log(e.error)
     }
 
-    if (gIsAuthorized && gPayload.userState === 'NEW') {
+    if (gIsAuthorized && gPayload.status === 'NEW') {
         return (
             <Navigate
                 to={paths.registration.main}

@@ -4,7 +4,7 @@ import { paths } from "../../../app/constants/paths";
 import { useAppSelector } from "../../../app/hooks";
 
 export const Registration: FC = () => {
-    const gAuthState = useAppSelector(state => state.gAuth.payload.userState)
+    const gAuthState = useAppSelector(state => state.gAuth.payload.status)
     const registrationProps = useAppSelector(state => state.registration.registraionProps)
 
     if (gAuthState === 'NEW' && registrationProps?.email){

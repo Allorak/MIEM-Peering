@@ -23,7 +23,7 @@ export const fetchGAuth = (payload: iGoogleAuthResponse): AppThunk => async (dis
             dispatch(actions.authFailed(response.error))
             return
         }
-        if (response.payload.userState === 'NEW'){
+        if (response.payload.status === 'NEW'){
             dispatch(registretionActions.setProps(payload))
         }
         dispatch(actions.authSuccess(response.payload))
@@ -35,5 +35,5 @@ export const fetchGAuth = (payload: iGoogleAuthResponse): AppThunk => async (dis
             message: 'Не удалось выполнить запрос'
         }));
     }
-    dispatch(actions.authSuccess({userState: 'NEW'}))
+    dispatch(actions.authSuccess({status: 'NEW'}))
 }
