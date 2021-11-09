@@ -251,3 +251,18 @@ export type IOverview = {
   deadlines: IDeadlines,
   grades: number[]
 }
+
+export type IWorkItem = {
+  id: string, 
+  responses: IWorkResponse[],
+  author: {
+    name: string,
+    id: string
+  }
+}
+
+export type IWorkResponse = {
+  questionId: number,
+  title: string,
+  response?: string
+}
