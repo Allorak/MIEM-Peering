@@ -14,10 +14,17 @@ export const paths = {
       course: '/t/course/:courseId/main'
     },
     task: {
-      main: '/t/course/:courseId/task/:taskId/main',
+      main: '/t/course/:courseId/task/:taskId/main', // TO DO страница статистики
       add: '/t/course/:courseId/task/add'
+    },
+    dashboard: {
+      overview: '/t/task/:taskId/overview',
+      grades: '/t/task/:taskId/grades',
+      export: '/t/task/:taskId/export',
+      experts: '/t/task/:taskId/experts',
+      works: '/t/task/:taskId/works',
+      checkings: '/t/task/:taskId/checkings'
     }
-
   },
   student: {
     main: '/st/course',

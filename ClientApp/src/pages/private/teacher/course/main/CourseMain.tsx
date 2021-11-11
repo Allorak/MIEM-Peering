@@ -31,7 +31,7 @@ export const CourseMain: FC = () => {
     const onTaskClick = (id: string) => {
         console.log("Task clicked:", id)
         if (path?.courseId) {
-            const taskPath = generatePath(paths.teacher.task.main, { courseId: path.courseId, taskId: id })
+            const taskPath = generatePath(paths.teacher.dashboard.overview, { taskId: id })
             history(taskPath)
         }
     }
@@ -43,7 +43,7 @@ export const CourseMain: FC = () => {
         }
     }
 
-    return (<>
+    return (
         <Box sx={constStyles.container}>
             <Box sx={styles.wrapper}>
                 <WorkBox
@@ -79,9 +79,7 @@ export const CourseMain: FC = () => {
                 </WorkBox>
             </Box>
         </Box>
-        {/* <AddCourse popupOpen={newCourse} /> */}
-        {/* добаление задания */}
-    </>)
+    )
 }
 
 const styles = {

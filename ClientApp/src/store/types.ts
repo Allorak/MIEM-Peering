@@ -35,6 +35,11 @@ export type IPath = {
   taskId?: string
 }
 
+export type IPathDashboard = {
+  taskId?: string,
+  activeMenuId?: IMenuTitles
+}
+
 export type IGAuthCheckUser = {
   status: 'NEW' | 'REGISTERED'
 }
@@ -154,6 +159,8 @@ export interface INewTaskSettings {
   maxSubmission: number
 }
 
+export interface IDeadlines extends Omit<INewTaskSettings, 'maxSubmission'>{}
+
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
 export type IParentQuestionRubric = {
@@ -216,4 +223,31 @@ export const defaultResponses = {
 export interface IMultipleResponse {
   id: number,
   response: string
+}
+
+
+export type IMenu = {
+  title: IMenuTitles,
+  path: string
+}
+
+export enum IMenuTitles {
+  OVERVIEW = 'Обзор',
+  WORKS = 'Работы',
+  CHECKINGS = 'Проверки',
+  EXPERTS = 'Эксперты',
+  GRADES = 'Успеваемость',
+  EXPORT = 'Экспорт'
+}
+
+export type IStatusBar = {
+  total: number,
+  submissions: number,
+  review: number
+}
+
+export type IOverview = {
+  statistics: IStatusBar,
+  deadlines: IDeadlines,
+  grades: number[]
 }
