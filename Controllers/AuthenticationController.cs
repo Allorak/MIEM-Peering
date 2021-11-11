@@ -68,7 +68,7 @@ namespace patools.Controllers
             }
             catch(Exception e)
             {
-                return Ok(new FailedResponse(new {code = 401, message = "Unauthorized"}));  
+                return Ok(new FailedResponse(new Error(401, "Unauthorized")));  
             }
         } 
     }
