@@ -41,7 +41,7 @@ export type IPathDashboard = {
 }
 
 export type IGAuthCheckUser = {
-  userState: 'NEW' | 'REGISTERED'
+  status: 'NEW' | 'REGISTERED'
 }
 
 export type IUserGAuth = {

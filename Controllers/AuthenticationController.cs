@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Google.Apis.Auth;
 using Microsoft.IdentityModel.Tokens;    
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using patools.Models;
+using System.Linq;
 namespace patools.Controllers
 {
     [Route("api")]
@@ -26,8 +27,9 @@ namespace patools.Controllers
         [HttpGet("gettoken")]    
         public Object GetToken()    
         {    
-            string key = "M13m_S3cr3T-t0k3N"; //Secret key which will be used later during validation    
-            var issuer = "http://localhost:5000";  //normally this will be your site URL    
+            string key = "M13m_S3cr3T-t0k3N";  
+            var issuer = "http://localhost:5000";  
+        
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));    
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);  
             
@@ -40,22 +42,34 @@ namespace patools.Controllers
             var token = new JwtSecurityToken(issuer, //Issure    
                             issuer,  //Audience    
                             permClaims,    
-                            expires: DateTime.Now.AddDays(1),    
+                            expires: DateTime.Now.AddDays(10),    
                             signingCredentials: credentials);    
             var jwt_token = new JwtSecurityTokenHandler().WriteToken(token);    
             return new { data = jwt_token };    
         }
-        
-        [Authorize]  
-        [HttpPost("posttoken")]  
-        public Object PostToken() 
+
+        [HttpPost("googleauth/{token}")]  
+        public async System.Threading.Tasks.Task<IActionResult> PostToken([FromRoute]string token) 
         {  
-            var identity = User.Identity as ClaimsIdentity;  
-            if (identity != null) 
-            {  
-                return new { payload = new {userState =  "NEW"}, success = true};  
-            }  
-            return null;  
+            try
+            {
+                var googleUser = await GoogleJsonWebSignature.ValidateAsync(token, new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new[] {"232154519390-nlp3m4fjjeosrvo8gld3l6lo7cd2v3na.apps.googleusercontent.com"}
+                });
+                var users = _context.Users.Where(u => u.Email == googleUser.Email);
+                if(users.Any())
+                {
+                    object user = users.First();
+                    return Ok(new SuccessfulResponse(new {status = "REGISTERED", user}));
+                }
+                else
+                    return Ok(new SuccessfulResponse(new {status = "NEW"}));
+            }
+            catch(Exception e)
+            {
+                return Ok(new FailedResponse(new Error(401, "Unauthorized")));  
+            }
         } 
     }
 }
