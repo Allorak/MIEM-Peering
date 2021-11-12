@@ -11,9 +11,9 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 interface IProps {
   id: number,
   title: string,
-  onEdit(id: number): void,
-  onRemove(id: number): void,
-  onClone(id: number): void,
+  onEdit?(id: number): void,
+  onRemove?(id: number): void,
+  onClone?(id: number): void,
   required: boolean
 }
 
@@ -51,47 +51,49 @@ export const AnswerBox: FC<IProps> = ({
           </Box>
         </Box>
       </Box>
-
-      <Box sx={styles.actionCOntainer}>
-        <Button variant='contained'
-          startIcon={<EditIcon />}
-          onClick={() => onEdit(id)}
-          sx={styles.actionBt}
-        >
-          <Box
-            component={'span'}
-            sx={styles.actionBtLabel}
+      {onEdit && onRemove && onClone && (
+        <Box sx={styles.actionCOntainer}>
+          <Button variant='contained'
+            startIcon={<EditIcon />}
+            onClick={() => onEdit(id)}
+            sx={styles.actionBt}
           >
-            {"Изменить"}
-          </Box>
-        </Button>
+            <Box
+              component={'span'}
+              sx={styles.actionBtLabel}
+            >
+              {"Изменить"}
+            </Box>
+          </Button>
 
-        <Button variant='contained'
-          startIcon={<ContentCopyIcon />}
-          onClick={() => onClone(id)}
-          sx={styles.actionBt}
-        >
-          <Box
-            component={'span'}
-            sx={styles.actionBtLabel}
+          <Button variant='contained'
+            startIcon={<ContentCopyIcon />}
+            onClick={() => onClone(id)}
+            sx={styles.actionBt}
           >
-            {"Создать копию"}
-          </Box>
-        </Button>
+            <Box
+              component={'span'}
+              sx={styles.actionBtLabel}
+            >
+              {"Создать копию"}
+            </Box>
+          </Button>
 
-        <Button variant='contained'
-          startIcon={<DeleteIcon />}
-          onClick={() => onRemove(id)}
-          sx={styles.actionBt}
-        >
-          <Box
-            component={'span'}
-            sx={styles.actionBtLabel}
+          <Button variant='contained'
+            startIcon={<DeleteIcon />}
+            onClick={() => onRemove(id)}
+            sx={styles.actionBt}
           >
-            {"Удалить"}
-          </Box>
-        </Button>
-      </Box>
+            <Box
+              component={'span'}
+              sx={styles.actionBtLabel}
+            >
+              {"Удалить"}
+            </Box>
+          </Button>
+        </Box>
+      )}
+
     </Box>
   )
 }
@@ -104,12 +106,12 @@ const styles = {
     padding: '16px 0px 0px 0px',
     boxShadow: '0px 0px 3px 0px rgba(34, 60, 80, 0.2)',
     borderLeft: theme => `3px solid ${theme.palette.primary.main}`,
+    boxSizing: "border-box"
   } as SxProps<Theme>,
   container: {
     margin: '0px 25px'
   } as SxProps<Theme>,
   topContainer: {
-    borderBottom: theme => `solid 1px ${theme.palette.divider}`,
     padding: '0px 0px 16px 0px'
   } as SxProps<Theme>,
   bodyContainer: {
@@ -138,7 +140,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'flex-end',
     gap: "10px",
-
+    borderTop: theme => `solid 1px ${theme.palette.divider}`,
   } as SxProps<Theme>,
   actionBtLabel: {
     "@media (max-width: 600px)": {

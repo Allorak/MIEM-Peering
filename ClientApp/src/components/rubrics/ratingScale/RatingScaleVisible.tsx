@@ -11,7 +11,6 @@ export const RatingScaleVisible: FC = () => {
     <Tooltip
       title={"Это всего лишь предварительный просмотр"}
       placement={"top"}
-            
     >
       <Select
         value={rate}
