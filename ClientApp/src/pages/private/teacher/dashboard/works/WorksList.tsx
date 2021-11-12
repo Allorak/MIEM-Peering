@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, useMediaQuery, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
 import { IWorkItem } from "../../../../../store/types";
@@ -19,9 +19,12 @@ export const WorksList: FC<IProps> = ({
   worksCatalog
 }) => {
 
+  const matches = useMediaQuery('(max-width:900px)');
+
+
   return (
     <Box sx={styles.wrapper}>
-      {worksCatalog && worksCatalog.length > 0 && (
+      {!matches && worksCatalog && worksCatalog.length > 0 && (
         worksCatalog.map((work, index) => (
           <Box
             key={work.id}
@@ -33,6 +36,25 @@ export const WorksList: FC<IProps> = ({
             </Typography>
           </Box>
         ))
+      )}
+
+      {matches && worksCatalog && worksCatalog.length > 0 && (
+        <FormControl fullWidth>
+          <Select
+            value={activeWorkId}
+            onChange={(e) => { onWorkChange(e.target.value) }}
+          >
+            {worksCatalog.map((work, index) => (
+              <MenuItem
+                key={index}
+                value={work.id}
+              >
+                {`${index + 1}. ${work.author.name}`}
+              </MenuItem>
+            ))}
+
+          </Select>
+        </FormControl>
       )}
     </Box>
   )

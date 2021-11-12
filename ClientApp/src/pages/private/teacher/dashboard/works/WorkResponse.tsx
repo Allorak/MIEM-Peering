@@ -1,11 +1,15 @@
+
+import { FC } from "react";
 import { Box } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
+
 import { AnswerBox } from "../../../../../components/rubrics/answerBox";
 import { AuthorResponse } from "../../../../../components/rubrics/authorResponse";
 import { QuestionBox } from "../../../../../components/rubrics/questionBox";
-import { scrollStyles } from "../../../../../const/styles";
+
 import { IWorkResponse } from "../../../../../store/types";
+
+import { scrollStyles } from "../../../../../const/styles";
 
 
 interface IProps {
@@ -41,6 +45,9 @@ const styles = {
     flexDirection: "column",
     gap: "15px",
     maxHeight: "calc(100vh - 183px - 62px)",
+    '@media (max-width: 900px)': {
+      maxHeight: "calc(100vh - 183px - 132px)",
+    },
     overflowY: 'auto',
     ...scrollStyles
   } as SxProps<Theme>

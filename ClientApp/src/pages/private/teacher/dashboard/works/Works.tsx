@@ -1,11 +1,12 @@
 import { FC, useCallback, useState } from "react";
 import { Box, SxProps, Theme } from "@mui/system";
-
-import { IWorkItem, IWorkResponse } from "../../../../../store/types";
-import { WorksList } from "./WorksList";
-import { WorkResponse } from "./WorkResponse";
 import { Button, Typography } from "@mui/material";
 import BorderColorTwoToneIcon from '@mui/icons-material/BorderColorTwoTone';
+
+import { WorksList } from "./WorksList";
+import { WorkResponse } from "./WorkResponse";
+
+import { IWorkItem, IWorkResponse } from "../../../../../store/types";
 
 
 export const Works: FC = () => {
@@ -29,6 +30,7 @@ export const Works: FC = () => {
         <Box sx={styles.topActionBox}>
           <Typography
             variant={"body1"}
+            sx={styles.subTitle}
           >
             {'Работа студента: '}
 
@@ -56,7 +58,6 @@ export const Works: FC = () => {
         />
       </Box>
 
-      {/* правая панель */}
       <Box sx={styles.rightContainer}>
         <WorksList
           worksCatalog={fakeData}
@@ -73,13 +74,25 @@ const styles = {
     display: "flex",
     gap: "25px",
     width: "100%",
-    alignItems: "flex-start"
+    alignItems: "flex-start",
+    '@media (max-width: 900px)': {
+      flexDirection: "column-reverse",
+      gap: "10px",
+    }
   } as SxProps<Theme>,
   leftContainer: {
     flex: "1 1 100%",
+    '@media (max-width: 900px)': {
+      flex: "1 1 auto",
+      width: "100%"
+    }
   } as SxProps<Theme>,
   rightContainer: {
-    flex: "0 0 230px"
+    flex: "0 0 230px",
+    '@media (max-width: 900px)': {
+      flex: "1 1 auto",
+      width: "100%"
+    }
   } as SxProps<Theme>,
   topActionBox: {
     display: "flex",
@@ -88,7 +101,18 @@ const styles = {
     margin: "0px 0px 20px 0px"
   } as SxProps<Theme>,
   addBt: {
-    padding: "8px 20px"
+    padding: "8px 20px",
+    '@media (max-width: 900px)': {
+      flex: "1 1 100%"
+    }
+  } as SxProps<Theme>,
+  subTitle: {
+    '@media (max-width: 900px)': {
+      display: "none",
+      opacity: 0,
+      width: "0px",
+      height: "0px"
+    }
   } as SxProps<Theme>,
 }
 
