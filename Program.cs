@@ -170,7 +170,7 @@ namespace patools
                     ID = Guid.NewGuid(),
                     Title = "Объектноориентрованное программирование на языке C++",
                     Teacher = db.Users.Where(user => user.Status == UserStatuses.Teacher).First(),
-                    Subject = Subjects.Programming
+                    Subject = "Программирование"
                 },
                 new Course 
                 {
@@ -178,7 +178,7 @@ namespace patools
                     Title = "Изучение основ линейной алгебры",
                     CourseCode = "7d28al_8",
                     Teacher = db.Users.Where(user => user.Status == UserStatuses.Teacher).First(),
-                    Subject = Subjects.LinearAlgebra
+                    Subject = "Линейная алгебра"
                 },
                 new Course
                 {
@@ -187,7 +187,7 @@ namespace patools
                     Description = "Данный курс предназначен для изучения основ квантовой физики и ее влияния на окружающий мир",
                     CourseCode = "Gbda82adG",
                     Teacher = db.Users.Where(user => user.Status == UserStatuses.Teacher).Skip(1).First(),
-                    Subject = Subjects.Physics
+                    Subject = "Физика"
                 }
             };
 
