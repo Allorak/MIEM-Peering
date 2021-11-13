@@ -28,6 +28,7 @@ namespace patools
 
         public void ConfigureServices(IServiceCollection services)
         {
+            SetupJWTServices(services);
             services.AddControllersWithViews();
             services.AddDbContext<PAToolsContext>();
             services.AddSpaStaticFiles(configuration =>
@@ -75,6 +76,24 @@ namespace patools
             });
         }
 
+        private void SetupJWTServices(IServiceCollection services)
+        {
+            string key = "M13m_S3cr3T-t0k3N";  
+            var issuer = "http://localhost:5000";  
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = issuer,
+                            ValidAudience = issuer,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                        };
+                    });
+        }
     }
 }
