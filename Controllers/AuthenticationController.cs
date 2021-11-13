@@ -13,7 +13,7 @@ using patools.Models;
 using System.Linq;
 namespace patools.Controllers
 {
-    [Route("api")]
+    [Route("api/v1")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
@@ -61,7 +61,7 @@ namespace patools.Controllers
                 var jwt_token = new JwtSecurityTokenHandler().WriteToken(token);    
                 return Ok(new SuccessfulResponse(new {resultToken = jwt_token})); 
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return Ok(new FailedResponse(new Error(401, "Unauthorized")));  
             }   
@@ -79,6 +79,7 @@ namespace patools.Controllers
         [HttpPost("googleauth/{token}")]  
         public async System.Threading.Tasks.Task<IActionResult> GoogleAuth([FromRoute]string token) 
         {  
+            System.Console.WriteLine(token);
             try
             {
                 var googleUser = await GoogleJsonWebSignature.ValidateAsync(token, new GoogleJsonWebSignature.ValidationSettings()
@@ -92,7 +93,7 @@ namespace patools.Controllers
                 object user = users.First();
                 return Ok(new SuccessfulResponse(new {status = "REGISTERED", user}));
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return Ok(new FailedResponse(new Error(401, "Unauthorized")));  
             }
