@@ -159,7 +159,7 @@ export interface INewTaskSettings {
   maxSubmission: number
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'maxSubmission'>{}
+export interface IDeadlines extends Omit<INewTaskSettings, 'maxSubmission'> { }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
@@ -250,4 +250,20 @@ export type IOverview = {
   statistics: IStatusBar,
   deadlines: IDeadlines,
   grades: number[]
+}
+
+export type IWorkItem = {
+  id: string,
+  responses: IWorkResponse[],
+  author: {
+    name: string,
+    id: string
+  }
+}
+
+export type IWorkResponse = {
+  id: string,
+  order: number,
+  title: string,
+  response?: string
 }

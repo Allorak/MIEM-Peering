@@ -7,6 +7,7 @@ import { reducer as courses } from '../store/courses'
 import { reducer as newCourse } from '../store/addCourse'
 import { reducer as tasks } from '../store/tasks'
 import { reducer as overview } from '../store/overview'
+import { reducer as works } from '../store/works'
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +18,8 @@ export const store = configureStore({
     courses,
     newCourse,
     tasks,
-    overview
+    overview,
+    works
   }
 })
 

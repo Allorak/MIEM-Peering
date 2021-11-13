@@ -120,6 +120,27 @@ const theme = createTheme({
                 disableRipple: true
             },
             styleOverrides: {
+                containedSecondary: {
+                    backgroundColor: palette.fill.secondary,
+                    color: palette.hover.white,
+                    ":hover": {
+                        backgroundColor: palette.hover.secondary,
+                        boxShadow: 'none',
+                        color: palette.hover.white
+                    }
+                },
+                outlinedSecondary: {
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${palette.outline.secondary}`,
+                    borderRadius: '4px',
+                    color: palette.outline.secondary,
+                    ":hover": {
+                        border: `1px solid ${palette.hover.secondary}`,
+                        borderRadius: '4px',
+                        backgroundColor: 'transparent',
+                        color: palette.hover.secondary
+                    }
+                },
                 root: {
                     boxShadow: 'none',
                     textTransform: 'none',
@@ -179,11 +200,9 @@ const theme = createTheme({
         },
         MuiOutlinedInput: {
             styleOverrides: {
-                
-                
                 input: {
                     padding: '18px 16px 16px 16px',
-                    
+
                 },
                 root: {
                     fontFamily: "'Inter', sans-serif",
@@ -204,8 +223,8 @@ const theme = createTheme({
                 multiline: {
                     padding: '0px'
                 }
-                
-                
+
+
 
             }
         }
