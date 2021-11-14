@@ -19,8 +19,8 @@ namespace patools.Controllers
             _context = context;
         }
 
-        [HttpPost("add/{token}")]
-        public async System.Threading.Tasks.Task<IActionResult> AddUser([FromRoute] string token, [FromBody] string role) 
+        [HttpPost("add/{token}/{role}")]
+        public async System.Threading.Tasks.Task<IActionResult> AddUser([FromRoute] string token, [FromRoute] string role) 
         {  
             try
             {

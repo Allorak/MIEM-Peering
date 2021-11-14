@@ -10,8 +10,8 @@ export const postRegistretion = async (payload: IRequestData): Promise<IResponse
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/users/add/${payload.gTokenId}`,
-    data: payload.role,
+    url: `/api/v1/users/add/${payload.gTokenId}/${payload.role}`,
+    // data: JSON.stringify(payload.role),
   }
 
   if (isMock) {
