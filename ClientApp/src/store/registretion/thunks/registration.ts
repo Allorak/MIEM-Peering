@@ -1,5 +1,5 @@
 import { actions } from "..";
-import { actions as authActions} from "../../auth";
+import { actions as authActions } from "../../auth";
 import { postRegistretion } from "../../../api/postRegistretion";
 import { AppThunk } from "../../../app/store";
 
@@ -19,13 +19,13 @@ export const registretion = (payload: IRegistretionRequest): AppThunk => async (
             }))
             return
         }
-        if (!response.success) {        
+        if (!response.success) {
             dispatch(actions.regFailed(response.error))
             return
         }
         dispatch(actions.regSuccess(response.payload))
-        dispatch(authActions.authSuccess({accessToken: response.payload.accessToken}))
-        
+        dispatch(authActions.authSuccess({ accessToken: response.payload.accessToken }))
+
     } catch (error) {
         dispatch(actions.regFailed({
             code: IErrorCode.REQUEST,

@@ -6,16 +6,12 @@ import { mock } from './mock'
 
 export const postRegistretion = async (payload: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/users`,
-    headers: {
-      'Authorization': `Bearer 'no accessToken'`,
-      'Accept-Language': 'ru',
-    },
-    data: payload,
+    url: `/api/v1/users/add/${payload.gTokenId}`,
+    data: payload.role,
   }
 
   if (isMock) {

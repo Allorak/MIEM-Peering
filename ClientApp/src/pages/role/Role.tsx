@@ -22,10 +22,12 @@ export const Role: FC = () => {
 
     const registrationProps = useAppSelector(state => state.registration.registraionProps)
 
+    console.log("Registration props:", registrationProps)
+
     const handleSelectRole = (role: IRole) => {
         if (registrationProps) {
             dispatch(registretion({
-                ...registrationProps, role: role
+                gTokenId: registrationProps.gAccessToken, role: role
             }))
         }
     }

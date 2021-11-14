@@ -50,13 +50,8 @@ export type IUserGAuth = {
 }
 
 export type IRegistretionRequest = {
-  email: string,
-  gAccessToken?: string,
+  gTokenId: string,
   role: IRole,
-  pass?: string,
-  imageUrl?: string,
-  firstName: string,
-  lastName: string
 }
 
 export type IRegistretionProps = {
