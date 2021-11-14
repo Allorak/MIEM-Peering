@@ -47,6 +47,7 @@ namespace patools.Controllers
                 var user = users.First();
                 var permClaims = new List<Claim>();    
                 permClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+                permClaims.Add(new Claim("id", user.ID.ToString()));
                 permClaims.Add(new Claim("fullname",user.Fullname));
                 permClaims.Add(new Claim("email",user.Email));
                 permClaims.Add(new Claim("status",user.Status.ToString()));
@@ -59,7 +60,7 @@ namespace patools.Controllers
                             expires: DateTime.Now.AddDays(10),    
                             signingCredentials: credentials);    
                 var jwt_token = new JwtSecurityTokenHandler().WriteToken(token);    
-                return Ok(new SuccessfulResponse(new {resultToken = jwt_token})); 
+                return Ok(new SuccessfulResponse(new {accessToken = jwt_token})); 
             }
             catch(Exception)
             {
