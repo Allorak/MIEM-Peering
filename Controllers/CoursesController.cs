@@ -96,13 +96,13 @@ namespace patools.Controllers
         [HttpPost]
         public async Task<ActionResult<Course>> PostCourse(Course course)
         {
-            var verify1 = _context.Courses.Where(x => x.Title == course.Title);
+            /*var verify1 = _context.Courses.Where(x => x.Title == course.Title);
             if(verify1.Any())
                 return Ok(new FailedResponse(new Error(404, "The title is already used")));
 
             var verify2 = _context.Courses.Where(x => x.Subject == course.Subject);
             if(verify2.Any())
-                return Ok(new FailedResponse(new Error(405, "The subject is already used")));
+                return Ok(new FailedResponse(new Error(405, "The subject is already used")));*/
 
             _context.Courses.Add(course);
             await _context.SaveChangesAsync();
