@@ -1,11 +1,7 @@
 import { actions } from "..";
-import { actions as registretionActions } from "../../registretion";
-import { postGUserCheck } from "../../../api/postGUserCheck";
-import { useAppSelector } from "../../../app/hooks";
 import { AppThunk } from "../../../app/store";
 
-
-import { IErrorCode} from "../../types";
+import { ICourse, ICourses, IErrorCode } from "../../types";
 import { getCourses } from "../../../api/getCourses";
 
 
@@ -19,7 +15,7 @@ export const fetchCourses = (): AppThunk => async (dispatch, getState) => {
         console.log("Fetch course error: No access or Role")
         return
     }
-    
+
     dispatch(actions.fetchStarted())
     try {
         const response = await getCourses({ accessToken })
@@ -34,7 +30,15 @@ export const fetchCourses = (): AppThunk => async (dispatch, getState) => {
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(response.payload))
+        dispatch(actions.fetchSuccess(JSON.parse(JSON.stringify(response.payload.map(course => (
+            {
+                id: course.id,
+                name: course.title,
+                subject: course.subject,
+                adminImageUrl: course.imageUrl,
+                adminName: course.fullname,
+                description: course.description
+            } as ICourses))))))
         return
 
     } catch (error) {

@@ -83,7 +83,7 @@ const styles = {
         transition: 'all 0.3s',
         ":hover": {
             cursor: 'pointer',
-            boxShadow: '0px 0px 7px 5px rgba(34, 60, 80, 0.2)'
+            boxShadow: '0px 0px 7px -4px rgba(34, 60, 80, 0.6)'
         }
     } as SxProps<Theme>,
     containerTop: {

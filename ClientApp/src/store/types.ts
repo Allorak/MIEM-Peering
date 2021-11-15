@@ -114,6 +114,15 @@ export type ICourses = {
   description?: string,
 }
 
+export type IResponseCourses = {
+  id: string,
+  imageUrl?: string,
+  fullname: string,
+  title: string,
+  subject: string,
+  description?: string,
+}
+
 export type INewCourseRequest = {
   name: string
   subject: string
