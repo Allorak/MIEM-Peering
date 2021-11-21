@@ -1,5 +1,5 @@
 import type { Theme } from '@mui/material'
-import { margin, SxProps } from '@mui/system'
+import { margin, maxHeight, SxProps } from '@mui/system'
 
 
 export const table: SxProps<Theme> = {
@@ -29,15 +29,34 @@ export const headCenteredCell: SxProps<Theme> = {
 
 export const bodyCell: SxProps<Theme> = {
   ...cell,
+  backgroundColor: "common.white"
+}
+export const bodyCellUser: SxProps<Theme> = {
+  display: "flex",
+  gap: "10px",
+  alignItems: "center",
+  fontWeight: "700"
+}
+
+export const bodyGeneralText: SxProps<Theme> = {
   fontWeight: "500",
   fontSize: "13px",
   lineHeight: "24px",
   color: "#0F1B41",
-  textOverflow: 'ellipsis',
-  overflow: 'hidden',
-  whiteSpace: "nowrap",
-  maxHeight: '72px',
-  backgroundColor: "common.white"
+  display: "-webkit-box",
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  padding: "0px"
+}
+
+export const bodyText: SxProps<Theme> = {
+  ...bodyGeneralText,
+  WebkitLineClamp: 10,
+}
+
+export const bodyShortText: SxProps<Theme> = {
+  ...bodyGeneralText,
+  WebkitLineClamp: 3,
 }
 
 export const bodyCenteredCell: SxProps<Theme> = {

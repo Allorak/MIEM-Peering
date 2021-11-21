@@ -1,7 +1,7 @@
 import { TableBody, TableHead } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import { FC } from "react";
-import { Table, TableBodyCell, TableBodyRow, TableHeadCell, TableHeadRow } from "../../../../../components/table";
+import { Table, TableBodyCell, TableBodyCellUser, TableBodyRow, TableHeadCell, TableHeadRow } from "../../../../../components/table";
 
 export const Experts: FC = () => {
   return (
@@ -18,8 +18,8 @@ export const Experts: FC = () => {
         {fakeData.map(expert => (
           <TableBodyRow>
             <TableBodyCell>{expert.email}</TableBodyCell>
-            <TableBodyCell>{expert.name}</TableBodyCell>
-            <TableBodyCell isCentered>{expert.progress}</TableBodyCell>
+            <TableBodyCellUser name={expert.name}></TableBodyCellUser>
+            <TableBodyCell isCentered></TableBodyCell>
             <TableBodyCell>{expert.action}</TableBodyCell>
           </TableBodyRow>
         ))}
@@ -48,7 +48,7 @@ const fakeData = [
     email: "mayusupov@miem.hse.ru",
     name: "Мухаммад Юсупов",
     progress: 5,
-    action: "haskdhjas"
+    action: "",
   },
   {
     email: "iivanov@miem.hse.ru",

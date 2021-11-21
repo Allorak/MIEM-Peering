@@ -1,5 +1,7 @@
 import { FC, useMemo } from "react"
 import { Box, TableCell as MuiTableCell, Theme, TableCellProps } from "@mui/material"
+
+import DefaultAvatar from '../../img/ico/avatar.svg'
 import type { SxProps } from "@mui/system"
 
 
@@ -7,14 +9,16 @@ import * as styles from "./styles"
 
 type IProps = TableCellProps & {
   isCentered?: boolean,
-  text?: boolean
+  name: string,
+  img?: string
 }
 
-export const TableBodyCell: FC<IProps> = ({
+export const TableBodyCellUser: FC<IProps> = ({
   children,
   isCentered,
+  img,
+  name,
   sx,
-  text,
   ...props
 }) => {
   const mergedSx = useMemo<SxProps<Theme> | undefined>(() => {
@@ -31,17 +35,11 @@ export const TableBodyCell: FC<IProps> = ({
       sx={mergedSx}
       {...props}
     >
-      {text && text === true ?
-        (
-          <Box sx={styles.bodyText}>
-            {children}
-          </Box>
-        ) :
-        (<Box sx={styles.bodyShortText}>
-          {children}
-        </Box>
-        )
-      }
+      <Box sx={styles.bodyCellUser}>
+        <img src={img ?? DefaultAvatar} height={"24px"} width={"24px"} alt={""} />
+        {name}
+        {children}
+      </Box>
     </MuiTableCell>
   )
 }
