@@ -35,5 +35,5 @@ export const fetchGAuth = (payload: iGoogleAuthResponse): AppThunk => async (dis
             message: 'Не удалось выполнить запрос'
         }));
     }
-    dispatch(actions.authSuccess({status: 'NEW'}))
+    //dispatch(actions.authSuccess({status: 'NEW'}))
 }
