@@ -26,3 +26,5 @@ export const Table: FC<IProps> = ({
     </MuiTable>
   )
 }
+
+// https://codepen.io/team/css-tricks/pen/wXgJww?editors=1100 адаптивная таблица

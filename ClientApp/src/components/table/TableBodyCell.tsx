@@ -16,7 +16,7 @@ export const TableBodyCell: FC<IProps> = ({
   ...props
 }) => {
   const mergedSx = useMemo<SxProps<Theme> | undefined>(() => {
-    const cellStyle = isCentered ? styles.centeredCell : styles.cell
+    const cellStyle = isCentered ? styles.bodyCenteredCell : styles.bodyCell
     return {
       ...cellStyle,
       ...sx

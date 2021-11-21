@@ -5,24 +5,24 @@ import type { SxProps } from "@mui/system"
 import * as styles from "./styles"
 
 
-type IProps = TableCellProps & {
-  isButtonCell?: boolean,
+interface IProps extends TableCellProps {
+  isCentered?: boolean,
 }
 
 export const TableHeadCell: FC<IProps> = ({
   children,
-  isButtonCell,
   sx,
+  isCentered,
   ...props
 }) => {
 
   const mergedSx = useMemo<SxProps<Theme> | undefined>(() => {
-    const cellStyle = isButtonCell ? styles.headButtonCell : styles.headCell
+    const cellStyle = isCentered ? styles.headCenteredCell : styles.headCell
     return {
       ...cellStyle,
       ...sx,
     }
-  }, [sx, isButtonCell])
+  }, [sx])
 
   return (
     <MuiTableCell

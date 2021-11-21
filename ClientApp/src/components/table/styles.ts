@@ -1,39 +1,66 @@
 import type { Theme } from '@mui/material'
-import type { SxProps } from '@mui/system'
+import { margin, SxProps } from '@mui/system'
 
 
 export const table: SxProps<Theme> = {
-  borderCollapse: 'collapse',
+  borderCollapse: 'separate',
+  width: 'auto',
+  borderSpacing: "0px 5px"
 }
 
 export const cell: SxProps<Theme> = {
   minWidth: '50px',
-  borderRadius: '6px',
-  border: 'none',
-  fontWeight: '500',
-  fontSize: '14px',
-  lineHeight: '32px',
-  textAlign: 'left',
-  color: '#17151C',
-  backgroundColor: 'secondary.light',
+  border: "none",
+  padding: '15px 8px'
 }
 
 export const headCell: SxProps<Theme> = {
   ...cell,
   fontWeight: '600',
   fontSize: '14px',
-  lineHeight: '24px',
-  color: 'common.white',
-  textAlign: 'center',
-  backgroundColor: 'rgba(122, 117, 133, 0.52)',
+  lineHeight: '17px',
+  color: '#1E253C',
 }
 
-export const headButtonCell: SxProps<Theme> = {
+export const headCenteredCell: SxProps<Theme> = {
   ...headCell,
-  width: "50px",
+  textAlign: "center",
 }
 
-export const centeredCell: SxProps<Theme> = {
+export const bodyCell: SxProps<Theme> = {
   ...cell,
+  fontWeight: "500",
+  fontSize: "13px",
+  lineHeight: "24px",
+  color: "#0F1B41",
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: "nowrap",
+  maxHeight: '72px',
+  backgroundColor: "common.white"
+}
+
+export const bodyCenteredCell: SxProps<Theme> = {
+  ...bodyCell,
   textAlign: "center",
+}
+
+export const headRow: SxProps<Theme> = {
+  "> th:first-child": {
+    padding: '15px 8px 15px 18px',
+  },
+  "> th:last-child": {
+    padding: '15px 18px 15px 8px',
+  }
+}
+
+export const bodyRow: SxProps<Theme> = {
+  "> td:first-child": {
+    padding: '15px 8px 15px 18px',
+    borderRadius: "4px 0px 0px 4px"
+  },
+  "> td:last-child": {
+    padding: '15px 18px 15px 8px',
+    borderRadius: "0px 4px 4px 0px"
+  }
 }

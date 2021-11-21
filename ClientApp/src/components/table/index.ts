@@ -1,4 +1,5 @@
 export { Table } from './Table'
 export { TableHeadCell } from './TableHeadCell'
 export { TableBodyCell } from './TableBodyCell'
-export { TableCellTextInput } from './TableCellTextInput'
+export { TableBodyRow } from './TableBodyRow'
+export { TableHeadRow } from './TableHeadRow'
