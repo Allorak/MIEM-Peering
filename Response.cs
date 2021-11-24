@@ -12,7 +12,7 @@ namespace patools
 
         public Error(int code, string message)
         {
-            Code = code; 
+            Code = code;
             Message = message;
         }
     }

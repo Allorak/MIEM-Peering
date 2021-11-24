@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace patools.Models
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Types
     {
         LongAnswer = 0,

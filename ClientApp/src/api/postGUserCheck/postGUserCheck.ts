@@ -10,10 +10,13 @@ export const postGUserCheck = async (payload: IRequestData): Promise<IResponse<I
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/googleauth/${payload.gAccessToken}`,
+    url: `/api/v1/googleauth`,
     headers: {
       'Accept-Language': 'ru',
     },
+    data : {
+      googleToken : payload.gAccessToken
+    }
   }
 
   // Типизация Response
