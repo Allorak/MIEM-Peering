@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using patools.Models;
-using project401.Dtos.User;
+using patools.Dtos.User;
 
 namespace project401
 {

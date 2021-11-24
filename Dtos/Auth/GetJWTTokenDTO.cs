@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace project401.Dtos.Auth
+namespace patools.Dtos.Auth
 {
     public class GetJWTTokenDTO
     {

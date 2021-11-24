@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using patools.Models;
 
-namespace project401.Dtos.User
+namespace patools.Dtos.User
 {
     public class GetRegisteredUserDTO
     {

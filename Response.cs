@@ -16,30 +16,10 @@ namespace patools
             Message = message;
         }
     }
-    public abstract class Response
+    public class Response<T>
     {
-        public bool Success { get; protected set; }
-        public object Payload { get; protected set; }
-        public Error Error { get; protected set; }
-    }
-
-    public class FailedResponse : Response
-    {
-        public FailedResponse(Error error)
-        {
-            Success = false;
-            Payload = null;
-            Error = error;
-        }
-    }
-
-    public class SuccessfulResponse : Response
-    {
-        public SuccessfulResponse(object payload)
-        {
-            Success = true;
-            Payload = payload;
-            Error = null;
-        }
+        public bool Success { get; set; }
+        public T Payload { get; set; }
+        public Error Error { get; set; }
     }
 }

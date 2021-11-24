@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using patools.Models;
-using project401.Dtos.User;
+using patools.Dtos.User;
 
-namespace project401.Dtos.Auth
+namespace patools.Dtos.Auth
 {
     public class GoogleGetRegisteredUserDTO
     {
