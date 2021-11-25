@@ -5,14 +5,17 @@ using System.Threading.Tasks;
 using AutoMapper;
 using patools.Models;
 using patools.Dtos.User;
+using patools.Dtos.Course;
 
-namespace project401
+namespace patools
 {
     public class AutoMapperProfile : Profile
     {
         public AutoMapperProfile()
         {
             CreateMap<User,GetRegisteredUserDTO>();
+            CreateMap<User, GetTeacherDTO>();
+            CreateMap<AddCourseDTO, Course>();
         }
     }
 }

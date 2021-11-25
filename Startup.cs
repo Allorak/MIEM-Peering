@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using patools.Models;
+using patools.Services.Authentication;
+using patools.Services.Courses;
 
 namespace patools
 {
@@ -36,6 +38,8 @@ namespace patools
                 configuration.RootPath = "ClientApp/build";
             });
             services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<IAuthenticationService,AuthenticationService>();
+            services.AddScoped<ICoursesService,CoursesService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

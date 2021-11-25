@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using patools.Dtos.User;
 using Microsoft.AspNetCore.Authentication;
 using patools.Services.Authentication;
+using System.Threading.Tasks;
 
 namespace patools.Controllers
 {
@@ -23,7 +24,7 @@ namespace patools.Controllers
         }
 
         [HttpGet("getjwttoken/")]
-        public async System.Threading.Tasks.Task<ActionResult<Response<GetJWTTokenDTO>>> GetJWTToken([FromBody]GoogleTokenDTO userInfo)
+        public async Task<ActionResult<Response<GetJWTTokenDTO>>> GetJWTToken([FromBody]GoogleTokenDTO userInfo)
         {
             try
             {
@@ -32,7 +33,7 @@ namespace patools.Controllers
                     Audience = new[] {_configuration.GetSection("AppSettings:AppId").Value}
                 });
 
-                return Ok(_authenticationService.GetJwtByEmail(googleUser.Email));
+                return Ok(await _authenticationService.GetJwtByEmail(googleUser.Email));
             }
             catch(Exception)
             {
@@ -45,7 +46,7 @@ namespace patools.Controllers
         }
 
         [HttpPost("googleauth/")]
-        public async System.Threading.Tasks.Task<ActionResult<Response<GoogleGetRegisteredUserDTO>>> GoogleAuth([FromBody]GoogleTokenDTO tokenInfo)
+        public async Task<ActionResult<Response<GoogleGetRegisteredUserDTO>>> GoogleAuth([FromBody]GoogleTokenDTO tokenInfo)
         {
             try
             {
