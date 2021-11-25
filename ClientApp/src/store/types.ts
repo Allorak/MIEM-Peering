@@ -276,3 +276,10 @@ export type IWorkResponse = {
   title: string,
   response?: string
 }
+
+export interface IExtpertItem {
+  email: string,
+  name: string,
+  taskComplete: number,
+  assignedTasks: number
+}

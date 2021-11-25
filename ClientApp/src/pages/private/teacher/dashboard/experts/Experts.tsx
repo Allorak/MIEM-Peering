@@ -1,7 +1,12 @@
+
+import { FC } from "react";
 import { TableBody, TableHead } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
+
+import { Progress } from "../../../../../components/progress";
 import { Table, TableBodyCell, TableBodyCellUser, TableBodyRow, TableHeadCell, TableHeadRow } from "../../../../../components/table";
+import { IExtpertItem } from "../../../../../store/types";
+
 
 export const Experts: FC = () => {
   return (
@@ -11,7 +16,7 @@ export const Experts: FC = () => {
           <TableHeadCell>{heads.email}</TableHeadCell>
           <TableHeadCell>{heads.name}</TableHeadCell>
           <TableHeadCell isCentered>{heads.progress}</TableHeadCell>
-          <TableHeadCell>{heads.action}</TableHeadCell>
+          <TableHeadCell isButton />
         </TableHeadRow>
       </TableHead>
       <TableBody>
@@ -19,8 +24,10 @@ export const Experts: FC = () => {
           <TableBodyRow>
             <TableBodyCell>{expert.email}</TableBodyCell>
             <TableBodyCellUser name={expert.name}></TableBodyCellUser>
-            <TableBodyCell isCentered></TableBodyCell>
-            <TableBodyCell>{expert.action}</TableBodyCell>
+            <TableBodyCell isCentered >
+              <Progress progress={expert.taskComplete / expert.assignedTasks * 100} />
+            </TableBodyCell>
+            <TableBodyCell isCentered>{"1"}</TableBodyCell>
           </TableBodyRow>
         ))}
       </TableBody>
@@ -47,19 +54,19 @@ const fakeData = [
   {
     email: "mayusupov@miem.hse.ru",
     name: "Мухаммад Юсупов",
-    progress: 5,
-    action: "",
+    taskComplete: 5,
+    assignedTasks: 10
   },
   {
     email: "iivanov@miem.hse.ru",
     name: "Иван Иванов",
-    progress: 2,
-    action: "haskdhjas"
+    taskComplete: 5,
+    assignedTasks: 10
   },
   {
     email: "vpupkin@miem.hse.ru",
     name: "Вася Пупкин",
-    progress: 4,
-    action: "haskdhjas"
+    taskComplete: 10,
+    assignedTasks: 10
   },
-]
+] as Array<IExtpertItem>

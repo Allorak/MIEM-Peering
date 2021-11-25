@@ -27,6 +27,12 @@ export const headCenteredCell: SxProps<Theme> = {
   textAlign: "center",
 }
 
+export const headButtonCell: SxProps<Theme> = {
+  ...headCell,
+  minWidth: "10px",
+  textAlign: "center",
+}
+
 export const bodyCell: SxProps<Theme> = {
   ...cell,
   backgroundColor: "common.white"

@@ -7,12 +7,14 @@ import * as styles from "./styles"
 
 interface IProps extends TableCellProps {
   isCentered?: boolean,
+  isButton?: boolean
 }
 
 export const TableHeadCell: FC<IProps> = ({
   children,
   sx,
   isCentered,
+  isButton,
   ...props
 }) => {
 
@@ -27,7 +29,7 @@ export const TableHeadCell: FC<IProps> = ({
   return (
     <MuiTableCell
       variant={"head"}
-      sx={mergedSx}
+      sx={isButton ? { ...mergedSx, ...styles.headButtonCell } : mergedSx}
       {...props}
     >
       {children}
