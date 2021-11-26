@@ -36,8 +36,10 @@ export const TableBodyCellUser: FC<IProps> = ({
       {...props}
     >
       <Box sx={styles.bodyCellUser}>
-        <img src={img ?? DefaultAvatar} height={"24px"} width={"24px"} alt={""} />
+        <Box sx={{ ...styles.expertImgWrapper, background: `url(${img ?? DefaultAvatar})0 0/cover no-repeat` }} />
+
         {name}
+
         {children}
       </Box>
     </MuiTableCell>

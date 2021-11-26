@@ -1,53 +1,43 @@
 
-import { FC } from "react";
-import { TableBody, TableHead } from "@mui/material";
-import { SxProps, Theme } from "@mui/system";
+import { FC, useCallback, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
+import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { fetchExperts, deleteExpert } from "../../../../../store/experts";
 
-import { Progress } from "../../../../../components/progress";
-import { Table, TableBodyCell, TableBodyCellUser, TableBodyRow, TableHeadCell, TableHeadRow } from "../../../../../components/table";
 import { IExtpertItem } from "../../../../../store/types";
+import { ExpertsTable } from "./ExpertsTable";
 
 
 export const Experts: FC = () => {
+
+  const dispatch = useAppDispatch()
+
+  const { path } = usePrivatePathTDashboard()
+
+  const status = useAppSelector(state => state.experts.isLoading)
+  const error = useAppSelector(state => state.experts.error)
+  const experts = useAppSelector(state => state.experts.payload)
+
+  useEffect(() => {
+    console.log(path)
+    if (path && path.taskId)
+      dispatch(fetchExperts(path.taskId))
+  }, [])
+
+  const handleRemove = useCallback((expertEmail: string) => {
+    if (path && path.taskId)
+      dispatch(deleteExpert(path.taskId, expertEmail))
+  }, [path])
+
   return (
-    <Table sx={styles.tableContainer}>
-      <TableHead>
-        <TableHeadRow>
-          <TableHeadCell>{heads.email}</TableHeadCell>
-          <TableHeadCell>{heads.name}</TableHeadCell>
-          <TableHeadCell isCentered>{heads.progress}</TableHeadCell>
-          <TableHeadCell isButton />
-        </TableHeadRow>
-      </TableHead>
-      <TableBody>
-        {fakeData.map(expert => (
-          <TableBodyRow>
-            <TableBodyCell>{expert.email}</TableBodyCell>
-            <TableBodyCellUser name={expert.name}></TableBodyCellUser>
-            <TableBodyCell isCentered >
-              <Progress progress={expert.taskComplete / expert.assignedTasks * 100} />
-            </TableBodyCell>
-            <TableBodyCell isCentered>{"1"}</TableBodyCell>
-          </TableBodyRow>
-        ))}
-      </TableBody>
-    </Table>
+    <DashboardWorkBox
+      isLoading={status}
+      error={error}
+    >
+      <ExpertsTable experts={experts ?? []} onRemove={handleRemove} />
+    </DashboardWorkBox>
   )
-}
-
-const styles = {
-  tableContainer: {
-    margin: "0px auto",
-    maxWidth: "900px",
-    width: "100%"
-  } as SxProps<Theme>
-}
-
-const heads = {
-  email: "Эл. почта",
-  name: "ФИО",
-  progress: "Прогресс",
-  action: "Действие"
 }
 
 const fakeData = [

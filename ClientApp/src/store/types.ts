@@ -280,6 +280,7 @@ export type IWorkResponse = {
 export interface IExtpertItem {
   email: string,
   name: string,
+  imgUrl?: string
   taskComplete: number,
   assignedTasks: number
 }

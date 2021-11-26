@@ -22,6 +22,12 @@ export const headCell: SxProps<Theme> = {
   color: '#1E253C',
 }
 
+export const expertImgWrapper: SxProps<Theme> = {
+  width: "25px",
+  height: "25px",
+  borderRadius: "50%"
+}
+
 export const headCenteredCell: SxProps<Theme> = {
   ...headCell,
   textAlign: "center",
@@ -29,7 +35,7 @@ export const headCenteredCell: SxProps<Theme> = {
 
 export const headButtonCell: SxProps<Theme> = {
   ...headCell,
-  minWidth: "10px",
+  width: "40px",
   textAlign: "center",
 }
 
