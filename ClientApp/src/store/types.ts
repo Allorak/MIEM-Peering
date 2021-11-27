@@ -19,6 +19,7 @@ export enum IErrorCode {
   BAD_REQUEST_DATA = 101,
   NEED_FORCE = 102, // пользователь может повторить запрос с параметром isForced: true
   OPERATION_ERROR = 103, // ошибка при выполнении операции
+  USER_ALREADY_REGISTERED = 104
 }
 
 export type IError = {
@@ -50,13 +51,8 @@ export type IUserGAuth = {
 }
 
 export type IRegistretionRequest = {
-  email: string,
-  gAccessToken?: string,
+  gTokenId: string,
   role: IRole,
-  pass?: string,
-  imageUrl?: string,
-  firstName: string,
-  lastName: string
 }
 
 export type IRegistretionProps = {
@@ -84,11 +80,12 @@ export type IRegistrationResponse = {
 // в будущем использовать для пользователя
 
 export type IUserProfile = {
+  id: string,
   email: string,
   role: IRole,
   imageUrl?: string,
-  firstName: string,
-  lastName: string
+  firstName: string, //fullname
+  lastName: string //fullname
 }
 
 export type IAuthRequest = {

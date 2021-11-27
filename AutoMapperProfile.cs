@@ -16,6 +16,7 @@ namespace patools
             CreateMap<User,GetRegisteredUserDTO>();
             CreateMap<User, GetTeacherDTO>();
             CreateMap<AddCourseDTO, Course>();
+            CreateMap<User,GetNewUserDTO>();
         }
     }
 }

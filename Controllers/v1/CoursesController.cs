@@ -39,12 +39,7 @@ namespace patools.Controllers.v1
         public async Task<ActionResult<List<Course>>> GetCourses()
         {
             if(!User.Identity.IsAuthenticated)
-                return Unauthorized(new Response<object>
-                {
-                    Success = false,
-                    Payload = null,
-                    Error = new Error(401,"User is unauthorized")
-                });
+                return Ok(new UnauthorizedUserResponse());
 
             return Ok(await _coursesService.GetAllCourses());
         }
@@ -53,6 +48,9 @@ namespace patools.Controllers.v1
         [HttpGet("get/{id}")]
         public async Task<ActionResult<Course>> GetCourse(Guid id)
         {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
             return Ok(await _coursesService.GetCourseById(id));
         }
 

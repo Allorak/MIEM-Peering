@@ -37,13 +37,14 @@ namespace patools.Controllers.v1
             }
             catch(Exception)
             {
-                return Unauthorized(new UnauthorizedUserResponse());
+                return Ok(new UnauthorizedUserResponse());
             }
         }
 
         [HttpPost("googleauth")]
         public async Task<ActionResult<Response<GoogleGetRegisteredUserDTO>>> GoogleAuth([FromBody]GoogleTokenDTO tokenInfo)
         {
+            System.Console.WriteLine(tokenInfo.GoogleToken);
             try
             {
                 var googleUser = await GoogleJsonWebSignature.ValidateAsync(tokenInfo.GoogleToken, new GoogleJsonWebSignature.ValidationSettings()
@@ -54,7 +55,7 @@ namespace patools.Controllers.v1
             }
             catch(Exception)
             {
-                return Unauthorized(new UnauthorizedUserResponse());
+                return Ok(new UnauthorizedUserResponse());
             }
         }
     }

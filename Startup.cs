@@ -16,6 +16,7 @@ using System;
 using patools.Models;
 using patools.Services.Authentication;
 using patools.Services.Courses;
+using patools.Services.Users;
 
 namespace patools
 {
@@ -40,6 +41,7 @@ namespace patools
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<IAuthenticationService,AuthenticationService>();
             services.AddScoped<ICoursesService,CoursesService>();
+            services.AddScoped<IUsersService,UsersService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
