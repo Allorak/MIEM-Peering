@@ -65,7 +65,7 @@ export const Role: FC = () => {
                     <Typography variant='h4' >
                         Студент
                     </Typography>
-                    <img src={StudentImg} alt='Teacher' style={{ height: '200px' }} />
+                    <img src={StudentImg} alt='Student' style={{ height: '200px' }} />
                     <Button variant='outlined'
                         sx={styles.selectButton}
                         onClick={() => { handleSelectRole('student') }}

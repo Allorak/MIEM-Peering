@@ -3,6 +3,7 @@ import { Box, SxProps, Theme } from "@mui/system";
 import { FC } from "react";
 import { useAppSelector } from "../../app/hooks";
 import SettingsIco from '../../img/ico/setting-hover.svg'
+import DeleteIco from '../../img/ico/delete-outline.svg'
 import DefaultAvatar from '../../img/ico/avatar.svg'
 import { palette } from "../../theme/colors";
 import { ICourses } from "../../store/types";
@@ -23,6 +24,10 @@ export const CourseCard: FC<IProps> = ({
         event.stopPropagation()
     }
 
+    const onDelete = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.stopPropagation()
+    }
+
     return (
         <Box sx={styles.root}
             onClick={() => onCourseSelect(course.id)}
@@ -34,7 +39,7 @@ export const CourseCard: FC<IProps> = ({
                     </Typography>
 
                     {
-                        userProfile && userProfile.role === 'teacher' && (
+                        userProfile && userProfile.role === 'teacher' ? (
                             <Box 
                             sx={styles.settingBt}
                             onClick={onSettings}
@@ -42,6 +47,17 @@ export const CourseCard: FC<IProps> = ({
                                 <img
                                     src={SettingsIco}
                                     alt="Settings"
+                                />
+                            </Box>
+                        ) : 
+                        (
+                            <Box 
+                            sx={styles.settingBt}
+                            onClick={onDelete}
+                            >
+                                <img
+                                    src={DeleteIco}
+                                    alt="Delete"
                                 />
                             </Box>
                         )
