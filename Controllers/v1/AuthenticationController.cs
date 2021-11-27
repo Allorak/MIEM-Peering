@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using patools.Services.Authentication;
 using System.Threading.Tasks;
 
-namespace patools.Controllers
+namespace patools.Controllers.v1
 {
     [ApiController]
     [Route("api/v1")]
@@ -23,7 +23,7 @@ namespace patools.Controllers
             _authenticationService = authenticationService;
         }
 
-        [HttpGet("getjwttoken/")]
+        [HttpGet("getjwttoken")]
         public async Task<ActionResult<Response<GetJWTTokenDTO>>> GetJWTToken([FromBody]GoogleTokenDTO userInfo)
         {
             try
@@ -37,15 +37,11 @@ namespace patools.Controllers
             }
             catch(Exception)
             {
-                var response = new Response<GetJWTTokenDTO>();
-                response.Success = false;
-                response.Error = new Error(401, "Unauthorized");
-                response.Payload = null;
-                return Unauthorized(response);
+                return Unauthorized(new UnauthorizedUserResponse());
             }
         }
 
-        [HttpPost("googleauth/")]
+        [HttpPost("googleauth")]
         public async Task<ActionResult<Response<GoogleGetRegisteredUserDTO>>> GoogleAuth([FromBody]GoogleTokenDTO tokenInfo)
         {
             try
@@ -58,11 +54,7 @@ namespace patools.Controllers
             }
             catch(Exception)
             {
-                var response = new Response<GetJWTTokenDTO>();
-                response.Success = false;
-                response.Error = new Error(401, "Unauthorized");
-                response.Payload = null;
-                return Unauthorized(response);
+                return Unauthorized(new UnauthorizedUserResponse());
             }
         }
     }

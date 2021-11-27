@@ -23,19 +23,20 @@ namespace patools.Services.Courses
             _context = context;
         }
 
-        public async Task<Response<GetCourseDTO>> AddCourse(AddCourseDTO newCourse)
+        public async Task<Response<GetCourseDTO>> AddCourse(Guid teacherId, AddCourseDTO newCourse)
         {
             var response = new Response<GetCourseDTO>();
 
             var course = _mapper.Map<Course>(newCourse);
             course.ID = Guid.NewGuid();
 
-            var teacher = _context.Users.FirstOrDefault(u => u.ID == newCourse.TeacherID && u.Role == UserRoles.Teacher);
+
+            var teacher = _context.Users.FirstOrDefault(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
             if(teacher == null)
             {
                 response.Success = false;
                 response.Payload = null;
-                response.Error = new Error(-100, "Invalid teacher id");
+                response.Error = new Error(-10, "Invalid teacher id");
                 return response;
             }
             course.Teacher = teacher;
@@ -51,6 +52,7 @@ namespace patools.Services.Courses
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
+                    CourseCode = x.CourseCode,
                     Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
                 })
                 .FirstOrDefaultAsync(x => x.ID == course.ID);
@@ -69,7 +71,7 @@ namespace patools.Services.Courses
             return response;
         }
 
-        public async Task<Response<string>> DeleteCourse(Guid courseId)
+        public async Task<Response<string>> DeleteCourse(Guid teacherId, Guid courseId)
         {
             var response = new Response<string>();
             var course = await _context.Courses.FindAsync(courseId);
@@ -100,6 +102,7 @@ namespace patools.Services.Courses
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
+                    CourseCode = x.CourseCode,
                     Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
                 });
 
@@ -128,6 +131,7 @@ namespace patools.Services.Courses
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
+                    CourseCode = x.CourseCode,
                     Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
                 })
                 .FirstOrDefaultAsync(x => x.ID == courseId);

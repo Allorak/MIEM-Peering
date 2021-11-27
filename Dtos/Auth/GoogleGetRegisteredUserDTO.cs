@@ -11,5 +11,6 @@ namespace patools.Dtos.Auth
     {
         public string Status { get; set; }
         public GetRegisteredUserDTO User { get; set; }
+        public string AccessToken { get; set; }
     }
 }

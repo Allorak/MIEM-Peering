@@ -51,6 +51,7 @@ namespace patools.Services.Authentication
             response.Payload = new GoogleGetRegisteredUserDTO
             {
                 Status = "REGISTERED",
+                AccessToken = CreateJwtFromUser(user),
                 User = _mapper.Map<GetRegisteredUserDTO>(user)
             };
             return response;
@@ -68,6 +69,18 @@ namespace patools.Services.Authentication
                 return response;
             }
 
+            response.Success = true;
+            response.Error = null;
+            response.Payload = new GetJWTTokenDTO
+            {
+                AccessToken = CreateJwtFromUser(user)
+            };
+
+            return response;
+        }
+
+        private string CreateJwtFromUser(User user)
+        {
             var permClaims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
@@ -90,14 +103,7 @@ namespace patools.Services.Authentication
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = new GetJWTTokenDTO
-            {
-                AccessToken = tokenHandler.WriteToken(token)
-            };
-
-            return response;
+            return tokenHandler.WriteToken(token);
         }
     }
 }

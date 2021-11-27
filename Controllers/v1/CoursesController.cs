@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ using patools.Dtos.Course;
 using patools.Models;
 using patools.Services.Courses;
 
-namespace patools.Controllers
+namespace patools.Controllers.v1
 {
     [Route("api/v1/[controller]")]
     [ApiController]
@@ -33,23 +34,31 @@ namespace patools.Controllers
         }
         */
 
-        // GET: api/v1/Courses
-        [HttpGet]
+        // GET: api/v1/Courses/get
+        [HttpGet("get")]
         public async Task<ActionResult<List<Course>>> GetCourses()
         {
+            if(!User.Identity.IsAuthenticated)
+                return Unauthorized(new Response<object>
+                {
+                    Success = false,
+                    Payload = null,
+                    Error = new Error(401,"User is unauthorized")
+                });
+
             return Ok(await _coursesService.GetAllCourses());
         }
 
-        // GET: api/v1/Courses/5
-        [HttpGet("{id}")]
+        // GET: api/v1/Courses/get/5
+        [HttpGet("get/{id}")]
         public async Task<ActionResult<Course>> GetCourse(Guid id)
         {
             return Ok(await _coursesService.GetCourseById(id));
         }
 
-        // PUT: api/v1/Courses/5
+        // PUT: api/v1/Courses/put/5
         //Refactoring is needed
-        [HttpPut("{id}")]
+        [HttpPut("put/{id}")]
         public async Task<IActionResult> PutCourse(Guid id, Course course)
         {
             if (id != course.ID)
@@ -78,18 +87,54 @@ namespace patools.Controllers
             return NoContent();
         }
 
-        // POST: api/v1/Courses
-        [HttpPost]
+        // POST: api/v1/Courses/add
+        [HttpPost("add")]
         public async Task<ActionResult<GetCourseDTO>> PostCourse(AddCourseDTO course)
         {
-            return Ok(await _coursesService.AddCourse(course));
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidUserIdResponse());
+
+            //The id stored in Claim is not Guid
+            Guid teacherId;
+            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
+                return Ok(new InvalidUserIdResponse());
+
+            return Ok(await _coursesService.AddCourse(teacherId, course));
         }
 
-        // DELETE: api/v1/Courses/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(Guid id)
+        // DELETE: api/v1/Courses/delete/5
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteCourse(Guid courseId)
         {
-            return Ok(await _coursesService.DeleteCourse(id));
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidUserIdResponse());
+
+            //The id stored in Claim is not Guid
+            Guid teacherId;
+            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
+                return Ok(new InvalidUserIdResponse());
+
+            return Ok(await _coursesService.DeleteCourse(teacherId, courseId));
         }
 
         //Should be in CourseService.cs file, Remove after refactoring
