@@ -8,12 +8,11 @@ import { StudentPrivate } from './student/StudentPrivate'
 
 import { PrivateHeader } from '../../components/header'
 
-import { Role } from '../role'
-import { Registration } from './registration'
-
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { paths } from '../../app/constants/paths'
 import { fetchUserProfile } from '../../store/userProfile'
+
+import { IRole } from '../../store/types'
 
 import * as globalStyles from "../../const/styles"
 
@@ -24,24 +23,17 @@ export function Private() {
   const dispatch = useAppDispatch()
 
   const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
-  const authPayload = useAppSelector(state => state.auth.payload)
-  const registrationProps = useAppSelector(state => state.registration.registraionProps)
+  const accessToken = useAppSelector(state => state.auth.accessToken)
+  const registrationToken = useAppSelector(state => state.registration.googleToken)
   const userProfilePayload = useAppSelector(state => state.userProfile.payload)
-  const userProfileIsLoading = useAppSelector(state => state.userProfile.isLoading)
 
   useEffect(() => {
-    if (authPayload?.accessToken) {
+    if (accessToken && !userProfilePayload) {
       dispatch(fetchUserProfile())
     }
-  }, [dispatch, authPayload.accessToken])
+  }, [dispatch, accessToken])
 
-  useEffect(() => {
-    if (authPayload && authPayload.accessToken) {
-      dispatch(fetchUserProfile())
-    }
-  }, [dispatch, authPayload])
-
-  if ((!isAuthorized || !authPayload.accessToken) && !registrationProps?.email) {
+  if ((!isAuthorized || !accessToken) && !registrationToken) {
     console.log('Navigate to login')
     return (
       <Navigate
@@ -54,7 +46,8 @@ export function Private() {
     )
   }
 
-  if (!userProfileIsLoading && userProfilePayload?.role === 'teacher') {
+  if (userProfilePayload && userProfilePayload.role === IRole.teacher) {
+    console.log("Teacher routes")
     return (
       <Box sx={styles.wrapper}>
         <PrivateHeader />
@@ -68,7 +61,7 @@ export function Private() {
     )
   }
 
-  if (!userProfileIsLoading && userProfilePayload?.role === 'student') {
+  if (userProfilePayload && userProfilePayload.role === IRole.student) {
     return (
       <Box sx={styles.wrapper}>
         <PrivateHeader />
@@ -82,12 +75,7 @@ export function Private() {
     )
   }
 
-  return (
-    <Routes>
-      <PrivateRoute path={paths.registration.main} element={<Registration />} />
-      <PrivateRoute path={paths.registration.selectRole} element={<Role />} />
-    </Routes>
-  )
+  return null
 }
 
 function PrivateRoute(props: RouteProps): React.ReactElement {
