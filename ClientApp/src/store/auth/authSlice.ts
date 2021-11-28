@@ -6,14 +6,14 @@ export interface IAuthState {
   isAuthorized: boolean,
   isAuthorizing: boolean,
   error: IError | undefined,
-  payload: IAuthResponse  
+  accessToken: string | undefined
 }
 
 const initialState: IAuthState = {
   isAuthorized: false,
   isAuthorizing: false,
-  error: undefined,  
-  payload: {} as IAuthResponse,
+  error: undefined,
+  accessToken: undefined
 };
 
 export const authSlice = createSlice({
@@ -25,10 +25,10 @@ export const authSlice = createSlice({
       state.error = undefined
     },
 
-    authSuccess: (state, { payload }: PayloadAction<IAuthResponse>) => {
+    authSuccess: (state, { payload }: PayloadAction<string>) => {
       state.isAuthorizing = false
       state.isAuthorized = true
-      state.payload = payload
+      state.accessToken = payload
     },
 
     authFailed: (state, { payload }: PayloadAction<IError>) => {
@@ -41,7 +41,7 @@ export const authSlice = createSlice({
       state.isAuthorized = false
       state.isAuthorizing = false
       state.error = undefined
-      state.payload = {} as IAuthResponse
+      state.accessToken = undefined
     }
   },
 });

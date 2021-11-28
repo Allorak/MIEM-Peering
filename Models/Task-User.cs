@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace patools.Models
 {
-    public enum TaskState 
-    { 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum TaskState
+    {
         Assigned = 0,
         Checking = 1,
         Graded = 2

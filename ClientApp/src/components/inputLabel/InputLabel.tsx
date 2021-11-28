@@ -6,16 +6,19 @@ import { palette } from "../../theme/colors";
 interface IProps extends TypographyProps {
     title: string
     required?: boolean
+    fontSize?: string
 }
 
 export const InputLabel: FC<IProps> = ({
     title,
-    required
+    required,
+    fontSize
 }) => {
     return (
-        <Typography variant='body1'
+        <Typography 
+            variant={fontSize === 'medium' ? 'h6' : 'body1'}
             sx={required ? {...styles.root, ...styles.required} : styles.root}
-        >
+        >   
             {title}
         </Typography>
     )
@@ -42,6 +45,5 @@ const styles = {
             lineHeight: '1',
             color: palette.fill.grey
         }
-        
     } as SxProps<Theme>,
 }

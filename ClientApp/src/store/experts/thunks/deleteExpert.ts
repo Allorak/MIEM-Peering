@@ -7,7 +7,7 @@ import { IErrorCode } from "../../types";
 
 
 export const deleteExpert = (taskId: string, email: string): AppThunk => async (dispatch, getState) => {
-    const accessToken = getState().auth.payload.accessToken
+    const accessToken = getState().auth.accessToken
 
     if (!accessToken) {
         dispatch(actions.fetchFailed({
