@@ -1,10 +1,13 @@
 import { actions } from "..";
-import { actions as registretionActions } from "../../registretion/";
+import { actions as registretionActions } from "../../registretion";
+import { actions as userProfileActions } from "../../userProfile";
+import { actions as authActions } from "../../auth";
+
 import { postGUserCheck } from "../../../api/postGUserCheck";
 import { AppThunk } from "../../../app/store";
 
 
-import { IErrorCode } from "../../types";
+import { GoogleAuthStatus, IErrorCode } from "../../types";
 
 
 export const fetchGAuth = (googleToken: string): AppThunk => async (dispatch) => {
@@ -24,8 +27,12 @@ export const fetchGAuth = (googleToken: string): AppThunk => async (dispatch) =>
             return
         }
 
-        if (response.payload.status === 'NEW') {
+        if (response.payload.status === GoogleAuthStatus.newUser)
             dispatch(registretionActions.setGoogleToken(googleToken))
+
+        if (response.payload.status === GoogleAuthStatus.registeredUser) {
+            dispatch(userProfileActions.userProfileSuccess(response.payload.user))
+            dispatch(authActions.authSuccess(response.payload.accessToken))
         }
 
         dispatch(actions.authSuccess(response.payload))

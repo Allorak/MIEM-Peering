@@ -30,8 +30,8 @@ export type IError = {
 export type IStatus = 'EMPTY' | 'FIRST_LOADING' | 'NOT_LOADED' | 'SUCCESS' | 'LOCKED'
 
 export enum IRole {
-  teacher = 'teacher',
-  student = 'student'
+  teacher = 'Teacher',
+  student = 'Student'
 }
 
 export type IPath = {

@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 import { Button, Typography } from "@mui/material";
@@ -22,6 +22,14 @@ export const Role: FC = () => {
     const isRegistratered = useAppSelector(state => state.registration.isRegistered)
     const isRegistering = useAppSelector(state => state.registration.isRegistering)
     const error = useAppSelector(state => state.registration.error)
+    const payload = useAppSelector(state => state.registration.payload)
+    const accessToken = useAppSelector(state => state.auth.accessToken)
+    const userProfile = useAppSelector(state => state.userProfile.payload)
+
+    useEffect(() => {
+        if (payload && payload === true && accessToken && userProfile)
+            userProfile.role === IRole.teacher ? history(paths.teacher.main) : history(paths.student.main)
+    }, [payload, accessToken, userProfile])
 
     const registrationToken = useAppSelector(state => state.registration.googleToken)
 

@@ -1,7 +1,5 @@
-import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
-import { useAppDispatch, useAppSelector } from '../../../app/hooks'
-import { usePrivatePathT } from '../../../app/hooks/usePrivatePathT'
 import { paths } from '../../../app/constants/paths'
 import { Box } from '@mui/system'
 import { TCourseList as CourseList } from './course/list'
@@ -13,37 +11,6 @@ import { Dashboard } from './dashboard/Dashboard'
 
 export function TeacherPrivate() {
     console.log('Teacher private')
-    const {
-        location,
-    } = usePrivatePathT()
-
-
-    const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
-    const accessToken = useAppSelector(state => state.auth.accessToken)
-
-    if (!isAuthorized || !accessToken) {
-        return (
-            <Navigate
-                to={paths.login}
-                replace
-                state={{
-                    from: location
-                }}
-            />
-        )
-    }
-
-    if (location.pathname === '/t' || location.pathname === paths.registration.selectRole) {
-        return (
-            <Navigate
-                to={paths.teacher.main}
-                replace
-                state={{
-                    from: location
-                }}
-            />
-        )
-    }
 
     return (
         <Box>

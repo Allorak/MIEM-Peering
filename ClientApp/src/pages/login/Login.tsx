@@ -1,5 +1,5 @@
-import { FC, useEffect } from 'react';
-import { useNavigate } from "react-router-dom"
+import { FC } from 'react';
+import { Navigate } from "react-router-dom"
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { Button, Checkbox, TextField, Typography } from '@mui/material';
 import { Box, Theme, SxProps } from '@mui/system';
@@ -7,8 +7,6 @@ import { Box, Theme, SxProps } from '@mui/system';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 
 import { fetchGAuth } from '../../store/googleAuth/thunks/googleAuth';
-import { actions as userProfileActions } from "../../store/userProfile";
-import { actions as authActions } from "../../store/auth";
 
 import { Logo } from '../../components/logo';
 import GoogleLogo from '../../img/google-logo.svg'
@@ -16,7 +14,7 @@ import GoogleLogo from '../../img/google-logo.svg'
 import { palette } from '../../theme/colors';
 
 import { paths } from '../../app/constants/paths';
-import { GoogleAuthStatus } from '../../store/types';
+import { GoogleAuthStatus, IRole } from '../../store/types';
 
 import clientID from '../../secret/GoogleClientID';
 
@@ -24,22 +22,31 @@ import clientID from '../../secret/GoogleClientID';
 export const Login: FC = () => {
     const dispatch = useAppDispatch()
 
-    const history = useNavigate()
-
     const isAuthorized = useAppSelector(state => state.gAuth.isAuthorized)
     const isAuthorizing = useAppSelector(state => state.gAuth.isAuthorizing)
     const payload = useAppSelector(state => state.gAuth.payload)
+    const userProfile = useAppSelector(state => state.userProfile.payload)
+    const accessToken = useAppSelector(state => state.auth.accessToken)
 
-    useEffect(() => {
-        if (payload && payload.status === GoogleAuthStatus.newUser) {
-            history(paths.registration.main)
-        }
+    if (payload && payload.status === GoogleAuthStatus.newUser) {
+        console.log("NEW USER")
+        return (
+            <Navigate
+                to={paths.registration.main}
+                replace
+            />
+        )
+    }
 
-        if (payload && payload.status === GoogleAuthStatus.registeredUser) {
-            dispatch(userProfileActions.userProfileSuccess(payload.user))
-            console.log("REGISTERED")
-        }
-    }, [payload])
+    if (payload && payload.status === GoogleAuthStatus.registeredUser && accessToken && userProfile) {
+        console.log("REGISTERED USER")
+        return (
+            <Navigate
+                to={userProfile.role === IRole.teacher ? paths.teacher.main : paths.student.main}
+                replace
+            />
+        )
+    }
 
     const onGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ('accessToken' in response) {
