@@ -1,18 +1,21 @@
+import { FC, useCallback } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+
 import { Button, Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
-import { FC } from "react";
-import StudentImg from '../../img/role/teacher.svg';
-import TeacherImg from '../../img/role/student.svg';
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-// import { Navigate } from "react-router";
-import { paths } from "../../app/constants/paths";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { IRole } from "../../store/types";
-import { registretion } from "../../store/registretion/thunks/registration";
+
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+
+import { registretion } from "../../../../store/registretion";
+import { IRole } from "../../../../store/types";
+import { paths } from "../../../../app/constants/paths";
+
+import { TeacherImg } from "../../../../components/icons/Teacher";
+import { StudentImg } from "../../../../components/icons/Student";
+
 
 export const Role: FC = () => {
-    console.log('role open')
-    const location = useLocation()
+
     const history = useNavigate()
     const dispatch = useAppDispatch()
 
@@ -20,59 +23,55 @@ export const Role: FC = () => {
     const isRegistering = useAppSelector(state => state.registration.isRegistering)
     const error = useAppSelector(state => state.registration.error)
 
-    const registrationProps = useAppSelector(state => state.registration.registraionProps)
+    const registrationToken = useAppSelector(state => state.registration.googleToken)
 
-    console.log("Registration props:", registrationProps)
-
-    const handleSelectRole = (role: IRole) => {
-        if (registrationProps) {
+    const handleSelectRole = useCallback((role: IRole) => {
+        if (registrationToken) {
             dispatch(registretion({
-                gTokenId: registrationProps.gAccessToken, role: role
+                googleToken: registrationToken, role: role
             }))
         }
-    }
-    if (!registrationProps) {
+    }, [registrationToken])
+
+    if (!registrationToken) {
         return (
             <Navigate
                 to={paths.login}
-                replace={true}
-                state={{
-                    from: location
-                }}
+                replace
             />
         )
     }
 
     return (
-        //container
         <Box sx={styles.container}>
-            {/* root */}
             <Box sx={styles.root}>
-                {/* teacher */}
                 <Box sx={styles.cardContainer}>
                     <Typography variant='h4' >
-                        Преподаватель
+                        {"Преподаватель"}
                     </Typography>
-                    <img src={TeacherImg} alt='Teacher' style={{ height: '200px' }} />
+
+                    <TeacherImg />
+
                     <Button variant='contained'
                         sx={styles.selectButton}
-                        onClick={() => { handleSelectRole('teacher') }}
+                        onClick={() => { handleSelectRole(IRole.teacher) }}
                     >
-                        Я преподаватель
+                        {"Я преподаватель"}
                     </Button>
                 </Box>
 
-                {/* student */}
                 <Box sx={styles.cardContainer}>
                     <Typography variant='h4' >
-                        Студент
+                        {"Студент"}
                     </Typography>
-                    <img src={StudentImg} alt='Teacher' style={{ height: '200px' }} />
+
+                    <StudentImg />
+
                     <Button variant='outlined'
                         sx={styles.selectButton}
-                        onClick={() => { handleSelectRole('student') }}
+                        onClick={() => { handleSelectRole(IRole.student) }}
                     >
-                        Я студент
+                        {"Я студент"}
                     </Button>
                 </Box>
             </Box>

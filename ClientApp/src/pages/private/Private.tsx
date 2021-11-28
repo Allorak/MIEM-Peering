@@ -8,7 +8,7 @@ import { StudentPrivate } from './student/StudentPrivate'
 
 import { PrivateHeader } from '../../components/header'
 
-import { Role } from '../role'
+import { Role } from './registration/role'
 import { Registration } from './registration'
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
@@ -24,24 +24,24 @@ export function Private() {
   const dispatch = useAppDispatch()
 
   const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
-  const authPayload = useAppSelector(state => state.auth.payload)
-  const registrationProps = useAppSelector(state => state.registration.registraionProps)
+  const accessToken = useAppSelector(state => state.auth.accessToken)
+  const registrationToken = useAppSelector(state => state.registration.googleToken)
   const userProfilePayload = useAppSelector(state => state.userProfile.payload)
   const userProfileIsLoading = useAppSelector(state => state.userProfile.isLoading)
 
   useEffect(() => {
-    if (authPayload?.accessToken) {
+    if (accessToken) {
       dispatch(fetchUserProfile())
     }
-  }, [dispatch, authPayload.accessToken])
+  }, [dispatch, accessToken])
 
   useEffect(() => {
-    if (authPayload && authPayload.accessToken) {
+    if (accessToken) {
       dispatch(fetchUserProfile())
     }
-  }, [dispatch, authPayload])
+  }, [dispatch, accessToken])
 
-  if ((!isAuthorized || !authPayload.accessToken) && !registrationProps?.email) {
+  if ((!isAuthorized || !accessToken) && !registrationToken) {
     console.log('Navigate to login')
     return (
       <Navigate

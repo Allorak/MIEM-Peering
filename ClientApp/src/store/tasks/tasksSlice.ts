@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IGAuthCheckUser, IError, ICourses, ITaskItem, INewTaskResponse } from '../types';
+import { IError, ITaskItem, INewTaskResponse } from '../types';
 
 
 export interface ITaskState {

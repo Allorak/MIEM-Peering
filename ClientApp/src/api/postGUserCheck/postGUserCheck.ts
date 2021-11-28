@@ -1,12 +1,9 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
-import { mock } from './mock'
 
 
-export const postGUserCheck = async (payload: IRequestData): Promise<IResponse<IResponseData>> => {
-
-  const isMock = false
+export const postGUserCheck = async ({ googleToken }: IRequestData): Promise<IResponse<IResponseData>> => {
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
@@ -14,19 +11,11 @@ export const postGUserCheck = async (payload: IRequestData): Promise<IResponse<I
     headers: {
       'Accept-Language': 'ru',
     },
-    data : {
-      googleToken : payload.gAccessToken
+    data: {
+      googleToken
     }
   }
 
-  // Типизация Response
-
-  if (isMock) {
-    const response = await mock(requestConfig)
-    return response
-  }
-
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
-  console.log(response.data, "DATA")
   return response.data
 }

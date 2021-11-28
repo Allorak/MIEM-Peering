@@ -1,19 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IGAuthCheckUser, IError } from '../types';
+import { IGoogleUserRegistered, IGoogleUserNew, IError } from '../types';
 
 
 export interface IGAuthState {
   isAuthorized: boolean,
   isAuthorizing: boolean,
   error: IError | undefined,
-  payload: IGAuthCheckUser
+  payload: IGoogleUserRegistered | IGoogleUserNew | undefined
 }
 
 const initialState: IGAuthState = {
   isAuthorized: false,
   isAuthorizing: false,
   error: undefined,
-  payload: {} as IGAuthCheckUser
+  payload: undefined
 };
 
 export const googleAuthSlice = createSlice({
@@ -25,7 +25,7 @@ export const googleAuthSlice = createSlice({
       state.error = undefined
     },
 
-    authSuccess: (state, { payload }: PayloadAction<IGAuthCheckUser>) => {
+    authSuccess: (state, { payload }: PayloadAction<IGoogleUserRegistered | IGoogleUserNew>) => {
       state.isAuthorizing = false
       state.isAuthorized = true
       state.error = undefined

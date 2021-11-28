@@ -1,60 +1,56 @@
-import { Button, Checkbox, TextField, Typography } from '@mui/material';
-import { Box, Theme } from '@mui/system';
-import { FC} from 'react';
+import { FC, useEffect } from 'react';
+import { useNavigate } from "react-router-dom"
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
-import { Logo } from '../../components/logo';
-import clientID from '../../secret/GoogleClientID';
-import { SxProps } from '@mui/system';
-import { palette } from '../../theme/colors';
-import { TextInput } from '../../components/textInput';
-import GoogleLogo from '../../img/google-logo.svg'
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { Navigate } from 'react-router-dom'
-import { paths } from '../../app/constants/paths';
-import { fetchGAuth } from '../../store/googleAuth/thunks/googleAuth';
+import { Button, Checkbox, TextField, Typography } from '@mui/material';
+import { Box, Theme, SxProps } from '@mui/system';
 
-interface IGoogleResponse {
-    email: string,
-    gAccessToken?: string,
-    pass?: string,
-    imageUrl?: string,
-    firstName: string,
-    lastName: string
-}
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+
+import { fetchGAuth } from '../../store/googleAuth/thunks/googleAuth';
+import { actions as userProfileActions } from "../../store/userProfile";
+import { actions as authActions } from "../../store/auth";
+
+import { Logo } from '../../components/logo';
+import GoogleLogo from '../../img/google-logo.svg'
+
+import { palette } from '../../theme/colors';
+
+import { paths } from '../../app/constants/paths';
+import { GoogleAuthStatus } from '../../store/types';
+
+import clientID from '../../secret/GoogleClientID';
 
 
 export const Login: FC = () => {
     const dispatch = useAppDispatch()
 
-    const gIsAuthorized = useAppSelector(state => state.gAuth.isAuthorized)
-    const gIsAuthorizing = useAppSelector(state => state.gAuth.isAuthorizing)
-    const gPayload = useAppSelector(state => state.gAuth.payload)
+    const history = useNavigate()
+
+    const isAuthorized = useAppSelector(state => state.gAuth.isAuthorized)
+    const isAuthorizing = useAppSelector(state => state.gAuth.isAuthorizing)
+    const payload = useAppSelector(state => state.gAuth.payload)
+
+    useEffect(() => {
+        if (payload && payload.status === GoogleAuthStatus.newUser) {
+            history(paths.registration.main)
+        }
+
+        if (payload && payload.status === GoogleAuthStatus.registeredUser) {
+            dispatch(userProfileActions.userProfileSuccess(payload.user))
+            console.log("REGISTERED")
+        }
+    }, [payload])
 
     const onGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ('accessToken' in response) {
             console.log(response, "Google response")
             console.log(response.accessToken, 'Google access token')
-            dispatch(fetchGAuth({
-                email: response.profileObj.email,
-                gAccessToken: response.tokenId,
-                imageUrl: response.profileObj.imageUrl.toString(),
-                firstName: response.profileObj.givenName,
-                lastName: response.profileObj.familyName
-            }))
+            dispatch(fetchGAuth(response.tokenId))
         }
     }
 
     const onGoogleLoginFail = (e: any) => {
         console.log(e.error)
-    }
-
-    if (gIsAuthorized && gPayload.status === 'NEW') {
-        return (
-            <Navigate
-                to={paths.registration.main}
-                replace
-            />
-        )
     }
 
     return (
@@ -63,10 +59,10 @@ export const Login: FC = () => {
                 <Logo />
                 <Box sx={styles.headingTitle}>
                     <Typography variant='h4'>
-                        Вход
+                        {"Вход"}
                     </Typography>
                     <Typography variant='body1'>
-                        Пожалуйста, войдите в систему, чтобы получить доступ ко всем функциям
+                        {"Пожалуйста, войдите в систему, чтобы получить доступ ко всем функциям"}
                     </Typography>
                 </Box>
                 <GoogleLogin
@@ -81,7 +77,7 @@ export const Login: FC = () => {
                             variant='outlined'
                             sx={{ width: '100%' }}
                         >
-                            Войти через Google
+                            {"Войти через Google"}
                         </Button>
                     )}
                     onSuccess={onGoogleLoginSuccess}
@@ -93,7 +89,7 @@ export const Login: FC = () => {
                     <Typography variant='body1'
                         sx={{ textTransform: 'uppercase', mx: '24px' }}
                     >
-                        или
+                        {"или"}
                     </Typography>
                     <span />
                 </Box>
@@ -102,7 +98,7 @@ export const Login: FC = () => {
                         <Typography variant='body1'
                             sx={styles.textFieldTitle}
                         >
-                            E-mail
+                            {"E-mail"}
                         </Typography>
                         <TextField
                             variant='outlined'
@@ -114,7 +110,7 @@ export const Login: FC = () => {
                         <Typography variant='body1'
                             sx={styles.textFieldTitle}
                         >
-                            Пароль
+                            {"Пароль"}
                         </Typography>
                         <TextField
                             variant='outlined'
@@ -127,24 +123,24 @@ export const Login: FC = () => {
                         <Typography
                             sx={styles.keepMeText}
                         >
-                            Запомнить меня
+                            {"Запомнить меня"}
                         </Typography>
                         <Typography
                             variant='button'
                             sx={{ flex: '1 0 auto' }}
                         >
-                            Забыли пароль
+                            {"Забыли пароль"}
                         </Typography>
                     </Box>
                     <Button variant='contained'
                         sx={{ width: '100%' }}
                     >
-                        Войти
+                        {"Войти"}
                     </Button>
                     <Typography variant='body1'
                         sx={{ lineHeight: '26px', marginTop: '18px' }}
                     >
-                        Нет учетной записи?
+                        {"Нет учетной записи?"}
                         <Typography variant='button'
                             sx={{
                                 lineHeight: '26px',
@@ -153,7 +149,7 @@ export const Login: FC = () => {
                                 paddingLeft: '10px'
                             }}
                         >
-                            Зарегистрироваться
+                            {"Зарегистрироваться"}
                         </Typography>
 
                     </Typography>

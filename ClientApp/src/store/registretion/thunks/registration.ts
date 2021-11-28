@@ -23,8 +23,8 @@ export const registretion = (payload: IRegistretionRequest): AppThunk => async (
             dispatch(actions.regFailed(response.error))
             return
         }
-        dispatch(actions.regSuccess(response.payload))
-        dispatch(authActions.authSuccess({ accessToken: response.payload.accessToken }))
+        dispatch(actions.regSuccess(response.success))
+        dispatch(authActions.authSuccess("jahsas"))
 
     } catch (error) {
         dispatch(actions.regFailed({

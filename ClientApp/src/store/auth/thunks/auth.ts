@@ -17,13 +17,13 @@ export const auth = (payload: IAuthRequest): AppThunk => async (dispatch) => {
             }))
             return
         }
-        if (!response.success) {            
+        if (!response.success) {
             dispatch(actions.authFailed(response.error))
             return
         }
 
-        dispatch(actions.authSuccess(response.payload))
-        
+        dispatch(actions.authSuccess("asjas"))
+
     } catch (error) {
         dispatch(actions.authFailed({
             code: IErrorCode.REQUEST,

@@ -19,9 +19,9 @@ export function TeacherPrivate() {
 
 
     const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
-    const authPayload = useAppSelector(state => state.auth.payload)
+    const accessToken = useAppSelector(state => state.auth.accessToken)
 
-    if (!isAuthorized || !authPayload.accessToken) {
+    if (!isAuthorized || !accessToken) {
         return (
             <Navigate
                 to={paths.login}

@@ -7,7 +7,7 @@ import { getOverview } from "../../../api/getOverview";
 
 export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getState) => {
     dispatch(actions.reset())
-    const accessToken = getState().auth.payload.accessToken
+    const accessToken = getState().auth.accessToken
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,

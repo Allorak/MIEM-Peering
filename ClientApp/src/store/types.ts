@@ -29,7 +29,10 @@ export type IError = {
 
 export type IStatus = 'EMPTY' | 'FIRST_LOADING' | 'NOT_LOADED' | 'SUCCESS' | 'LOCKED'
 
-export type IRole = 'teacher' | 'student';
+export enum IRole {
+  teacher = 'teacher',
+  student = 'student'
+}
 
 export type IPath = {
   courseId?: string,
@@ -41,17 +44,23 @@ export type IPathDashboard = {
   activeMenuId?: IMenuTitles
 }
 
-export type IGAuthCheckUser = {
-  status: 'NEW' | 'REGISTERED'
+export enum GoogleAuthStatus {
+  newUser = "NEW",
+  registeredUser = "REGISTERED"
 }
 
-export type IUserGAuth = {
-  email: string,
-  gAccessToken: string
+export type IGoogleUserNew = {
+  status: GoogleAuthStatus.newUser
+}
+
+export type IGoogleUserRegistered = {
+  status: GoogleAuthStatus.registeredUser,
+  user: IUserProfile,
+  accessToken: string
 }
 
 export type IRegistretionRequest = {
-  gTokenId: string,
+  googleToken: string,
   role: IRole,
 }
 
@@ -77,15 +86,12 @@ export type IRegistrationResponse = {
   accessToken: string
 }
 
-// в будущем использовать для пользователя
-
 export type IUserProfile = {
   id: string,
   email: string,
   role: IRole,
   imageUrl?: string,
-  firstName: string, //fullname
-  lastName: string //fullname
+  fullname: string
 }
 
 export type IAuthRequest = {
