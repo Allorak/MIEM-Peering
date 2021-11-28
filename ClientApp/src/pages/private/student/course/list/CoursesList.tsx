@@ -33,7 +33,7 @@ export const STCourseList: FC = () => {
 
     const onCourse = (id: string) => {
         history(generatePath(
-            paths.teacher.courses.course, { courseId: id }
+            paths.student.courses.course, { courseId: id }
         ))
     }
 

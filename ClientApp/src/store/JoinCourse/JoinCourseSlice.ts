@@ -14,21 +14,21 @@ const initialState: INewCourseState = {
   payload: {} as ICourse,
 };
 
-export const addCourseSlice = createSlice({
-  name: 'addCourseSlice',
+export const joinCourseSlice = createSlice({
+  name: 'joinCourseSlice',
   initialState,
   reducers: {
-    addCourseStarted: (state) => {
+    joinCourseStarted: (state) => {
       state.isLoading = true
       state.error = undefined
     },
 
-    courseAddSuccess: (state, { payload }: PayloadAction<ICourse>) => {
+    courseJoinSuccess: (state, { payload }: PayloadAction<ICourse>) => {
       state.isLoading = false
       state.payload = payload
     },
 
-    courseAddFailed: (state, { payload }: PayloadAction<IError>) => {
+    courseJoinFailed: (state, { payload }: PayloadAction<IError>) => {
       state.isLoading = false
       state.error = payload
     },
@@ -41,6 +41,6 @@ export const addCourseSlice = createSlice({
   },
 });
 
-export const actions = addCourseSlice.actions
+export const actions = joinCourseSlice.actions
 
-export const reducer = addCourseSlice.reducer
+export const reducer = joinCourseSlice.reducer

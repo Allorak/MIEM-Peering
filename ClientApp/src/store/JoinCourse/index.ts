@@ -1,4 +1,4 @@
 export {
   actions,
   reducer,
-} from './addCourseSlice'
+} from './JoinCourseSlice'
