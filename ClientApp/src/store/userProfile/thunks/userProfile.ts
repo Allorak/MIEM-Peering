@@ -1,17 +1,15 @@
 import { actions } from "..";
 import { postUserProfile } from "../../../api/postUserProfile";
-import { useAppSelector } from "../../../app/hooks";
 import { AppThunk } from "../../../app/store";
 
 
-import { IErrorCode, IAuthResponse } from "../../types";
+import { IErrorCode } from "../../types";
 
 
 export const fetchUserProfile = (): AppThunk => async (dispatch, getState) => {
     dispatch(actions.userProfileStarted())
-    const accessToken = getState().auth.payload.accessToken
-    
-    console.log('ABC', accessToken)
+    const accessToken = getState().auth.accessToken
+
     try {
         if (!accessToken) {
             dispatch(actions.userProfileFailed({
@@ -20,8 +18,8 @@ export const fetchUserProfile = (): AppThunk => async (dispatch, getState) => {
             }));
             return
         }
-        
-        const response = await postUserProfile({accessToken})
+
+        const response = await postUserProfile({ accessToken })
         if (!response) {
             dispatch(actions.userProfileFailed({
                 code: IErrorCode.RESPONSE,
@@ -29,13 +27,13 @@ export const fetchUserProfile = (): AppThunk => async (dispatch, getState) => {
             }))
             return
         }
-        if (!response.success) {        
+        if (!response.success) {
             dispatch(actions.userProfileFailed(response.error))
             return
         }
         dispatch(actions.userProfileSuccess(response.payload))
 
-        
+
     } catch (error) {
         dispatch(actions.userProfileFailed({
             code: IErrorCode.REQUEST,

@@ -6,7 +6,7 @@ import { getCourses } from "../../../api/getCourses";
 
 
 export const fetchCourses = (): AppThunk => async (dispatch, getState) => {
-    const accessToken = getState().auth.payload.accessToken
+    const accessToken = getState().auth.accessToken
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,

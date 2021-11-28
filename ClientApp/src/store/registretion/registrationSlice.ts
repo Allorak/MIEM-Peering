@@ -6,16 +6,16 @@ export interface IRegState {
   isRegistered: boolean,
   isRegistering: boolean,
   error: IError | undefined,
-  payload: IRegistrationResponse,
-  registraionProps: IRegistretionProps
+  payload: boolean | undefined,
+  googleToken: string | undefined
 }
 
 const initialState: IRegState = {
   isRegistered: false,
   isRegistering: false,
   error: undefined,
-  payload: {} as IRegistrationResponse,
-  registraionProps: {} as IRegistretionProps
+  payload: undefined,
+  googleToken: undefined
 };
 
 export const registrationSlice = createSlice({
@@ -27,7 +27,7 @@ export const registrationSlice = createSlice({
       state.error = undefined
     },
 
-    regSuccess: (state, { payload }: PayloadAction<IRegistrationResponse>) => {
+    regSuccess: (state, { payload }: PayloadAction<boolean>) => {
       state.isRegistering = false
       state.isRegistered = true
       state.payload = payload
@@ -39,11 +39,11 @@ export const registrationSlice = createSlice({
       state.error = payload
     },
 
-    setProps: (state, { payload }: PayloadAction<IRegistretionProps>) => {
+    setGoogleToken: (state, { payload }: PayloadAction<string>) => {
       state.error = undefined
       state.isRegistering = false
       state.isRegistered = false
-      state.registraionProps = payload
+      state.googleToken = payload
     }
   },
 });

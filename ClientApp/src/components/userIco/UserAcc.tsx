@@ -6,10 +6,10 @@ import Avatar from '../../img/ico/avatar.svg'
 export const UserAcc: FC = () => {
 
     const payload = useAppSelector(state => state.userProfile.payload)
-    
+    console.log(payload?.imageUrl, "IMG")
     return (
         <Box>
-            <Box sx={{...styles.avatarImage, backgroundImage: `url(${payload?.imageUrl ? payload.imageUrl : Avatar})`}}/>
+            <Box sx={{...styles.avatarImage, backgroundImage: `url(${payload && payload.imageUrl ? payload.imageUrl : Avatar})`}}/>
         </Box>
     )
 }

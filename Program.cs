@@ -18,7 +18,7 @@ namespace patools
             var host = CreateHostBuilder(args).Build();
 
             PAToolsContext db = new PAToolsContext();
-            db.Database.EnsureDeleted();
+            //db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             InitializeDB(db);
             host.Run();
@@ -30,13 +30,13 @@ namespace patools
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-        
+
         private static void InitializeDB(PAToolsContext db)
         {
             if(!db.Users.Any())
                 db.Users.AddRange(CreateFakeUsers());
             db.SaveChanges();
-            
+
             if(!db.Groups.Any())
                 db.Groups.AddRange(CreateFakeGroups());
             db.SaveChanges();
@@ -78,106 +78,101 @@ namespace patools
                 {
                     ID = Guid.NewGuid(),
                     Fullname = "Моисеев Михаил",
-                    Status = UserStatuses.Student,
-                    Email = "mvmoiseev@miem.hse.ru",
-                    Password = "12343123"
+                    Role = UserRoles.Teacher,
+                    Email = "mvmoiseev@miem.hse.ru"
                 },
                 new User
                 {
                     ID = Guid.NewGuid(),
                     Fullname = "Иванов Иван",
-                    Status = UserStatuses.Teacher,
-                    Email = "ivanov_ivanov@gmail.com",
-                    Password = "abc123**Hd_"
+                    Role = UserRoles.Teacher,
+                    Email = "ivanov_ivanov@gmail.com"
                 },
                 new User
                 {
                     ID = Guid.NewGuid(),
                     Fullname = "Афанасьев Илья Игоревич",
-                    Status = UserStatuses.Student,
-                    Email = "god_of_gods@mail.ru",
-                    Password = "BEjbdiAYDGF(Q#cb*"
+                    Role = UserRoles.Student,
+                    Email = "god_of_gods@mail.ru"
                 },
                 new User
                 {
                     ID = Guid.NewGuid(),
                     Fullname = "Ковалев Алексей Владимирович",
-                    Status = UserStatuses.Student,
-                    Email = "avkovalev@miem.hse.ru",
-                    Password = "mynameisaleksey"
+                    Role = UserRoles.Student,
+                    Email = "avkovalev@miem.hse.ru"
                 },
                 new User
                 {
                     ID = Guid.NewGuid(),
                     Fullname = "Силаева Виталина Игоревна",
-                    Status = UserStatuses.Teacher,
+                    Role = UserRoles.Teacher,
                     Email = "visilaeva@edu.hse.ru",
-                    ImageUrl = "https://get.wallhere.com/photo/cat-face-eyes-branches-659829.jpg",
-                    Password = "jidfbv`p8fgwiuc#B@("
+                    ImageUrl = "https://get.wallhere.com/photo/cat-face-eyes-branches-659829.jpg"
                 },
             };
 
             return users;
         }
-    
+
         private static List<Group> CreateFakeGroups()
         {
             var groups = new List<Group>
             {
-                new Group 
+                new Group
                 {
                     ID = Guid.NewGuid(),
                     Name = "БИВ196"
                 },
-                new Group 
+                new Group
                 {
                     ID = Guid.NewGuid(),
                     Name = "БИТ182"
                 },
-                new Group 
+                new Group
                 {
                     ID = Guid.NewGuid(),
                     Name = "БИВ201"
                 },
-                new Group 
+                new Group
                 {
                     ID = Guid.NewGuid(),
                     Name = "БИВ181"
                 },
-                new Group 
+                new Group
                 {
                     ID = Guid.NewGuid(),
                     Name = "БИТ191"
                 },
-                new Group 
+                new Group
                 {
                     ID = Guid.NewGuid(),
                     Name = "БИТ202"
                 },
-                
+
             };
 
             return groups;
         }
-   
+
         private static List<Course> CreateFakeCourses(PAToolsContext db)
         {
             Random random = new Random();
             var courses = new List<Course>
             {
-                new Course 
+                new Course
                 {
                     ID = Guid.NewGuid(),
                     Title = "Объектноориентрованное программирование на языке C++",
-                    Teacher = db.Users.Where(user => user.Status == UserStatuses.Teacher).First(),
+                    Teacher = db.Users.Where(user => user.Role == UserRoles.Teacher).First(),
                     Subject = "Программирование"
                 },
-                new Course 
+                new Course
                 {
                     ID = Guid.NewGuid(),
                     Title = "Изучение основ линейной алгебры",
                     CourseCode = "7d28al_8",
-                    Teacher = db.Users.Where(user => user.Status == UserStatuses.Teacher).First(),
+                    Teacher = db.Users.Where(user => user.Role == UserRoles.Teacher).First(),
                     Subject = "Линейная алгебра"
                 },
                 new Course
@@ -186,50 +181,50 @@ namespace patools
                     Title = "Квантовая физика",
                     Description = "Данный курс предназначен для изучения основ квантовой физики и ее влияния на окружающий мир",
                     CourseCode = "Gbda82adG",
-                    Teacher = db.Users.Where(user => user.Status == UserStatuses.Teacher).Skip(1).First(),
+                    Teacher = db.Users.Where(user => user.Role == UserRoles.Teacher).Skip(1).First(),
                     Subject = "Физика"
                 }
             };
 
             return courses;
         }
-    
+
         private static List<patools.Models.Task> CreateFakeTasks(PAToolsContext db)
         {
             var tasks = new List<patools.Models.Task>
             {
-                new Models.Task 
+                new Models.Task
                 {
                     ID = Guid.NewGuid(),
                     Title = "Польза ООП в промышленных предприятиях",
                     SubmissionsToCheck = 3,
                     Course = db.Courses.Where(course => course.Title == "Объектноориентрованное программирование на языке C++").First()
                 },
-                new Models.Task 
+                new Models.Task
                 {
                     ID = Guid.NewGuid(),
                     Title = "История изучения квантовой физики",
                     SubmissionsToCheck = 5,
-                    StartDatetime = DateTime.Now.AddDays(3),
-                    CompletionDeadlineDatetime = DateTime.Now.AddDays(10),
-                    CheckStartDatetime = DateTime.Now.AddDays(11),
-                    CheckDeadlineDatetime = DateTime.Now.AddDays(15),
+                    SubmissionStartDateTime = DateTime.Now.AddDays(3),
+                    SubmissionEndDateTime = DateTime.Now.AddDays(10),
+                    ReviewStartDateTime = DateTime.Now.AddDays(11),
+                    ReviewEndDateTime = DateTime.Now.AddDays(15),
                     Course = db.Courses.Where(course => course.Title == "Квантовая физика").First()
                 },
-                new Models.Task 
+                new Models.Task
                 {
                     ID = Guid.NewGuid(),
                     Title = "Комплексные числа в линейной алгебре",
                     SubmissionsToCheck = 2,
-                    StartDatetime = DateTime.Now.AddDays(1),
-                    CompletionDeadlineDatetime = DateTime.Now.AddDays(5),
+                    SubmissionStartDateTime = DateTime.Now.AddDays(1),
+                    SubmissionEndDateTime = DateTime.Now.AddDays(5),
                     Course = db.Courses.Where(course => course.Title == "Изучение основ линейной алгебры").First()
                 }
             };
 
             return tasks;
         }
-    
+
         private static List<Question> CreateFakeQuestions(PAToolsContext db)
         {
             var questions = new List<Question>
@@ -255,12 +250,12 @@ namespace patools
                     Type = Types.MultipleChoices,
                     Task = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").First()
                 },
-                
+
             };
 
             return questions;
         }
-    
+
         private static List<Variant> CreateFakeVariants(PAToolsContext db)
         {
             var variants = new List<Variant>
@@ -299,7 +294,7 @@ namespace patools
 
             return variants;
         }
-    
+
         private static List<CourseUser> CreateFakeCourseUsers(PAToolsContext db)
         {
             var courseUsers = new List<CourseUser>
@@ -308,31 +303,31 @@ namespace patools
                 {
                     ID = Guid.NewGuid(),
                     Course = db.Courses.First(),
-                    User = db.Users.Where(user => user.Status == UserStatuses.Student).Skip(1).First()
+                    User = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First()
                 },
                 new CourseUser
                 {
                     ID = Guid.NewGuid(),
                     Course = db.Courses.Skip(1).First(),
-                    User = db.Users.Where(user => user.Status == UserStatuses.Student).First()
+                    User = db.Users.Where(user => user.Role == UserRoles.Student).First()
                 },
                 new CourseUser
                 {
                     ID = Guid.NewGuid(),
                     Course = db.Courses.First(),
-                    User = db.Users.Where(user => user.Status == UserStatuses.Student).First()
+                    User = db.Users.Where(user => user.Role == UserRoles.Student).First()
                 },
                 new CourseUser
                 {
                     ID = Guid.NewGuid(),
                     Course = db.Courses.Skip(1).First(),
-                    User = db.Users.Where(user => user.Status == UserStatuses.Student).Skip(1).First()
+                    User = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First()
                 }
             };
 
             return courseUsers;
         }
-    
+
         private static List<GroupUser> CreateFakeGroupUsers(PAToolsContext db)
         {
             var groupUsers = new List<GroupUser>
@@ -341,51 +336,51 @@ namespace patools
                 {
                     ID = Guid.NewGuid(),
                     Group = db.Groups.First(),
-                    Student = db.Users.Where(user => user.Status == UserStatuses.Student).Skip(1).First(),
+                    Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
                     Subgroup = Subgroups.First
                 },
                 new GroupUser
                 {
                     ID = Guid.NewGuid(),
                     Group = db.Groups.First(),
-                    Student = db.Users.Where(user => user.Status == UserStatuses.Student).First(),
+                    Student = db.Users.Where(user => user.Role == UserRoles.Student).First(),
                     Subgroup = Subgroups.Second
                 },
                 new GroupUser
                 {
                     ID = Guid.NewGuid(),
                     Group = db.Groups.Skip(1).First(),
-                    Student = db.Users.Where(user => user.Status == UserStatuses.Student).Skip(1).First(),
+                    Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
                     Subgroup = Subgroups.First
                 }
             };
 
             return groupUsers;
         }
-    
+
         private static List<TaskUser> CreateFakeTaskUsers(PAToolsContext db)
         {
-            var taskUsers = new List<TaskUser> 
+            var taskUsers = new List<TaskUser>
             {
                 new TaskUser
                 {
                     ID = Guid.NewGuid(),
                     Task = db.Tasks.First(),
-                    Student = db.Users.Where(user => user.Status == UserStatuses.Student).Skip(1).First(),
+                    Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
                     State = TaskState.Assigned
                 },
                 new TaskUser
                 {
                     ID = Guid.NewGuid(),
                     Task = db.Tasks.First(),
-                    Student = db.Users.Where(user => user.Status == UserStatuses.Student).First(),
+                    Student = db.Users.Where(user => user.Role == UserRoles.Student).First(),
                     State = TaskState.Checking
                 },
                 new TaskUser
                 {
                     ID = Guid.NewGuid(),
                     Task = db.Tasks.Skip(1).First(),
-                    Student = db.Users.Where(user => user.Status == UserStatuses.Student).Skip(1).First(),
+                    Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
                     State = TaskState.Assigned
                 }
             };

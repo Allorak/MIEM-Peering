@@ -11,7 +11,7 @@ namespace patools.Models
         [Required]
         [MaxLength(150)]
         public string Title { get; set; }
-        
+
         [DataType(DataType.Date)]
         [DisplayFormat
         (
@@ -19,35 +19,35 @@ namespace patools.Models
             ApplyFormatInEditMode = true,
             NullDisplayText = "No start datetime set"
         )]
-        public DateTime? StartDatetime { get; set; }
+        public DateTime? SubmissionStartDateTime { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat
         (
             DataFormatString = "{0:yyyy-MM-dd}",
             ApplyFormatInEditMode = true,
-            NullDisplayText = "No completion deadline set"
+            NullDisplayText = "No submission deadline set"
         )]
-        public DateTime? CompletionDeadlineDatetime { get; set; }
+        public DateTime? SubmissionEndDateTime { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat
         (
             DataFormatString = "{0:yyyy-MM-dd}",
             ApplyFormatInEditMode = true,
-            NullDisplayText = "No check start datetime set"
+            NullDisplayText = "No review start datetime set"
         )]
-        public DateTime? CheckStartDatetime { get; set; }
+        public DateTime? ReviewStartDateTime { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat
         (
             DataFormatString = "{0:yyyy-MM-dd}",
             ApplyFormatInEditMode = true,
-            NullDisplayText = "No check deadline set"
+            NullDisplayText = "No review deadline set"
         )]
-        public DateTime? CheckDeadlineDatetime { get; set; }
-        
+        public DateTime? ReviewEndDateTime { get; set; }
+
         //Todo: Проверка что значение >=1
         public int SubmissionsToCheck { get; set; }
 

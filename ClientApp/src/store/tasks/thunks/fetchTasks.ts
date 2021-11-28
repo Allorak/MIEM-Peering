@@ -2,12 +2,12 @@ import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
 
-import { IErrorCode} from "../../types";
+import { IErrorCode } from "../../types";
 import { getTasks } from "../../../api/getTasks";
 
 
 export const fetchTasks = (id: string): AppThunk => async (dispatch, getState) => {
-    const accessToken = getState().auth.payload.accessToken
+    const accessToken = getState().auth.accessToken
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,
@@ -16,7 +16,7 @@ export const fetchTasks = (id: string): AppThunk => async (dispatch, getState) =
         console.log("Fetch course error: No access or Role")
         return
     }
-    
+
     dispatch(actions.fetchStarted())
     try {
         const response = await getTasks({ accessToken, courseId: id })

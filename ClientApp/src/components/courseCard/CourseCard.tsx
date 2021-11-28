@@ -6,7 +6,7 @@ import SettingsIco from '../../img/ico/setting-hover.svg'
 import DeleteIco from '../../img/ico/delete-outline.svg'
 import DefaultAvatar from '../../img/ico/avatar.svg'
 import { palette } from "../../theme/colors";
-import { ICourses } from "../../store/types";
+import { ICourses, IRole } from "../../store/types";
 
 interface IProps {
     course: ICourses
@@ -39,10 +39,10 @@ export const CourseCard: FC<IProps> = ({
                     </Typography>
 
                     {
-                        userProfile && userProfile.role === 'teacher' ? (
-                            <Box 
-                            sx={styles.settingBt}
-                            onClick={onSettings}
+                        userProfile && userProfile.role === IRole.teacher && (
+                            <Box
+                                sx={styles.settingBt}
+                                onClick={onSettings}
                             >
                                 <img
                                     src={SettingsIco}

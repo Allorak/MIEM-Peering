@@ -19,6 +19,7 @@ export enum IErrorCode {
   BAD_REQUEST_DATA = 101,
   NEED_FORCE = 102, // пользователь может повторить запрос с параметром isForced: true
   OPERATION_ERROR = 103, // ошибка при выполнении операции
+  USER_ALREADY_REGISTERED = 104
 }
 
 export type IError = {
@@ -28,7 +29,10 @@ export type IError = {
 
 export type IStatus = 'EMPTY' | 'FIRST_LOADING' | 'NOT_LOADED' | 'SUCCESS' | 'LOCKED'
 
-export type IRole = 'teacher' | 'student';
+export enum IRole {
+  teacher = 'Teacher',
+  student = 'Student'
+}
 
 export type IPath = {
   courseId?: string,
@@ -40,23 +44,24 @@ export type IPathDashboard = {
   activeMenuId?: IMenuTitles
 }
 
-export type IGAuthCheckUser = {
-  status: 'NEW' | 'REGISTERED'
+export enum GoogleAuthStatus {
+  newUser = "NEW",
+  registeredUser = "REGISTERED"
 }
 
-export type IUserGAuth = {
-  email: string,
-  gAccessToken: string
+export type IGoogleUserNew = {
+  status: GoogleAuthStatus.newUser
+}
+
+export type IGoogleUserRegistered = {
+  status: GoogleAuthStatus.registeredUser,
+  user: IUserProfile,
+  accessToken: string
 }
 
 export type IRegistretionRequest = {
-  email: string,
-  gAccessToken?: string,
+  googleToken: string,
   role: IRole,
-  pass?: string,
-  imageUrl?: string,
-  firstName: string,
-  lastName: string
 }
 
 export type IRegistretionProps = {
@@ -81,14 +86,12 @@ export type IRegistrationResponse = {
   accessToken: string
 }
 
-// в будущем использовать для пользователя
-
 export type IUserProfile = {
+  id: string,
   email: string,
   role: IRole,
   imageUrl?: string,
-  firstName: string,
-  lastName: string
+  fullname: string
 }
 
 export type IAuthRequest = {

@@ -1,3 +1,4 @@
+export { registretion } from "./thunks/registration";
 
 export {
   actions,
