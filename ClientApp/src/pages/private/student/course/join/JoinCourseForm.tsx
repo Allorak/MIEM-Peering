@@ -1,68 +1,31 @@
-import { Button, TextField, Typography } from "@mui/material";
-import { Box, SxProps, Theme } from "@mui/system";
 import { FC, useCallback, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { InputLabel } from "../../../../../components/inputLabel";
-import { joinCourse } from "../../../../../store/JoinCourse/thunks/joinCourse";
 import * as globalStyles from "../../../../../const/styles";
 
-interface ICourseItem {
-    courseId: string
+import { Button, TextField } from "@mui/material";
+import { Box, SxProps, Theme } from "@mui/system";
+
+interface IProps {
+    onSubmit(courseCode: string): void
 }
 
-// interface IErrors extends Omit<ICourseItem, 'description'> { }
-interface IErrors {
-    name: string
-    subject: string
-}
-
-export const JoinCourseForm: FC = () => {
-    const [courseCode, setCourseCode] = useState<ICourseItem>(initialCourse)
-    const [errors, setErrors] = useState<IErrors>(initialErrors)
-    const dispatch = useAppDispatch()
+export const JoinCourseForm: FC<IProps> = ({onSubmit}) => {
+    const [courseCode, setCourseCode] = useState<string>('')
+    const [errors, setErrors] = useState<boolean>(false)
 
     const onChangeCourseCode = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        if (typeof event.target !== 'undefined' && typeof event.target.name !== 'undefined' && typeof event.target.value !== 'undefined') {
-            const { name, value } = event.target
-            if (Object.keys(initialCourse).indexOf(name) > -1) {
-                setCourseCode(prev => (
-                    { ...prev, [name]: value }
-                ))
-                if (name === 'name' || name === 'subject') {
-                    const error = validate(name, value)
-                    if (errors[name] && error === "") {
-                        setErrors(prev => (
-                            { ...prev, [name]: error }
-                        ))
-                    }
-                }
-            }
-        }
+        setCourseCode(event.target.value)
     }
 
-    const onFieldBlur = (name: string, value: string) => {
-        if (Object.keys(errors).indexOf(name) > -1) {
-            const error = validate(name, value)
-            if (error) {
-                setErrors(prev => (
-                    { ...prev, [name]: error }
-                ))
-            }
-        }
+    const onFieldBlur = (value: string) => {
+        const error = !value || value === ''
+        setErrors(error)
     }
 
     const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
         event.preventDefault()
-        dispatch(joinCourse(courseCode))
-    }, [dispatch])  
-
-    const validate = (name: string, value: string): string | undefined => {
-        switch (name) {
-            case 'name':
-            case 'subject':
-                return value ? "" : "Обязательное поле"
-        }
-    }
+        onSubmit(courseCode)
+    }, [courseCode])
 
     return (
         <Box
@@ -73,20 +36,20 @@ export const JoinCourseForm: FC = () => {
             <Box sx={styles.formItemContainer}>
                 <InputLabel
                     title={'Код курса'}
+                    fontSize='medium'
                     required
                 />
                 <TextField
-                    name={'name'}
                     variant='outlined'
                     required
                     onChange={onChangeCourseCode}
-                    value={courseCode.courseId ? courseCode.courseId : ''}
-                    onBlur={e => onFieldBlur(e.target.name, e.target.value)}
-                    {...(errors.name.length > 0 && { error: true, helperText: errors.name })}
+                    value={courseCode}
+                    onBlur={e => onFieldBlur(e.target.value)}
+                    {...(errors && { error: true, helperText: "Обязательное поле" })}
                 />
             </Box>
-            
-            <Box sx={globalStyles.submitBtContainer}>
+
+            <Box sx={globalStyles.submitBtContainerCenter}>
                 <Button
                     type='submit'
                     variant='contained'
@@ -104,18 +67,8 @@ const styles = {
     } as SxProps<Theme>,
     formItemContainer: {
         margin: '0px 0px 10px 0px',
-
+    } as SxProps<Theme>,
+    formInputLabel: {
+        fontSize: '18px'
     } as SxProps<Theme>,
 }
-
-const initialCourse: ICourseItem = {
-    courseId: '',
-}
-
-const initialErrors: IErrors = {
-    name: '',
-    subject: ''
-}
-
-
-

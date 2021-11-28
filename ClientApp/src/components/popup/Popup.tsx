@@ -60,10 +60,8 @@ export const Popup: FC<IProps> = ({
 }
 
 const styles = {
-
     dialogWrapper: {
         flex: '0 1 600px'
-
     } as SxProps<Theme>,
     topContainer: {
         display: 'flex',

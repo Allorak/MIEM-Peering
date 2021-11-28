@@ -3,10 +3,10 @@ import { Box, SxProps, Theme } from "@mui/system";
 import { FC } from "react";
 import { useAppSelector } from "../../app/hooks";
 import SettingsIco from '../../img/ico/setting-hover.svg'
-import DeleteIco from '../../img/ico/delete-outline.svg'
 import DefaultAvatar from '../../img/ico/avatar.svg'
 import { palette } from "../../theme/colors";
 import { ICourses, IRole } from "../../store/types";
+import { Delete as DeleteIcon } from "../icons/Delete";
 
 interface IProps {
     course: ICourses
@@ -39,7 +39,7 @@ export const CourseCard: FC<IProps> = ({
                     </Typography>
 
                     {
-                        userProfile && userProfile.role === IRole.teacher && (
+                        userProfile && userProfile.role === IRole.teacher ? (
                             <Box
                                 sx={styles.settingBt}
                                 onClick={onSettings}
@@ -55,10 +55,7 @@ export const CourseCard: FC<IProps> = ({
                             sx={styles.settingBt}
                             onClick={onDelete}
                             >
-                                <img
-                                    src={DeleteIco}
-                                    alt="Delete"
-                                />
+                                <DeleteIcon />
                             </Box>
                         )
                     }

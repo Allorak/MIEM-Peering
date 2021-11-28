@@ -1,19 +1,13 @@
 import { actions } from "..";
-import { postAuth } from "../../../api/postAuth";
-import { postNewCourse } from "../../../api/postNewCourse";
+import { postJoinCourse } from "../../../api/postJoinCourse";
 import { AppThunk } from "../../../app/store";
+import { IErrorCode } from "../../types";
 
-
-import { IErrorCode, ICourse } from "../../types";
-
-
-export const joinCourse = (payload: ICourse): AppThunk => async (dispatch, getState) => {
+export const joinCourse = (courseCode: string): AppThunk => async (dispatch, getState) => {
     dispatch(actions.joinCourseStarted())
     try {
-        const accessToken = getState().auth.payload.accessToken
-        const role = getState().userProfile.payload.role  
-        const couserId = payload.courseId //Полученный id курса
-        if (!accessToken || role !== 'student') {
+        const accessToken = getState().auth.accessToken
+        if (!accessToken) {
             dispatch(actions.courseJoinFailed({
                 code: IErrorCode.NO_ACCESS,
                 message: 'Ошибка аутентификации', // TODO
@@ -21,7 +15,7 @@ export const joinCourse = (payload: ICourse): AppThunk => async (dispatch, getSt
             console.log("Join course error: No access or Role")
             return
         }
-        const response = await postNewCourse({...payload, accessToken}) // ???
+        const response = await postJoinCourse({accessToken, courseCode})
         if (!response) {
             dispatch(actions.courseJoinFailed({
                 code: IErrorCode.RESPONSE,
