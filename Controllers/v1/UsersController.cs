@@ -44,8 +44,9 @@ namespace patools.Controllers
 
                 return Ok(await _usersService.AddGoogleUser(user));
             }
-            catch(Exception)
+            catch(Exception e)
             {
+                System.Console.WriteLine(e.ToString());
                 return Ok(new UnauthorizedUserResponse());
             }
         }

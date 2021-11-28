@@ -22,8 +22,8 @@ namespace patools.Services.Users
         public async Task<Response<GetNewUserDTO>> AddGoogleUser(User newUser)
         {
             var response = new Response<GetNewUserDTO>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
-            if(user != null)
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+            if(existingUser != null)
             {
                 response.Success = false;
                 response.Payload = null;
@@ -31,12 +31,12 @@ namespace patools.Services.Users
                 return response;
             }
 
-            await _context.Users.AddAsync(user);
+            await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
 
             response.Success = true;
             response.Error = null;
-            response.Payload = _mapper.Map<GetNewUserDTO>(user);
+            response.Payload = _mapper.Map<GetNewUserDTO>(newUser);
             return response;
         }
 
