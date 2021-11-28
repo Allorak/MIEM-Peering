@@ -23,7 +23,7 @@ export const JoinCourse: FC<IProps> = ({ popupOpen, onCloseHandler }) => {
     const history = useNavigate()
 
     if (payload && payload.courseId) {
-        history(generatePath(paths.teacher.courses.course, {courseId: payload.courseId}))
+        history(generatePath(paths.student.courses.course, {courseId: payload.courseId}))
         dispatch(actions.courseSetInitialState())
         
     }

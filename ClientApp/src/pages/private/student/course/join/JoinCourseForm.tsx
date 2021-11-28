@@ -3,13 +3,11 @@ import { Box, SxProps, Theme } from "@mui/system";
 import { FC, useCallback, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { InputLabel } from "../../../../../components/inputLabel";
-import { addCourse } from "../../../../../store/addCourse/thunks/addCourse";
+import { joinCourse } from "../../../../../store/JoinCourse/thunks/joinCourse";
 import * as globalStyles from "../../../../../const/styles";
 
 interface ICourseItem {
-    name: string
-    subject: string
-    description?: string
+    courseId: string
 }
 
 // interface IErrors extends Omit<ICourseItem, 'description'> { }
@@ -19,7 +17,7 @@ interface IErrors {
 }
 
 export const JoinCourseForm: FC = () => {
-    const [course, setCourseCode] = useState<ICourseItem>(initialCourse)
+    const [courseCode, setCourseCode] = useState<ICourseItem>(initialCourse)
     const [errors, setErrors] = useState<IErrors>(initialErrors)
     const dispatch = useAppDispatch()
 
@@ -55,8 +53,8 @@ export const JoinCourseForm: FC = () => {
 
     const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
         event.preventDefault()
-        dispatch(addCourse(course))
-    }, [dispatch])
+        dispatch(joinCourse(courseCode))
+    }, [dispatch])  
 
     const validate = (name: string, value: string): string | undefined => {
         switch (name) {
@@ -82,7 +80,7 @@ export const JoinCourseForm: FC = () => {
                     variant='outlined'
                     required
                     onChange={onChangeCourseCode}
-                    value={course.name ? course.name : ''}
+                    value={courseCode.courseId ? courseCode.courseId : ''}
                     onBlur={e => onFieldBlur(e.target.name, e.target.value)}
                     {...(errors.name.length > 0 && { error: true, helperText: errors.name })}
                 />
@@ -111,9 +109,7 @@ const styles = {
 }
 
 const initialCourse: ICourseItem = {
-    name: '',
-    subject: '',
-    description: ''
+    courseId: '',
 }
 
 const initialErrors: IErrors = {
