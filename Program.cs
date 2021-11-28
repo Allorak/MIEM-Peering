@@ -18,7 +18,7 @@ namespace patools
             var host = CreateHostBuilder(args).Build();
 
             PAToolsContext db = new PAToolsContext();
-            // db.Database.EnsureDeleted();
+            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             InitializeDB(db);
             host.Run();
@@ -78,7 +78,7 @@ namespace patools
                 {
                     ID = Guid.NewGuid(),
                     Fullname = "Моисеев Михаил",
-                    Role = UserRoles.Student,
+                    Role = UserRoles.Teacher,
                     Email = "mvmoiseev@miem.hse.ru"
                 },
                 new User
@@ -205,10 +205,10 @@ namespace patools
                     ID = Guid.NewGuid(),
                     Title = "История изучения квантовой физики",
                     SubmissionsToCheck = 5,
-                    StartDatetime = DateTime.Now.AddDays(3),
-                    CompletionDeadlineDatetime = DateTime.Now.AddDays(10),
-                    CheckStartDatetime = DateTime.Now.AddDays(11),
-                    CheckDeadlineDatetime = DateTime.Now.AddDays(15),
+                    SubmissionStartDateTime = DateTime.Now.AddDays(3),
+                    SubmissionEndDateTime = DateTime.Now.AddDays(10),
+                    ReviewStartDateTime = DateTime.Now.AddDays(11),
+                    ReviewEndDateTime = DateTime.Now.AddDays(15),
                     Course = db.Courses.Where(course => course.Title == "Квантовая физика").First()
                 },
                 new Models.Task
@@ -216,8 +216,8 @@ namespace patools
                     ID = Guid.NewGuid(),
                     Title = "Комплексные числа в линейной алгебре",
                     SubmissionsToCheck = 2,
-                    StartDatetime = DateTime.Now.AddDays(1),
-                    CompletionDeadlineDatetime = DateTime.Now.AddDays(5),
+                    SubmissionStartDateTime = DateTime.Now.AddDays(1),
+                    SubmissionEndDateTime = DateTime.Now.AddDays(5),
                     Course = db.Courses.Where(course => course.Title == "Изучение основ линейной алгебры").First()
                 }
             };

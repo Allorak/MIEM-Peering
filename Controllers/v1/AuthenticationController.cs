@@ -44,7 +44,6 @@ namespace patools.Controllers.v1
         [HttpPost("googleauth")]
         public async Task<ActionResult<Response<GoogleGetRegisteredUserDTO>>> GoogleAuth([FromBody]GoogleTokenDTO tokenInfo)
         {
-            System.Console.WriteLine(tokenInfo.GoogleToken);
             try
             {
                 var googleUser = await GoogleJsonWebSignature.ValidateAsync(tokenInfo.GoogleToken, new GoogleJsonWebSignature.ValidationSettings()

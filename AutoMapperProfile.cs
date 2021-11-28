@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using patools.Models;
 using patools.Dtos.User;
 using patools.Dtos.Course;
+using patools.Dtos.Task;
 
 namespace patools
 {
@@ -17,6 +14,7 @@ namespace patools
             CreateMap<User, GetTeacherDTO>();
             CreateMap<AddCourseDTO, Course>();
             CreateMap<User,GetNewUserDTO>();
+            CreateMap<Task,GetTaskDeadlinesDTO>();
         }
     }
 }

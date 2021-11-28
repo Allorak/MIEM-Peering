@@ -43,13 +43,13 @@ namespace patools
         }
     }
 
-    public class InvalidUserIdResponse : Response<object>
+    public class InvalidGuidIdResponse : Response<object>
     {
-        public InvalidUserIdResponse():base()
+        public InvalidGuidIdResponse():base()
         {
             Success = false;
             Payload = null;
-            Error = new Error(-10,"The authorized user id is invalid for the execution of the command");
+            Error = new Error(-10,"The guid id provided is invalid for the execution of the command");
         }
     }
 }

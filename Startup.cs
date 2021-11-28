@@ -17,6 +17,7 @@ using patools.Models;
 using patools.Services.Authentication;
 using patools.Services.Courses;
 using patools.Services.Users;
+using patools.Services.Tasks;
 
 namespace patools
 {
@@ -42,6 +43,7 @@ namespace patools
             services.AddScoped<IAuthenticationService,AuthenticationService>();
             services.AddScoped<ICoursesService,CoursesService>();
             services.AddScoped<IUsersService,UsersService>();
+            services.AddScoped<ITasksService,TasksService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
