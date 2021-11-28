@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Course;
+using patools.Dtos.Task;
 using patools.Models;
 using patools.Services.Courses;
+using patools.Services.Tasks;
 
 namespace patools.Controllers.v1
 {
@@ -18,10 +20,12 @@ namespace patools.Controllers.v1
     {
         private readonly PAToolsContext _context;
         private readonly ICoursesService _coursesService;
+        private readonly ITasksService _tasksService;
 
-        public CoursesController(PAToolsContext context, ICoursesService coursesService)
+        public CoursesController(PAToolsContext context, ICoursesService coursesService,ITasksService tasksService)
         {
             _coursesService = coursesService;
+            _tasksService = tasksService;
             _context = context;
         }
 
@@ -133,6 +137,28 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidJwtTokenResponse());
 
             return Ok(await _coursesService.DeleteCourse(teacherId, courseId));
+        }
+
+        [HttpPost("{courseId}/task/add")]
+        public async Task<ActionResult<GetNewTaskDTO>> AddTask([FromRoute] Guid courseId, AddTaskDTO task)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            if(!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidGuidIdResponse());
+
+            //The id stored in Claim is not Guid
+            Guid teacherId;
+            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _tasksService.AddTask(courseId, teacherId, task));
         }
 
         //Should be in CourseService.cs file, Remove after refactoring

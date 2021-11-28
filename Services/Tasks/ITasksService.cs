@@ -7,5 +7,6 @@ namespace patools.Services.Tasks
     public interface ITasksService
     {
         Task<Response<GetTaskOverviewDTO>> GetTaskOverview (Guid taskId);
+        Task<Response<GetNewTaskDTO>> AddTask(Guid courseId, Guid teacherId, AddTaskDTO task);
     }
 }

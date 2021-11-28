@@ -75,7 +75,7 @@ namespace patools.Services.Authentication
             {
                 AccessToken = CreateJwtFromUser(user)
             };
-
+            System.Console.WriteLine($"Jwt - {response.Payload.AccessToken}");
             return response;
         }
 
