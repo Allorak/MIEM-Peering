@@ -23,16 +23,12 @@ namespace patools.Controllers
         }
 
         [HttpGet("{taskId}/overview")]
-        public async System.Threading.Tasks.Task<IActionResult> GetTaskOverview([FromRoute] string taskId)
+        public async System.Threading.Tasks.Task<IActionResult> GetTaskOverview([FromRoute]Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
 
-            Guid guidTaskId;
-            if(!Guid.TryParse(taskId,out guidTaskId))
-                return Ok(new InvalidGuidIdResponse());
-
-            return Ok(await _tasksService.GetTaskOverview(guidTaskId));
+            return Ok(await _tasksService.GetTaskOverview(taskId));
         }
     }
 }

@@ -40,6 +40,24 @@ namespace patools.Services.Users
             return response;
         }
 
+        public async Task<Response<GetRegisteredUserDTO>> GetUserProfile(Guid userId)
+        {
+            var response = new Response<GetRegisteredUserDTO>();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
+            if(user == null)
+            {
+                response.Success = false;
+                response.Payload = null;
+                response.Error = new Error(-15,"User not found");
+                return response;
+            }
+
+            response.Success = true;
+            response.Error = null;
+            response.Payload = _mapper.Map<GetRegisteredUserDTO>(user);
+            return response;
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using(var hmac = new System.Security.Cryptography.HMACSHA512())

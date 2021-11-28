@@ -7,6 +7,7 @@ using patools.Models;
 using Google.Apis.Auth;
 using patools.Dtos.User;
 using patools.Services.Users;
+using System.Security.Claims;
 
 namespace patools.Controllers
 {
@@ -48,6 +49,25 @@ namespace patools.Controllers
             {
                 return Ok(new UnauthorizedUserResponse());
             }
+        }
+
+        [HttpGet("get")]
+        public async Task<ActionResult<GetRegisteredUserDTO>> GetUserProfile()
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            Guid userId;
+            if(!Guid.TryParse(userIdClaim.Value, out userId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            return Ok(await _usersService.GetUserProfile(userId));
         }
     }
 }

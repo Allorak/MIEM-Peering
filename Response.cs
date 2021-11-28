@@ -52,4 +52,14 @@ namespace patools
             Error = new Error(-10,"The guid id provided is invalid for the execution of the command");
         }
     }
+
+    public class InvalidJwtTokenResponse : Response<object>
+    {
+        public InvalidJwtTokenResponse() : base()
+        {
+            Success = false;
+            Payload = null;
+            Error = new Error(-20,"The jwt token provided is invalid");
+        }
+    }
 }

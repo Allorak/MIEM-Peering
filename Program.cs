@@ -18,7 +18,7 @@ namespace patools
             var host = CreateHostBuilder(args).Build();
 
             PAToolsContext db = new PAToolsContext();
-            db.Database.EnsureDeleted();
+            //db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             InitializeDB(db);
             host.Run();
