@@ -12,34 +12,44 @@ namespace patools
 
         public Error(int code, string message)
         {
-            Code = code; 
+            Code = code;
             Message = message;
         }
     }
-    public abstract class Response
+    public class Response<T>
     {
-        public bool Success { get; protected set; }
-        public object Payload { get; protected set; }
-        public Error Error { get; protected set; }
+        public bool Success { get; set; }
+        public T Payload { get; set; }
+        public Error Error { get; set; }
     }
 
-    public class FailedResponse : Response
+    public class UnauthorizedUserResponse : Response<object>
     {
-        public FailedResponse(Error error)
+        public UnauthorizedUserResponse():base()
         {
             Success = false;
             Payload = null;
-            Error = error;
+            Error = new Error(401,"User is unauthorized");
         }
     }
 
-    public class SuccessfulResponse : Response
+    public class IncorrectUserRoleResponse : Response<object>
     {
-        public SuccessfulResponse(object payload)
+        public IncorrectUserRoleResponse():base()
         {
-            Success = true;
-            Payload = payload;
-            Error = null;
+            Success = false;
+            Payload = null;
+            Error = new Error(403,"Incorrect user role for the execution of the command");
+        }
+    }
+
+    public class InvalidUserIdResponse : Response<object>
+    {
+        public InvalidUserIdResponse():base()
+        {
+            Success = false;
+            Payload = null;
+            Error = new Error(-10,"The authorized user id is invalid for the execution of the command");
         }
     }
 }

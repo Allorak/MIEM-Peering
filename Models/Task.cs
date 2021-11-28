@@ -11,7 +11,7 @@ namespace patools.Models
         [Required]
         [MaxLength(150)]
         public string Title { get; set; }
-        
+
         [DataType(DataType.Date)]
         [DisplayFormat
         (
@@ -47,7 +47,7 @@ namespace patools.Models
             NullDisplayText = "No check deadline set"
         )]
         public DateTime? CheckDeadlineDatetime { get; set; }
-        
+
         //Todo: Проверка что значение >=1
         public int SubmissionsToCheck { get; set; }
 

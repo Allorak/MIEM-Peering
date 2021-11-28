@@ -1,28 +1,21 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
-import { mock } from './mock'
 
 
-export const postRegistretion = async (payload: IRequestData): Promise<IResponse<IResponseData>> => {
-
-  const isMock = true
+export const postRegistretion = async ({
+  googleToken,
+  role
+}: IRequestData): Promise<IResponse<IResponseData>> => {
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/users`,
-    headers: {
-      'Authorization': `Bearer 'no accessToken'`,
-      'Accept-Language': 'ru',
-    },
-    data: payload,
+    url: `/api/v1/users/google/add`,
+    data: {
+      googleToken,
+      role
+    }
   }
-
-  if (isMock) {
-    const response = await mock(requestConfig)
-    return response
-  }
-
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data

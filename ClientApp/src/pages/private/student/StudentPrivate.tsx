@@ -20,9 +20,9 @@ export function StudentPrivate() {
 
 
     const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
-    const authPayload = useAppSelector(state => state.auth.payload)
-    
-    if (!isAuthorized || !authPayload.accessToken) {
+    const accessToken = useAppSelector(state => state.auth.accessToken)
+
+    if (!isAuthorized || !accessToken) {
         return (
             <Navigate
                 to={paths.login}

@@ -5,13 +5,13 @@ import { IUserProfile, IError } from '../types';
 export interface IUserProfileState {
   isLoading: boolean,
   error: IError | undefined,
-  payload: IUserProfile  
+  payload: IUserProfile | undefined
 }
 
 const initialState: IUserProfileState = {
   isLoading: false,
   error: undefined,  
-  payload: {} as IUserProfile,
+  payload: undefined
 };
 
 export const userProfileSlice = createSlice({
@@ -31,6 +31,7 @@ export const userProfileSlice = createSlice({
     userProfileFailed: (state, { payload }: PayloadAction<IError>) => {
       state.isLoading = false
       state.error = payload
+      state.payload = undefined
     },
 
     userProfileRemove: (state) => {

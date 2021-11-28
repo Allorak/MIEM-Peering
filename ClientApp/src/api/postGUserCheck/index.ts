@@ -1,7 +1,9 @@
-import { IGAuthCheckUser, IUserGAuth } from "../../store/types";
+import { IGoogleUserRegistered, IGoogleUserNew } from "../../store/types";
 
-export type IRequestData = IUserGAuth
+export type IRequestData = {
+  googleToken: string
+}
 
-export type IResponseData = IGAuthCheckUser
+export type IResponseData = IGoogleUserRegistered | IGoogleUserNew
 
 export { postGUserCheck } from './postGUserCheck';

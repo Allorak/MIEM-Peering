@@ -217,11 +217,13 @@ namespace patools.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("BLOB");
 
-                    b.Property<int>("Status")
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("BLOB");
+
+                    b.Property<int>("Role")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ID");

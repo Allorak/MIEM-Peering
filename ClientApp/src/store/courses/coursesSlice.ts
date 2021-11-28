@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IGAuthCheckUser, IError, ICourses } from '../types';
+import { IError, ICourses } from '../types';
 
 
 export interface ICoursesState {

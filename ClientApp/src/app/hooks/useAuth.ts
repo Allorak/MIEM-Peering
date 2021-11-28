@@ -17,7 +17,7 @@ export const useAuth = (): IUseAuthResult => {
 
   const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
   const isAuthorizing = useAppSelector(state => state.auth.isAuthorized)
-  const isRegistration = useAppSelector(state => state.registration.registraionProps)
+  const isRegistration = useAppSelector(state => state.registration.googleToken)
 
   const handleAuthorize = useCallback(() => {
     // dispatch(authorize())
