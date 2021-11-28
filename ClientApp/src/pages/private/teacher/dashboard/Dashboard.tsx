@@ -12,9 +12,10 @@ import { paths } from "../../../../app/constants/paths";
 
 import { CourseMain } from '../course/main';
 import { Overview } from './Overview';
+import { Works } from './works';
+import { Experts } from './experts';
 
 import * as globalStyles from "../../../../const/styles"
-import { Works } from './works';
 
 
 export const Dashboard: FC = () => {
@@ -79,7 +80,7 @@ export const Dashboard: FC = () => {
             <Box marginRight={"15px"}>
               <Routes>
                 <Route path={paths.teacher.dashboard.overview} element={<Overview />} />
-                <Route path={paths.teacher.dashboard.experts} element={<CourseMain />} />
+                <Route path={paths.teacher.dashboard.experts} element={<Experts />} />
                 <Route path={paths.teacher.dashboard.export} element={<CourseMain />} />
                 <Route path={paths.teacher.dashboard.grades} element={<CourseMain />} />
                 <Route path={paths.teacher.dashboard.works} element={<Works />} />
