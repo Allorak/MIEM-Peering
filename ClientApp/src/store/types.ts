@@ -149,7 +149,7 @@ export interface INewTask {
 }
 
 export type INewTaskResponse = {
-  newTaskId: string
+  id: string
 }
 export interface INewTaskMainInfo {
   title: string
