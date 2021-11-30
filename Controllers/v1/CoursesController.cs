@@ -86,6 +86,58 @@ namespace patools.Controllers.v1
         }
 
         // POST: api/v1/Courses/add
+        [HttpGet("getteachercourse")]
+        public async Task<ActionResult<List<Course>>> GetTeacherCourse()
+        //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
+        {
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidGuidIdResponse());
+
+            //The id stored in Claim is not Guid
+            Guid teacherId;
+            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _coursesService.GetTeacherCourses(teacherId));
+        }
+
+        // POST: api/v1/Courses/add
+        [HttpGet("getstudentcourse")]
+        public async Task<ActionResult<List<Course>>> GetStudentCourse()
+        //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
+        {
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(studentIdClaim == null)
+                return Ok(new InvalidGuidIdResponse());
+
+            //The id stored in Claim is not Guid
+            Guid studentId;
+            if(!Guid.TryParse(studentIdClaim.Value, out studentId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _coursesService.GetStudentCourses(studentId));
+        }
+
+        // POST: api/v1/Courses/add
         [HttpPost("add")]
         public async Task<ActionResult<GetCourseDTO>> PostCourse(AddCourseDTO course)
         {

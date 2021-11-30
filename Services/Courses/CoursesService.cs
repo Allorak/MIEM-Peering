@@ -149,5 +149,69 @@ namespace patools.Services.Courses
             response.Payload =  course;
             return response;
         }
+
+        public async Task<Response<List<GetCourseDTO>>> GetTeacherCourses(Guid teacherId)
+        {
+            var response = new Response<List<GetCourseDTO>>();
+
+            var course = _context.Courses
+                .Include(course => course.Teacher)
+                .Where(e => e.Teacher.ID == teacherId);
+
+            if (course == null)
+            {
+                response.Success = false;
+                response.Payload = null;
+                response.Error = new Error(123, "Course not");
+            }
+
+            var courses = _context.Courses
+                .Include(course => course.Teacher)
+                .Where(x => x.Teacher.ID == teacherId)
+                .Select(x => new GetCourseDTO
+                {
+                    ID = x.ID,
+                    Title = x.Title,
+                    Description = x.Description,
+                    Subject = x.Subject,
+                    CourseCode = x.CourseCode,
+                    Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
+                });
+
+            response.Success = true;
+            response.Error = null;
+            response.Payload = await courses.ToListAsync();
+            return response;
+        }
+
+        public async Task<Response<List<GetCourseDTO>>> GetStudentCourses(Guid studentId)
+        {
+            var response = new Response<List<GetCourseDTO>>();
+            var courses = _context.Courses
+                .Include(course => course.Teacher)
+                .Where(x => x.Teacher.ID == studentId)
+                .Select(x => new GetCourseDTO
+                {
+                    ID = x.ID,
+                    Title = x.Title,
+                    Description = x.Description,
+                    Subject = x.Subject,
+                    CourseCode = x.CourseCode,
+                    Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
+                });
+
+            if(courses == null)
+            {
+                response.Success = false;
+                response.Error = new Error(403, "Error to get courses");
+                response.Payload = null;
+                return response;
+            }
+
+            response.Success = true;
+            response.Error = null;
+            response.Payload = await courses.ToListAsync();
+            return response;
+        }
     }
 }
