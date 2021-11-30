@@ -8,6 +8,7 @@ import { IErrorCode, INewCourseRequest, IRole } from "../../types";
 
 
 export const addCourse = (payload: INewCourseRequest): AppThunk => async (dispatch, getState) => {
+    console.log(payload)
     dispatch(actions.addCourseStarted())
     try {
         const accessToken = getState().auth.accessToken
