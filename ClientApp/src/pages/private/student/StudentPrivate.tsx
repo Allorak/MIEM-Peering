@@ -5,6 +5,7 @@ import { paths } from '../../../app/constants/paths'
 import { Box } from '@mui/system'
 import { Wrapper } from '../../../components/wrapper'
 import { usePrivatePathSt } from '../../../app/hooks/usePrivatePathSt'
+import { STCourseList as CourseList } from './course/list'
 
 
 
@@ -61,7 +62,7 @@ export function StudentPrivate() {
     return (
         <Box>
             <Routes>
-                <Route path={paths.student.main} element={<></>} />
+                <Route path={paths.student.main} element={<CourseList />} />
             </Routes>
         </Box>
 

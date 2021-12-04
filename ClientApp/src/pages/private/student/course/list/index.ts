@@ -1,0 +1,1 @@
+export { STCourseList } from './CoursesList';
