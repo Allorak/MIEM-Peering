@@ -128,18 +128,7 @@ namespace patools.Services.Courses
         public async Task<Response<List<GetCourseDTO>>> GetTeacherCourses(Guid teacherId)
         {
             var response = new Response<List<GetCourseDTO>>();
-
-            var course = _context.Courses
-                .Include(course => course.Teacher)
-                .Where(e => e.Teacher.ID == teacherId);
-
-            if (course == null)
-            {
-                response.Success = false;
-                response.Payload = null;
-                response.Error = new Error(ErrorCodes.Exception, "Course not");
-            }
-
+            
             var courses = _context.Courses
                 .Include(course => course.Teacher)
                 .Where(x => x.Teacher.ID == teacherId)

@@ -5,7 +5,10 @@
     <projectFile profileName="patools">patools.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="" />
+    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/Courses/CoursesService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Courses/CoursesService.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,8 +67,12 @@
       </RecentBranches>
     </option>
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/AuthenticationController.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="ProjectId" id="21mkjGjaWckRcMOe4jzvS37Eq57" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
