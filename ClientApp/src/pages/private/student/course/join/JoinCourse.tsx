@@ -1,5 +1,5 @@
-import { FC, SetStateAction, useCallback} from "react";
-import { generatePath, useNavigate} from "react-router-dom";
+import { FC, SetStateAction, useCallback } from "react";
+import { generatePath, useNavigate } from "react-router-dom";
 
 import { Popup } from "../../../../../components/popup";
 import { JoinCourseForm } from "./JoinCourseForm";
@@ -15,7 +15,7 @@ interface IProps {
 }
 
 export const JoinCourse: FC<IProps> = ({ popupOpen, onCloseHandler }) => {
-    
+
     const dispatch = useAppDispatch()
     const loading = useAppSelector(state => state.joinCourse.isLoading)
     const payload = useAppSelector(state => state.joinCourse.payload)
@@ -25,8 +25,8 @@ export const JoinCourse: FC<IProps> = ({ popupOpen, onCloseHandler }) => {
         dispatch(joinCourse(courseCode))
     }, [dispatch])
 
-    if (payload && payload.courseId) {
-        history(generatePath(paths.student.courses.course, {courseId: payload.courseId}))
+    if (payload && payload.id) {
+        history(generatePath(paths.student.courses.course, { courseId: payload.id }))
         dispatch(actions.courseSetInitialState())
     }
 
@@ -37,8 +37,8 @@ export const JoinCourse: FC<IProps> = ({ popupOpen, onCloseHandler }) => {
             loading={loading}
             onCloseHandler={onCloseHandler}
         >
-            <JoinCourseForm 
-                onSubmit = {handleRequest}
+            <JoinCourseForm
+                onSubmit={handleRequest}
             />
         </Popup>
     )

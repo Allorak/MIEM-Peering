@@ -8,8 +8,8 @@ using Google.Apis.Auth;
 using patools.Dtos.User;
 using patools.Services.Users;
 using System.Security.Claims;
-
-namespace patools.Controllers
+using patools.Errors;
+namespace patools.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/users")]
@@ -63,8 +63,7 @@ namespace patools.Controllers
                 return Ok(new InvalidJwtTokenResponse());
 
             //The id stored in Claim is not Guid
-            Guid userId;
-            if(!Guid.TryParse(userIdClaim.Value, out userId))
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidJwtTokenResponse());
 
             return Ok(await _usersService.GetUserProfile(userId));

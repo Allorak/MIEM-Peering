@@ -7,10 +7,10 @@ import { palette } from "../../theme/colors";
 
 
 export const Deadlines: FC<IDeadlines> = ({
-  sBegin,
-  sEnd,
-  rBegin,
-  rEnd,
+  submissionStartDateTime: sBegin,
+  submissionEndDateTime: sEnd,
+  reviewStartDateTime: rBegin,
+  reviewEndDateTime: rEnd,
 }) => {
 
   return (

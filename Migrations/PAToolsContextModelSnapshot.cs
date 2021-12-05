@@ -116,16 +116,31 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Criteria")
-                        .HasMaxLength(300)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("MaxValue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MinValue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RespondentType")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid>("TaskID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
@@ -145,6 +160,9 @@ namespace patools.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CourseID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("ReviewEndDateTime")

@@ -51,14 +51,14 @@ export const NewTaskAuthorForm: FC<IProps> = ({
           case IQuestionTypes.TEXT:
           case IQuestionTypes.SHORT_TEXT:
             return {
-              id: rubric.id,
+              order: rubric.order,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type
             }
           case IQuestionTypes.MULTIPLE:
             return {
-              id: rubric.id,
+              order: rubric.order,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type,
@@ -66,7 +66,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
             }
           case IQuestionTypes.SELECT_RATE:
             return {
-              id: rubric.id,
+              order: rubric.order,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type,
@@ -82,14 +82,14 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     if (currentQuestion) {
       setQuestions(prev => {
         return prev.map(question => {
-          return question.id === currentQuestion.id ? { ...request } : question
+          return question.order === currentQuestion.order ? { ...request } : question
         })
       })
     } else {
       setQuestions(prev => {
         prev.push({
           ...request,
-          id: prev.length
+          order: prev.length
         })
         return prev
       })
@@ -103,7 +103,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
   }, [])
 
   const onEditQuestion = useCallback((id: number) => {
-    const findQuestion = questions.find(question => question.id === id)
+    const findQuestion = questions.find(question => question.order === id)
     if (findQuestion) {
       setCurrentQuestion(() => {
         if (findQuestion.type === IQuestionTypes.MULTIPLE)
@@ -121,18 +121,18 @@ export const NewTaskAuthorForm: FC<IProps> = ({
 
   const onCloneQuestion = useCallback((id: number) => {
     setQuestions(prev => {
-      const findQuestion = prev.find(rubric => rubric.id === id)
+      const findQuestion = prev.find(rubric => rubric.order === id)
       if (findQuestion) {
         const newRubrics = [] as IQuestionRubrics
 
         for (const item of prev) {
-          if (item.id > id) {
-            newRubrics.push({ ...item, id: item.id + 1 })
+          if (item.order > id) {
+            newRubrics.push({ ...item, order: item.order + 1 })
           }
 
-          else if (item.id === id) {
+          else if (item.order === id) {
             newRubrics.push(item)
-            newRubrics.push({ ...item, id: item.id + 1 })
+            newRubrics.push({ ...item, order: item.order + 1 })
           }
 
           else newRubrics.push(item)
@@ -146,16 +146,16 @@ export const NewTaskAuthorForm: FC<IProps> = ({
 
   const onRemoveQuestion = useCallback((id: number) => {
     setQuestions(prev => {
-      const findQuestion = prev.find(rubric => rubric.id === id)
+      const findQuestion = prev.find(rubric => rubric.order === id)
       if (findQuestion) {
         const newRubrics = [] as IQuestionRubrics
 
         for (const item of prev) {
-          if (item.id > id) {
-            newRubrics.push({ ...item, id: item.id - 1 })
+          if (item.order > id) {
+            newRubrics.push({ ...item, order: item.order - 1 })
           }
 
-          else if (item.id < id) {
+          else if (item.order < id) {
             newRubrics.push(item)
           }
         }
@@ -173,14 +173,14 @@ export const NewTaskAuthorForm: FC<IProps> = ({
           case IQuestionTypes.TEXT:
           case IQuestionTypes.SHORT_TEXT:
             return {
-              id: rubric.id,
+              order: rubric.order,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type
             }
           case IQuestionTypes.MULTIPLE:
             return {
-              id: rubric.id,
+              order: rubric.order,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type,
@@ -188,7 +188,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
             }
           case IQuestionTypes.SELECT_RATE:
             return {
-              id: rubric.id,
+              order: rubric.order,
               title: rubric.title,
               required: rubric.required,
               type: rubric.type,
@@ -206,12 +206,12 @@ export const NewTaskAuthorForm: FC<IProps> = ({
       {questions.length > 0 && (questions.map((question) => {
         return (
           <AnswerBox
-            id={question.id}
+            id={question.order}
             title={question.title}
             onEdit={onEditQuestion}
             onClone={onCloneQuestion}
             onRemove={onRemoveQuestion}
-            key={question.id}
+            key={question.order}
             required={question.required}
           >
             <QuestionBox>
@@ -281,7 +281,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
-      id: question?.id ?? 9999,
+      order: question?.order ?? 9999,
       title: question?.title ?? "",
       required: question?.required ?? false,
       type: question?.type ?? IQuestionTypes.SHORT_TEXT
@@ -352,7 +352,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     if (request.type === IQuestionTypes.MULTIPLE) {
       if (request.responses && request.responses.length > 0)
         onSubmit({
-          id: request.id,
+          order: request.order,
           required: request.required,
           type: IQuestionTypes.MULTIPLE,
           responses: request.responses.map(response => ({ ...response })),
@@ -362,7 +362,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
 
     if (request.type === IQuestionTypes.SHORT_TEXT) {
       onSubmit({
-        id: request.id,
+        order: request.order,
         required: request.required,
         type: IQuestionTypes.SHORT_TEXT,
         title: request.title
@@ -371,7 +371,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
 
     if (request.type === IQuestionTypes.TEXT) {
       onSubmit({
-        id: request.id,
+        order: request.order,
         required: request.required,
         type: IQuestionTypes.TEXT,
         title: request.title
@@ -381,7 +381,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     if (request.type === IQuestionTypes.SELECT_RATE) {
       if (request.minValue && request.maxValue && request.maxValue - request.minValue > 0)
         onSubmit({
-          id: request.id,
+          order: request.order,
           required: request.required,
           type: IQuestionTypes.SELECT_RATE,
           title: request.title,
@@ -393,7 +393,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
 
   return (
     <Popup
-      title={question ? `Вопрос ${question.id + 1}` : 'Добавить вопрос'}
+      title={question ? `Вопрос ${question.order + 1}` : 'Добавить вопрос'}
       open={popupStatus}
       onCloseHandler={closePopup}
     >
@@ -676,7 +676,7 @@ const styles = {
 }
 
 const initialQuestion: IShortTextQuestion = {
-  id: 999,
+  order: 999,
   title: "Введите свой вопрос",
   type: IQuestionTypes.SHORT_TEXT,
   required: false

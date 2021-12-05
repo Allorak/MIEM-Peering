@@ -9,11 +9,11 @@ export const getOverview = async ({
   taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/${taskId}overview`,
+    url: `/api/v1/tasks/${taskId}/overview`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

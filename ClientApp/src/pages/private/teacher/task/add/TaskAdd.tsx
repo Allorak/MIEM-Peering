@@ -76,9 +76,9 @@ export const TaskAdd: FC = () => {
       }, pathT.courseId))
   }, [step, newTaskItem, pathT])
 
-  if (newTaskPayload && newTaskPayload.newTaskId
+  if (newTaskPayload && newTaskPayload.id
     && pathT && pathT.courseId) {
-    history(generatePath(paths.teacher.dashboard.overview, { taskId: newTaskPayload.newTaskId }))
+    history(generatePath(paths.teacher.dashboard.overview, { taskId: newTaskPayload.id }))
     dispatch(actions.createReset())
   }
 
@@ -145,22 +145,22 @@ const initialTask: INewTask = {
     title: ""
   },
   settings: {
-    sBegin: new Date(),
-    sEnd: new Date(),
-    rBegin: new Date(),
-    rEnd: new Date(),
-    maxSubmission: 0
+    submissionStartDateTime: new Date(),
+    submissionEndDateTime: new Date(),
+    reviewStartDateTime: new Date(),
+    reviewEndDateTime: new Date(),
+    submissionsToCheck: 0
   },
   authorForm: {
     rubrics: [
       {
-        id: 0,
+        order: 0,
         title: "Write your work here 📝",
         type: IQuestionTypes.TEXT,
         required: true
       },
       {
-        id: 1,
+        order: 1,
         title: "Additional wishes when evaluating ☝",
         required: false,
         type: IQuestionTypes.SHORT_TEXT,
@@ -170,7 +170,7 @@ const initialTask: INewTask = {
   peerForm: {
     rubrics: [
       {
-        id: 0,
+        order: 0,
         title: "Rate the work",
         type: IQuestionTypes.SELECT_RATE,
         required: true,
@@ -178,13 +178,13 @@ const initialTask: INewTask = {
         maxValue: 10
       },
       {
-        id: 1,
+        order: 1,
         title: "What is good about this work? 👍",
         type: IQuestionTypes.TEXT,
         required: false,
       },
       {
-        id: 2,
+        order: 2,
         title: "What's wrong with this work? 👎",
         type: IQuestionTypes.TEXT,
         required: false,
