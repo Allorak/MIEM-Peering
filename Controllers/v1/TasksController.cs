@@ -23,7 +23,7 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
-        [HttpGet("{taskId}/overview")]
+        [HttpGet("{taskId:guid}/overview")]
         public async System.Threading.Tasks.Task<IActionResult> GetTaskOverview([FromRoute]Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -42,6 +42,27 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidGuidIdResponse());
             
             return Ok(await _tasksService.GetTaskOverview(taskId, teacherId));
+        }
+
+        [HttpGet("{taskId:guid}/authorform")]
+        public async System.Threading.Tasks.Task<IActionResult> GetAuthorForm([FromRoute] Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            if(!User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+            
+            //The user has no id Claim
+            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(studentIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(studentIdClaim.Value, out var studentId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _tasksService.GetAuthorForm(taskId, studentId));
         }
     }
 }

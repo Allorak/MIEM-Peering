@@ -19,6 +19,7 @@ namespace patools
             CreateMap<Task,GetNewTaskDTO>();
             CreateMap<AddQuestionDTO,Question>();
             CreateMap<Task,GetTaskMainInfoDTO>();
+            CreateMap<Question,GetQuestionDTO>();
         }
     }
 }

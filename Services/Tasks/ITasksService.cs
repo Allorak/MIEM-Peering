@@ -10,6 +10,7 @@ namespace patools.Services.Tasks
     {
         Task<Response<GetTaskOverviewDTO>> GetTaskOverview (Guid taskId, Guid teacherId);
         Task<Response<GetNewTaskDTO>> AddTask(Guid courseId, Guid teacherId, AddTaskDTO task);
-        Task<Response<List<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole);
+        Task<Response<IEnumerable<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole);
+        Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid studentId);
     }
 }

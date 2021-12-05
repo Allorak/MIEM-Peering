@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using patools.Dtos.Question;
 using patools.Dtos.Task;
 using patools.Models;
 using patools.Errors;
@@ -73,17 +74,17 @@ namespace patools.Services.Tasks
             return response;
         }
 
-        public async Task<Response<List<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole)
+        public async Task<Response<IEnumerable<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole)
         {
-            var response = new Response<List<GetTaskMainInfoDTO>>();
+            var response = new Response<IEnumerable<GetTaskMainInfoDTO>>();
 
             var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseId);
             if (course == null)
-                return new InvalidGuidIdResponse<List<GetTaskMainInfoDTO>>("Invalid course id");
+                return new InvalidGuidIdResponse<IEnumerable<GetTaskMainInfoDTO>>("Invalid course id");
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == userId);
             if (user == null)
-                return new InvalidGuidIdResponse<List<GetTaskMainInfoDTO>>("Invalid user id");
+                return new InvalidGuidIdResponse<IEnumerable<GetTaskMainInfoDTO>>("Invalid user id");
 
             var courseUserConnection = await _context.CourseUsers.FirstOrDefaultAsync(x => x.User.ID == user.ID && x.Course.ID == courseId);
 
@@ -101,6 +102,33 @@ namespace patools.Services.Tasks
             }
             response.Success = true;
             response.Error = null;
+            return response;
+        }
+
+        public async Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid studentId)
+        {
+            var response = new Response<GetAuthorFormDTO>();
+
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetAuthorFormDTO>("Invalid task id");
+            
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == studentId && u.Role == UserRoles.Student);
+            if (student == null)
+                return new InvalidGuidIdResponse<GetAuthorFormDTO>("Invalid task id");
+
+            var taskUser = await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == student && tu.Task == task);
+            if (taskUser == null)
+                return new NoAccessResponse<GetAuthorFormDTO>("This task is not assigned to this user");
+
+            var questions = _context.Questions
+                .Where(q => q.Task == task && q.RespondentType == RespondentTypes.Author)
+                .OrderBy(q => q.Order)
+                .Select(q => _mapper.Map<GetQuestionDTO>(q));
+
+            response.Success = true;
+            response.Error = null;
+            response.Payload = new GetAuthorFormDTO() {Rubrics = questions};
             return response;
         }
 
