@@ -1,29 +1,20 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
-import { mock } from './mock'
 
 
 export const getCourses = async ({
   accessToken
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = false
-
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/courses/get`,
+    url: `/api/v1/Courses/getteachercourse`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
     }
   }
-
-  if (isMock) {
-    const response = await mock(requestConfig)
-    return response
-  }
-
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data

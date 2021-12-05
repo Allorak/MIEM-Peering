@@ -105,7 +105,7 @@ export type IAuthResponse = {
 }
 
 export type ICourse = {
-  courseId: string
+  id: string
 }
 
 export type ICourses = {
@@ -119,8 +119,10 @@ export type ICourses = {
 
 export type IResponseCourses = {
   id: string,
-  imageUrl?: string,
-  fullname: string,
+  teacher: {
+    fullname: string,
+    imageUrl?: string,
+  },
   title: string,
   subject: string,
   description?: string,
