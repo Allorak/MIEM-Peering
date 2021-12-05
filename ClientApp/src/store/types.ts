@@ -249,7 +249,10 @@ export enum IMenuTitles {
   CHECKINGS = 'Проверки',
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
-  EXPORT = 'Экспорт'
+  EXPORT = 'Экспорт',
+  MENU_1 = 'Меню 1',
+  MENU_2 = 'Меню 2',
+  MENU_3 = 'Меню 3'
 }
 
 export type IStatusBar = {
