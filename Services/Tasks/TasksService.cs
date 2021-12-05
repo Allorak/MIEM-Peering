@@ -104,14 +104,23 @@ namespace patools.Services.Tasks
             return response;
         }
 
-        public async System.Threading.Tasks.Task<Response<GetTaskOverviewDTO>> GetTaskOverview(Guid taskId)
+        public async System.Threading.Tasks.Task<Response<GetTaskOverviewDTO>> GetTaskOverview(Guid taskId, Guid teacherId)
         {
             var response = new Response<GetTaskOverviewDTO>();
 
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskId);
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<GetTaskOverviewDTO>("Invalid teacher id");
+
+            var task = await _context.Tasks
+                .Include(x => x.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskId);
             if (task == null)
                 return new InvalidGuidIdResponse<GetTaskOverviewDTO>("Invalid task id");
 
+            if (task.Course.Teacher.ID != teacher.ID)
+                return new NoAccessResponse<GetTaskOverviewDTO>("This teacher has no access to this task");
+            
             var totalAssignments = await _context.TaskUsers.CountAsync(tu => tu.Task == task);
             int submissionsNumber = 1;
             int reviewsNumber = 1;
