@@ -14,7 +14,7 @@ export const postTask = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/courses/${courseId}/task/add`,
+    url: `/api/v1/courses/${courseId}/tasks/add`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

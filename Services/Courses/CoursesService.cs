@@ -137,7 +137,7 @@ namespace patools.Services.Courses
             {
                 response.Success = false;
                 response.Payload = null;
-                response.Error = new Error(123, "Course not");
+                response.Error = new Error(ErrorCodes.Exception, "Course not");
             }
 
             var courses = _context.Courses
@@ -178,7 +178,7 @@ namespace patools.Services.Courses
             if(courses == null)
             {
                 response.Success = false;
-                response.Error = new Error(403, "Error to get courses");
+                response.Error = new Error(ErrorCodes.Exception, "Error to get courses");
                 response.Payload = null;
                 return response;
             }
