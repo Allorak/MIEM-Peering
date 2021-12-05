@@ -8,7 +8,7 @@ export const getCourses = async ({
   accessToken
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = false
+  const isMock = true
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
