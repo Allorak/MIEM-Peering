@@ -18,6 +18,7 @@ namespace patools
             CreateMap<Task,GetTaskDeadlinesDTO>();
             CreateMap<Task,GetNewTaskDTO>();
             CreateMap<AddQuestionDTO,Question>();
+            CreateMap<Task,GetTaskMainInfoDTO>();
         }
     }
 }

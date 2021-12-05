@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Task;
 using patools.Models;
-
+using patools.Errors;
 namespace patools.Services.Tasks
 {
     public class TasksService : ITasksService
@@ -23,32 +25,24 @@ namespace patools.Services.Tasks
             var response = new Response<GetNewTaskDTO>();
 
             var course = await _context.Courses.Include(c => c.Teacher).FirstOrDefaultAsync(c => c.ID == courseId);
-            if(course == null)
-            {
-                response.Success = false;
-                response.Payload = null;
-                response.Error = new Error(-15, "Invalid course ID");
-                return response;
-            }
+            if (course == null)
+                return new InvalidGuidIdResponse<GetNewTaskDTO>("Invalid course id");
 
-            if(course.Teacher.ID != teacherId)
-            {
-                response.Success = false;
-                response.Payload = null;
-                response.Error = new Error(403, "This teacher has no access to the requested course");
-                return response;
-            }
+            if (course.Teacher.ID != teacherId)
+                return new NoAccessResponse<GetNewTaskDTO>("This teacher has no access to this course");
 
-            var newTask = new Models.Task();
-            newTask.ID = Guid.NewGuid();
-            newTask.Title = task.MainInfo.Title;
-            newTask.Description = task.MainInfo.Description;
-            newTask.Course = course;
-            newTask.SubmissionStartDateTime = task.Settings.SubmissionStartDateTime;
-            newTask.SubmissionEndDateTime = task.Settings.SubmissionEndDateTime;
-            newTask.ReviewStartDateTime = task.Settings.ReviewStartDateTime;
-            newTask.ReviewEndDateTime = task.Settings.ReviewEndDateTime;
-            newTask.SubmissionsToCheck = task.Settings.SubmissionsToCheck;
+            var newTask = new Models.Task
+            {
+                ID = Guid.NewGuid(),
+                Title = task.MainInfo.Title,
+                Description = task.MainInfo.Description,
+                Course = course,
+                SubmissionStartDateTime = task.Settings.SubmissionStartDateTime,
+                SubmissionEndDateTime = task.Settings.SubmissionEndDateTime,
+                ReviewStartDateTime = task.Settings.ReviewStartDateTime,
+                ReviewEndDateTime = task.Settings.ReviewEndDateTime,
+                SubmissionsToCheck = task.Settings.SubmissionsToCheck
+            };
             await _context.Tasks.AddAsync(newTask);
             await _context.SaveChangesAsync();
 
@@ -56,7 +50,6 @@ namespace patools.Services.Tasks
             foreach(var authorQuestion in task.AuthorForm.Rubrics)
             {
                 var newAuthorQuestion = _mapper.Map<Question>(authorQuestion);
-                System.Console.WriteLine(newAuthorQuestion.Title);
                 newAuthorQuestion.ID = Guid.NewGuid();
                 newAuthorQuestion.Task = newTask;
                 newAuthorQuestion.RespondentType = RespondentTypes.Author;
@@ -80,17 +73,44 @@ namespace patools.Services.Tasks
             return response;
         }
 
+        public async Task<Response<List<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole)
+        {
+            var response = new Response<List<GetTaskMainInfoDTO>>();
+
+            var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseId);
+            if (course == null)
+                return new InvalidGuidIdResponse<List<GetTaskMainInfoDTO>>("Invalid course id");
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == userId);
+            if (user == null)
+                return new InvalidGuidIdResponse<List<GetTaskMainInfoDTO>>("Invalid user id");
+
+            var courseUserConnection = await _context.CourseUsers.FirstOrDefaultAsync(x => x.User.ID == user.ID && x.Course.ID == courseId);
+
+            if(userRole == UserRoles.Teacher && course.Teacher != user)
+                response.Payload = null;
+            else if(userRole == UserRoles.Student && courseUserConnection == null)
+                response.Payload = null;
+            else
+            {
+                var tasks = await _context.Tasks
+                                    .Where(t => t.Course.ID == courseId)
+                                    .Select(x => _mapper.Map<GetTaskMainInfoDTO>(x))
+                                    .ToListAsync();
+                response.Payload = tasks;
+            }
+            response.Success = true;
+            response.Error = null;
+            return response;
+        }
+
         public async System.Threading.Tasks.Task<Response<GetTaskOverviewDTO>> GetTaskOverview(Guid taskId)
         {
             var response = new Response<GetTaskOverviewDTO>();
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskId);
-            if(task == null)
-            {
-                response.Success = false;
-                response.Payload = null;
-                response.Error = new Error(-15,"Task not found");
-            }
+            if (task == null)
+                return new InvalidGuidIdResponse<GetTaskOverviewDTO>("Invalid task id");
 
             var totalAssignments = await _context.TaskUsers.CountAsync(tu => tu.Task == task);
             int submissionsNumber = 1;

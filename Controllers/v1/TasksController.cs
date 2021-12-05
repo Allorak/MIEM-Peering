@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using patools.Models;
 using patools.Services.Tasks;
-
-namespace patools.Controllers
+using patools.Errors;
+namespace patools.Controllers.v1
 {
     [ApiController]
     [Route("api/v1/tasks")]

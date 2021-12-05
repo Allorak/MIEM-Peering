@@ -7,6 +7,7 @@ using patools.Dtos.User;
 using Microsoft.AspNetCore.Authentication;
 using patools.Services.Authentication;
 using System.Threading.Tasks;
+using patools.Errors;
 
 namespace patools.Controllers.v1
 {
@@ -24,7 +25,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpGet("getjwttoken")]
-        public async Task<ActionResult<Response<GetJWTTokenDTO>>> GetJWTToken([FromBody]GoogleTokenDTO userInfo)
+        public async Task<ActionResult<Response<GetJWTTokenDTO>>> GetJwtToken([FromBody]GoogleTokenDTO userInfo)
         {
             try
             {

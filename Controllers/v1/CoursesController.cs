@@ -11,6 +11,7 @@ using patools.Dtos.Task;
 using patools.Models;
 using patools.Services.Courses;
 using patools.Services.Tasks;
+using patools.Errors;
 
 namespace patools.Controllers.v1
 {
@@ -49,7 +50,7 @@ namespace patools.Controllers.v1
         }
 
         // GET: api/v1/Courses/get/5
-        [HttpGet("get/{id}")]
+        [HttpGet("get/{id:guid}")]
         public async Task<ActionResult<Course>> GetCourse(Guid id)
         {
             if(!User.Identity.IsAuthenticated)
@@ -60,7 +61,7 @@ namespace patools.Controllers.v1
 
         // PUT: api/v1/Courses/put/5
         //Refactoring is needed
-        [HttpPut("put/{id}")]
+        [HttpPut("put/{id:guid}")]
         public async Task<IActionResult> PutCourse(Guid id, Course course)
         {
             if (id != course.ID)
@@ -107,16 +108,15 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidGuidIdResponse());
 
             //The id stored in Claim is not Guid
-            Guid teacherId;
-            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
 
             return Ok(await _coursesService.AddCourse(teacherId, course));
         }
 
         // DELETE: api/v1/Courses/delete/5
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteCourse(Guid courseId)
+        [HttpDelete("delete/{id:guid}")]
+        public async Task<IActionResult> DeleteCourse(Guid id)
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
@@ -132,14 +132,13 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidJwtTokenResponse());
 
             //The id stored in Claim is not Guid
-            Guid teacherId;
-            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidJwtTokenResponse());
 
-            return Ok(await _coursesService.DeleteCourse(teacherId, courseId));
+            return Ok(await _coursesService.DeleteCourse(teacherId, id));
         }
 
-        [HttpPost("{courseId}/task/add")]
+        [HttpPost("{courseId:guid}/tasks/add")]
         public async Task<ActionResult<GetNewTaskDTO>> AddTask([FromRoute] Guid courseId, AddTaskDTO task)
         {
             if(!User.Identity.IsAuthenticated)
@@ -154,13 +153,38 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidGuidIdResponse());
 
             //The id stored in Claim is not Guid
-            Guid teacherId;
-            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
 
             return Ok(await _tasksService.AddTask(courseId, teacherId, task));
         }
 
+        [HttpGet("{courseId:guid}/tasks/get")]
+        public async Task<ActionResult<List<GetTaskMainInfoDTO>>> GetCourseTasks([FromRoute] Guid courseId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            UserRoles? role = null;
+            if(User.IsInRole(UserRoles.Teacher.ToString()))
+                role = UserRoles.Teacher;
+            if(User.IsInRole(UserRoles.Student.ToString()))
+                role = UserRoles.Student;
+            if (!role.HasValue)
+                return Ok(new InvalidJwtTokenResponse());
+            
+            
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            return Ok(await _tasksService.GetCourseTasks(courseId, userId, role.Value));
+        }
         //Should be in CourseService.cs file, Remove after refactoring
         private bool CourseExists(Guid id)
         {

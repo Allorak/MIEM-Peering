@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using patools.Dtos.Auth;
 using patools.Dtos.User;
+using patools.Errors;
 using patools.Models;
 using SystemTask = System.Threading.Tasks;
 
@@ -32,11 +33,11 @@ namespace patools.Services.Authentication
         {
             var response = new Response<GoogleGetRegisteredUserDTO>();
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            
+            response.Success = true;
+            response.Error = null;
             if(user == null)
             {
-
-                response.Success = true;
-                response.Error = null;
                 response.Payload = new GoogleGetRegisteredUserDTO
                 {
                     Status = "NEW",
@@ -46,8 +47,6 @@ namespace patools.Services.Authentication
                 return response;
             }
 
-            response.Success = true;
-            response.Error = null;
             response.Payload = new GoogleGetRegisteredUserDTO
             {
                 Status = "REGISTERED",
@@ -62,12 +61,7 @@ namespace patools.Services.Authentication
             var response = new Response<GetJWTTokenDTO>();
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if(user == null)
-            {
-                response.Error = new Error(-5,"User is not registered");
-                response.Success = false;
-                response.Payload = null;
-                return response;
-            }
+                return new BadRequestDataResponse<GetJWTTokenDTO>("The user is not registered");
 
             response.Success = true;
             response.Error = null;
@@ -91,13 +85,13 @@ namespace patools.Services.Authentication
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:TokenSecret").Value));
 
-            var creds = new SigningCredentials(key,SecurityAlgorithms.HmacSha256Signature);
+            var credentials = new SigningCredentials(key,SecurityAlgorithms.HmacSha256Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(permClaims),
                 Expires = DateTime.Now.AddDays(10),
-                SigningCredentials = creds
+                SigningCredentials = credentials
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
