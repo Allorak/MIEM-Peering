@@ -10,11 +10,11 @@ export const postTask = async ({
   task
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/courses/${courseId}/task/create`,
+    url: `/api/v1/courses/${courseId}/task/add`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

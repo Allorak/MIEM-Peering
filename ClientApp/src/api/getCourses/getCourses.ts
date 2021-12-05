@@ -12,7 +12,7 @@ export const getCourses = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/courses`,
+    url: `/api/v1/courses/get`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

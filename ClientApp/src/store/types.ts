@@ -149,7 +149,7 @@ export interface INewTask {
 }
 
 export type INewTaskResponse = {
-  newTaskId: string
+  id: string
 }
 export interface INewTaskMainInfo {
   title: string
@@ -164,19 +164,19 @@ export interface INewTaskPeerForm {
 }
 
 export interface INewTaskSettings {
-  sBegin: Date | undefined
-  sEnd: Date | undefined
-  rBegin: Date | undefined
-  rEnd: Date | undefined
-  maxSubmission: number
+  submissionStartDateTime: Date | undefined
+  submissionEndDateTime: Date | undefined
+  reviewStartDateTime: Date | undefined
+  reviewEndDateTime: Date | undefined
+  submissionsToCheck: number
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'maxSubmission'> { }
+export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck'> { }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
 export type IParentQuestionRubric = {
-  id: number
+  order: number
   title: string
   required: boolean
 }

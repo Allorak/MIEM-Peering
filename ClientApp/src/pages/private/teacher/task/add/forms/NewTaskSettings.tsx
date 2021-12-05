@@ -53,7 +53,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
           >
             <Controller
               control={control}
-              name={'sBegin'}
+              name={'submissionStartDateTime'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
                 <Box sx={styles.fieldsContainer}>
@@ -110,7 +110,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
           >
             <Controller
               control={control}
-              name={'sEnd'}
+              name={'submissionEndDateTime'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
                 <Box sx={styles.fieldsContainer}>
@@ -167,7 +167,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
           >
             <Controller
               control={control}
-              name={'rBegin'}
+              name={'reviewStartDateTime'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
                 <Box sx={styles.fieldsContainer}>
@@ -224,7 +224,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
           >
             <Controller
               control={control}
-              name={'rEnd'}
+              name={'reviewEndDateTime'}
               rules={fields.dateRules}
               render={({ field: { ref, ...rest } }) => (
                 <Box sx={styles.fieldsContainer}>
@@ -278,7 +278,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
               required
               variant={'outlined'}
               autoComplete={'off'}
-              {...(formState.errors.maxSubmission !== undefined && { error: true, helperText: formState.errors.maxSubmission.message })}
+              {...(formState.errors.submissionsToCheck !== undefined && { error: true, helperText: formState.errors.submissionsToCheck.message })}
             />
           </Box>
         </Box>
@@ -298,17 +298,17 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
 
 const initialValue = (): INewTaskSettings => {
   const taskSettings = {
-    sBegin: new Date(),
-    sEnd: new Date(new Date().setDate(new Date().getDate() + 1)),
-    rBegin: new Date(new Date().setDate(new Date().getDate() + 3)),
-    rEnd: new Date(new Date().setDate(new Date().getDate() + 4)),
-    maxSubmission: 2
+    submissionStartDateTime: new Date(),
+    submissionEndDateTime: new Date(new Date().setDate(new Date().getDate() + 1)),
+    reviewStartDateTime: new Date(new Date().setDate(new Date().getDate() + 3)),
+    reviewEndDateTime: new Date(new Date().setDate(new Date().getDate() + 4)),
+    submissionsToCheck: 2
   }
 
-  taskSettings.sBegin.setHours(23, 59, 0)
-  taskSettings.sEnd.setHours(23, 59, 0)
-  taskSettings.rBegin.setHours(23, 59, 0)
-  taskSettings.rEnd.setHours(23, 59, 0)
+  taskSettings.submissionStartDateTime.setHours(23, 59, 0)
+  taskSettings.submissionEndDateTime.setHours(23, 59, 0)
+  taskSettings.reviewStartDateTime.setHours(23, 59, 0)
+  taskSettings.reviewEndDateTime.setHours(23, 59, 0)
   
   return taskSettings
 }
