@@ -16,6 +16,11 @@ export const submitBtContainer: SxProps<Theme> = {
   justifyContent: 'flex-end'
 }
 
+export const submitBtContainerCenter: SxProps<Theme> = {
+  display: 'flex',
+  justifyContent: 'center'
+}
+
 export const scrollStyles = {
   "&::-webkit-scrollbar": {
     width: "5px",

@@ -204,7 +204,7 @@ export enum IQuestionTypes {
   TEXT = 'text',
   MULTIPLE = 'multiple',
   SELECT_RATE = 'select',
-  SHORT_TEXT = 'short-text',
+  SHORT_TEXT = 'shortText',
 }
 
 export const defaultResponses = {
