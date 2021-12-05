@@ -12,7 +12,7 @@ export type IUsePrivatePathResult = {
 
 export const usePrivatePathSt = (): IUsePrivatePathResult => {
   const location = useLocation();
-  if (location.pathname === paths.teacher.main) {
+  if (location.pathname === paths.student.main) {
     return {
       location,
       path: {} as IPath
@@ -20,6 +20,7 @@ export const usePrivatePathSt = (): IUsePrivatePathResult => {
   }
 
   const path = matchPath('st/course/:courseId', location.pathname)
+    ?? matchPath('st/course/:courseId/main', location.pathname)
     ?? matchPath('st/course/:courseId/task', location.pathname)
     ?? matchPath('st/course/:courseId/task/:taskId', location.pathname)
     
