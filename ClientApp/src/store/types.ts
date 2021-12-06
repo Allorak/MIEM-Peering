@@ -287,3 +287,8 @@ export interface IExtpertItem {
   taskComplete: number,
   assignedTasks: number
 }
+
+export interface ICatalog {
+  id: string,
+  name: string
+}
