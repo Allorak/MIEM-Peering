@@ -10,7 +10,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
   return {
     success: true,
     payload: {
-      newTaskId: "id"
+      id: "id"
     }
   }
 }
