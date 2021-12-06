@@ -232,4 +232,8 @@ _Pvt_Extensions
 .fake/
 
 app.db
+app.db-shm
+app.db-wal
+
+.idea
 .idea/
