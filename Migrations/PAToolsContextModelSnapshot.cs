@@ -116,16 +116,31 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Criteria")
-                        .HasMaxLength(300)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("MaxValue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MinValue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RespondentType")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid>("TaskID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
@@ -144,19 +159,22 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("CheckDeadlineDatetime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("CheckStartDatetime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("CompletionDeadlineDatetime")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("CourseID")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("StartDatetime")
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReviewEndDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReviewStartDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SubmissionEndDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SubmissionStartDateTime")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SubmissionsToCheck")
@@ -217,11 +235,13 @@ namespace patools.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("BLOB");
 
-                    b.Property<int>("Status")
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("BLOB");
+
+                    b.Property<int>("Role")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ID");

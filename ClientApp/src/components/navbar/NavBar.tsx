@@ -4,18 +4,20 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { paths } from "../../app/constants/paths"
 import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
+import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
 import { palette } from "../../theme/colors"
 
 export const Navbar: FC = () => {
 
     const { location, path: pathT } = usePrivatePathT()
+    const { path: pathSt } = usePrivatePathSt()
     const history = useNavigate()
 
     const CourseItem: FC = () => {
         return (
             <Typography variant='h6'
                 sx={{ ...styles.item, ...styles.itemHover }}
-                onClick={() => { history(paths.teacher.main) }}
+                onClick={() => { history(pathT ? paths.teacher.main : paths.student.main) }}
             >
                 Мои курсы
             </Typography>
@@ -83,8 +85,6 @@ export const Navbar: FC = () => {
         </>)
     }
 
-
-
     if (pathT && pathT.courseId && pathT.taskId) {
         const courseItem = FakeData[0]
         const taskItem = FakeData[1]
@@ -100,7 +100,34 @@ export const Navbar: FC = () => {
         </>)
     }
 
-    console.log('Navbar return null...')
+    if (pathSt && pathSt.courseId && !pathSt.taskId) {
+        //получаем title у курса с помощью redux по path.courseId
+        const courseItem = FakeData[0]
+        return (<>
+            <CourseItem />
+            <SpanDelimetr />
+            <CourseTitle courseId={courseItem.id} courseTitle={courseItem.title} />
+        </>)
+    }
+
+
+
+    if (pathSt && pathSt.courseId && pathSt.taskId) {
+        const courseItem = FakeData[0]
+        const taskItem = FakeData[1]
+        return (<>
+            <CourseItem />
+            <SpanDelimetr />
+            <CourseTitle courseId={courseItem.id} courseTitle={courseItem.title} />
+            <SpanDelimetr />
+            <TaskItem courseId={courseItem.id} />
+            <SpanDelimetr />
+            <TaskTitle courseId={courseItem.id} taskTitle={taskItem.title} taskId={taskItem.id} />
+
+        </>)
+    }
+
+    console.log('Navbar return null...', pathSt, pathSt?.courseId, pathSt?.taskId)
 
     return null
 }

@@ -2,12 +2,12 @@ import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
 
-import { IErrorCode, INewTask} from "../../types";
+import { IErrorCode, INewTask } from "../../types";
 import { postTask } from "../../../api/postTask";
 
 
 export const createTasks = (task: INewTask, courseId: string): AppThunk => async (dispatch, getState) => {
-    const accessToken = getState().auth.payload.accessToken
+    const accessToken = getState().auth.accessToken
     if (!accessToken) {
         dispatch(actions.createError({
             code: IErrorCode.NO_ACCESS,
@@ -15,7 +15,7 @@ export const createTasks = (task: INewTask, courseId: string): AppThunk => async
         }))
         return
     }
-    
+
     dispatch(actions.createStarted())
     try {
         const response = await postTask({ accessToken, courseId, task })

@@ -5,7 +5,8 @@ import { useAppSelector } from "../../app/hooks";
 import SettingsIco from '../../img/ico/setting-hover.svg'
 import DefaultAvatar from '../../img/ico/avatar.svg'
 import { palette } from "../../theme/colors";
-import { ICourses } from "../../store/types";
+import { ICourses, IRole } from "../../store/types";
+import { Delete as DeleteIcon } from "../icons/Delete";
 
 interface IProps {
     course: ICourses
@@ -23,6 +24,10 @@ export const CourseCard: FC<IProps> = ({
         event.stopPropagation()
     }
 
+    const onDelete = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.stopPropagation()
+    }
+
     return (
         <Box sx={styles.root}
             onClick={() => onCourseSelect(course.id)}
@@ -34,15 +39,23 @@ export const CourseCard: FC<IProps> = ({
                     </Typography>
 
                     {
-                        userProfile && userProfile.role === 'teacher' && (
-                            <Box 
-                            sx={styles.settingBt}
-                            onClick={onSettings}
+                        userProfile && userProfile.role === IRole.teacher ? (
+                            <Box
+                                sx={styles.settingBt}
+                                onClick={onSettings}
                             >
                                 <img
                                     src={SettingsIco}
                                     alt="Settings"
                                 />
+                            </Box>
+                        ) : 
+                        (
+                            <Box 
+                            sx={styles.settingBt}
+                            onClick={onDelete}
+                            >
+                                <DeleteIcon />
                             </Box>
                         )
                     }
@@ -83,7 +96,7 @@ const styles = {
         transition: 'all 0.3s',
         ":hover": {
             cursor: 'pointer',
-            boxShadow: '0px 0px 7px 5px rgba(34, 60, 80, 0.2)'
+            boxShadow: '0px 0px 7px -4px rgba(34, 60, 80, 0.6)'
         }
     } as SxProps<Theme>,
     containerTop: {

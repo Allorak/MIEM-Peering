@@ -4,15 +4,16 @@ import { postNewCourse } from "../../../api/postNewCourse";
 import { AppThunk } from "../../../app/store";
 
 
-import { IErrorCode, INewCourseRequest } from "../../types";
+import { IErrorCode, INewCourseRequest, IRole } from "../../types";
 
 
 export const addCourse = (payload: INewCourseRequest): AppThunk => async (dispatch, getState) => {
+    console.log(payload)
     dispatch(actions.addCourseStarted())
     try {
-        const accessToken = getState().auth.payload.accessToken
-        const role = getState().userProfile.payload.role        
-        if (!accessToken || role !== 'teacher') {
+        const accessToken = getState().auth.accessToken
+        const userProfie = getState().userProfile.payload
+        if (!accessToken || !userProfie || (userProfie && userProfie.role !== IRole.teacher)) {
             dispatch(actions.courseAddFailed({
                 code: IErrorCode.NO_ACCESS,
                 message: 'Ошибка аутентификации', // TODO
@@ -20,7 +21,7 @@ export const addCourse = (payload: INewCourseRequest): AppThunk => async (dispat
             console.log("Add course error: No access or Role")
             return
         }
-        const response = await postNewCourse({...payload, accessToken})
+        const response = await postNewCourse({ ...payload, accessToken })
         if (!response) {
             dispatch(actions.courseAddFailed({
                 code: IErrorCode.RESPONSE,
@@ -28,13 +29,13 @@ export const addCourse = (payload: INewCourseRequest): AppThunk => async (dispat
             }))
             return
         }
-        if (!response.success) {            
+        if (!response.success) {
             dispatch(actions.courseAddFailed(response.error))
             return
         }
 
         dispatch(actions.courseAddSuccess(response.payload))
-        
+
     } catch (error) {
         dispatch(actions.courseAddFailed({
             code: IErrorCode.REQUEST,

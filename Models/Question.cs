@@ -1,14 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace patools.Models
 {
-    public enum Types
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum QuestionTypes
     {
-        LongAnswer = 0,
-        ShortAnswer = 1,
-        MultipleChoices = 2
+        Text = 0,
+        ShortText = 1,
+        MultipleChoices = 2,
+        Select = 3
+    }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum RespondentTypes
+    {
+        Author = 0,
+        Peer = 1
     }
 
     public class Question
@@ -16,19 +26,30 @@ namespace patools.Models
         public Guid ID { get; set; }
 
         [Required]
+        [MaxLength(150)]
+        public string Title { get; set; }
+
         [MaxLength(500)]
         public string Description { get; set; }
 
-        [MaxLength(300)]
-        [DisplayFormat(NullDisplayText = "No criteria set")]
-        public string Criteria { get; set; }
+        [Required]
+        public int Order { get; set; }
 
         [Required]
-        public Types Type { get; set; }
+        public bool Required { get; set; }
+
+        [Required]
+        public QuestionTypes Type { get; set; }
+
+        [Required]
+        public RespondentTypes RespondentType { get; set; }
+
+        //for select-type questions
+        public int MinValue { get; set; }
+        public int MaxValue { get; set; }
 
         [Required]
         public Task Task { get; set; }
-
         public List<Variant> Variants { get; set; }
     }
 }

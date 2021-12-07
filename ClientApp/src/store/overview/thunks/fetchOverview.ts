@@ -7,7 +7,7 @@ import { getOverview } from "../../../api/getOverview";
 
 export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getState) => {
     dispatch(actions.reset())
-    const accessToken = getState().auth.payload.accessToken
+    const accessToken = getState().auth.accessToken
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,
@@ -31,7 +31,15 @@ export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getS
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(response.payload))
+        dispatch(actions.fetchSuccess({
+            ...response.payload,
+            deadlines: {
+                submissionEndDateTime: new Date(response.payload.deadlines.submissionEndDateTime),
+                submissionStartDateTime: new Date(response.payload.deadlines.submissionStartDateTime),
+                reviewEndDateTime: new Date(response.payload.deadlines.reviewEndDateTime),
+                reviewStartDateTime: new Date(response.payload.deadlines.reviewStartDateTime),
+            }
+        }))
         return
 
     } catch (error) {

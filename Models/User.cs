@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace patools.Models
 {
-    public enum UserStatuses
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum UserRoles
     {
         Student = 0,
         Teacher = 1,
@@ -21,7 +23,7 @@ namespace patools.Models
         public string Fullname { get; set; }
 
         [Required]
-        public UserStatuses Status { get; set; }
+        public UserRoles Role { get; set; }
 
         [Required]
         [MinLength(5)]
@@ -34,9 +36,8 @@ namespace patools.Models
         [DataType(DataType.ImageUrl)]
         public string ImageUrl { get; set; }
 
-        [MinLength(8)]
-        [MaxLength(50)]
-        public string Password { get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
 
         public List<CourseUser> CourseUsers { get; set; }
         public List<GroupUser> GroupUsers { get; set; }

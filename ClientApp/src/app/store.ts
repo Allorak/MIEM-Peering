@@ -5,9 +5,11 @@ import { reducer as userProfile } from '../store/userProfile'
 import { reducer as registration } from '../store/registretion'
 import { reducer as courses } from '../store/courses'
 import { reducer as newCourse } from '../store/addCourse'
+import { reducer as joinCourse } from '../store/JoinCourse'
 import { reducer as tasks } from '../store/tasks'
 import { reducer as overview } from '../store/overview'
 import { reducer as works } from '../store/works'
+import { reducer as experts } from '../store/experts'
 
 export const store = configureStore({
   reducer: {
@@ -17,9 +19,11 @@ export const store = configureStore({
     registration,
     courses,
     newCourse,
+    joinCourse,
     tasks,
     overview,
-    works
+    works,
+    experts
   }
 })
 

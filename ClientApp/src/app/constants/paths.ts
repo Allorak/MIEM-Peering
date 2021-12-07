@@ -31,5 +31,8 @@ export const paths = {
     courses: {
       course: '/st/course/:courseId/main'
     },
+    dashboard: {
+      overview: '/st/task/:taskId/overview',
+    }
   }
 }

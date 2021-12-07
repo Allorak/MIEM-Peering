@@ -19,6 +19,7 @@ export enum IErrorCode {
   BAD_REQUEST_DATA = 101,
   NEED_FORCE = 102, // пользователь может повторить запрос с параметром isForced: true
   OPERATION_ERROR = 103, // ошибка при выполнении операции
+  USER_ALREADY_REGISTERED = 104
 }
 
 export type IError = {
@@ -28,7 +29,10 @@ export type IError = {
 
 export type IStatus = 'EMPTY' | 'FIRST_LOADING' | 'NOT_LOADED' | 'SUCCESS' | 'LOCKED'
 
-export type IRole = 'teacher' | 'student';
+export enum IRole {
+  teacher = 'Teacher',
+  student = 'Student'
+}
 
 export type IPath = {
   courseId?: string,
@@ -40,23 +44,24 @@ export type IPathDashboard = {
   activeMenuId?: IMenuTitles
 }
 
-export type IGAuthCheckUser = {
-  status: 'NEW' | 'REGISTERED'
+export enum GoogleAuthStatus {
+  newUser = "NEW",
+  registeredUser = "REGISTERED"
 }
 
-export type IUserGAuth = {
-  email: string,
-  gAccessToken: string
+export type IGoogleUserNew = {
+  status: GoogleAuthStatus.newUser
+}
+
+export type IGoogleUserRegistered = {
+  status: GoogleAuthStatus.registeredUser,
+  user: IUserProfile,
+  accessToken: string
 }
 
 export type IRegistretionRequest = {
-  email: string,
-  gAccessToken?: string,
+  googleToken: string,
   role: IRole,
-  pass?: string,
-  imageUrl?: string,
-  firstName: string,
-  lastName: string
 }
 
 export type IRegistretionProps = {
@@ -81,14 +86,12 @@ export type IRegistrationResponse = {
   accessToken: string
 }
 
-// в будущем использовать для пользователя
-
 export type IUserProfile = {
+  id: string,
   email: string,
   role: IRole,
   imageUrl?: string,
-  firstName: string,
-  lastName: string
+  fullname: string
 }
 
 export type IAuthRequest = {
@@ -102,7 +105,7 @@ export type IAuthResponse = {
 }
 
 export type ICourse = {
-  courseId: string
+  id: string
 }
 
 export type ICourses = {
@@ -110,6 +113,17 @@ export type ICourses = {
   adminImageUrl?: string,
   adminName: string,
   name: string,
+  subject: string,
+  description?: string,
+}
+
+export type IResponseCourses = {
+  id: string,
+  teacher: {
+    fullname: string,
+    imageUrl?: string,
+  },
+  title: string,
   subject: string,
   description?: string,
 }
@@ -137,7 +151,7 @@ export interface INewTask {
 }
 
 export type INewTaskResponse = {
-  newTaskId: string
+  id: string
 }
 export interface INewTaskMainInfo {
   title: string
@@ -152,19 +166,19 @@ export interface INewTaskPeerForm {
 }
 
 export interface INewTaskSettings {
-  sBegin: Date | undefined
-  sEnd: Date | undefined
-  rBegin: Date | undefined
-  rEnd: Date | undefined
-  maxSubmission: number
+  submissionStartDateTime: Date | undefined
+  submissionEndDateTime: Date | undefined
+  reviewStartDateTime: Date | undefined
+  reviewEndDateTime: Date | undefined
+  submissionsToCheck: number
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'maxSubmission'> { }
+export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck'> { }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
 export type IParentQuestionRubric = {
-  id: number
+  order: number
   title: string
   required: boolean
 }
@@ -192,7 +206,7 @@ export enum IQuestionTypes {
   TEXT = 'text',
   MULTIPLE = 'multiple',
   SELECT_RATE = 'select',
-  SHORT_TEXT = 'short-text',
+  SHORT_TEXT = 'shortText',
 }
 
 export const defaultResponses = {
@@ -252,6 +266,15 @@ export type IOverview = {
   grades: number[]
 }
 
+export type IOverviewResponse = IOverview & {
+  deadlines: {
+    submissionStartDateTime: string
+    submissionEndDateTime: string
+    reviewStartDateTime: string
+    reviewEndDateTime: string
+  }
+}
+
 export type IWorkItem = {
   id: string,
   responses: IWorkResponse[],
@@ -266,4 +289,12 @@ export type IWorkResponse = {
   order: number,
   title: string,
   response?: string
+}
+
+export interface IExtpertItem {
+  email: string,
+  name: string,
+  imgUrl?: string
+  taskComplete: number,
+  assignedTasks: number
 }

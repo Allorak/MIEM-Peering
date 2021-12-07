@@ -7,13 +7,17 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;    
-using Microsoft.AspNetCore.Authentication.JwtBearer;    
-using System.Text; 
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using patools.Models;
+using patools.Services.Authentication;
+using patools.Services.Courses;
+using patools.Services.Users;
+using patools.Services.Tasks;
 
 namespace patools
 {
@@ -35,6 +39,11 @@ namespace patools
             {
                 configuration.RootPath = "ClientApp/build";
             });
+            services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<IAuthenticationService,AuthenticationService>();
+            services.AddScoped<ICoursesService,CoursesService>();
+            services.AddScoped<IUsersService,UsersService>();
+            services.AddScoped<ITasksService,TasksService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -55,8 +64,8 @@ namespace patools
 
             app.UseRouting();
 
-            app.UseAuthentication();  
-            app.UseAuthorization(); 
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -78,20 +87,15 @@ namespace patools
 
         private void SetupJWTServices(IServiceCollection services)
         {
-            string key = "M13m_S3cr3T-t0k3N";  
-            var issuer = "http://localhost:5000";  
-
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
                             ValidateIssuerSigningKey = true,
-                            ValidIssuer = issuer,
-                            ValidAudience = issuer,
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("AppSettings:TokenSecret").Value))
                         };
                     });
         }
