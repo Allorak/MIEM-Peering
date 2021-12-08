@@ -8,8 +8,8 @@ namespace patools.Services.Tasks
 {
     public interface ITasksService
     {
-        Task<Response<GetTaskOverviewDTO>> GetTaskOverview (Guid taskId, Guid teacherId);
-        Task<Response<GetNewTaskDTO>> AddTask(Guid courseId, Guid teacherId, AddTaskDTO task);
-        Task<Response<List<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole);
+        Task<Response<GetTaskOverviewDtoResponse>> GetTaskOverview (Guid taskId, Guid teacherId);
+        Task<Response<GetNewTaskDtoResponse>> AddTask(AddTaskDto task);
+        Task<Response<List<GetTaskMainInfoDtoResponse>>> GetCourseTasks(GetCourseTasksDtoRequest courseInfo);
     }
 }

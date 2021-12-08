@@ -30,18 +30,9 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
-        /*
-        // GET: api/v1/Courses
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
-        {
-            return await _context.Courses.ToListAsync();
-        }
-        */
-
         // GET: api/v1/Courses/get
         [HttpGet("get")]
-        public async Task<ActionResult<List<Course>>> GetCourses()
+        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCourses()
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -51,7 +42,7 @@ namespace patools.Controllers.v1
 
         // GET: api/v1/Courses/get/5
         [HttpGet("get/{id:guid}")]
-        public async Task<ActionResult<Course>> GetCourse(Guid id)
+        public async Task<ActionResult<GetCourseDtoResponse>> GetCourse(Guid id)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -92,7 +83,7 @@ namespace patools.Controllers.v1
 
         // POST: api/v1/Courses/add
         [HttpGet("getteachercourse")]
-        public async Task<ActionResult<List<Course>>> GetTeacherCourse()
+        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetTeacherCourse()
         //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)
@@ -118,7 +109,7 @@ namespace patools.Controllers.v1
 
         // POST: api/v1/Courses/add
         [HttpGet("getstudentcourse")]
-        public async Task<ActionResult<List<Course>>> GetStudentCourse()
+        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetStudentCourse()
         //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)
@@ -144,7 +135,7 @@ namespace patools.Controllers.v1
 
         // POST: api/v1/Courses/add
         [HttpPost("add")]
-        public async Task<ActionResult<GetCourseDTO>> PostCourse(AddCourseDTO course)
+        public async Task<ActionResult<GetCourseDtoResponse>> PostCourse(AddCourseDto course)
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
@@ -163,7 +154,8 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
 
-            return Ok(await _coursesService.AddCourse(teacherId, course));
+            course.TeacherId = teacherId;
+            return Ok(await _coursesService.AddCourse(course));
         }
 
         // DELETE: api/v1/Courses/delete/5
@@ -191,7 +183,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("{courseId:guid}/tasks/add")]
-        public async Task<ActionResult<GetNewTaskDTO>> AddTask([FromRoute] Guid courseId, AddTaskDTO task)
+        public async Task<ActionResult<GetNewTaskDtoResponse>> AddTask([FromRoute] Guid courseId, AddTaskDto task)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -208,11 +200,13 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
 
-            return Ok(await _tasksService.AddTask(courseId, teacherId, task));
+            task.CourseId = courseId;
+            task.TeacherId = teacherId;
+            return Ok(await _tasksService.AddTask(task));
         }
 
         [HttpGet("{courseId:guid}/tasks/get")]
-        public async Task<ActionResult<List<GetTaskMainInfoDTO>>> GetCourseTasks([FromRoute] Guid courseId)
+        public async Task<ActionResult<List<GetTaskMainInfoDtoResponse>>> GetCourseTasks([FromRoute] Guid courseId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -235,7 +229,13 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidJwtTokenResponse());
 
-            return Ok(await _tasksService.GetCourseTasks(courseId, userId, role.Value));
+            var courseTasksInfo = new GetCourseTasksDtoRequest()
+            {
+                CourseId = courseId,
+                UserId = userId,
+                UserRole = role.Value
+            };
+            return Ok(await _tasksService.GetCourseTasks(courseTasksInfo));
         }
         //Should be in CourseService.cs file, Remove after refactoring
         private bool CourseExists(Guid id)

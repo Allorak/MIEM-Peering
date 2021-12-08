@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using patools.Dtos.Task;
 using patools.Models;
 using patools.Services.Tasks;
 using patools.Errors;
@@ -24,7 +25,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpGet("{taskId}/overview")]
-        public async System.Threading.Tasks.Task<IActionResult> GetTaskOverview([FromRoute]Guid taskId)
+        public async System.Threading.Tasks.Task<ActionResult<GetTaskOverviewDtoResponse>> GetTaskOverview([FromRoute]Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());

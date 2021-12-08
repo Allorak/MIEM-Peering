@@ -29,46 +29,40 @@ namespace patools.Services.Authentication
             _context = context;
         }
 
-        public async Task<Response<GoogleGetRegisteredUserDTO>> FindUserByEmail(string email)
+        public async Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email)
         {
-            var response = new Response<GoogleGetRegisteredUserDTO>();
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             
-            response.Success = true;
-            response.Error = null;
             if(user == null)
             {
-                response.Payload = new GoogleGetRegisteredUserDTO
-                {
-                    Status = "NEW",
-                    User = null
-                };
-
-                return response;
+                return new SuccessfulResponse<GetGoogleRegisteredUserDtoResponse>
+                    (new GetGoogleRegisteredUserDtoResponse()
+                    {
+                        Status = "NEW",
+                        User = null 
+                    });
             }
 
-            response.Payload = new GoogleGetRegisteredUserDTO
+            return new SuccessfulResponse<GetGoogleRegisteredUserDtoResponse>
+            (new GetGoogleRegisteredUserDtoResponse()
             {
                 Status = "REGISTERED",
                 AccessToken = CreateJwtFromUser(user),
-                User = _mapper.Map<GetRegisteredUserDTO>(user)
-            };
-            return response;
+                User = _mapper.Map<GetRegisteredUserDtoResponse>(user)
+            });
         }
 
-        public async Task<Response<GetJWTTokenDTO>> GetJwtByEmail(string email)
+        public async Task<Response<GetJwtTokenDtoResponse>> GetJwtByEmail(string email)
         {
-            var response = new Response<GetJWTTokenDTO>();
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if(user == null)
-                return new BadRequestDataResponse<GetJWTTokenDTO>("The user is not registered");
+                return new BadRequestDataResponse<GetJwtTokenDtoResponse>("The user is not registered");
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = new GetJWTTokenDTO
+            var response = new SuccessfulResponse<GetJwtTokenDtoResponse>
+            (new GetJwtTokenDtoResponse
             {
                 AccessToken = CreateJwtFromUser(user)
-            };
+            });
             System.Console.WriteLine($"Jwt - {response.Payload.AccessToken}");
             return response;
         }

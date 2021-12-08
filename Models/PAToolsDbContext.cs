@@ -12,6 +12,8 @@ namespace patools.Models
         public DbSet<Task> Tasks { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Variant> Variants { get; set; }
+        public DbSet<Submission> Submissions { get; set; }
+        public DbSet<Answer> Answers { get; set; }
 
         public DbSet<CourseUser> CourseUsers { get; set; }
         public DbSet<GroupUser> GroupUsers { get; set; }
@@ -21,14 +23,10 @@ namespace patools.Models
 
         public PAToolsContext()
         {
-            //var folder = Environment.SpecialFolder.LocalApplicationData;
-            //var path = Environment.GetFolderPath(folder);
             var path = Environment.CurrentDirectory;
             DbPath = $"{path}{System.IO.Path.DirectorySeparatorChar}app.db";
         }
 
-        // The following configures EF to create a Sqlite database file in the
-        // special "local" folder for your platform.
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite($"Filename={DbPath}");
     }

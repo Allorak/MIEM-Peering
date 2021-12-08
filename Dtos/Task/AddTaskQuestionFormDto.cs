@@ -3,8 +3,8 @@ using patools.Models;
 
 namespace patools.Dtos.Task
 {
-    public class AddTaskQuestionFormDTO
+    public class AddTaskQuestionFormDto
     {
-        public AddQuestionDTO[] Rubrics { get; set; }
+        public AddQuestionDto[] Rubrics { get; set; }
     }
 }

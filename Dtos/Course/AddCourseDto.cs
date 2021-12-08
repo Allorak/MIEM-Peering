@@ -6,8 +6,9 @@ using patools.Models;
 
 namespace patools.Dtos.Course
 {
-    public class AddCourseDTO
+    public class AddCourseDto
     {
+        public Guid TeacherId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Subject { get; set; }

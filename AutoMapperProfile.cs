@@ -11,14 +11,15 @@ namespace patools
     {
         public AutoMapperProfile()
         {
-            CreateMap<User,GetRegisteredUserDTO>();
-            CreateMap<User, GetTeacherDTO>();
-            CreateMap<AddCourseDTO, Course>();
-            CreateMap<User,GetNewUserDTO>();
-            CreateMap<Task,GetTaskDeadlinesDTO>();
-            CreateMap<Task,GetNewTaskDTO>();
-            CreateMap<AddQuestionDTO,Question>();
-            CreateMap<Task,GetTaskMainInfoDTO>();
+            CreateMap<AddUserDTO, User>();
+            CreateMap<User,GetRegisteredUserDtoResponse>();
+            CreateMap<User, GetTeacherDtoResponse>();
+            CreateMap<AddCourseDto, Course>();
+            CreateMap<User,GetNewUserDtoResponse>();
+            CreateMap<Task,GetTaskDeadlinesDtoResponse>();
+            CreateMap<Task,GetNewTaskDtoResponse>();
+            CreateMap<AddQuestionDto,Question>();
+            CreateMap<Task,GetTaskMainInfoDtoResponse>();
         }
     }
 }

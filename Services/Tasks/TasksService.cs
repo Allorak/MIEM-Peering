@@ -20,16 +20,17 @@ namespace patools.Services.Tasks
             _context = context;
         }
 
-        public async Task<Response<GetNewTaskDTO>> AddTask(Guid courseId, Guid teacherId, AddTaskDTO task)
+        public async Task<Response<GetNewTaskDtoResponse>> AddTask(AddTaskDto task)
         {
-            var response = new Response<GetNewTaskDTO>();
 
-            var course = await _context.Courses.Include(c => c.Teacher).FirstOrDefaultAsync(c => c.ID == courseId);
+            var course = await _context.Courses
+                .Include(c => c.Teacher)
+                .FirstOrDefaultAsync(c => c.ID == task.CourseId);
             if (course == null)
-                return new InvalidGuidIdResponse<GetNewTaskDTO>("Invalid course id");
+                return new InvalidGuidIdResponse<GetNewTaskDtoResponse>("Invalid course id");
 
-            if (course.Teacher.ID != teacherId)
-                return new NoAccessResponse<GetNewTaskDTO>("This teacher has no access to this course");
+            if (course.Teacher.ID != task.TeacherId)
+                return new NoAccessResponse<GetNewTaskDtoResponse>("This teacher has no access to this course");
 
             var newTask = new Models.Task
             {
@@ -67,82 +68,74 @@ namespace patools.Services.Tasks
 
             await _context.SaveChangesAsync();
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = _mapper.Map<GetNewTaskDTO>(newTask);
-            return response;
+            return new SuccessfulResponse<GetNewTaskDtoResponse>(_mapper.Map<GetNewTaskDtoResponse>(newTask));
         }
 
-        public async Task<Response<List<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole)
+        public async Task<Response<List<GetTaskMainInfoDtoResponse>>> GetCourseTasks(GetCourseTasksDtoRequest courseInfo)
         {
-            var response = new Response<List<GetTaskMainInfoDTO>>();
-
-            var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseId);
+            var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseInfo.CourseId);
             if (course == null)
-                return new InvalidGuidIdResponse<List<GetTaskMainInfoDTO>>("Invalid course id");
+                return new InvalidGuidIdResponse<List<GetTaskMainInfoDtoResponse>>("Invalid course id");
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == userId);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == courseInfo.UserId);
             if (user == null)
-                return new InvalidGuidIdResponse<List<GetTaskMainInfoDTO>>("Invalid user id");
+                return new InvalidGuidIdResponse<List<GetTaskMainInfoDtoResponse>>("Invalid user id");
 
-            var courseUserConnection = await _context.CourseUsers.FirstOrDefaultAsync(x => x.User.ID == user.ID && x.Course.ID == courseId);
+            var courseUserConnection = await _context.CourseUsers
+                .FirstOrDefaultAsync(x => x.User == user && x.Course == course);
 
-            if(userRole == UserRoles.Teacher && course.Teacher != user)
-                response.Payload = null;
-            else if(userRole == UserRoles.Student && courseUserConnection == null)
-                response.Payload = null;
+            SuccessfulResponse<List<GetTaskMainInfoDtoResponse>> response;
+            if (courseInfo.UserRole == UserRoles.Teacher && course.Teacher != user)
+                response = new SuccessfulResponse<List<GetTaskMainInfoDtoResponse>>(null);
+            else if(courseInfo.UserRole == UserRoles.Student && courseUserConnection == null)
+                response = new SuccessfulResponse<List<GetTaskMainInfoDtoResponse>>(null);
             else
             {
                 var tasks = await _context.Tasks
-                                    .Where(t => t.Course.ID == courseId)
-                                    .Select(x => _mapper.Map<GetTaskMainInfoDTO>(x))
+                                    .Where(t => t.Course.ID == courseInfo.CourseId)
+                                    .Select(x => _mapper.Map<GetTaskMainInfoDtoResponse>(x))
                                     .ToListAsync();
-                response.Payload = tasks;
+                response = new SuccessfulResponse<List<GetTaskMainInfoDtoResponse>>(tasks);
             }
-            response.Success = true;
-            response.Error = null;
             return response;
         }
 
-        public async System.Threading.Tasks.Task<Response<GetTaskOverviewDTO>> GetTaskOverview(Guid taskId, Guid teacherId)
+        public async System.Threading.Tasks.Task<Response<GetTaskOverviewDtoResponse>> GetTaskOverview(Guid taskId, Guid teacherId)
         {
-            var response = new Response<GetTaskOverviewDTO>();
 
             var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId);
             if (teacher == null)
-                return new InvalidGuidIdResponse<GetTaskOverviewDTO>("Invalid teacher id");
+                return new InvalidGuidIdResponse<GetTaskOverviewDtoResponse>("Invalid teacher id");
 
             var task = await _context.Tasks
                 .Include(x => x.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskId);
             if (task == null)
-                return new InvalidGuidIdResponse<GetTaskOverviewDTO>("Invalid task id");
+                return new InvalidGuidIdResponse<GetTaskOverviewDtoResponse>("Invalid task id");
 
             if (task.Course.Teacher.ID != teacher.ID)
-                return new NoAccessResponse<GetTaskOverviewDTO>("This teacher has no access to this task");
+                return new NoAccessResponse<GetTaskOverviewDtoResponse>("This teacher has no access to this task");
             
             var totalAssignments = await _context.TaskUsers.CountAsync(tu => tu.Task == task);
             int submissionsNumber = 1;
             int reviewsNumber = 1;
             float[] grades = {10,10,10,10,10,10};
 
-            var statistics = new GetTaskStatisticsDTO
+            var statistics = new GetTaskStatisticsDtoResponse
             {
                 Submissions = submissionsNumber,
                 Review = reviewsNumber,
                 Total = totalAssignments
             };
-            var deadlines = _mapper.Map<GetTaskDeadlinesDTO>(task);
+            var deadlines = _mapper.Map<GetTaskDeadlinesDtoResponse>(task);
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = new GetTaskOverviewDTO
-            {
-                Statistics = statistics,
-                Deadlines = deadlines,
-                Grades = grades
-            };
-            return response;
+            return new SuccessfulResponse<GetTaskOverviewDtoResponse>
+                (new GetTaskOverviewDtoResponse
+                {
+                    Statistics = statistics,
+                    Deadlines = deadlines,
+                    Grades = grades
+                });
         }
     }
 }

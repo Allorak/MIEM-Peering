@@ -25,7 +25,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpGet("getjwttoken")]
-        public async Task<ActionResult<Response<GetJWTTokenDTO>>> GetJwtToken([FromBody]GoogleTokenDTO userInfo)
+        public async Task<ActionResult<Response<GetJwtTokenDtoResponse>>> GetJwtToken([FromBody]GetJwtByGoogleDtoRequest userInfo)
         {
             try
             {
@@ -43,14 +43,14 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("googleauth")]
-        public async Task<ActionResult<Response<GoogleGetRegisteredUserDTO>>> GoogleAuth([FromBody]GoogleTokenDTO tokenInfo)
+        public async Task<ActionResult<Response<GetGoogleRegisteredUserDtoResponse>>> GoogleAuth([FromBody]GetJwtByGoogleDtoRequest tokenInfo)
         {
             try
             {
                 System.Console.WriteLine($"Google - {tokenInfo.GoogleToken}"); // TODO: remove after all the testing
                 var googleUser = await GoogleJsonWebSignature.ValidateAsync(tokenInfo.GoogleToken, new GoogleJsonWebSignature.ValidationSettings()
                 {
-                    Audience = new[] {"232154519390-nlp3m4fjjeosrvo8gld3l6lo7cd2v3na.apps.googleusercontent.com"}
+                    Audience = new[] {_configuration.GetSection("AppSettings:AppId").Value}
                 });
                 return Ok(await _authenticationService.FindUserByEmail(googleUser.Email));
             }
