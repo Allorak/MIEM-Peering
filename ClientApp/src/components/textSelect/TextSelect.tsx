@@ -13,7 +13,7 @@ export const TextSelect: FC<IProps> = ({
   return (
     <FormControl fullWidth>
       <Select
-        value={props.value}
+        onChange={props.onChange}
         {...props}
       >
         {items.map((item, index) => (
