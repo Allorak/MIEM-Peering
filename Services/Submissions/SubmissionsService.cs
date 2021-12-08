@@ -31,23 +31,23 @@ namespace patools.Services.Submissions
                 return new InvalidGuidIdResponse<string>("Invalid task id");
             
             var taskUser = await _context.TaskUsers
-                .FirstOrDefaultAsync(tu => tu.Student == student && tu.Task == task);
+                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
                 return new InvalidGuidIdResponse<string>("The task isn't assigned to this user");
 
             var newSubmission = new Submission()
             {
                 ID = Guid.NewGuid(),
-                TaskUserAssignment = taskUser
+                PeeringTaskUserAssignment = taskUser
             };
-            taskUser.State = TaskState.Checking;
+            taskUser.State = PeeringTaskState.Checking;
             await _context.Submissions.AddAsync(newSubmission);
 
             var newAnswers = new List<Answer>();
             foreach (var answer in submission.Answers)
             {
                 var question = await _context.Questions
-                    .FirstOrDefaultAsync(q => q.Task == taskUser.Task && q.Order == answer.Order);
+                    .FirstOrDefaultAsync(q => q.PeeringTask == taskUser.PeeringTask && q.Order == answer.Order);
                 
                 if (question == null)
                     return new BadRequestDataResponse<string>($"Incorrect Order({answer.Order}) in answer");

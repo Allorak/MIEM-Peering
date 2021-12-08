@@ -9,7 +9,7 @@ namespace patools.Models
         public DbSet<Course> Courses { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Question> Questions { get; set; }
-        public DbSet<Task> Tasks { get; set; }
+        public DbSet<PeeringTask> Tasks { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Variant> Variants { get; set; }
         public DbSet<Submission> Submissions { get; set; }
@@ -17,7 +17,7 @@ namespace patools.Models
 
         public DbSet<CourseUser> CourseUsers { get; set; }
         public DbSet<GroupUser> GroupUsers { get; set; }
-        public DbSet<TaskUser> TaskUsers { get; set; }
+        public DbSet<PeeringTaskUser> TaskUsers { get; set; }
 
         public string DbPath { get; private set; }
 

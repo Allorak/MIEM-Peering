@@ -10,7 +10,7 @@ using patools.Dtos.Course;
 using patools.Dtos.Task;
 using patools.Models;
 using patools.Services.Courses;
-using patools.Services.Tasks;
+using patools.Services.PeeringTasks;
 using patools.Errors;
 
 namespace patools.Controllers.v1
@@ -21,12 +21,12 @@ namespace patools.Controllers.v1
     {
         private readonly PAToolsContext _context;
         private readonly ICoursesService _coursesService;
-        private readonly ITasksService _tasksService;
+        private readonly IPeeringTasksService _peeringTasksService;
 
-        public CoursesController(PAToolsContext context, ICoursesService coursesService,ITasksService tasksService)
+        public CoursesController(PAToolsContext context, ICoursesService coursesService,IPeeringTasksService peeringTasksService)
         {
             _coursesService = coursesService;
-            _tasksService = tasksService;
+            _peeringTasksService = peeringTasksService;
             _context = context;
         }
 
@@ -183,7 +183,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("{courseId:guid}/tasks/add")]
-        public async Task<ActionResult<GetNewTaskDtoResponse>> AddTask([FromRoute] Guid courseId, AddTaskDto task)
+        public async Task<ActionResult<GetNewPeeringTaskDtoResponse>> AddTask([FromRoute] Guid courseId, AddPeeringTaskDto peeringTask)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -200,13 +200,13 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
 
-            task.CourseId = courseId;
-            task.TeacherId = teacherId;
-            return Ok(await _tasksService.AddTask(task));
+            peeringTask.CourseId = courseId;
+            peeringTask.TeacherId = teacherId;
+            return Ok(await _peeringTasksService.AddTask(peeringTask));
         }
 
         [HttpGet("{courseId:guid}/tasks/get")]
-        public async Task<ActionResult<List<GetTaskMainInfoDtoResponse>>> GetCourseTasks([FromRoute] Guid courseId)
+        public async Task<ActionResult<List<GetPeeringTaskMainInfoDtoResponse>>> GetCourseTasks([FromRoute] Guid courseId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -235,7 +235,7 @@ namespace patools.Controllers.v1
                 UserId = userId,
                 UserRole = role.Value
             };
-            return Ok(await _tasksService.GetCourseTasks(courseTasksInfo));
+            return Ok(await _peeringTasksService.GetCourseTasks(courseTasksInfo));
         }
         //Should be in CourseService.cs file, Remove after refactoring
         private bool CourseExists(Guid id)

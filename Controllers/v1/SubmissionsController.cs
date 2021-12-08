@@ -8,7 +8,7 @@ using patools.Errors;
 using patools.Models;
 using patools.Services.Courses;
 using patools.Services.Submissions;
-using patools.Services.Tasks;
+using patools.Services.PeeringTasks;
 
 namespace patools.Controllers.v1
 {

@@ -1,6 +1,6 @@
 namespace patools.Dtos.Task
 {
-    public class GetTaskStatisticsDtoResponse
+    public class GetPeeringTaskStatisticsDtoResponse
     {
         public int Total { get; set; }
         public int Submissions { get; set; }

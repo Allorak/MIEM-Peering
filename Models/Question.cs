@@ -50,6 +50,6 @@ namespace patools.Models
         public int MaxValue { get; set; }
 
         [Required]
-        public Task Task { get; set; }
+        public PeeringTask PeeringTask { get; set; }
     }
 }

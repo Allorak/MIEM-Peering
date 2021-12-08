@@ -5,60 +5,31 @@
     <projectFile profileName="patools">patools.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Controllers/v1/SubmissionsController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dtos/Answer/AddAnswerDto.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dtos/Submission/AddSubmissionDto.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dtos/Task/GetCourseTasksDtoRequest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Migrations/20211208171412_Added submission and answer.Designer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Migrations/20211208171412_Added submission and answer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Models/Answer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Models/Submission.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Services/Submissions/ISubmissionsService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Services/Submissions/SubmissionsService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="Added Submissions">
+      <change afterPath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AutoMapperProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/AutoMapperProfile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/v1/AuthenticationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/AuthenticationController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Controllers/v1/CoursesController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/CoursesController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/v1/TasksController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/TasksController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/v1/UsersController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/UsersController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Auth/GetJWTTokenDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Auth/GetJwtTokenDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Auth/GoogleGetRegisteredUserDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Auth/GetGoogleRegisteredUserDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Auth/GoogleTokenDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Auth/GetJwtByGoogleDtoRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Course/AddCourseDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Course/AddCourseDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Course/GetCourseDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Course/GetResponseCourseDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Question/AddQuestionDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Question/AddQuestionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/AddTaskDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskMainInfoDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/AddTaskMainInfoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskQuestionFormDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/AddTaskQuestionFormDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskSettingsDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/AddTaskSettingsDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetNewTaskDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/GetNewTaskDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskDeadlinesDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/GetTaskDeadlinesDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskMainInfoDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/GetTaskMainInfoDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskOverviewDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/GetTaskOverviewDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskStatisticsDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/Task/GetTaskStatisticsDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/User/GetNewUserDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/User/GetNewUserDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/User/GetRegisteredUserDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/User/GetRegisteredUserDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/User/GetTeacherDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/User/GetTeacherDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Migrations/PAToolsContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Migrations/PAToolsContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Course.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Course.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Group.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Group.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/v1/SubmissionsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/SubmissionsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/v1/TasksController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/PeeringTasksController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskMainInfoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskMainInfoDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskQuestionFormDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskQuestionFormDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskSettingsDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskSettingsDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetCourseTasksDtoRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetCourseTasksDtoRequest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetNewTaskDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetNewPeeringTaskDtoResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskDeadlinesDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskDeadlinesDtoResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskMainInfoDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskMainInfoDtoResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskOverviewDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskOverviewDtoResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskStatisticsDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskStatisticsDtoResponse.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Models/PAToolsDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/PAToolsDbContext.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Models/Question.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Question.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Task.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Task.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Response.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Response.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Authentication/AuthenticationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Authentication/AuthenticationService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Authentication/IAuthenticationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Authentication/IAuthenticationService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Courses/CoursesService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Courses/CoursesService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Courses/ICoursesService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Courses/ICoursesService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Users/IUsersService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Users/IUsersService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Users/UsersService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Users/UsersService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Submission.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Submission.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Task-User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/PeeringTask-User.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Task.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/PeeringTask.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/Submissions/SubmissionsService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Submissions/SubmissionsService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Startup.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -190,6 +161,14 @@
       <workItem from="1638707810589" duration="3963000" />
       <workItem from="1638715471215" duration="5928000" />
     </task>
+    <task id="LOCAL-00001" summary="Added Submissions">
+      <created>1638997995427</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1638997995427</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -213,5 +192,7 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Added Submissions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Submissions" />
   </component>
 </project>

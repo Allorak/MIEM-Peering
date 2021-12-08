@@ -2,7 +2,7 @@ using System;
 
 namespace patools.Dtos.Task
 {
-    public class GetTaskMainInfoDtoResponse
+    public class GetPeeringTaskMainInfoDtoResponse
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

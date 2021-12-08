@@ -8,6 +8,6 @@ namespace patools.Models
         public Guid ID { get; set; }
         
         [Required]
-        public TaskUser TaskUserAssignment { get; set; }     
+        public PeeringTaskUser PeeringTaskUserAssignment { get; set; }     
     }
 }

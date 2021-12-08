@@ -16,10 +16,10 @@ namespace patools
             CreateMap<User, GetTeacherDtoResponse>();
             CreateMap<AddCourseDto, Course>();
             CreateMap<User,GetNewUserDtoResponse>();
-            CreateMap<Task,GetTaskDeadlinesDtoResponse>();
-            CreateMap<Task,GetNewTaskDtoResponse>();
+            CreateMap<PeeringTask,GetPeeringTaskDeadlinesDtoResponse>();
+            CreateMap<PeeringTask,GetNewPeeringTaskDtoResponse>();
             CreateMap<AddQuestionDto,Question>();
-            CreateMap<Task,GetTaskMainInfoDtoResponse>();
+            CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
         }
     }
 }
