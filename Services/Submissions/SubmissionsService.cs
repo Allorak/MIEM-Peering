@@ -34,7 +34,9 @@ namespace patools.Services.Submissions
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
                 return new InvalidGuidIdResponse<string>("The task isn't assigned to this user");
-
+            if (taskUser.State != PeeringTaskState.Assigned)
+                return new OperationErrorResponse<string>("The submission for this task already exists");
+            
             var newSubmission = new Submission()
             {
                 ID = Guid.NewGuid(),

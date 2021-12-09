@@ -5,32 +5,9 @@
     <projectFile profileName="patools">patools.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="Added Submissions">
-      <change afterPath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AutoMapperProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/AutoMapperProfile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/v1/CoursesController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/CoursesController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/v1/SubmissionsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/SubmissionsController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/v1/TasksController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/v1/PeeringTasksController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskMainInfoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskMainInfoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskQuestionFormDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskQuestionFormDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/AddTaskSettingsDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/AddPeeringTaskSettingsDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetCourseTasksDtoRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetCourseTasksDtoRequest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetNewTaskDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetNewPeeringTaskDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskDeadlinesDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskDeadlinesDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskMainInfoDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskMainInfoDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskOverviewDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskOverviewDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dtos/Task/GetTaskStatisticsDtoResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Dtos/PeeringTask/GetPeeringTaskStatisticsDtoResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/PAToolsDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/PAToolsDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Question.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Question.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Submission.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Submission.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Task-User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/PeeringTask-User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Task.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/PeeringTask.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="Renamed Task to PeeringTask">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Services/Submissions/SubmissionsService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Submissions/SubmissionsService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Startup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Startup.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +145,14 @@
       <option name="project" value="LOCAL" />
       <updated>1638997995427</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Renamed Task to PeeringTask">
+      <created>1638998549505</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1638998549505</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -193,6 +177,7 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Added Submissions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Submissions" />
+    <MESSAGE value="Renamed Task to PeeringTask" />
+    <option name="LAST_COMMIT_MESSAGE" value="Renamed Task to PeeringTask" />
   </component>
 </project>
