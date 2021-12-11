@@ -16,6 +16,7 @@ import { Works } from './works';
 import { Experts } from './experts';
 
 import * as globalStyles from "../../../../const/styles"
+import { Checkings } from './checkings';
 
 
 export const Dashboard: FC = () => {
@@ -84,7 +85,7 @@ export const Dashboard: FC = () => {
                 <Route path={paths.teacher.dashboard.export} element={<CourseMain />} />
                 <Route path={paths.teacher.dashboard.grades} element={<CourseMain />} />
                 <Route path={paths.teacher.dashboard.works} element={<Works />} />
-                <Route path={paths.teacher.dashboard.checkings} element={<CourseMain />} />
+                <Route path={paths.teacher.dashboard.checkings} element={<Checkings />} />
               </Routes>
             </Box>
           </Box>

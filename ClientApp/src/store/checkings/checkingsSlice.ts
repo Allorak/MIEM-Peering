@@ -1,20 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, ICatalog } from '../types';
+import { IError, ICatalog, IStudentWork } from '../types';
 
 
-export interface ICoursesState {
-  isLoading: boolean,
-  isLock: boolean,
+export interface ICheckingsState {
+  isListLoading: boolean,
+  isListLock: boolean,
+  isWorkLoading: boolean,
+  isWorkLock: boolean,
   error: IError | undefined,
   studentList: ICatalog[] | undefined,
+  studentWork: IStudentWork | undefined
 
 }
 
-const initialState: ICoursesState = {
-  isLoading: false,
+const initialState: ICheckingsState = {
+  isListLoading: false,
+  isWorkLoading: false,
   error: undefined,
-  isLock: true,
+  isListLock: true,
+  isWorkLock: true,
   studentList: undefined,
+  studentWork: undefined
 };
 
 export const checkings = createSlice({
@@ -22,22 +28,42 @@ export const checkings = createSlice({
   initialState,
   reducers: {
     fetchStudentListStarted: (state) => {
-      state.isLoading = true
-      state.isLock = true
+      state.isListLoading = true
+      state.isListLock = true
       state.error = undefined
+    },
+
+    fetchStudentWorkStarted: (state) => {
+      state.isWorkLoading = true
+      state.isWorkLock = true
+      state.error = undefined
+      state.studentWork = undefined
     },
 
     fetchStudentListSuccess: (state, { payload }: PayloadAction<Array<ICatalog>>) => {
-      state.isLoading = false
+      state.isListLoading = false
       state.error = undefined
-      state.isLock = false
+      state.isListLock = false
       state.studentList = JSON.parse(JSON.stringify(payload))
     },
 
-    fetchFailed: (state, { payload }: PayloadAction<IError>) => {
-      state.isLoading = false
+    fetchStudentWorkSuccess: (state, { payload }: PayloadAction<IStudentWork>) => {
+      state.isWorkLoading = false
+      state.error = undefined
+      state.isWorkLock = false
+      state.studentWork = JSON.parse(JSON.stringify(payload))
+    },
+
+    fetchListFailed: (state, { payload }: PayloadAction<IError>) => {
+      state.isListLoading = false
       state.error = payload
-      state.isLock = false
+      state.isListLock = false
+    },
+
+    fetchWorkFailed: (state, { payload }: PayloadAction<IError>) => {
+      state.isWorkLoading = false
+      state.error = payload
+      state.isWorkLock = false
     },
   },
 });

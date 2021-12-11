@@ -303,3 +303,24 @@ export interface ICatalog {
   id: string,
   name: string
 }
+
+
+/* Chickings */
+
+export interface IStudentWorkItem {
+  questionId: string,
+  order: number,
+  title: string,
+  required: boolean
+  response?: number | string
+}
+
+export interface IStudentWorkSelectItem extends IStudentWorkItem, ISelectRatingQuestion { }
+
+export interface IStudentWorkTextItem extends IStudentWorkItem, ITextQuestion { }
+
+export interface IStudentWorkShortTextItem extends IStudentWorkItem, IShortTextQuestion { }
+
+export interface IStudentWorkMultipleItem extends IStudentWorkItem, IMultipleQuiestion { }
+
+export type IStudentWork = Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
