@@ -1,15 +1,14 @@
 import { FC, useEffect } from "react"
-import { Box, SxProps, Theme } from "@mui/system"
+import { SxProps, Theme } from "@mui/system"
 
 import { Deadlines } from "../../../../../components/deadlines"
-import { StatusBar } from "../../../../../components/statusBar"
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
-import { fetchOverview } from "../../../../../store/overview";
+import { fetchOverviewStudent } from "../../../../../store/overviewStudent";
 
 
 export const Overview: FC = () => {
@@ -17,15 +16,15 @@ export const Overview: FC = () => {
   const dispatch = useAppDispatch()
   const { path } = usePrivatePathStDashboard()
 
-  const status = useAppSelector(state => state.overview.isLoading)
-  const error = useAppSelector(state => state.overview.error)
-  const payload = useAppSelector(state => state.overview.payload)
+  const status = useAppSelector(state => state.overviewStudent.isLoading)
+  const error = useAppSelector(state => state.overviewStudent.error)
+  const payload = useAppSelector(state => state.overviewStudent.payload)
 
   useEffect(() => {
     if (path && path.taskId)
-      dispatch(fetchOverview(path.taskId))
+      dispatch(fetchOverviewStudent(path.taskId))
   }, [])
-
+  console.log(payload)
   return (
     <DashboardWorkBox
       isLoading={status}
@@ -34,11 +33,6 @@ export const Overview: FC = () => {
       {payload && (
         <>
           <Deadlines {...payload.deadlines} />
-          <Box sx={styles.gridWrapper}>
-            <Box sx={styles.statusbarBox}>
-              <StatusBar {...payload.statistics} />
-            </Box>
-          </Box>
         </>
       )}
 

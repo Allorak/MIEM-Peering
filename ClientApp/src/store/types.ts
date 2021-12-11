@@ -261,6 +261,10 @@ export type IStatusBar = {
   review: number
 }
 
+export type IStatusTask = {
+  count: number
+}
+
 export type IOverview = {
   statistics: IStatusBar,
   deadlines: IDeadlines,
@@ -269,6 +273,7 @@ export type IOverview = {
 
 export type IOverviewStudent = {
   deadlines: IDeadlines,
+  status: IStatusTask
 }
 
 export type IWorkItem = {
