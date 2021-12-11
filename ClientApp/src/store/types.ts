@@ -267,6 +267,10 @@ export type IOverview = {
   grades: number[]
 }
 
+export type IOverviewStudent = {
+  deadlines: IDeadlines,
+}
+
 export type IWorkItem = {
   id: string,
   responses: IWorkResponse[],

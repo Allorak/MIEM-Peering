@@ -6,7 +6,8 @@ export interface ICoursesState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: IOverview
+  payload: IOverview,
+  studentPayload: IOverviewStudent
 }
 
 const initialState: ICoursesState = {
