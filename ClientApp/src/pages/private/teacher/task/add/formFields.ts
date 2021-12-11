@@ -79,8 +79,8 @@ export const dateRules: RegisterOptions = {
   }
 }
 
-export const maxSubmissionProps: UseControllerProps<INewTaskSettings, "maxSubmission"> = ({
-  name: "maxSubmission",
+export const maxSubmissionProps: UseControllerProps<INewTaskSettings, "submissionsToCheck"> = ({
+  name: "submissionsToCheck",
   rules: {
     required: {
       value: true,

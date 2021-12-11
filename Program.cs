@@ -232,27 +232,37 @@ namespace patools
                 new Question
                 {
                     ID = Guid.NewGuid(),
+                    Title = "Эссе о полезности",
                     Description = "Напишите эссе длиной не менее 300 символов на тему: \"Почему ООП полезно в промышленных предприятиях?\"",
-                    Type = Types.LongAnswer,
+                    Order = 0,
+                    Required = true,
+                    Type = QuestionTypes.Text,
+                    RespondentType = RespondentTypes.Author,
                     Task = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").First()
                 },
                 new Question
                 {
                     ID = Guid.NewGuid(),
+                    Title = "Пример приложений",
                     Description = "Приведите пример приложений, которыми Вы пользуютесь, использующих ООП",
-                    Type = Types.ShortAnswer,
+                    Order = 1,
+                    Required = false,
+                    Type = QuestionTypes.ShortText,
+                    RespondentType = RespondentTypes.Author,
                     Task = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").First()
                 },
                 new Question
                 {
                     ID = Guid.NewGuid(),
-                    Description = "В каком веке была открыта квантовая физика",
-                    Type = Types.MultipleChoices,
+                    Title = "В каком веке была открыта квантовая физика",
+                    Order = 0,
+                    Required = true,
+                    Type = QuestionTypes.MultipleChoices,
+                    RespondentType = RespondentTypes.Author,
                     Task = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").First()
                 },
 
             };
-
             return questions;
         }
 
@@ -264,31 +274,31 @@ namespace patools
                 {
                     ID = Guid.NewGuid(),
                     Content = "XV",
-                    Question = db.Questions.Where(question => question.Description == "В каком веке была открыта квантовая физика").First()
+                    Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
                     Content = "XIX",
-                    Question = db.Questions.Where(question => question.Description == "В каком веке была открыта квантовая физика").First()
+                    Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
                     Content = "XX",
-                    Question = db.Questions.Where(question => question.Description == "В каком веке была открыта квантовая физика").First()
+                    Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
                     Content = "XXI",
-                    Question = db.Questions.Where(question => question.Description == "В каком веке была открыта квантовая физика").First()
+                    Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
                     Content = "XVIII",
-                    Question = db.Questions.Where(question => question.Description == "В каком веке была открыта квантовая физика").First()
+                    Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 }
             };
 

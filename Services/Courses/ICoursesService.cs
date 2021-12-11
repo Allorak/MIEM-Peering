@@ -13,7 +13,10 @@ namespace patools.Services.Courses
     {
         Task<Response<List<GetCourseDTO>>> GetAllCourses();
         Task<Response<GetCourseDTO>> GetCourseById(Guid courseId);
+        Task<Response<List<GetCourseDTO>>> GetTeacherCourses(Guid teacherId);
+        Task<Response<List<GetCourseDTO>>> GetStudentCourses(Guid studentId);
         Task<Response<GetCourseDTO>> AddCourse(Guid teacherID, AddCourseDTO newCourse);
         Task<Response<string>> DeleteCourse(Guid teacherID, Guid courseId);
+
     }
 }
