@@ -56,7 +56,7 @@ export const AddCourseForm: FC = () => {
     const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
         event.preventDefault()
         dispatch(addCourse(course))
-    }, [dispatch])
+    }, [dispatch, course])
 
     const validate = (name: string, value: string): string | undefined => {
         switch (name) {

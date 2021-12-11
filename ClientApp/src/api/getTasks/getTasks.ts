@@ -13,12 +13,11 @@ export const getTasks = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks`,
+    url: `/api/v1/courses/${courseId}/tasks/get`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
-    },
-    data: courseId
+    }
   }
 
   if (isMock) {

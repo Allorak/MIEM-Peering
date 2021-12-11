@@ -12,6 +12,8 @@ namespace patools.Models
         [MaxLength(150)]
         public string Title { get; set; }
 
+        public string Description { get; set; }
+
         [DataType(DataType.Date)]
         [DisplayFormat
         (

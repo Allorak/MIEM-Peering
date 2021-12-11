@@ -5,7 +5,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.User;
 using patools.Models;
-
+using patools.Errors;
 namespace patools.Services.Users
 {
     public class UsersService : IUsersService
@@ -23,13 +23,8 @@ namespace patools.Services.Users
         {
             var response = new Response<GetNewUserDTO>();
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
-            if(existingUser != null)
-            {
-                response.Success = false;
-                response.Payload = null;
-                response.Error = new Error(-10912, "This email is already in use");
-                return response;
-            }
+            if (existingUser != null)
+                return new UserAlreadyRegisteredResponse<GetNewUserDTO>();
 
             await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
@@ -44,14 +39,9 @@ namespace patools.Services.Users
         {
             var response = new Response<GetRegisteredUserDTO>();
             var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
-            if(user == null)
-            {
-                response.Success = false;
-                response.Payload = null;
-                response.Error = new Error(-15,"User not found");
-                return response;
-            }
-
+            if (user == null)
+                return new InvalidGuidIdResponse<GetRegisteredUserDTO>("Invalid user id");
+            
             response.Success = true;
             response.Error = null;
             response.Payload = _mapper.Map<GetRegisteredUserDTO>(user);
@@ -60,11 +50,9 @@ namespace patools.Services.Users
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using(var hmac = new System.Security.Cryptography.HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
+            using var hmac = new System.Security.Cryptography.HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
     }
 }

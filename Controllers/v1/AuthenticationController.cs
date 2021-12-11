@@ -7,6 +7,7 @@ using patools.Dtos.User;
 using Microsoft.AspNetCore.Authentication;
 using patools.Services.Authentication;
 using System.Threading.Tasks;
+using patools.Errors;
 
 namespace patools.Controllers.v1
 {
@@ -24,7 +25,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpGet("getjwttoken")]
-        public async Task<ActionResult<Response<GetJWTTokenDTO>>> GetJWTToken([FromBody]GoogleTokenDTO userInfo)
+        public async Task<ActionResult<Response<GetJWTTokenDTO>>> GetJwtToken([FromBody]GoogleTokenDTO userInfo)
         {
             try
             {
@@ -46,6 +47,7 @@ namespace patools.Controllers.v1
         {
             try
             {
+                System.Console.WriteLine($"Google - {tokenInfo.GoogleToken}"); // TODO: remove after all the testing
                 var googleUser = await GoogleJsonWebSignature.ValidateAsync(tokenInfo.GoogleToken, new GoogleJsonWebSignature.ValidationSettings()
                 {
                     Audience = new[] {"232154519390-nlp3m4fjjeosrvo8gld3l6lo7cd2v3na.apps.googleusercontent.com"}

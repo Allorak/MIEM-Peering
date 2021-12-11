@@ -21,10 +21,10 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         review: 140
       },
       deadlines: {
-        sBegin: new Date(),
-        sEnd: new Date(),
-        rBegin: new Date(),
-        rEnd: new Date()
+        submissionStartDateTime: new Date(),
+        submissionEndDateTime: new Date(),
+        reviewStartDateTime: new Date(),
+        reviewEndDateTime: new Date()
       },
       grades: data.map(item => item)
 
