@@ -21,25 +21,27 @@ export const MultipleEditable: FC<IProps> = ({
 }) => {
 
   const handleRadioChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    if (value !== event.target.value) {
-      const filteredResponses = responses.filter(item => item.response === event.target.value)
-      if (filteredResponses && filteredResponses.length > 0) onEdit(event.target.value, id)
-    }
+    onEdit(event.target.value, id)
+    // if (value !== event.target.value) {
+      // const filteredResponses = responses.filter(item => item.response === event.target.value)
+      // if (filteredResponses && filteredResponses.length > 0) onEdit(event.target.value, id)
+    // }
   }, [])
 
   return (
     <RadioGroup
-      value={value}
+      defaultValue={value}
       onChange={handleRadioChange}
+      name={id}
     >
       {responses.map((item, index) => (
         <FormControlLabel
-          key={item.id}
+          key={`${id}+${index}`}
           sx={styles.root}
-          id={item.id.toString()}
+          id={`${id}+${index}`}
           value={item.response}
           control={
-            <Radio value={item.response} />
+            <Radio/>
           }
           label={
             <Typography variant={'h6'}>
