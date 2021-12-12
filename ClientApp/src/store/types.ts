@@ -312,10 +312,12 @@ export interface IStudentWorkItem {
   order: number,
   title: string,
   required: boolean
-  response?: number | string
+  response?: string
 }
 
-export interface IStudentWorkSelectItem extends IStudentWorkItem, ISelectRatingQuestion { }
+export interface IStudentWorkSelectItem extends Omit<IStudentWorkItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
 
 export interface IStudentWorkTextItem extends IStudentWorkItem, ITextQuestion { }
 
@@ -324,3 +326,23 @@ export interface IStudentWorkShortTextItem extends IStudentWorkItem, IShortTextQ
 export interface IStudentWorkMultipleItem extends IStudentWorkItem, IMultipleQuiestion { }
 
 export type IStudentWork = Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+
+export interface IPeerFormItem {
+  id: string,
+  order: number,
+  required: boolean,
+  title: string,
+  response?: string
+}
+
+export interface IPeerFormSelectItem extends Omit<IPeerFormItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
+
+export interface IPeerFormTextItem extends IPeerFormItem, ITextQuestion { }
+
+export interface IPeerFormShortTextItem extends IPeerFormItem, IShortTextQuestion { }
+
+export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion { }
+
+export type IPeerForm = Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>

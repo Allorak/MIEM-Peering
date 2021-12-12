@@ -13,6 +13,9 @@ import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
 
 import * as globalStyles from "../../../../../const/styles"
+import { fetchPeerForm } from "../../../../../store/checkings/thunks/fetchPeerForm";
+import { CheckingsForm } from "./CheckingForm";
+import { IPeerForm, IQuestionTypes } from "../../../../../store/types";
 
 export const Checkings: FC = () => {
 
@@ -24,39 +27,66 @@ export const Checkings: FC = () => {
   const lockList = useAppSelector(state => state.checkings.isListLock)
   const statusStudentWork = useAppSelector(state => state.checkings.isWorkLoading)
   const lockStudentWork = useAppSelector(state => state.checkings.isListLoading)
+  const statusPeerForm = useAppSelector(state => state.checkings.isPeerFormLoading)
+  const lockPeerForm = useAppSelector(state => state.checkings.isPeerFormLock)
   const error = useAppSelector(state => state.checkings.error)
 
   const studentList = useAppSelector(state => state.checkings.studentList)
   const studentWork = useAppSelector(state => state.checkings.studentWork)
+  const peerForm = useAppSelector(state => state.checkings.peerForm)
 
   const [currentStudent, setCurrentStudent] = useState<string | undefined>()
+  const [responses, setResponses] = useState<IPeerForm>()
 
   useEffect(() => {
     if (path && path.taskId) {
       dispatch(fetchStudentList(path.taskId))
+      dispatch(fetchPeerForm(path.taskId))
     }
-    console.log("!")
   }, [])
+
+  useEffect(() => {
+    if (peerForm && peerForm.length > 0) {
+      setResponses(JSON.parse(JSON.stringify(peerForm)))
+    }
+  }, [peerForm, setResponses])
+
+  const getStudentWork = useCallback((studentId: string) => {
+    if (path && path.taskId)
+      dispatch(fetchStudentWork(path.taskId, studentId))
+  }, [path])
 
   useEffect(() => {
     if (!currentStudent && studentList && studentList.length > 0 && currentStudent !== studentList[0].id) {
       setCurrentStudent(studentList[0].id)
       getStudentWork(studentList[0].id)
     }
-  }, [studentList])
+  }, [peerForm])
 
   const handleStudentChange = useCallback((studentId: string) => {
-    console.log(currentStudent !== studentId)
     if (currentStudent !== studentId) {
       setCurrentStudent(studentId)
       getStudentWork(studentId)
+      if (path && path.taskId) {
+        setResponses(undefined)
+        dispatch(fetchPeerForm(path.taskId))
+      }
     }
   }, [])
 
-  const getStudentWork = useCallback((studentId: string) => {
-    if (path && path.taskId)
-      dispatch(fetchStudentWork(path.taskId, studentId))
-  }, [path])
+  const handleOnFormEdit = useCallback((value: string | number, questionId: string) => {
+    console.log(questionId, value)
+    if (responses && responses.length > 0) {
+      const filtered = responses.map(item => {
+        if (item.id !== questionId) return item
+        if (item.type === IQuestionTypes.SELECT_RATE && typeof value === 'number')
+          return { ...item, response: value }
+        if (item.type !== IQuestionTypes.SELECT_RATE && typeof value === 'string')
+          return { ...item, response: value }
+      })
+      if (filtered && filtered.length > 0) setResponses(JSON.parse(JSON.stringify(filtered)))
+    }
+  }, [responses])
 
   return (
     <DashboardWorkBox
@@ -86,8 +116,18 @@ export const Checkings: FC = () => {
             </Box>
 
             <Box sx={styles.formContainer}>
-              <Box sx={{ height: "530px", backgroundColor: "pink" }}></Box>
-
+              <DashboardWorkBox
+                isLoading={statusPeerForm}
+                isLock={lockPeerForm}
+                error={error}
+              >
+                {responses && responses.length > 0 && (
+                  <CheckingsForm
+                    peerForm={responses}
+                    onResponseeEdit={handleOnFormEdit}
+                  />
+                )}
+              </DashboardWorkBox>
             </Box>
           </Box>
         </Box>

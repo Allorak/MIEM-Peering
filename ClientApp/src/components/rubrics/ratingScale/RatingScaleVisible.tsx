@@ -3,7 +3,7 @@ import { MenuItem, Select, Tooltip } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
 interface IProps {
-  response?: string
+  response?: number
   isResponse?: boolean,
 }
 

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, ICatalog, IStudentWork } from '../types';
+import { IError, ICatalog, IStudentWork, IPeerForm } from '../types';
 
 
 export interface ICheckingsState {
@@ -7,20 +7,25 @@ export interface ICheckingsState {
   isListLock: boolean,
   isWorkLoading: boolean,
   isWorkLock: boolean,
+  isPeerFormLoading: boolean,
+  isPeerFormLock: boolean,
   error: IError | undefined,
   studentList: ICatalog[] | undefined,
-  studentWork: IStudentWork | undefined
-
+  studentWork: IStudentWork | undefined,
+  peerForm: IPeerForm | undefined
 }
 
 const initialState: ICheckingsState = {
   isListLoading: false,
   isWorkLoading: false,
+  isPeerFormLoading: false,
   error: undefined,
   isListLock: true,
   isWorkLock: true,
+  isPeerFormLock: true,
   studentList: undefined,
-  studentWork: undefined
+  studentWork: undefined,
+  peerForm: undefined
 };
 
 export const checkings = createSlice({
@@ -31,6 +36,7 @@ export const checkings = createSlice({
       state.isListLoading = true
       state.isListLock = true
       state.error = undefined
+      state.studentList = undefined
     },
 
     fetchStudentWorkStarted: (state) => {
@@ -38,6 +44,13 @@ export const checkings = createSlice({
       state.isWorkLock = true
       state.error = undefined
       state.studentWork = undefined
+    },
+
+    fetchPeerFormStarted: (state) => {
+      state.isPeerFormLoading = true
+      state.isPeerFormLock = true
+      state.error = undefined
+      state.peerForm = undefined
     },
 
     fetchStudentListSuccess: (state, { payload }: PayloadAction<Array<ICatalog>>) => {
@@ -54,6 +67,13 @@ export const checkings = createSlice({
       state.studentWork = JSON.parse(JSON.stringify(payload))
     },
 
+    fetchPeerFormSuccess: (state, { payload }: PayloadAction<IPeerForm>) => {
+      state.isPeerFormLoading = false
+      state.error = undefined
+      state.isPeerFormLock = false
+      state.peerForm = JSON.parse(JSON.stringify(payload))
+    },
+
     fetchListFailed: (state, { payload }: PayloadAction<IError>) => {
       state.isListLoading = false
       state.error = payload
@@ -64,6 +84,12 @@ export const checkings = createSlice({
       state.isWorkLoading = false
       state.error = payload
       state.isWorkLock = false
+    },
+
+    fetchPeerFormFailed: (state, { payload }: PayloadAction<IError>) => {
+      state.isPeerFormLoading = false
+      state.error = payload
+      state.isPeerFormLock = false
     },
   },
 });
