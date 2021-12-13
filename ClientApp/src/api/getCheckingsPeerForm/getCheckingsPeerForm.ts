@@ -13,7 +13,7 @@ export const getCheckingsPeerForm = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/${taskId}`,
+    url: `/api/v1/tasks/${taskId}/peerform/get`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

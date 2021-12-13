@@ -354,7 +354,9 @@ export interface IPeerFormShortTextItem extends IPeerFormItem, IShortTextQuestio
 
 export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion { }
 
-export type IPeerForm = Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
+export type IPeerForm = {
+  rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
+}
 
 export type IPeerResponseItem = {
   questionId: string,

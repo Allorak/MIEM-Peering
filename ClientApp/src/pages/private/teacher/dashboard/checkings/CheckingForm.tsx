@@ -24,14 +24,14 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
 
   const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
-    for (const item of peerForm) {
+    for (const item of peerForm.rubrics) {
       if (item.required && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
         console.log(item, "!", typeof item.response === 'undefined')
         return
       }
     }
     const formResponses: IPeerResponses = {
-      responses: peerForm.map(response => {
+      responses: peerForm.rubrics.map(response => {
         if (response.response !== undefined)
           return { questionId: response.id, response: typeof response.response === 'string' ? response.response.trim() : response.response }
         return { questionId: response.id }
@@ -46,7 +46,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
       component={'form'}
       onSubmit={submitForm}
     >
-      {peerForm.map((item, index) => (
+      {peerForm.rubrics.map((item, index) => (
         <AnswerBox
           id={index}
           key={item.id}

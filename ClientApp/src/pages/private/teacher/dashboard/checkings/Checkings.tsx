@@ -7,9 +7,7 @@ import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePat
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
-import { actions, createReview, fetchStudentWork } from "../../../../../store/checkings";
-import { fetchStudentList } from "../../../../../store/checkings/thunks/fetchStudentList";
-import { fetchPeerForm } from "../../../../../store/checkings/thunks/fetchPeerForm";
+import { actions, createReview, fetchStudentWork, fetchStudentList, fetchPeerForm } from "../../../../../store/checkings";
 
 import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
@@ -51,11 +49,7 @@ export const Checkings: FC = () => {
   }, [])
 
   useEffect(() => {
-    console.log("Responses:", responses)
-  }, [responses])
-
-  useEffect(() => {
-    if (peerForm && peerForm.length > 0) {
+    if (peerForm && peerForm.rubrics && peerForm.rubrics.length > 0) {
       setResponses(JSON.parse(JSON.stringify(peerForm)))
     }
   }, [peerForm])
@@ -85,14 +79,16 @@ export const Checkings: FC = () => {
 
   const handleOnFormEdit = useCallback((value: string | number | undefined, questionId: string) => {
     setResponses(prev => {
-      if (prev && prev.length > 0) {
-        return JSON.parse(JSON.stringify(prev.map(item => {
-          if (item.id !== questionId) return item
-          if (item.type === IQuestionTypes.SELECT_RATE && (typeof value === 'number' || typeof value === 'undefined'))
-            return { ...item, response: value }
-          if (item.type !== IQuestionTypes.SELECT_RATE && (typeof value === 'string' || typeof value === 'undefined'))
-            return { ...item, response: value }
-        })))
+      if (prev && prev.rubrics && prev.rubrics.length > 0) {
+        return {
+          rubrics: JSON.parse(JSON.stringify(prev.rubrics.map(item => {
+            if (item.id !== questionId) return item
+            if (item.type === IQuestionTypes.SELECT_RATE && (typeof value === 'number' || typeof value === 'undefined'))
+              return { ...item, response: value }
+            if (item.type !== IQuestionTypes.SELECT_RATE && (typeof value === 'string' || typeof value === 'undefined'))
+              return { ...item, response: value }
+          })))
+        }
       }
     })
   }, [responses])
@@ -139,7 +135,7 @@ export const Checkings: FC = () => {
                   isLock={lockPeerForm}
                   error={error}
                 >
-                  {responses && responses.length > 0 && (
+                  {responses && responses.rubrics && responses.rubrics.length > 0 && (
                     <CheckingsForm
                       peerForm={responses}
                       onSubmit={onRequest}
