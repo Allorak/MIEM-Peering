@@ -278,6 +278,16 @@ export type IOverviewStudent = {
   status: IStatusTask
 }
 
+export type IOverviewResponse = IOverview & {
+  deadlines: {
+    submissionStartDateTime: string
+    submissionEndDateTime: string
+    reviewStartDateTime: string
+    reviewEndDateTime: string
+  }
+}
+
+
 export type IWorkItem = {
   id: string,
   responses: IWorkResponse[],
