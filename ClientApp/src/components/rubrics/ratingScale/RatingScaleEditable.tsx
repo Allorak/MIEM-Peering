@@ -6,7 +6,7 @@ import { FormReValidateMode, FormValidateMode } from "../../../const/common";
 
 interface IProps {
   value?: number
-  onEdit: (value: number, id: string) => void,
+  onEdit: (value: number | undefined, id: string) => void,
   required: boolean,
   id: string,
   minValue: number,
@@ -50,6 +50,7 @@ export const RatingScaleEditable: FC<IProps> = ({
   })
 
   const handleOnChange = useCallback((e: SelectChangeEvent<unknown>) => {
+    if (!required && typeof e.target.value === 'undefined') onEdit(undefined, id)
     if (!isNaN(Number(e.target.value)) && valueProps.value !== Number(e.target.value)) {
       const filtered = rates.filter(rate => (rate === Number(e.target.value)))
       if (filtered && filtered.length > 0) onEdit(Number(e.target.value), id)
@@ -66,7 +67,7 @@ export const RatingScaleEditable: FC<IProps> = ({
         onChange={handleOnChange}
       >
         {!required && (
-          <MenuItem value={''}>{"-"}</MenuItem>
+          <MenuItem>{"-"}</MenuItem>
         )}
         {rates.map(rate => (
           <MenuItem value={rate}>{rate}</MenuItem>

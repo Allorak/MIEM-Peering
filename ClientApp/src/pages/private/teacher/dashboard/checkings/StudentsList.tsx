@@ -3,11 +3,11 @@ import { Box } from "@mui/system"
 import { SelectChangeEvent } from "@mui/material"
 
 import { TextSelect } from "../../../../../components/textSelect"
-import { ICatalog } from "../../../../../store/types"
+import { IStudentList } from "../../../../../store/types"
 
 interface IProps {
   selectedStudentId: string
-  studentsList: ICatalog[]
+  studentsList: IStudentList
   onStudentChange: (id: string) => void
 }
 
@@ -25,7 +25,7 @@ export const StudentsListSelect: FC<IProps> = ({
     <Box>
       <TextSelect
         value={selectedStudentId}
-        items={studentsList}
+        items={studentsList.students.map(student => ({ id: student.id, name: student.fullName }))}
         onChange={handleStudentChange}
       />
     </Box>

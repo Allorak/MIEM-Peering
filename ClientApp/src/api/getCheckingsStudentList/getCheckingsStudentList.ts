@@ -13,7 +13,7 @@ export const getCheckingsStudentList = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/${taskId}`,
+    url: `/api/v1/tasks/${taskId}/checkings/students/get`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

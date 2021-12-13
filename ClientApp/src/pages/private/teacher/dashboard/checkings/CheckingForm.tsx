@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { Box, Button, Theme } from "@mui/material";
 import { SxProps } from "@mui/system";
 
@@ -9,21 +9,36 @@ import { RatingScaleEditable } from "../../../../../components/rubrics/ratingSca
 import { ShortTextEditable } from "../../../../../components/rubrics/shortText";
 import { TextEditable } from "../../../../../components/rubrics/text";
 
-import { IPeerForm, IQuestionTypes } from "../../../../../store/types";
+import { IPeerForm, IQuestionTypes, IPeerResponses } from "../../../../../store/types";
 
 
 import * as globalStyles from "../../../../../const/styles";
 
 interface IProps {
   peerForm: IPeerForm,
-  onResponseeEdit: (value: string | number, questionId: string) => void
+  onSubmit: (formResponses: IPeerResponses) => void
+  onEdit: (value: string | number | undefined, questionId: string) => void
 }
 
-export const CheckingsForm: FC<IProps> = ({ peerForm, onResponseeEdit }) => {
+export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
 
   const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
-  }, [])
+    for (const item of peerForm) {
+      if (item.required && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
+        console.log(item, "!", typeof item.response === 'undefined')
+        return
+      }
+    }
+    const formResponses: IPeerResponses = {
+      responses: peerForm.map(response => {
+        if (response.response !== undefined)
+          return { questionId: response.id, response: typeof response.response === 'string' ? response.response.trim() : response.response }
+        return { questionId: response.id }
+      })
+    }
+    onSubmit(formResponses)
+  }, [peerForm])
 
   return (
     <Box
@@ -31,9 +46,9 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onResponseeEdit }) => {
       component={'form'}
       onSubmit={submitForm}
     >
-      {peerForm.map(item => (
+      {peerForm.map((item, index) => (
         <AnswerBox
-          id={item.order}
+          id={index}
           key={item.id}
           title={item.title}
           required={item.required}
@@ -44,7 +59,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onResponseeEdit }) => {
                 id={item.id}
                 required={item.required}
                 value={item.response}
-                onEdit={onResponseeEdit}
+                onEdit={onEdit}
               />
             )}
 
@@ -53,7 +68,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onResponseeEdit }) => {
                 id={item.id}
                 required={item.required}
                 value={item.response}
-                onEdit={onResponseeEdit}
+                onEdit={onEdit}
               />
             )}
 
@@ -61,7 +76,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onResponseeEdit }) => {
               <MultipleEditable
                 id={item.id}
                 required={item.required}
-                onEdit={onResponseeEdit}
+                onEdit={onEdit}
                 value={item.response}
                 responses={JSON.parse(JSON.stringify(item.responses))}
               />
@@ -71,7 +86,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onResponseeEdit }) => {
               <RatingScaleEditable
                 id={item.id}
                 required={item.required}
-                onEdit={onResponseeEdit}
+                onEdit={onEdit}
                 value={item.response}
                 maxValue={item.maxValue}
                 minValue={item.minValue}
@@ -81,7 +96,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onResponseeEdit }) => {
         </AnswerBox>
       ))}
 
-      <Box sx={{...globalStyles.submitBtContainer, ...{marginTop: "20px"}}}>
+      <Box sx={{ ...globalStyles.submitBtContainer, ...{ marginTop: "20px" } }}>
         <Button
           type='submit'
           variant='contained'

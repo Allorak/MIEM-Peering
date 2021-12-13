@@ -307,6 +307,13 @@ export interface ICatalog {
 
 /* Chickings */
 
+export interface IStudentList {
+  students: Array<{
+    id: string,
+    fullName: string
+  }>
+}
+
 export interface IStudentWorkItem {
   questionId: string,
   order: number,
@@ -325,7 +332,9 @@ export interface IStudentWorkShortTextItem extends IStudentWorkItem, IShortTextQ
 
 export interface IStudentWorkMultipleItem extends IStudentWorkItem, IMultipleQuiestion { }
 
-export type IStudentWork = Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+export type IStudentWork = {
+  responses: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+}
 
 export interface IPeerFormItem {
   id: string,
@@ -346,3 +355,12 @@ export interface IPeerFormShortTextItem extends IPeerFormItem, IShortTextQuestio
 export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion { }
 
 export type IPeerForm = Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
+
+export type IPeerResponseItem = {
+  questionId: string,
+  response?: string | number
+}
+
+export type IPeerResponses = {
+  responses: Array<IPeerResponseItem>
+}

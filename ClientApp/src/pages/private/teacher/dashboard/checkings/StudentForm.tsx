@@ -19,7 +19,7 @@ export const StudentWork: FC<IProps> = ({
   studentWork
 }) => {
 
-  const sorted = studentWork
+  const sorted = studentWork.responses
 
   return (
     <Box sx={styles.wrapper}>

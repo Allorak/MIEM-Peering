@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, ICatalog, IStudentWork, IPeerForm } from '../types';
+import { IError, IStudentList, IStudentWork, IPeerForm } from '../types';
 
 
 export interface ICheckingsState {
@@ -7,20 +7,24 @@ export interface ICheckingsState {
   isListLock: boolean,
   isWorkLoading: boolean,
   isWorkLock: boolean,
+  isAddReviewLoading: boolean,
+  isAddReviewLock: boolean,
   isPeerFormLoading: boolean,
   isPeerFormLock: boolean,
   error: IError | undefined,
-  studentList: ICatalog[] | undefined,
+  studentList: IStudentList | undefined,
   studentWork: IStudentWork | undefined,
   peerForm: IPeerForm | undefined
 }
 
 const initialState: ICheckingsState = {
   isListLoading: false,
+  isAddReviewLoading: false,
   isWorkLoading: false,
   isPeerFormLoading: false,
   error: undefined,
   isListLock: true,
+  isAddReviewLock: false,
   isWorkLock: true,
   isPeerFormLock: true,
   studentList: undefined,
@@ -39,6 +43,12 @@ export const checkings = createSlice({
       state.studentList = undefined
     },
 
+    createReviewStarted: (state) => {
+      state.isAddReviewLoading = true
+      state.isAddReviewLock = true
+      state.error = undefined
+    },
+
     fetchStudentWorkStarted: (state) => {
       state.isWorkLoading = true
       state.isWorkLock = true
@@ -53,11 +63,17 @@ export const checkings = createSlice({
       state.peerForm = undefined
     },
 
-    fetchStudentListSuccess: (state, { payload }: PayloadAction<Array<ICatalog>>) => {
+    fetchStudentListSuccess: (state, { payload }: PayloadAction<IStudentList>) => {
       state.isListLoading = false
       state.error = undefined
       state.isListLock = false
       state.studentList = JSON.parse(JSON.stringify(payload))
+    },
+
+    createReviewSuccess: (state) => {
+      state.isAddReviewLoading = false
+      state.isAddReviewLock = false
+      state.error = undefined
     },
 
     fetchStudentWorkSuccess: (state, { payload }: PayloadAction<IStudentWork>) => {
@@ -80,6 +96,12 @@ export const checkings = createSlice({
       state.isListLock = false
     },
 
+    createReviewFailed: (state, { payload }: PayloadAction<IError>) => {
+      state.isAddReviewLoading = false
+      state.isAddReviewLock = false
+      state.error = payload
+    },
+
     fetchWorkFailed: (state, { payload }: PayloadAction<IError>) => {
       state.isWorkLoading = false
       state.error = payload
@@ -91,6 +113,20 @@ export const checkings = createSlice({
       state.error = payload
       state.isPeerFormLock = false
     },
+    reset: (state) => {
+      state.isListLoading = false
+      state.isAddReviewLoading = false
+      state.isWorkLoading = false
+      state.isPeerFormLoading = false
+      state.error = undefined
+      state.isListLock = true
+      state.isAddReviewLock = false
+      state.isWorkLock = true
+      state.isPeerFormLock = true
+      state.studentList = undefined
+      state.studentWork = undefined
+      state.peerForm = undefined
+    }
   },
 });
 

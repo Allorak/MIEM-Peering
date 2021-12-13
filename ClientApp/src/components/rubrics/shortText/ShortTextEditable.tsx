@@ -3,7 +3,7 @@ import { TextField } from "@mui/material";
 
 interface IProps {
   value?: string
-  onEdit: (value: string, id: string) => void,
+  onEdit: (value: string | undefined, id: string) => void,
   required: boolean,
   id: string
 }
@@ -11,7 +11,7 @@ interface IProps {
 export const ShortTextEditable: FC<IProps> = ({ value, onEdit, required, id }) => {
 
   const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    onEdit(e.target.value, id)
+    onEdit(e.target.value ? e.target.value : undefined, id)
   }, [])
 
   return (
