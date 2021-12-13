@@ -35,8 +35,8 @@ export const fetchCourses = (): AppThunk => async (dispatch, getState) => {
                 id: course.id,
                 name: course.title,
                 subject: course.subject,
-                adminImageUrl: course.imageUrl,
-                adminName: course.fullname,
+                adminImageUrl: course.teacher.imageUrl,
+                adminName: course.teacher.fullname,
                 description: course.description
             } as ICourses))))))
         return

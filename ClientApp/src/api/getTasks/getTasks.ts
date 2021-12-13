@@ -9,16 +9,15 @@ export const getTasks = async ({
   courseId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks`,
+    url: `/api/v1/courses/${courseId}/tasks/get`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
-    },
-    data: courseId
+    }
   }
 
   if (isMock) {

@@ -25,6 +25,8 @@ export const TestPage: FC = () => {
     )
 }
 
+console.log(new Date("2021-12-10T20:59:00.913").toDateString(), "TTT")
+
 const styles = {
     boxCon: {
         backdropFilter: 'blur(2px)',
