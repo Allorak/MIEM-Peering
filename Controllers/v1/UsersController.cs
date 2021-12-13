@@ -25,7 +25,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("google/add")]
-        public async Task<ActionResult<GetNewUserDTO>> AddGoogleUser(AddGoogleUserDTO newUser)
+        public async Task<ActionResult<GetNewUserDtoResponse>> AddGoogleUser(AddGoogleUserDTO newUser)
         {
             try
             {
@@ -34,9 +34,8 @@ namespace patools.Controllers.v1
                     Audience = new[] {"232154519390-nlp3m4fjjeosrvo8gld3l6lo7cd2v3na.apps.googleusercontent.com"}
                 });
 
-                var user = new User()
+                var user = new AddUserDTO()
                 {
-                    ID = Guid.NewGuid(),
                     Email = googleUser.Email,
                     Fullname = googleUser.Name,
                     Role = newUser.Role,
@@ -52,7 +51,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpGet("get")]
-        public async Task<ActionResult<GetRegisteredUserDTO>> GetUserProfile()
+        public async Task<ActionResult<GetRegisteredUserDtoResponse>> GetUserProfile()
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());

@@ -25,8 +25,5 @@ namespace patools.Models
 
         [Required]
         public string Subject { get; set; }
-
-        public List<Task> Tasks { get; set; }
-        public List<CourseUser> CourseUsers { get; set; }
     }
 }

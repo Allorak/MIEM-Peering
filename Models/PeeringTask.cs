@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace patools.Models
 {
-    public class Task
+    public class PeeringTask
     {
         public Guid ID { get; set; }
 
@@ -56,7 +56,5 @@ namespace patools.Models
         [Required]
         public Course Course { get; set; }
 
-        public List<Question> Questions { get; set; }
-        public List<TaskUser> TaskUsers { get; set; }
     }
 }

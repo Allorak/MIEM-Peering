@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace patools.Models
@@ -49,7 +50,6 @@ namespace patools.Models
         public int MaxValue { get; set; }
 
         [Required]
-        public Task Task { get; set; }
-        public List<Variant> Variants { get; set; }
+        public PeeringTask PeeringTask { get; set; }
     }
 }

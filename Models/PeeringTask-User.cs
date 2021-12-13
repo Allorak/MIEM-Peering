@@ -6,24 +6,24 @@ using System.Text.Json.Serialization;
 namespace patools.Models
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum TaskState
+    public enum PeeringTaskState
     {
         Assigned = 0,
         Checking = 1,
         Graded = 2
     }
 
-    public class TaskUser
+    public class PeeringTaskUser
     {
         public Guid ID { get; set; }
 
         [Required]
-        public Task Task { get; set; }
+        public PeeringTask PeeringTask { get; set; }
 
         [Required]
         public User Student { get; set; }
 
         [Required]
-        public TaskState State { get; set; }
+        public PeeringTaskState State { get; set; }
     }
 }
