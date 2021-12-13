@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import { Theme, Box } from "@mui/material";
+import { Theme, Box, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
@@ -124,7 +124,15 @@ export const Checkings: FC = () => {
                   error={error}
                 >
                   {studentWork && studentWork.responses && studentWork.responses.length > 0 && (
-                    <StudentWork studentWork={studentWork} />
+                    <>
+                      <Typography
+                        variant={"h6"}
+                        sx={styles.subTitle}
+                      >
+                        {"Форма с ответами:"}
+                      </Typography>
+                      <StudentWork studentWork={studentWork} />
+                    </>
                   )}
                 </DashboardWorkBox>
               </Box>
@@ -136,11 +144,19 @@ export const Checkings: FC = () => {
                   error={error}
                 >
                   {responses && responses.rubrics && responses.rubrics.length > 0 && (
-                    <CheckingsForm
-                      peerForm={responses}
-                      onSubmit={onRequest}
-                      onEdit={handleOnFormEdit}
-                    />
+                    <>
+                      <Typography
+                        variant={"h6"}
+                        sx={styles.subTitle}
+                      >
+                        {"Форма для оценивания:"}
+                      </Typography>
+                      <CheckingsForm
+                        peerForm={responses}
+                        onSubmit={onRequest}
+                        onEdit={handleOnFormEdit}
+                      />
+                    </>
                   )}
                 </DashboardWorkBox>
               </Box>
@@ -169,11 +185,29 @@ const styles = {
   formWrapper: {
     display: "flex",
     gap: "10px",
+    '@media (max-width: 900px)': {
+      flexDirection: "column",
+      gap: "0px",
+    }
   } as SxProps<Theme>,
   formContainer: {
     flex: "0 1 50%",
     maxHeight: "calc(100vh - 183px - 70px)",
     overflowY: "auto",
-    ...globalStyles.scrollStyles
+    ...globalStyles.scrollStyles,
+    '@media (max-width: 900px)': {
+      flex: "0 0 100%",
+      maxHeight: "unset",
+    }
+  } as SxProps<Theme>,
+  subTitle: {
+    color: "#5A7180",
+    margin: "15px 0px 7px 0px",
+    '@media (min-width: 900px)': {
+      display: "none",
+      opacity: 0,
+      width: "0px",
+      height: "0px"
+    }
   } as SxProps<Theme>,
 }
