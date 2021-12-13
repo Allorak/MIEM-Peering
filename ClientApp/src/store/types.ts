@@ -251,7 +251,10 @@ export enum IMenuTitles {
   CHECKINGS = 'Проверки',
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
-  EXPORT = 'Экспорт'
+  EXPORT = 'Экспорт',
+  MENU_1 = 'Меню 1',
+  MENU_2 = 'Меню 2',
+  MENU_3 = 'Меню 3'
 }
 
 export type IStatusBar = {
@@ -260,10 +263,19 @@ export type IStatusBar = {
   review: number
 }
 
+export type IStatusTask = {
+  count: number
+}
+
 export type IOverview = {
   statistics: IStatusBar,
   deadlines: IDeadlines,
   grades: number[]
+}
+
+export type IOverviewStudent = {
+  deadlines: IDeadlines,
+  status: IStatusTask
 }
 
 export type IOverviewResponse = IOverview & {
@@ -274,6 +286,7 @@ export type IOverviewResponse = IOverview & {
     reviewEndDateTime: string
   }
 }
+
 
 export type IWorkItem = {
   id: string,

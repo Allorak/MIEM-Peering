@@ -6,6 +6,7 @@ import { Box } from '@mui/system'
 import { usePrivatePathSt } from '../../../app/hooks/usePrivatePathSt'
 import { STCourseList as CourseList } from './course/list'
 import { CourseMain } from './course/main'
+import { Dashboard } from './dashboard/Dashboard'
 
 
 
@@ -64,6 +65,7 @@ export function StudentPrivate() {
             <Routes>
                 <Route path={paths.student.main} element={<CourseList />} />
                 <Route path={paths.student.courses.course} element={<CourseMain />} />
+                <Route path={"*"} element={<Dashboard />} />
             </Routes>
         </Box>
 
