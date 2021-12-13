@@ -50,9 +50,6 @@ namespace patools.Controllers.v1
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
 
-            if(!User.IsInRole(UserRoles.Student.ToString()))
-                return Ok(new IncorrectUserRoleResponse());
-            
             //The user has no id Claim
             var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if(studentIdClaim == null)
