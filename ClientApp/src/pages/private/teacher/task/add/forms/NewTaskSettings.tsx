@@ -2,7 +2,7 @@
 import { FC } from "react";
 import { Controller, useController, useForm } from "react-hook-form";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { SxProps, Theme } from "@mui/system";
+import { display, SxProps, Theme } from "@mui/system";
 import DateAdapter from '@mui/lab/AdapterDateFns';
 import { LocalizationProvider, MobileDatePicker, TimePicker } from "@mui/lab";
 import ruLocale from "date-fns/locale/ru";
@@ -10,7 +10,7 @@ import ruLocale from "date-fns/locale/ru";
 import { InputLabel } from "../../../../../../components/inputLabel";
 
 import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
-import { INewTaskSettings } from "../../../../../../store/types";
+import { IFirstStepSettings, INewTaskSettings, PeerSteps } from "../../../../../../store/types";
 
 import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
@@ -284,7 +284,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
         </Box>
       </Box>
 
-      <Box sx={{...globalStyles.submitBtContainer, my: "15px"}}>
+      <Box sx={{ ...globalStyles.submitBtContainer, marginTop: "15px" }}>
         <Button
           type='submit'
           variant='contained'
@@ -297,26 +297,43 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
 }
 
 const initialValue = (): INewTaskSettings => {
-  const taskSettings = {
-    submissionStartDateTime: new Date(),
-    submissionEndDateTime: new Date(new Date().setDate(new Date().getDate() + 1)),
-    reviewStartDateTime: new Date(new Date().setDate(new Date().getDate() + 3)),
-    reviewEndDateTime: new Date(new Date().setDate(new Date().getDate() + 4)),
-    submissionsToCheck: 2
+  var submissionStartDateTime = new Date()
+  submissionStartDateTime.setHours(23, 59, 0)
+
+  var submissionEndDateTime = new Date()
+  submissionEndDateTime.setDate(submissionStartDateTime.getDate() + 1)
+  submissionEndDateTime.setHours(23, 59, 0)
+
+  var reviewStartDateTime = new Date()
+  reviewStartDateTime.setDate(submissionStartDateTime.getDate() + 3)
+  reviewStartDateTime.setHours(23, 59, 0)
+
+  var reviewEndDateTime = new Date()
+  reviewEndDateTime.setDate(submissionStartDateTime.getDate() + 4)
+  reviewEndDateTime.setHours(23, 59, 0)
+
+  const taskSettings: INewTaskSettings = {
+    submissionStartDateTime: submissionStartDateTime,
+    submissionEndDateTime: submissionEndDateTime,
+    reviewStartDateTime: reviewStartDateTime,
+    reviewEndDateTime: reviewEndDateTime,
+    submissionsToCheck: 2,
+    stepParams: {
+      step: PeerSteps.FIRST_STEP,
+      experts: ['ivan@ivanov.ru']
+    } as IFirstStepSettings
   }
 
-  taskSettings.submissionStartDateTime.setHours(23, 59, 0)
-  taskSettings.submissionEndDateTime.setHours(23, 59, 0)
-  taskSettings.reviewStartDateTime.setHours(23, 59, 0)
-  taskSettings.reviewEndDateTime.setHours(23, 59, 0)
-  
   return taskSettings
 }
 
 const styles = {
   container: {
     maxWidth: '780px',
-    margin: "0px auto 50px auto"
+    margin: "0px auto 0 auto",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px"
   } as SxProps<Theme>,
   wrapper: {
     display: "grid",

@@ -14,7 +14,7 @@ import { actions, createTasks } from "../../../../../store/tasks"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
 import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
 import { paths } from "../../../../../app/constants/paths";
-import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes } from "../../../../../store/types"
+import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes, PeerSteps } from "../../../../../store/types"
 
 import * as globalStyles from "../../../../../const/styles"
 
@@ -148,7 +148,11 @@ const initialTask: INewTask = {
     submissionEndDateTime: new Date(),
     reviewStartDateTime: new Date(),
     reviewEndDateTime: new Date(),
-    submissionsToCheck: 2
+    submissionsToCheck: 2,
+    stepParams: {
+      step: PeerSteps.FIRST_STEP,
+      experts: ['ivan@ivanov.ru']
+    }
   },
   authorForm: {
     rubrics: [
