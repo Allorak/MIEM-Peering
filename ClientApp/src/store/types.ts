@@ -181,6 +181,7 @@ export type IParentQuestionRubric = {
   order: number
   title: string
   required: boolean
+  description?: string
 }
 
 export interface ITextQuestion extends IParentQuestionRubric {

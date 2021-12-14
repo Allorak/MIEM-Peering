@@ -14,7 +14,8 @@ interface IProps {
   onEdit?(id: number): void,
   onRemove?(id: number): void,
   onClone?(id: number): void,
-  required: boolean
+  required: boolean,
+  description?: string
 }
 
 const questionTx = 'В'
@@ -23,6 +24,7 @@ export const AnswerBox: FC<IProps> = ({
   id,
   title,
   children,
+  description,
   onEdit,
   onRemove,
   onClone,
@@ -43,6 +45,14 @@ export const AnswerBox: FC<IProps> = ({
           >
             {title}
           </Typography>
+
+          {description && (
+            <Typography
+              variant={"h6"}
+            >
+              {description}
+            </Typography>
+          )}
         </Box>
 
         <Box sx={styles.bodyContainer}>
