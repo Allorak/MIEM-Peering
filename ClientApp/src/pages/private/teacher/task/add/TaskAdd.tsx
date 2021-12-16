@@ -70,8 +70,8 @@ export const TaskAdd: FC = () => {
   const setSettings = useCallback((response: INewTaskSettings) => {
     if (pathT && pathT.courseId)
       dispatch(createTasks({
-        ...newTaskItem,
-        settings: response
+        ...JSON.parse(JSON.stringify(newTaskItem)),
+        settings: JSON.parse(JSON.stringify(response))
       }, pathT.courseId))
   }, [step, newTaskItem, pathT])
 

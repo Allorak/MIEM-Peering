@@ -1,10 +1,14 @@
-import { Box, Button, TextField, Theme } from "@mui/material";
-import { SxProps } from "@mui/system";
 import { FC, SetStateAction, useCallback, useEffect } from "react";
+import { Box, Button, IconButton, TextField, Theme } from "@mui/material";
+import { SxProps } from "@mui/system";
 import { useController, useForm } from "react-hook-form";
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import { InputLabel } from "../../../../../../components/inputLabel";
 import { Popup } from "../../../../../../components/popup";
+
 import { FormValidateMode, FormReValidateMode } from "../../../../../../const/common";
+
 
 interface IProps {
   popupStatus: boolean,
@@ -56,19 +60,17 @@ export const ExpertUpdateForm: FC<IProps> = ({
   const handleSubmitRequest = useCallback((expertItem: IExpertForm) => {
     const expertEmail = expertItem.email
     if (expertEmail) onSubmit(expertEmail)
-  }, [])
-
-  console.log(expert ? 'Назначение эксперта' : 'Редактирование')
+  }, [expert, onSubmit])
 
   return (
     <Popup
+      PaperProps={{ sx: styles.dialogWrapper }}
       title={expert ? 'Редактирование' : 'Назначение эксперта'}
       open={popupStatus}
       onCloseHandler={onCloseHandler}
     >
       <Box
         component={"form"}
-        sx={styles.formContainer}
         onSubmit={handleSubmit(handleSubmitRequest)}
       >
         <InputLabel
@@ -83,17 +85,20 @@ export const ExpertUpdateForm: FC<IProps> = ({
           fullWidth
           {...(formState.errors.email && { error: true, helperText: formState.errors.email.message })}
         />
-        <Box>
+
+        <Box
+          sx={{
+            ...styles.actionBtContainer,
+            justifyContent: expert ? "space-between" : "flex-end"
+          }}
+        >
           {expert && (
-            <Button
-              type={"button"}
-              variant={"text"}
-              size={"small"}
-              color={"error"}
+            <IconButton
               onClick={() => onRemove()}
+              sx={styles.deleteBt}
             >
-              {"Удалить"}
-            </Button>
+              <DeleteIcon sx={{ color: "error.main" }} />
+            </IconButton>
           )}
 
           <Button
@@ -101,6 +106,7 @@ export const ExpertUpdateForm: FC<IProps> = ({
             variant={"contained"}
             color={"primary"}
             size={"small"}
+            sx={styles.submitBt}
           >
             {expert ? "Изменить" : "Добавить"}
           </Button>
@@ -111,7 +117,20 @@ export const ExpertUpdateForm: FC<IProps> = ({
 }
 
 const styles = {
-  formContainer: {
-    maxWidth: "250px",
-  } as SxProps<Theme>
+  submitBt: {
+    padding: "5px 8px"
+  } as SxProps<Theme>,
+  dialogWrapper: {
+    flex: '0 1 400px'
+  } as SxProps<Theme>,
+  actionBtContainer: {
+    margin: "15px 0px 0px 0px",
+    display: "flex",
+    width: "100%",
+  } as SxProps<Theme>,
+  deleteBt: {
+    borderRadius: "3px",
+    height: "36px",
+    width: "36px",
+  } as SxProps<Theme>,
 }

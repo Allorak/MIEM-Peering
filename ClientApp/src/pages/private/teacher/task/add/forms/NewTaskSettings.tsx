@@ -2,7 +2,7 @@
 import { FC, useCallback, useState } from "react";
 import { Controller, useController, useForm } from "react-hook-form";
 import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
-import { display, SxProps, Theme } from "@mui/system";
+import { SxProps, Theme } from "@mui/system";
 import DateAdapter from '@mui/lab/AdapterDateFns';
 import { LocalizationProvider, MobileDatePicker, TimePicker } from "@mui/lab";
 import ruLocale from "date-fns/locale/ru";
@@ -14,6 +14,7 @@ import { IFirstStepSettings, INewTaskSettings, PeerSteps } from "../../../../../
 
 import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
+
 import { ExpertTable } from "../components/ExpertsTable";
 import { ExpertUpdateForm } from "../components/ExpertUpdateForm";
 
@@ -28,11 +29,10 @@ interface IIterationCatalog {
 }
 
 export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
-
   const [popupStatus, setPopupStatus] = useState(false)
-  const [currentExpert, setCurrentExpert] = useState<string | undefined>("")
+  const [currentExpert, setCurrentExpert] = useState<string>()
 
-  const { control, formState, handleSubmit, getValues, setValue } = useForm<INewTaskSettings>({
+  const { control, formState, getValues, setValue } = useForm<INewTaskSettings>({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
@@ -42,7 +42,6 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
 
   const { field: maxSubmissionProps } = useController({ control, ...fields.maxSubmissionProps })
   const { field: peerStepProps } = useController({ control, ...fields.peerStepProps })
-
   const experts = getValues('stepParams.experts')
 
   const handleOnStepChange = useCallback((value: SelectChangeEvent<unknown>) => {
@@ -62,15 +61,11 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
   }, [setValue, peerStepProps])
 
   const handleAddOrEditExpert = useCallback((email?: string) => {
-    if (email) {
-      setCurrentExpert(email)
-    } else {
-      setCurrentExpert(undefined)
-    }
+    setCurrentExpert(email)
     setPopupStatus(true)
   }, [])
 
-  const onExpertSubmit = useCallback((email: string) => {
+  const handleExpertSubmit = useCallback((email: string) => {
     if (peerStepProps.value === PeerSteps.FIRST_STEP) {
       if (currentExpert && experts.length > 0) {
         if (currentExpert !== email) {
@@ -80,37 +75,52 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
               expert !== currentExpert ? expert : email
             )
             setValue('stepParams.experts', JSON.parse(JSON.stringify(filteredExperts)))
-            setPopupStatus(false)
-            return
           }
+          setPopupStatus(false)
+          return
         } else {
           setPopupStatus(false)
           return
         }
       }
+
       if (!currentExpert) {
-        const pushedExpert = [...JSON.parse(JSON.stringify(experts)), email]
-        setValue('stepParams.experts', JSON.parse(JSON.stringify(pushedExpert)))
+        const flag = experts.filter(expert => expert === email).length === 0
+
+        if (flag) {
+          const pushedExpert = [...JSON.parse(JSON.stringify(experts)), email]
+          setValue('stepParams.experts', JSON.parse(JSON.stringify(pushedExpert)))
+        }
+
         setPopupStatus(false)
         return
       }
     }
-  }, [currentExpert, experts, peerStepProps, setValue])
+  }, [currentExpert, experts, peerStepProps])
 
-  const onRemoveExpert = useCallback(() => {
+  const handleRemoveExpert = useCallback(() => {
     if (peerStepProps.value === PeerSteps.FIRST_STEP && currentExpert && experts.length > 0) {
       const filteredExperts = experts.filter(expert => expert !== currentExpert)
       setValue('stepParams.experts', JSON.parse(JSON.stringify(filteredExperts)))
       setPopupStatus(false)
     }
-  }, [peerStepProps, currentExpert, experts, setValue])
+  }, [peerStepProps, currentExpert, experts])
+
+  const onSettingsFormSubmit = useCallback((event: React.FormEvent<HTMLElement>) => {
+    event.preventDefault()
+    const request = getValues()
+    if (request.stepParams.step === PeerSteps.FIRST_STEP && request.stepParams.experts.length > 0) {
+      onSubmit(request)
+    }
+    // if (request.stepParams.step === PeerSteps.SECOND_STEP && request.stepParams.taskId) //TODO
+  }, [getValues])
 
   return (
     <>
       <Box
         sx={styles.container}
         component={'form'}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={onSettingsFormSubmit}
       >
         <Box sx={styles.wrapper}>
           <Box sx={styles.dateBox}>
@@ -152,6 +162,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
                         }
                       />
                     </Box>
+
                     <Box sx={styles.timePicker}>
                       <TimePicker
                         {...rest}
@@ -405,8 +416,8 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
 
       <ExpertUpdateForm
         popupStatus={popupStatus}
-        onSubmit={onExpertSubmit}
-        onRemove={onRemoveExpert}
+        onSubmit={handleExpertSubmit}
+        onRemove={handleRemoveExpert}
         onCloseHandler={setPopupStatus}
         expert={currentExpert}
       />
@@ -438,7 +449,7 @@ const initialValue = (): INewTaskSettings => {
     submissionsToCheck: 2,
     stepParams: {
       step: PeerSteps.FIRST_STEP,
-      experts: ['ivan@ivanov.ru']
+      experts: []
     } as IFirstStepSettings
   }
 
