@@ -52,6 +52,10 @@ export const responsesProps: UseControllerProps<ITextQuestion | IShortTextQuesti
   name: "responses",
 })
 
+export const descriptionRubricsProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "description"> = ({
+  name: "description",
+})
+
 export const minAuthorProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "minValue"> = ({
   name: "minValue",
   rules: {
@@ -88,7 +92,17 @@ export const maxSubmissionProps: UseControllerProps<INewTaskSettings, "submissio
     },
     min: {
       value: 2,
-      message: "Минимальное значение 3"
+      message: "Минимальное значение 2"
+    }
+  },
+})
+
+export const peerStepProps: UseControllerProps<INewTaskSettings, "stepParams.step"> = ({
+  name: "stepParams.step",
+  rules: {
+    required: {
+      value: true,
+      message: "Это обязательное поле"
     }
   },
 })

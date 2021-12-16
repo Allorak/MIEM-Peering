@@ -171,9 +171,25 @@ export interface INewTaskSettings {
   reviewStartDateTime: Date | undefined
   reviewEndDateTime: Date | undefined
   submissionsToCheck: number
+  stepParams: IFirstStepSettings | ISecondStepSettings
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck'> { }
+export enum PeerSteps {
+  FIRST_STEP = 'firstStep',
+  SECOND_STEP = 'secondStep',
+}
+
+export interface IFirstStepSettings {
+  step: PeerSteps.FIRST_STEP,
+  experts: Array<string>
+}
+
+export interface ISecondStepSettings {
+  step: PeerSteps.SECOND_STEP,
+  taskId: string
+}
+
+export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'stepParams'> { }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
@@ -181,6 +197,7 @@ export type IParentQuestionRubric = {
   order: number
   title: string
   required: boolean
+  description?: string
 }
 
 export interface ITextQuestion extends IParentQuestionRubric {

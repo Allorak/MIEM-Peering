@@ -3,20 +3,20 @@ import { useNavigate, generatePath } from "react-router-dom";
 import { Box, SxProps, Theme } from "@mui/system"
 
 import { Subheader } from "../../../../../components/subheader"
+import { WorkBox } from "../../../../../components/workBox"
+
 import { NewTaskMainInfo } from "./forms/NewTaskMainInfo"
 import { NewTaskAuthorForm } from "./forms/NewTaskAuthorForm"
 import { NewTaskSettings } from "./forms/NewTaskSettings"
 
-import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes } from "../../../../../store/types"
-
 import { actions, createTasks } from "../../../../../store/tasks"
 
-import * as globalStyles from "../../../../../const/styles"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
-import { WorkBox } from "../../../../../components/workBox"
-import { paths } from "../../../../../app/constants/paths";
 import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
+import { paths } from "../../../../../app/constants/paths";
+import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes, PeerSteps } from "../../../../../store/types"
 
+import * as globalStyles from "../../../../../const/styles"
 
 export const TaskAdd: FC = () => {
 
@@ -45,7 +45,7 @@ export const TaskAdd: FC = () => {
       setNewTaskItem(prev => ({
         ...prev,
         authorForm: {
-          rubrics: responses.map(response => ({ ...response }))
+          rubrics: JSON.parse(JSON.stringify(responses))
         }
       }))
       setStpep('peer-form')
@@ -55,7 +55,7 @@ export const TaskAdd: FC = () => {
       setNewTaskItem(prev => ({
         ...prev,
         peerForm: {
-          rubrics: responses.map(response => ({ ...response }))
+          rubrics: JSON.parse(JSON.stringify(responses))
         }
       }))
       setStpep('settings')
@@ -65,14 +65,13 @@ export const TaskAdd: FC = () => {
 
   useEffect(() => {
     dispatch(actions.createReset())
-    console.log("Reset")
   }, [dispatch])
 
   const setSettings = useCallback((response: INewTaskSettings) => {
     if (pathT && pathT.courseId)
       dispatch(createTasks({
-        ...newTaskItem,
-        settings: response
+        ...JSON.parse(JSON.stringify(newTaskItem)),
+        settings: JSON.parse(JSON.stringify(response))
       }, pathT.courseId))
   }, [step, newTaskItem, pathT])
 
@@ -149,7 +148,11 @@ const initialTask: INewTask = {
     submissionEndDateTime: new Date(),
     reviewStartDateTime: new Date(),
     reviewEndDateTime: new Date(),
-    submissionsToCheck: 0
+    submissionsToCheck: 2,
+    stepParams: {
+      step: PeerSteps.FIRST_STEP,
+      experts: ['ivan@ivanov.ru']
+    }
   },
   authorForm: {
     rubrics: [

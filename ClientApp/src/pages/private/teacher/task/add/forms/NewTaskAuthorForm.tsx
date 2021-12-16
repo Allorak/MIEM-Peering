@@ -54,6 +54,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               order: rubric.order,
               title: rubric.title,
               required: rubric.required,
+              description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type
             }
           case IQuestionTypes.MULTIPLE:
@@ -61,6 +62,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               order: rubric.order,
               title: rubric.title,
               required: rubric.required,
+              description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type,
               responses: rubric.responses.map(response => ({ ...response }))
             }
@@ -69,6 +71,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               order: rubric.order,
               title: rubric.title,
               required: rubric.required,
+              description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type,
               minValue: rubric.minValue,
               maxValue: rubric.maxValue
@@ -176,6 +179,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               order: rubric.order,
               title: rubric.title,
               required: rubric.required,
+              description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type
             }
           case IQuestionTypes.MULTIPLE:
@@ -183,6 +187,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               order: rubric.order,
               title: rubric.title,
               required: rubric.required,
+              description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type,
               responses: rubric.responses.map(response => ({ ...response }))
             }
@@ -190,6 +195,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
             return {
               order: rubric.order,
               title: rubric.title,
+              description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               required: rubric.required,
               type: rubric.type,
               minValue: rubric.minValue,
@@ -213,6 +219,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
             onRemove={onRemoveQuestion}
             key={question.order}
             required={question.required}
+            description={question.description}
           >
             <QuestionBox>
               {question.type === IQuestionTypes.SHORT_TEXT && (
@@ -290,9 +297,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
 
   useEffect(() => {
     if (popupStatus) {
-      console.log(question, "QUEST")
       reset(question ? { ...question } : { ...initialQuestion })
-      console.log(getValues('required'), "TYPE")
     }
   }, [reset, popupStatus])
 
@@ -302,6 +307,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   const { field: responsesProps } = useController({ control, ...fields.responsesProps })
   const { field: minValueProps } = useController({ control, ...fields.minAuthorProps })
   const { field: maxValueProps } = useController({ control, ...fields.maxAuthorProps })
+  const { field: descriptionProps } = useController({ control, ...fields.descriptionRubricsProps })
 
   const changeType = useCallback((type: IQuestionTypes) => {
     setValue('type', type)
@@ -355,6 +361,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
           order: request.order,
           required: request.required,
           type: IQuestionTypes.MULTIPLE,
+          description: request.description && request.description.trim() !== "" ? request.description.trim() : undefined,
           responses: request.responses.map(response => ({ ...response })),
           title: request.title
         })
@@ -365,6 +372,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
         order: request.order,
         required: request.required,
         type: IQuestionTypes.SHORT_TEXT,
+        description: request.description && request.description.trim() !== "" ? request.description.trim() : undefined,
         title: request.title
       })
     }
@@ -372,6 +380,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     if (request.type === IQuestionTypes.TEXT) {
       onSubmit({
         order: request.order,
+        description: request.description && request.description.trim() !== "" ? request.description.trim() : undefined,
         required: request.required,
         type: IQuestionTypes.TEXT,
         title: request.title
@@ -379,10 +388,11 @@ const UpdateQuestion: FC<IQuestionItem> = ({
     }
 
     if (request.type === IQuestionTypes.SELECT_RATE) {
-      if (request.minValue && request.maxValue && request.maxValue - request.minValue > 0)
+      if (request.minValue !== undefined && request.maxValue !== undefined && request.maxValue - request.minValue > 0)
         onSubmit({
           order: request.order,
           required: request.required,
+          description: request.description && request.description.trim() !== "" ? request.description.trim() : undefined,
           type: IQuestionTypes.SELECT_RATE,
           title: request.title,
           minValue: request.minValue,
@@ -412,9 +422,21 @@ const UpdateQuestion: FC<IQuestionItem> = ({
             InputProps={titleProps}
             required
             autoComplete={'off'}
-            rows={2}
-            multiline
             {...(formState.errors.title !== undefined && { error: true, helperText: formState.errors.title.message })}
+          />
+
+          <InputLabel
+            title={'Описание'}
+          />
+
+          <TextField
+            type={'text'}
+            InputProps={descriptionProps}
+            autoComplete={'off'}
+            rows={3}
+            multiline
+            maxRows={3}
+            {...(formState.errors.description !== undefined && { error: true, helperText: formState.errors.description.message })}
           />
         </Box>
 
@@ -551,7 +573,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
                 autoComplete={'off'}
                 InputProps={{
                   ...maxValueProps,
-                  inputProps: { min: minValueProps.value ? Number(Number(minValueProps.value) + Number(1)) : 1, max: 100 }
+                  inputProps: { min: getValues('minValue') !== undefined ? Number(Number(minValueProps.value) + Number(1)) : 1, max: 100 }
 
                 }}
                 {...(formState.errors.maxValue !== undefined && { error: true, helperText: formState.errors.maxValue.message })}
