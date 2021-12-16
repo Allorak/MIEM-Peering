@@ -20,7 +20,7 @@ export const ExpertTable: FC<IProps> = ({ experts, onAdd, onEdit }) => {
           <TableHeadCell isCentered isButton>{
             <Button
               type={"button"}
-              variant={"contained"}
+              variant={"text"}
               color={"success"}
               onClick={() => onAdd()}
               size={"small"}
