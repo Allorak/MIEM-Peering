@@ -115,6 +115,16 @@ export type ICourses = {
   name: string,
   subject: string,
   description?: string,
+  settings?: IActiveCodeCourse | IDisableCodeCourse
+}
+
+export type IActiveCodeCourse = {
+  enableCode: true,
+  code?: string
+}
+
+export type IDisableCodeCourse = {
+  enableCode: false,
 }
 
 export type IResponseCourses = {
@@ -126,6 +136,7 @@ export type IResponseCourses = {
   title: string,
   subject: string,
   description?: string,
+  settings?: IActiveCodeCourse | IDisableCodeCourse
 }
 
 export type INewCourseRequest = {
@@ -134,6 +145,10 @@ export type INewCourseRequest = {
   description?: string
 }
 
+export type IUpdateCourseRequest = INewCourseRequest & {
+  id: string
+  settings?: IActiveCodeCourse | IDisableCodeCourse
+}
 
 export type ITaskItem = {
   id: string,
