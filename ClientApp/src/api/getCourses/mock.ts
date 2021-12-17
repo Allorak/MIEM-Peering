@@ -16,7 +16,11 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         },
         title: 'Решение уравнений',
         subject: 'Математика',
-        description: "Master Angular 5 from the basics to building an advanced application with Firebase's Firestore as well"
+        description: "Master Angular 5 from the basics to building an advanced application with Firebase's Firestore as well",
+        settings: {
+          enableCode: true,
+          code: "GhTk3Ls"
+        },
       },
       {
         id: '2',
@@ -27,6 +31,9 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         title: 'Codeigniter',
         subject: 'English',
         description: "Learn Php Codeigniter and understand working with MVC and HMVC from zero to hero",
+        settings: {
+          enableCode: false,
+        },
       },
     ]
   }

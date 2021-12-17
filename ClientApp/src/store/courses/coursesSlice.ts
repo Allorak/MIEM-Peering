@@ -7,13 +7,15 @@ export interface ICoursesState {
   isLock: boolean,
   error: IError | undefined,
   payload: Array<ICourses>
+  updateStatus: boolean | undefined
 }
 
 const initialState: ICoursesState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as Array<ICourses>
+  payload: {} as Array<ICourses>,
+  updateStatus: undefined
 };
 
 export const courses = createSlice({
