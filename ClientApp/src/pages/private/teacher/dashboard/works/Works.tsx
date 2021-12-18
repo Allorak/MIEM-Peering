@@ -6,7 +6,7 @@ import BorderColorTwoToneIcon from '@mui/icons-material/BorderColorTwoTone';
 import { WorksList } from "./WorksList";
 import { WorkResponse } from "./WorkResponse";
 
-import { IWorkItem, IWorkResponse } from "../../../../../store/types";
+import { IWorkItem } from "../../../../../store/types";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
 import { fetchWorks } from "../../../../../store/works";
@@ -17,9 +17,9 @@ export const Works: FC = () => {
 
   const dispatch = useAppDispatch()
 
-  const isLoading = useAppSelector(state => state.works.isLoading)
-  const isLock = useAppSelector(state => state.works.isLock)
-  const payload = useAppSelector(state => state.works.payload)
+  const isWorkListLoading = useAppSelector(state => state.works.isWorkListLoading)
+  const isWorkListLock = useAppSelector(state => state.works.isWorkListLock)
+  const workList = useAppSelector(state => state.works.workList)
   const error = useAppSelector(state => state.works.error)
 
   const { path } = usePrivatePathTDashboard()
@@ -27,28 +27,40 @@ export const Works: FC = () => {
   useEffect(() => {
     if (path && path.taskId)
       dispatch(fetchWorks(path.taskId))
+  }, [path])
+
+  useEffect(() => {
+    if (workList && workList.length > 0 && !activeWork) {
+      const defaultSelectedWork = workList[0]
+      requestWorkResponsesById(defaultSelectedWork.workId)
+      setActiveWork(JSON.parse(JSON.stringify(defaultSelectedWork)))
+    }
+  }, [workList])
+
+  const requestWorkResponsesById = useCallback((workId: string) => {
+
   }, [])
 
   const [activeWork, setActiveWork] = useState<IWorkItem>()
 
   const handleOnWorkChange = useCallback((workId: string) => {
-    if (payload && payload.length > 0) {
-      const workItem = payload.find(work => work.id === workId)
+    if (workList && workList.length > 0) {
+      const workItem = workList.find(work => work.workId === workId)
       if (workItem) {
         setActiveWork(
           JSON.parse(JSON.stringify(workItem))
         )
       }
     }
-  }, [activeWork, setActiveWork, payload])
+  }, [activeWork, workList])
 
   return (
     <DashboardWorkBox
-      isLoading={isLoading}
-      isLock={isLock}
+      isLoading={isWorkListLoading}
+      isLock={isWorkListLock}
       error={error}
     >
-      {payload && payload.length > 0 && (
+      {workList && workList.length > 0 && activeWork &&(
         <Box sx={styles.gridContainer}>
           <Box sx={styles.leftContainer}>
             <Box sx={styles.topActionBox}>
@@ -63,7 +75,7 @@ export const Works: FC = () => {
                   color={'inherit'}
                   component={'span'}
                 >
-                  {activeWork ? activeWork.author.name : payload[0].author.name}
+                  {activeWork.studentName}
                 </Typography>
               </Typography>
 
@@ -77,15 +89,13 @@ export const Works: FC = () => {
               </Button>
             </Box>
 
-            <WorkResponse
-              responses={JSON.parse(JSON.stringify(activeWork ? activeWork.responses : payload[0].responses))}
-            />
+            <WorkResponse responses={[]} />
           </Box>
 
           <Box sx={styles.rightContainer}>
             <WorksList
-              worksCatalog={payload}
-              activeWorkId={activeWork ? activeWork.id : payload[0].id}
+              worksCatalog={workList}
+              activeWorkId={activeWork.workId}
               onWorkChange={handleOnWorkChange}
             />
           </Box>

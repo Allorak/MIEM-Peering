@@ -2,49 +2,49 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IError, IWorkItem } from '../types';
 
 
-export interface ICoursesState {
-  isLoading: boolean,
-  isLock: boolean,
+export interface IWorksState {
+  isWorkListLoading: boolean,
+  isWorkListLock: boolean,
   error: IError | undefined,
-  payload: IWorkItem[] | undefined
+  workList: IWorkItem[] | undefined
 }
 
-const initialState: ICoursesState = {
-  isLoading: false,
+const initialState: IWorksState = {
+  isWorkListLoading: false,
   error: undefined,
-  isLock: true,
-  payload: undefined
+  isWorkListLock: true,
+  workList: undefined
 };
 
 export const works = createSlice({
-  name: 'works',
+  name: 'teacherWorks',
   initialState,
   reducers: {
     fetchStarted: (state) => {
-      state.isLoading = true
-      state.isLock = true
+      state.isWorkListLoading = true
+      state.isWorkListLock = true
       state.error = undefined
-      state.payload = undefined
+      state.workList = undefined
     },
 
     fetchSuccess: (state, { payload }: PayloadAction<Array<IWorkItem>>) => {
-      state.isLoading = false
+      state.isWorkListLoading = false
       state.error = undefined
-      state.isLock = false
-      state.payload = payload
+      state.isWorkListLock = false
+      state.workList = payload
     },
 
     fetchFailed: (state, { payload }: PayloadAction<IError>) => {
-      state.isLoading = false
+      state.isWorkListLoading = false
       state.error = payload
-      state.isLock = false
+      state.isWorkListLock = false
     },
 
     reset: (state) => {
-      state.isLoading = false
+      state.isWorkListLoading = false
       state.error = undefined
-      state.isLock = true
-      state.payload = undefined
+      state.isWorkListLock = true
+      state.workList = undefined
     },
   },
 });

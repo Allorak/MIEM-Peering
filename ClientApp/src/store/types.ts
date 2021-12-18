@@ -323,12 +323,8 @@ export type IOverviewResponse = IOverview & {
 
 
 export type IWorkItem = {
-  id: string,
-  responses: IWorkResponse[],
-  author: {
-    name: string,
-    id: string
-  }
+  workId: string,
+  studentName: string
 }
 
 export type IWorkResponse = {
