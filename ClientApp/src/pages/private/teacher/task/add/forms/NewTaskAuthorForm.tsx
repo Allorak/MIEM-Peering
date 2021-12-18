@@ -32,11 +32,13 @@ import { RatingScaleVisible } from "../../../../../../components/rubrics/ratingS
 
 interface IProps {
   rubrics: IQuestionRubrics,
-  onSubmit(questions: IQuestionRubrics): void
+  onSubmit(questions: IQuestionRubrics): void,
+  isPeerForm?: boolean
 }
 
 export const NewTaskAuthorForm: FC<IProps> = ({
   rubrics,
+  isPeerForm,
   onSubmit
 }) => {
 
@@ -64,7 +66,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               required: rubric.required,
               description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type,
-              responses: rubric.responses.map(response => ({ ...response }))
+              responses: JSON.parse(JSON.stringify(rubric.responses))
             }
           case IQuestionTypes.SELECT_RATE:
             return {
@@ -74,7 +76,8 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type,
               minValue: rubric.minValue,
-              maxValue: rubric.maxValue
+              maxValue: rubric.maxValue,
+              ...(isPeerForm && { coefficientPercentage: rubric.coefficientPercentage })
             }
         }
       })
@@ -189,7 +192,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               required: rubric.required,
               description: rubric.description && rubric.description.trim() !== "" ? rubric.description.trim() : undefined,
               type: rubric.type,
-              responses: rubric.responses.map(response => ({ ...response }))
+              responses: JSON.parse(JSON.stringify(rubric.responses))
             }
           case IQuestionTypes.SELECT_RATE:
             return {
@@ -199,7 +202,8 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               required: rubric.required,
               type: rubric.type,
               minValue: rubric.minValue,
-              maxValue: rubric.maxValue
+              maxValue: rubric.maxValue,
+              ...(isPeerForm && { coefficientPercentage: rubric.coefficientPercentage })
             }
         }
       })
@@ -213,7 +217,10 @@ export const NewTaskAuthorForm: FC<IProps> = ({
         return (
           <AnswerBox
             id={question.order}
-            title={question.title}
+            title={isPeerForm && question.type === IQuestionTypes.SELECT_RATE && question.coefficientPercentage ?
+              `${question.title} (коэф. ${question.coefficientPercentage}%)` :
+              question.title
+            }
             onEdit={onEditQuestion}
             onClone={onCloneQuestion}
             onRemove={onRemoveQuestion}
@@ -265,6 +272,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
         popupStatus={popupStatus}
         closePopup={setPopupStatus}
         onSubmit={onUpdate}
+        isPeerForm={isPeerForm}
       />
     </Box>
   )
@@ -274,15 +282,19 @@ interface IQuestionItem {
   question?: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion
   popupStatus: boolean,
   closePopup(value: SetStateAction<boolean>): void,
-  onSubmit: (rubric: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion) => void
+  onSubmit: (rubric: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion) => void,
+  isPeerForm?: boolean
 }
 
 const UpdateQuestion: FC<IQuestionItem> = ({
   question,
   popupStatus,
   closePopup,
-  onSubmit
+  onSubmit,
+  isPeerForm
 }) => {
+
+  const [isSelectRate, setIsSelectRate] = useState<boolean>()
 
   const { control, formState, reset, setValue, getValues } = useForm<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>({
     mode: FormValidateMode,
@@ -298,8 +310,9 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   useEffect(() => {
     if (popupStatus) {
       reset(question ? { ...question } : { ...initialQuestion })
+      setIsSelectRate(isPeerForm && question && question.type === IQuestionTypes.SELECT_RATE ? true : undefined)
     }
-  }, [reset, popupStatus])
+  }, [popupStatus])
 
   const { field: titleProps } = useController({ control, ...fields.titleAuthorProps })
   const { field: requiredProps } = useController({ control, ...fields.requiredProps })
@@ -308,6 +321,24 @@ const UpdateQuestion: FC<IQuestionItem> = ({
   const { field: minValueProps } = useController({ control, ...fields.minAuthorProps })
   const { field: maxValueProps } = useController({ control, ...fields.maxAuthorProps })
   const { field: descriptionProps } = useController({ control, ...fields.descriptionRubricsProps })
+  const { field: coefficientProps } = useController({
+    control,
+    name: "coefficientPercentage",
+    rules: {
+      required: {
+        value: isPeerForm ? true : false,
+        message: "Это обязательное поле"
+      },
+      min: {
+        value: 1,
+        message: "Минимальное значение 1"
+      },
+      max: {
+        value: 100,
+        message: "Максимальное значение 100"
+      }
+    }
+  })
 
   const changeType = useCallback((type: IQuestionTypes) => {
     setValue('type', type)
@@ -318,7 +349,14 @@ const UpdateQuestion: FC<IQuestionItem> = ({
       setValue('minValue', defaultResponses.rateResponses.minValue)
       setValue('maxValue', defaultResponses.rateResponses.maxValue)
     }
-  }, [setValue])
+
+    if (type === IQuestionTypes.SELECT_RATE && isPeerForm) {
+      setIsSelectRate(true)
+      setValue('required', true)
+    } else {
+      setIsSelectRate(undefined)
+    }
+  }, [setValue, question, isPeerForm])
 
   const changeRequired = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setValue('required', event.target.checked)
@@ -332,7 +370,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
       setValue('responses', cloneResponses)
 
     }
-  }, [getValues, setValue])
+  }, [getValues, setValue, question])
 
   const addResponse = useCallback(() => {
     if (getValues('type') === IQuestionTypes.MULTIPLE) {
@@ -340,7 +378,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
       cloneResponses.push({ id: cloneResponses[length - 1].id + 1, response: `Вариант ${cloneResponses.length + 1}` })
       setValue('responses', cloneResponses)
     }
-  }, [getValues, setValue])
+  }, [getValues, setValue, question])
 
   const removeResponse = useCallback((id: number) => {
     if (getValues('type') === IQuestionTypes.MULTIPLE) {
@@ -350,7 +388,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
         setValue('responses', newResponses)
       }
     }
-  }, [getValues, setValue])
+  }, [getValues, setValue, question])
 
   const onFormSubmit = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
@@ -396,7 +434,8 @@ const UpdateQuestion: FC<IQuestionItem> = ({
           type: IQuestionTypes.SELECT_RATE,
           title: request.title,
           minValue: request.minValue,
-          maxValue: request.maxValue
+          maxValue: request.maxValue,
+          ...(isPeerForm && { coefficientPercentage: request.coefficientPercentage })
         })
     }
   }, [getValues, question])
@@ -541,46 +580,65 @@ const UpdateQuestion: FC<IQuestionItem> = ({
         )}
 
         {typeProps.value === IQuestionTypes.SELECT_RATE && (
-          <Box sx={styles.minMaxBox}>
-            <Box>
-              <InputLabel
-                required
-                title={'Минимальная'}
-              />
+          <>
+            <Box sx={styles.minMaxBox}>
+              <Box>
+                <InputLabel
+                  required
+                  title={'Минимальная'}
+                />
 
-              <TextField
-                type={'number'}
-                InputProps={{
-                  ...minValueProps,
-                  inputProps: { min: 0, max: 100 }
+                <TextField
+                  type={'number'}
+                  InputProps={{
+                    ...minValueProps,
+                    inputProps: { min: 0, max: 100 }
 
-                }}
-                required
-                autoComplete={'off'}
-                {...(formState.errors.minValue !== undefined && { error: true, helperText: formState.errors.minValue.message })}
-              />
+                  }}
+                  required
+                  autoComplete={'off'}
+                  {...(formState.errors.minValue !== undefined && { error: true, helperText: formState.errors.minValue.message })}
+                />
+              </Box>
+
+              <Box>
+                <InputLabel
+                  required
+                  title={'Максимальная'}
+                />
+
+                <TextField
+                  type={'number'}
+                  required
+                  autoComplete={'off'}
+                  InputProps={{
+                    ...maxValueProps,
+                    inputProps: { min: getValues('minValue') !== undefined ? Number(Number(minValueProps.value) + Number(1)) : 1, max: 100 }
+
+                  }}
+                  {...(formState.errors.maxValue !== undefined && { error: true, helperText: formState.errors.maxValue.message })}
+                  {...(getValues('minValue') && maxValueProps.value && getValues('minValue') >= maxValueProps.value && { error: true, helperText: "Ошибка" })}
+                />
+              </Box>
             </Box>
 
-            <Box>
-              <InputLabel
-                required
-                title={'Максимальная'}
-              />
+            {isPeerForm && (
+              <Box>
+                <InputLabel
+                  required
+                  title={'Весовой коэффициент (в процентах)'}
+                />
 
-              <TextField
-                type={'number'}
-                required
-                autoComplete={'off'}
-                InputProps={{
-                  ...maxValueProps,
-                  inputProps: { min: getValues('minValue') !== undefined ? Number(Number(minValueProps.value) + Number(1)) : 1, max: 100 }
-
-                }}
-                {...(formState.errors.maxValue !== undefined && { error: true, helperText: formState.errors.maxValue.message })}
-                {...(getValues('minValue') && maxValueProps.value && getValues('minValue') >= maxValueProps.value && { error: true, helperText: "Ошибка" })}
-              />
-            </Box>
-          </Box>
+                <TextField
+                  type={'number'}
+                  InputProps={coefficientProps}
+                  autoComplete={'off'}
+                  required
+                  {...(formState.errors.coefficientPercentage !== undefined && { error: true, helperText: formState.errors.coefficientPercentage.message })}
+                />
+              </Box>
+            )}
+          </>
         )}
 
         <FormControlLabel
@@ -589,6 +647,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
               onChange={changeRequired}
               name="required"
               checked={requiredProps.value}
+              disabled={isPeerForm && isSelectRate}
             />
           }
           label={"Обязательный вопрос"}

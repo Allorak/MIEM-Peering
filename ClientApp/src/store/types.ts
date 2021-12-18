@@ -231,7 +231,8 @@ export interface IMultipleQuiestion extends IParentQuestionRubric {
 export interface ISelectRatingQuestion extends IParentQuestionRubric {
   type: IQuestionTypes.SELECT_RATE,
   maxValue: number,
-  minValue: number
+  minValue: number,
+  coefficientPercentage?: number
 }
 
 export enum IQuestionTypes {

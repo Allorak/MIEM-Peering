@@ -68,6 +68,11 @@ export const TaskAdd: FC = () => {
   }, [dispatch])
 
   const setSettings = useCallback((response: INewTaskSettings) => {
+    console.log("Response:", {
+      ...JSON.parse(JSON.stringify(newTaskItem)),
+      settings: JSON.parse(JSON.stringify(response))
+    })
+
     if (pathT && pathT.courseId)
       dispatch(createTasks({
         ...JSON.parse(JSON.stringify(newTaskItem)),
@@ -108,6 +113,7 @@ export const TaskAdd: FC = () => {
             <NewTaskAuthorForm
               onSubmit={setFormRubrics}
               rubrics={newTaskItem.peerForm.rubrics}
+              isPeerForm
             />
           )}
 
