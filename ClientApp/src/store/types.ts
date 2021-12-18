@@ -355,13 +355,6 @@ export interface ICatalog {
 
 /* Chickings */
 
-export interface IStudentList {
-  students: Array<{
-    id: string,
-    fullName: string
-  }>
-}
-
 export interface IStudentWorkItem {
   questionId: string,
   order: number,

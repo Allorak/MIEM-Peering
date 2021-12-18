@@ -3,9 +3,9 @@ import { IStudentWork } from "../../store/types";
 export type IRequestData = {
     accessToken: string,
     taskId: string,
-    studentId: string
+    workId: string
 }
 
 export type IResponseData = IStudentWork
 
-export { getCheckingsStudentWork } from './getCheckingsStudentWork';
+export { getStudentWork } from './getStudentWork';

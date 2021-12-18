@@ -12,7 +12,7 @@ export const fetchStudentWork = (taskId: string, workId: string): AppThunk => as
 
   const accessToken = getState().auth.accessToken
   if (!accessToken) {
-    dispatch(actions.fetchWorkFailed({
+    dispatch(actions.fetchFailed({
       code: IErrorCode.NO_ACCESS,
       message: 'Ошибка аутентификации', // TODO
     }))
@@ -23,21 +23,21 @@ export const fetchStudentWork = (taskId: string, workId: string): AppThunk => as
   try {
     const response = await getStudentWork({ accessToken, taskId, workId })
     if (!response) {
-      dispatch(actions.fetchWorkFailed({
+      dispatch(actions.fetchFailed({
         code: IErrorCode.RESPONSE,
         message: 'Некорректный ответ сервера', // TODO: i18n
       }))
       return
     }
     if (!response.success) {
-      dispatch(actions.fetchWorkFailed(response.error))
+      dispatch(actions.fetchFailed(response.error))
       return
     }
     dispatch(actions.fetchStudentWorkSuccess(response.payload))
     return
 
   } catch (error) {
-    dispatch(actions.fetchWorkFailed({
+    dispatch(actions.fetchFailed({
       code: IErrorCode.REQUEST,
       message: 'Не удалось выполнить запрос'
     }));

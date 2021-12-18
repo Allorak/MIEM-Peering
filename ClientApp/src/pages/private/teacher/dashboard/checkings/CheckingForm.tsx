@@ -52,6 +52,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
           key={item.id}
           title={item.title}
           required={item.required}
+          description={item.description}
         >
           <QuestionBox>
             {item.type === IQuestionTypes.SHORT_TEXT && (

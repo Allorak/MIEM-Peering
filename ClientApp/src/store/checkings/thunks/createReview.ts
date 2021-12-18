@@ -1,13 +1,11 @@
-import { actions, fetchPeerForm, fetchStudentList } from "..";
+import { actions, fetchPeerForm, fetchCheckingsWorkList } from "..";
 import { AppThunk } from "../../../app/store";
-
-import { getCheckingsPeerForm } from "../../../api/getCheckingsPeerForm";
 
 import { IErrorCode, IPeerResponses } from "../../types";
 import { postReviewByTeacher } from "../../../api/postReviewByTeacher";
 
 
-export const createReview = (taskId: string, studentId: string, responses: IPeerResponses): AppThunk => async (dispatch, getState) => {
+export const createReview = (taskId: string, workId: string, responses: IPeerResponses): AppThunk => async (dispatch, getState) => {
     dispatch(actions.createReviewStarted())
 
     const accessToken = getState().auth.accessToken
@@ -20,7 +18,7 @@ export const createReview = (taskId: string, studentId: string, responses: IPeer
     }
 
     try {
-        const response = await postReviewByTeacher({ accessToken, taskId, responses, studentId })
+        const response = await postReviewByTeacher({ accessToken, taskId, responses, workId })
         if (!response) {
             dispatch(actions.createReviewFailed({
                 code: IErrorCode.RESPONSE,
@@ -34,7 +32,7 @@ export const createReview = (taskId: string, studentId: string, responses: IPeer
         }
         dispatch(actions.createReviewSuccess())
         dispatch(actions.reset())
-        dispatch(fetchStudentList(taskId))
+        dispatch(fetchCheckingsWorkList(taskId))
         dispatch(fetchPeerForm(taskId))
         return
 

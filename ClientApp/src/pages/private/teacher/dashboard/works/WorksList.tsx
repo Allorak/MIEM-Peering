@@ -27,12 +27,12 @@ export const WorksList: FC<IProps> = ({
       {!matches && worksCatalog && worksCatalog.length > 0 && (
         worksCatalog.map((work, index) => (
           <Box
-            key={work.id}
-            sx={work.id === activeWorkId ? { ...styles.itemContainer, ...styles.activeItem } : { ...styles.itemContainer, ...styles.unActiveItem }}
-            onClick={() => onWorkChange(work.id)}
+            key={work.workId}
+            sx={work.workId === activeWorkId ? { ...styles.itemContainer, ...styles.activeItem } : { ...styles.itemContainer, ...styles.unActiveItem }}
+            onClick={() => onWorkChange(work.workId)}
           >
             <Typography variant={'h6'} color={'inherit'}>
-              {`${index + 1}. ${work.author.name}`}
+              {`${index + 1}. ${work.studentName}`}
             </Typography>
           </Box>
         ))
@@ -47,9 +47,9 @@ export const WorksList: FC<IProps> = ({
             {worksCatalog.map((work, index) => (
               <MenuItem
                 key={index}
-                value={work.id}
+                value={work.workId}
               >
-                {`${index + 1}. ${work.author.name}`}
+                {`${index + 1}. ${work.studentName}`}
               </MenuItem>
             ))}
 

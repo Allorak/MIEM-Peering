@@ -4,4 +4,5 @@ export {
   reducer,
 } from './worksSlice'
 
-export { fetchWorks } from "./thunks/fetchWorks";
+export { fetchWorkList } from "./thunks/fetchWorkList";
+export { fetchStudentWork } from "./thunks/fetchStudentWork";

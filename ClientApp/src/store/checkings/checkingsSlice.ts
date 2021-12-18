@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, IStudentList, IStudentWork, IPeerForm } from '../types';
+import { IError, IStudentWork, IPeerForm, IWorkItem } from '../types';
 
 
 export interface ICheckingsState {
@@ -12,7 +12,7 @@ export interface ICheckingsState {
   isPeerFormLoading: boolean,
   isPeerFormLock: boolean,
   error: IError | undefined,
-  studentList: IStudentList | undefined,
+  studentList: IWorkItem[] | undefined,
   studentWork: IStudentWork | undefined,
   peerForm: IPeerForm | undefined
 }
@@ -63,7 +63,7 @@ export const checkings = createSlice({
       state.peerForm = undefined
     },
 
-    fetchStudentListSuccess: (state, { payload }: PayloadAction<IStudentList>) => {
+    fetchStudentListSuccess: (state, { payload }: PayloadAction<Array<IWorkItem>>) => {
       state.isListLoading = false
       state.error = undefined
       state.isListLock = false

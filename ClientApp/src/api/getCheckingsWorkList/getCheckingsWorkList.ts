@@ -4,7 +4,7 @@ import { api, IResponse } from '..'
 import { mock } from './mock'
 
 
-export const getWorks = async ({
+export const getCheckingsWorkList = async ({
   accessToken,
   taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
@@ -13,18 +13,14 @@ export const getWorks = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/t/${taskId}works`,
+    url: `/api/v1/tasks/${taskId}/checkings/students/get`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
     }
   }
 
-  if (isMock) {
-    const response = await mock(requestConfig)
-    return response
-  }
-
+  if (isMock) return await mock(requestConfig)
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data

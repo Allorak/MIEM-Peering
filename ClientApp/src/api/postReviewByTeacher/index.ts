@@ -3,7 +3,7 @@ import { IPeerResponses } from "../../store/types";
 export type IRequestData = {
     accessToken: string,
     taskId: string,
-    studentId: string,
+    workId: string,
     responses: IPeerResponses
 }
 

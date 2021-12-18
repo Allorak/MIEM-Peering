@@ -4,19 +4,20 @@ import { delay, IResponse } from '..'
 import { IQuestionTypes } from '../../store/types'
 
 
-export const mock = async (requestConfig: AxiosRequestConfig, studentId: string): Promise<IResponse<IResponseData>> => {
+export const mock = async (requestConfig: AxiosRequestConfig, workId: string): Promise<IResponse<IResponseData>> => {
   await delay(1500)
-  if (studentId === "123")
+  if (workId === "123")
     return {
       success: true,
       payload: {
         responses: [
           {
             questionId: "123",
+            description: "Описание 1",
             order: 0,
             title: "Title 1",
             type: IQuestionTypes.TEXT,
-            response: "Ответ М",
+            response: "Мухаммад Юсупов ответ 1",
             required: false
           },
           {
@@ -24,7 +25,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
             order: 1,
             title: "Title 2",
             type: IQuestionTypes.TEXT,
-            response: "Ответ М",
+            response: "Мухаммад Юсупов ответ 2",
             required: true
           },
           {
@@ -35,7 +36,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
             responses: [
               {
                 id: 1,
-                response: "Вариант 1",
+                response: "Мухаммад Юсупов",
               },
               {
                 id: 2,
@@ -50,7 +51,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
                 response: "Вариант 4",
               }
             ],
-            response: "Вариант 4",
+            response: "Мухаммад Юсупов",
             required: false
           },
           {
@@ -58,7 +59,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
             order: 4,
             title: "Title 4",
             type: IQuestionTypes.SELECT_RATE,
-            response: 4,
+            response: 1,
             required: true,
             minValue: 0,
             maxValue: 5
@@ -67,7 +68,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
       }
     }
 
-  if (studentId === "234")
+  if (workId === "234")
     return {
       success: true,
       payload: {
@@ -77,7 +78,6 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
             order: 0,
             title: "Title 1",
             type: IQuestionTypes.TEXT,
-            response: "Ответ И",
             required: false
           },
           {
@@ -85,7 +85,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
             order: 1,
             title: "Title 2",
             type: IQuestionTypes.TEXT,
-            response: "Ответ И",
+            response: "Иван Иванов ответ 2",
             required: true
           },
           {
@@ -96,7 +96,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
             responses: [
               {
                 id: 1,
-                response: "Вариант 1",
+                response: "Иван Иванов",
               },
               {
                 id: 2,
@@ -111,7 +111,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
                 response: "Вариант 4",
               }
             ],
-            response: "Вариант 4",
+            response: "Иван Иванов",
             required: false
           },
           {
@@ -119,7 +119,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
             order: 4,
             title: "Title 4",
             type: IQuestionTypes.SELECT_RATE,
-            response: 4,
+            response: 2,
             required: true,
             minValue: 0,
             maxValue: 5
@@ -156,7 +156,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
           responses: [
             {
               id: 1,
-              response: "Вариант 1",
+              response: "Ответ",
             },
             {
               id: 2,
@@ -171,7 +171,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
               response: "Вариант 4",
             }
           ],
-          response: "Вариант 4",
+          response: "Ответ",
           required: false
         },
         {
@@ -179,7 +179,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, studentId: string)
           order: 4,
           title: "Title 4",
           type: IQuestionTypes.SELECT_RATE,
-          response: 4,
+          response: 3,
           required: true,
           minValue: 0,
           maxValue: 5

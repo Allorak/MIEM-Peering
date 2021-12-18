@@ -7,7 +7,7 @@ import { mock } from './mock'
 export const postReviewByTeacher = async ({
   accessToken,
   taskId,
-  studentId,
+  workId,
   responses
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
@@ -15,7 +15,7 @@ export const postReviewByTeacher = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/tasks/${taskId}/works/${studentId}/post`,
+    url: `/api/v1/tasks/${taskId}/works/${workId}/post`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

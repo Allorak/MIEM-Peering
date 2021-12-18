@@ -1,17 +1,14 @@
 import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
-import { getCheckingsStudentList } from "../../../api/getCheckingsStudentList";
-
 import { IErrorCode } from "../../types";
+import { getWorksList } from "../../../api/getWorksList";
 
 
-export const fetchStudentList = (taskId: string): AppThunk => async (dispatch, getState) => {
-    dispatch(actions.fetchStudentListStarted())
-
+export const fetchWorkList = (taskId: string): AppThunk => async (dispatch, getState) => {
     const accessToken = getState().auth.accessToken
     if (!accessToken) {
-        dispatch(actions.fetchListFailed({
+        dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,
             message: 'Ошибка аутентификации', // TODO
         }))
@@ -19,24 +16,25 @@ export const fetchStudentList = (taskId: string): AppThunk => async (dispatch, g
         return
     }
 
+    dispatch(actions.fetchWorkListStarted())
     try {
-        const response = await getCheckingsStudentList({ accessToken, taskId })
+        const response = await getWorksList({ accessToken, taskId })
         if (!response) {
-            dispatch(actions.fetchListFailed({
+            dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
                 message: 'Некорректный ответ сервера', // TODO: i18n
             }))
             return
         }
         if (!response.success) {
-            dispatch(actions.fetchListFailed(response.error))
+            dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchStudentListSuccess(response.payload))
+        dispatch(actions.fetchWorkListSuccess(response.payload))
         return
 
     } catch (error) {
-        dispatch(actions.fetchListFailed({
+        dispatch(actions.fetchFailed({
             code: IErrorCode.REQUEST,
             message: 'Не удалось выполнить запрос'
         }));

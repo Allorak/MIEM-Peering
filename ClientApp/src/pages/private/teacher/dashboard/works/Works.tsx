@@ -9,7 +9,7 @@ import { WorkResponse } from "./WorkResponse";
 import { IWorkItem } from "../../../../../store/types";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
-import { fetchWorks } from "../../../../../store/works";
+import { fetchWorkList, fetchStudentWork } from "../../../../../store/works";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
 
@@ -17,17 +17,22 @@ export const Works: FC = () => {
 
   const dispatch = useAppDispatch()
 
+  const { path } = usePrivatePathTDashboard()
+
   const isWorkListLoading = useAppSelector(state => state.works.isWorkListLoading)
   const isWorkListLock = useAppSelector(state => state.works.isWorkListLock)
+  const isStudentWorkLoading = useAppSelector(state => state.works.isStudentWorkLoading)
+  const isStudentWorkLock = useAppSelector(state => state.works.isStudentWorkLock)
   const workList = useAppSelector(state => state.works.workList)
+  const studentWork = useAppSelector(state => state.works.studentWork)
   const error = useAppSelector(state => state.works.error)
 
-  const { path } = usePrivatePathTDashboard()
+  const [activeWork, setActiveWork] = useState<IWorkItem>()
 
   useEffect(() => {
     if (path && path.taskId)
-      dispatch(fetchWorks(path.taskId))
-  }, [path])
+      dispatch(fetchWorkList(path.taskId))
+  }, [])
 
   useEffect(() => {
     if (workList && workList.length > 0 && !activeWork) {
@@ -38,10 +43,9 @@ export const Works: FC = () => {
   }, [workList])
 
   const requestWorkResponsesById = useCallback((workId: string) => {
-
-  }, [])
-
-  const [activeWork, setActiveWork] = useState<IWorkItem>()
+    if (path && path.taskId)
+      dispatch(fetchStudentWork(path.taskId, workId))
+  }, [path])
 
   const handleOnWorkChange = useCallback((workId: string) => {
     if (workList && workList.length > 0) {
@@ -50,6 +54,7 @@ export const Works: FC = () => {
         setActiveWork(
           JSON.parse(JSON.stringify(workItem))
         )
+        requestWorkResponsesById(workItem.workId)
       }
     }
   }, [activeWork, workList])
@@ -60,7 +65,7 @@ export const Works: FC = () => {
       isLock={isWorkListLock}
       error={error}
     >
-      {workList && workList.length > 0 && activeWork &&(
+      {workList && workList.length > 0 && activeWork && (
         <Box sx={styles.gridContainer}>
           <Box sx={styles.leftContainer}>
             <Box sx={styles.topActionBox}>
@@ -89,7 +94,15 @@ export const Works: FC = () => {
               </Button>
             </Box>
 
-            <WorkResponse responses={[]} />
+            <DashboardWorkBox
+              isLoading={isStudentWorkLoading}
+              isLock={isStudentWorkLock}
+              error={error}
+            >
+              {studentWork && (
+                <WorkResponse responses={studentWork} />
+              )}
+            </DashboardWorkBox>
           </Box>
 
           <Box sx={styles.rightContainer}>

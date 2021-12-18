@@ -30,6 +30,7 @@ export const StudentWork: FC<IProps> = ({
             key={item.questionId}
             title={item.title}
             required={item.required}
+            description={item.description}
           >
             <QuestionBox>
               {item.type === IQuestionTypes.MULTIPLE && (

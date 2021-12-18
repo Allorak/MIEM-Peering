@@ -7,7 +7,7 @@ import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePat
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
-import { actions, createReview, fetchStudentWork, fetchStudentList, fetchPeerForm } from "../../../../../store/checkings";
+import { actions, createReview, fetchStudentWork, fetchCheckingsWorkList, fetchPeerForm } from "../../../../../store/checkings";
 
 import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
@@ -37,13 +37,13 @@ export const Checkings: FC = () => {
   const studentWork = useAppSelector(state => state.checkings.studentWork)
   const peerForm = useAppSelector(state => state.checkings.peerForm)
 
-  const [currentStudent, setCurrentStudent] = useState<string | undefined>()
+  const [currentWorkId, setCurrentWorkIdStudent] = useState<string | undefined>()
   const [responses, setResponses] = useState<IPeerForm>()
 
   useEffect(() => {
     if (path && path.taskId) {
       dispatch(actions.reset())
-      dispatch(fetchStudentList(path.taskId))
+      dispatch(fetchCheckingsWorkList(path.taskId))
       dispatch(fetchPeerForm(path.taskId))
     }
   }, [])
@@ -54,21 +54,21 @@ export const Checkings: FC = () => {
     }
   }, [peerForm])
 
-  const getStudentWork = useCallback((studentId: string) => {
+  const getStudentWork = useCallback((workId: string) => {
     if (path && path.taskId)
-      dispatch(fetchStudentWork(path.taskId, studentId))
+      dispatch(fetchStudentWork(path.taskId, workId))
   }, [path])
 
   useEffect(() => {
-    if (studentList && studentList.students && studentList.students.length > 0) {
-      setCurrentStudent(studentList.students[0].id)
-      getStudentWork(studentList.students[0].id)
+    if (studentList && studentList.length > 0) {
+      setCurrentWorkIdStudent(studentList[0].workId)
+      getStudentWork(studentList[0].workId)
     }
   }, [studentList])
 
   const handleStudentChange = useCallback((studentId: string) => {
-    if (currentStudent !== studentId) {
-      setCurrentStudent(studentId)
+    if (currentWorkId !== studentId) {
+      setCurrentWorkIdStudent(studentId)
       getStudentWork(studentId)
       if (path && path.taskId) {
         setResponses(undefined)
@@ -94,9 +94,9 @@ export const Checkings: FC = () => {
   }, [responses])
 
   const onRequest = useCallback((formResponses: IPeerResponses) => {
-    if (path && path.taskId && currentStudent && formResponses.responses)
-      dispatch(createReview(path.taskId, currentStudent, formResponses))
-  }, [currentStudent, path])
+    if (path && path.taskId && currentWorkId && formResponses.responses)
+      dispatch(createReview(path.taskId, currentWorkId, formResponses))
+  }, [currentWorkId, path])
 
   return (
     <DashboardWorkBox
@@ -104,10 +104,10 @@ export const Checkings: FC = () => {
       isLock={lockList}
       error={error}
     >
-      {studentList && studentList.students && studentList.students.length > 0 && currentStudent ? (
+      {studentList && studentList.length > 0 && currentWorkId ? (
         <Box sx={styles.container}>
           <StudentsListSelect
-            selectedStudentId={currentStudent}
+            selectedStudentId={currentWorkId}
             studentsList={studentList}
             onStudentChange={handleStudentChange}
           />
