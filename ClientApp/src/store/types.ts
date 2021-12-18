@@ -186,7 +186,8 @@ export interface INewTaskSettings {
   reviewStartDateTime: Date | undefined
   reviewEndDateTime: Date | undefined
   submissionsToCheck: number
-  stepParams: IFirstStepSettings | ISecondStepSettings
+  stepParams: IFirstStepSettings | ISecondStepSettings,
+  type: PeerTaskTypes
 }
 
 export enum PeerSteps {
@@ -204,7 +205,7 @@ export interface ISecondStepSettings {
   taskId: string
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'stepParams'> { }
+export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'stepParams' | 'type'> { }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
@@ -343,4 +344,10 @@ export interface IExtpertItem {
   imgUrl?: string
   taskComplete: number,
   assignedTasks: number
+}
+
+export enum PeerTaskTypes {
+  SINGLE_BLIND = 'singleBlind',
+  DOUBLE_BLIND = 'doubleBlind',
+  OPEN = 'open'
 }

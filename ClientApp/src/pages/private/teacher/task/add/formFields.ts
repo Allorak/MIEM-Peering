@@ -107,3 +107,12 @@ export const peerStepProps: UseControllerProps<INewTaskSettings, "stepParams.ste
   },
 })
 
+export const taskTypeProps: UseControllerProps<INewTaskSettings, "type"> = ({
+  name: "type",
+  rules: {
+    required: {
+      value: true,
+      message: "Это обязательное поле"
+    }
+  },
+})
