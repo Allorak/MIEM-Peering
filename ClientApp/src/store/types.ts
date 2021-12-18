@@ -347,3 +347,70 @@ export enum PeerTaskTypes {
   DOUBLE_BLIND = 'doubleBlind',
   OPEN = 'open'
 }
+export interface ICatalog {
+  id: string,
+  name: string
+}
+
+
+/* Chickings */
+
+export interface IStudentList {
+  students: Array<{
+    id: string,
+    fullName: string
+  }>
+}
+
+export interface IStudentWorkItem {
+  questionId: string,
+  order: number,
+  title: string,
+  required: boolean
+  response?: string
+}
+
+export interface IStudentWorkSelectItem extends Omit<IStudentWorkItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
+
+export interface IStudentWorkTextItem extends IStudentWorkItem, ITextQuestion { }
+
+export interface IStudentWorkShortTextItem extends IStudentWorkItem, IShortTextQuestion { }
+
+export interface IStudentWorkMultipleItem extends IStudentWorkItem, IMultipleQuiestion { }
+
+export type IStudentWork = {
+  responses: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+}
+
+export interface IPeerFormItem {
+  id: string,
+  order: number,
+  required: boolean,
+  title: string,
+  response?: string
+}
+
+export interface IPeerFormSelectItem extends Omit<IPeerFormItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
+
+export interface IPeerFormTextItem extends IPeerFormItem, ITextQuestion { }
+
+export interface IPeerFormShortTextItem extends IPeerFormItem, IShortTextQuestion { }
+
+export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion { }
+
+export type IPeerForm = {
+  rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
+}
+
+export type IPeerResponseItem = {
+  questionId: string,
+  response?: string | number
+}
+
+export type IPeerResponses = {
+  responses: Array<IPeerResponseItem>
+}

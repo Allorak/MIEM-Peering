@@ -1,1 +1,2 @@
-export { RatingScaleVisible } from "./RatingScaleVisible"
+export { RatingScaleVisible } from "./RatingScaleVisible";
+export { RatingScaleEditable } from "./RatingScaleEditable";
