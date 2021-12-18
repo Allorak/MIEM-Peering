@@ -10,7 +10,7 @@ import ruLocale from "date-fns/locale/ru";
 import { InputLabel } from "../../../../../../components/inputLabel";
 
 import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
-import { IFirstStepSettings, INewTaskSettings, PeerSteps } from "../../../../../../store/types";
+import { IFirstStepSettings, INewTaskSettings, PeerSteps, PeerTaskTypes } from "../../../../../../store/types";
 
 import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
@@ -42,6 +42,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
 
   const { field: maxSubmissionProps } = useController({ control, ...fields.maxSubmissionProps })
   const { field: peerStepProps } = useController({ control, ...fields.peerStepProps })
+  const { field: typeProps } = useController({ control, ...fields.taskTypeProps })
   const experts = getValues('stepParams.experts')
 
   const handleOnStepChange = useCallback((value: SelectChangeEvent<unknown>) => {
@@ -371,6 +372,43 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
           <Box sx={styles.dateBox}>
             <Box>
               <InputLabel
+                title={"Выберите тип:"}
+                required
+              />
+
+              <Select
+                sx={{ display: "block" }}
+                type={"text"}
+                required
+                inputProps={typeProps}
+              >
+                <MenuItem
+                  key={PeerTaskTypes.SINGLE_BLIND}
+                  value={PeerTaskTypes.SINGLE_BLIND}
+                >
+                  {"Single blind"}
+                </MenuItem>
+
+                <MenuItem
+                  key={PeerTaskTypes.DOUBLE_BLIND}
+                  value={PeerTaskTypes.DOUBLE_BLIND}
+                >
+                  {"Double blind"}
+                </MenuItem>
+
+                <MenuItem
+                  key={PeerTaskTypes.OPEN}
+                  value={PeerTaskTypes.OPEN}
+                >
+                  {"Open Peer review"}
+                </MenuItem>
+              </Select>
+            </Box>
+          </Box>
+
+          <Box sx={styles.dateBox}>
+            <Box>
+              <InputLabel
                 title={"Выберите итерацию:"}
                 required
               />
@@ -450,7 +488,8 @@ const initialValue = (): INewTaskSettings => {
     stepParams: {
       step: PeerSteps.FIRST_STEP,
       experts: []
-    } as IFirstStepSettings
+    } as IFirstStepSettings,
+    type: PeerTaskTypes.DOUBLE_BLIND
   }
 
   return taskSettings

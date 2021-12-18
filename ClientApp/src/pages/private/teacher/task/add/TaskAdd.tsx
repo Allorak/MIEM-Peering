@@ -14,7 +14,7 @@ import { actions, createTasks } from "../../../../../store/tasks"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
 import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
 import { paths } from "../../../../../app/constants/paths";
-import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes, PeerSteps } from "../../../../../store/types"
+import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes, PeerSteps, PeerTaskTypes } from "../../../../../store/types"
 
 import * as globalStyles from "../../../../../const/styles"
 
@@ -108,6 +108,7 @@ export const TaskAdd: FC = () => {
             <NewTaskAuthorForm
               onSubmit={setFormRubrics}
               rubrics={newTaskItem.peerForm.rubrics}
+              isPeerForm
             />
           )}
 
@@ -152,7 +153,8 @@ const initialTask: INewTask = {
     stepParams: {
       step: PeerSteps.FIRST_STEP,
       experts: ['ivan@ivanov.ru']
-    }
+    },
+    type: PeerTaskTypes.DOUBLE_BLIND
   },
   authorForm: {
     rubrics: [
