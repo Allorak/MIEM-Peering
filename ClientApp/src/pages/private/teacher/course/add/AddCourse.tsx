@@ -15,17 +15,17 @@ interface IProps {
 }
 
 export const AddCourse: FC<IProps> = ({ popupOpen, onCloseHandler }) => {
-    
+
     const dispatch = useAppDispatch()
     const loading = useAppSelector(state => state.newCourse.isLoading)
     const errorState = useAppSelector(state => state.newCourse.error)
     const payload = useAppSelector(state => state.newCourse.payload)
     const history = useNavigate()
 
-    if (payload && payload.courseId) {
-        history(generatePath(paths.teacher.courses.course, {courseId: payload.courseId}))
+    if (payload && payload.id) {
+        history(generatePath(paths.teacher.courses.course, { courseId: payload.id }))
         dispatch(actions.courseSetInitialState())
-        
+
     }
 
     return (

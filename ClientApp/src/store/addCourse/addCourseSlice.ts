@@ -5,13 +5,13 @@ import { ICourse, IError } from '../types';
 export interface INewCourseState {
   isLoading: boolean,
   error: IError | undefined,
-  payload: ICourse
+  payload: ICourse | undefined
 }
 
 const initialState: INewCourseState = {
   isLoading: false,
   error: undefined,
-  payload: {} as ICourse,
+  payload: undefined,
 };
 
 export const addCourseSlice = createSlice({
@@ -36,7 +36,7 @@ export const addCourseSlice = createSlice({
     courseSetInitialState: (state) => {
       state.isLoading =  false
       state.error = undefined
-      state.payload = { } as ICourse
+      state.payload = undefined
     }
   },
 });

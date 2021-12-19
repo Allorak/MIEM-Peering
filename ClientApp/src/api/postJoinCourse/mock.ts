@@ -8,6 +8,6 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
 
   return {
     success: true,
-    payload: {courseId: '1'}
+    payload: {id: '1'}
   }
 }

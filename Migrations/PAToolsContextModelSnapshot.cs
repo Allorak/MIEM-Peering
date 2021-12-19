@@ -16,6 +16,33 @@ namespace patools.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.11");
 
+            modelBuilder.Entity("patools.Models.Answer", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("QuestionID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("SubmissionID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("QuestionID");
+
+                    b.HasIndex("SubmissionID");
+
+                    b.ToTable("Answers");
+                });
+
             modelBuilder.Entity("patools.Models.Course", b =>
                 {
                     b.Property<Guid>("ID")
@@ -55,10 +82,10 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("CourseID")
+                    b.Property<Guid?>("CourseID")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("UserID")
+                    b.Property<Guid?>("UserID")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
@@ -92,10 +119,10 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("GroupID")
+                    b.Property<Guid?>("GroupID")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("StudentID")
+                    b.Property<Guid?>("StudentID")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Subgroup")
@@ -135,7 +162,7 @@ namespace patools.Migrations
                     b.Property<int>("RespondentType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("TaskID")
+                    b.Property<Guid?>("TaskID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
@@ -153,13 +180,29 @@ namespace patools.Migrations
                     b.ToTable("Questions");
                 });
 
+            modelBuilder.Entity("patools.Models.Submission", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("TaskUserAssignmentID")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("TaskUserAssignmentID");
+
+                    b.ToTable("Submissions");
+                });
+
             modelBuilder.Entity("patools.Models.Task", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("CourseID")
+                    b.Property<Guid?>("CourseID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
@@ -201,10 +244,10 @@ namespace patools.Migrations
                     b.Property<int>("State")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("StudentID")
+                    b.Property<Guid?>("StudentID")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("TaskID")
+                    b.Property<Guid?>("TaskID")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
@@ -260,7 +303,7 @@ namespace patools.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("QuestionID")
+                    b.Property<Guid?>("QuestionID")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
@@ -268,6 +311,21 @@ namespace patools.Migrations
                     b.HasIndex("QuestionID");
 
                     b.ToTable("Variants");
+                });
+
+            modelBuilder.Entity("patools.Models.Answer", b =>
+                {
+                    b.HasOne("patools.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionID");
+
+                    b.HasOne("patools.Models.Submission", "Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionID");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Submission");
                 });
 
             modelBuilder.Entity("patools.Models.Course", b =>
@@ -282,16 +340,12 @@ namespace patools.Migrations
             modelBuilder.Entity("patools.Models.CourseUser", b =>
                 {
                     b.HasOne("patools.Models.Course", "Course")
-                        .WithMany("CourseUsers")
-                        .HasForeignKey("CourseID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("CourseID");
 
                     b.HasOne("patools.Models.User", "User")
-                        .WithMany("CourseUsers")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("UserID");
 
                     b.Navigation("Course");
 
@@ -301,16 +355,12 @@ namespace patools.Migrations
             modelBuilder.Entity("patools.Models.GroupUser", b =>
                 {
                     b.HasOne("patools.Models.Group", "Group")
-                        .WithMany("GroupUsers")
-                        .HasForeignKey("GroupID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("GroupID");
 
                     b.HasOne("patools.Models.User", "Student")
-                        .WithMany("GroupUsers")
-                        .HasForeignKey("StudentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("StudentID");
 
                     b.Navigation("Group");
 
@@ -320,21 +370,26 @@ namespace patools.Migrations
             modelBuilder.Entity("patools.Models.Question", b =>
                 {
                     b.HasOne("patools.Models.Task", "Task")
-                        .WithMany("Questions")
-                        .HasForeignKey("TaskID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("TaskID");
 
                     b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("patools.Models.Submission", b =>
+                {
+                    b.HasOne("patools.Models.TaskUser", "TaskUserAssignment")
+                        .WithMany()
+                        .HasForeignKey("TaskUserAssignmentID");
+
+                    b.Navigation("TaskUserAssignment");
                 });
 
             modelBuilder.Entity("patools.Models.Task", b =>
                 {
                     b.HasOne("patools.Models.Course", "Course")
-                        .WithMany("Tasks")
-                        .HasForeignKey("CourseID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("CourseID");
 
                     b.Navigation("Course");
                 });
@@ -342,16 +397,12 @@ namespace patools.Migrations
             modelBuilder.Entity("patools.Models.TaskUser", b =>
                 {
                     b.HasOne("patools.Models.User", "Student")
-                        .WithMany("TaskUsers")
-                        .HasForeignKey("StudentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("StudentID");
 
                     b.HasOne("patools.Models.Task", "Task")
-                        .WithMany("TaskUsers")
-                        .HasForeignKey("TaskID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("TaskID");
 
                     b.Navigation("Student");
 
@@ -361,45 +412,10 @@ namespace patools.Migrations
             modelBuilder.Entity("patools.Models.Variant", b =>
                 {
                     b.HasOne("patools.Models.Question", "Question")
-                        .WithMany("Variants")
-                        .HasForeignKey("QuestionID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("QuestionID");
 
                     b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("patools.Models.Course", b =>
-                {
-                    b.Navigation("CourseUsers");
-
-                    b.Navigation("Tasks");
-                });
-
-            modelBuilder.Entity("patools.Models.Group", b =>
-                {
-                    b.Navigation("GroupUsers");
-                });
-
-            modelBuilder.Entity("patools.Models.Question", b =>
-                {
-                    b.Navigation("Variants");
-                });
-
-            modelBuilder.Entity("patools.Models.Task", b =>
-                {
-                    b.Navigation("Questions");
-
-                    b.Navigation("TaskUsers");
-                });
-
-            modelBuilder.Entity("patools.Models.User", b =>
-                {
-                    b.Navigation("CourseUsers");
-
-                    b.Navigation("GroupUsers");
-
-                    b.Navigation("TaskUsers");
                 });
 #pragma warning restore 612, 618
         }

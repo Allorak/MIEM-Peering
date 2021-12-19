@@ -19,33 +19,27 @@ namespace patools.Services.Users
             _context = context;
         }
 
-        public async Task<Response<GetNewUserDTO>> AddGoogleUser(User newUser)
+        public async Task<Response<GetNewUserDtoResponse>> AddGoogleUser(AddUserDTO newUser)
         {
-            var response = new Response<GetNewUserDTO>();
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
             if (existingUser != null)
-                return new UserAlreadyRegisteredResponse<GetNewUserDTO>();
+                return new UserAlreadyRegisteredResponse<GetNewUserDtoResponse>();
 
-            await _context.Users.AddAsync(newUser);
+            var user = _mapper.Map<User>(newUser);
+            user.ID = Guid.NewGuid();
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = _mapper.Map<GetNewUserDTO>(newUser);
-            return response;
+            return new SuccessfulResponse<GetNewUserDtoResponse>(_mapper.Map<GetNewUserDtoResponse>(user));
         }
 
-        public async Task<Response<GetRegisteredUserDTO>> GetUserProfile(Guid userId)
+        public async Task<Response<GetRegisteredUserDtoResponse>> GetUserProfile(Guid userId)
         {
-            var response = new Response<GetRegisteredUserDTO>();
             var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
             if (user == null)
-                return new InvalidGuidIdResponse<GetRegisteredUserDTO>("Invalid user id");
+                return new InvalidGuidIdResponse<GetRegisteredUserDtoResponse>("Invalid user id");
             
-            response.Success = true;
-            response.Error = null;
-            response.Payload = _mapper.Map<GetRegisteredUserDTO>(user);
-            return response;
+            return new SuccessfulResponse<GetRegisteredUserDtoResponse>(_mapper.Map<GetRegisteredUserDtoResponse>(user));
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

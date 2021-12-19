@@ -232,3 +232,9 @@ _Pvt_Extensions
 .fake/
 
 app.db
+app.db-shm
+app.db-wal
+
+.idea
+.idea/
+.idea/.idea.patools.dir/.idea/workspace.xml

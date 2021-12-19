@@ -12,6 +12,5 @@ namespace patools.Models
         [MaxLength(10)]
         public string Name { get; set; }
 
-        public List<GroupUser> GroupUsers { get; set; }
     }
 }

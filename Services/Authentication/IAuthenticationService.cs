@@ -10,8 +10,8 @@ namespace patools.Services.Authentication
 {
     public interface IAuthenticationService
     {
-        Task<Response<GetJWTTokenDTO>> GetJwtByEmail(string email);
+        Task<Response<GetJwtTokenDtoResponse>> GetJwtByEmail(string email);
 
-        Task<Response<GoogleGetRegisteredUserDTO>> FindUserByEmail(string email);
+        Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email);
     }
 }
