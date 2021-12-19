@@ -105,21 +105,32 @@ namespace patools.Services.Tasks
             return response;
         }
 
-        public async Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid studentId)
+        public async Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid userId)
         {
             var response = new Response<GetAuthorFormDTO>();
 
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskId);
+            var task = await _context.Tasks
+                .Include(t=>t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskId);
             if (task == null)
                 return new InvalidGuidIdResponse<GetAuthorFormDTO>("Invalid task id");
             
-            var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == studentId && u.Role == UserRoles.Student);
-            if (student == null)
-                return new InvalidGuidIdResponse<GetAuthorFormDTO>("Invalid task id");
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetAuthorFormDTO>("Invalid user id");
 
-            var taskUser = await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == student && tu.Task == task);
-            if (taskUser == null)
-                return new NoAccessResponse<GetAuthorFormDTO>("This task is not assigned to this user");
+            if (user.Role == UserRoles.Student)
+            {
+                var taskUser =
+                    await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == user && tu.Task == task);
+                if (taskUser == null)
+                    return new NoAccessResponse<GetAuthorFormDTO>("This task is not assigned to this user");
+            }
+            else if (user.Role == UserRoles.Teacher)
+            {
+                if (task.Course.Teacher != user)
+                    return new NoAccessResponse<GetAuthorFormDTO>("This teacher has no access to the task");
+            }
 
             var questions = _context.Questions
                 .Where(q => q.Task == task && q.RespondentType == RespondentTypes.Author)

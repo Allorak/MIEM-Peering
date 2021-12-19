@@ -51,15 +51,15 @@ namespace patools.Controllers.v1
                 return Ok(new UnauthorizedUserResponse());
 
             //The user has no id Claim
-            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(studentIdClaim == null)
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
                 return Ok(new InvalidJwtTokenResponse());
 
             //The id stored in Claim is not Guid
-            if(!Guid.TryParse(studentIdClaim.Value, out var studentId))
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
 
-            return Ok(await _tasksService.GetAuthorForm(taskId, studentId));
+            return Ok(await _tasksService.GetAuthorForm(taskId, userId));
         }
     }
 }
