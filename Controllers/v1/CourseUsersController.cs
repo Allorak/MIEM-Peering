@@ -47,7 +47,7 @@ namespace patools.Controllers.v1
                     .Include(course => course.Course)
                     .Include(user => user.User)
                     .Include(course => course.Course.Teacher)
-                    .Select(x => new {x.User.ID, x.Course.Title, x.Course.Description, x.Course.CourseCode, x.Course.Subject, x.User.Fullname, x.User.Role, x.User.Email, x.User.ImageUrl});
+                    .Select(x => new {x.Course.ID, x.Course.Title, x.Course.Description, x.Course.CourseCode, x.Course.Subject, x.User.Fullname, x.User.Role, x.User.Email, x.User.ImageUrl});
             
             return Ok(course.ToList());
         }
@@ -78,17 +78,19 @@ namespace patools.Controllers.v1
 
         // POST: api/v1/CourseUsers/{userID}/{courseID}
         [HttpPost("{userID}/{courseID}")]
-        public async Task<ActionResult<CourseUser>> PostCourseUser(Guid userID, Guid courseID)
+        public async Task<Response<string>> PostCourseUser(Guid userID, Guid courseID)
         {
+
+            var response = new Response<string>();
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userID);
             if (user == null)
-                return new InvalidGuidIdResponse<string>();
+                return new InvalidGuidIdResponse<string>("Invalid user id");
 
             var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseID);
             if (course == null)
-                return new InvalidGuidIdResponse<string>();
-            
+                return new InvalidGuidIdResponse<string>("Invalid course id");
+
             var newCourseUser = new Models.CourseUser
             {
                 ID = Guid.NewGuid(),
@@ -99,7 +101,10 @@ namespace patools.Controllers.v1
             await _context.CourseUsers.AddAsync(newCourseUser);
             await _context.SaveChangesAsync();
 
-            return Ok(newCourseUser);
+            response.Success = true;
+            response.Error = null;
+            response.Payload = "CourseUser was added successfully";
+            return response;
         }
 
         /*
