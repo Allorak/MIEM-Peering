@@ -8,9 +8,9 @@ namespace patools.Services.Tasks
 {
     public interface ITasksService
     {
-        Task<Response<GetTaskOverviewDTO>> GetTaskOverview (Guid taskId, Guid teacherId);
-        Task<Response<GetNewTaskDTO>> AddTask(Guid courseId, Guid teacherId, AddTaskDTO task);
-        Task<Response<IEnumerable<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole);
+        Task<Response<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview (Guid taskId, Guid teacherId);
+        Task<Response<GetNewPeeringTaskDtoResponse>> AddTask(Guid courseId, Guid teacherId, AddPeeringTaskDto task);
+        Task<Response<IEnumerable<GetPeeringTaskMainInfoDtoResponse>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole);
         Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid userId);
     }
 }

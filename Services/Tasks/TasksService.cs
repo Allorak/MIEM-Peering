@@ -21,18 +21,18 @@ namespace patools.Services.Tasks
             _context = context;
         }
 
-        public async Task<Response<GetNewTaskDTO>> AddTask(Guid courseId, Guid teacherId, AddTaskDTO task)
+        public async Task<Response<GetNewPeeringTaskDtoResponse>> AddTask(Guid courseId, Guid teacherId, AddPeeringTaskDto task)
         {
-            var response = new Response<GetNewTaskDTO>();
+            var response = new Response<GetNewPeeringTaskDtoResponse>();
 
             var course = await _context.Courses.Include(c => c.Teacher).FirstOrDefaultAsync(c => c.ID == courseId);
             if (course == null)
-                return new InvalidGuidIdResponse<GetNewTaskDTO>("Invalid course id");
+                return new InvalidGuidIdResponse<GetNewPeeringTaskDtoResponse>("Invalid course id");
 
             if (course.Teacher.ID != teacherId)
-                return new NoAccessResponse<GetNewTaskDTO>("This teacher has no access to this course");
+                return new NoAccessResponse<GetNewPeeringTaskDtoResponse>("This teacher has no access to this course");
 
-            var newTask = new Models.Task
+            var newTask = new Models.PeeringTask
             {
                 ID = Guid.NewGuid(),
                 Title = task.MainInfo.Title,
@@ -52,7 +52,7 @@ namespace patools.Services.Tasks
             {
                 var newAuthorQuestion = _mapper.Map<Question>(authorQuestion);
                 newAuthorQuestion.ID = Guid.NewGuid();
-                newAuthorQuestion.Task = newTask;
+                newAuthorQuestion.PeeringTask = newTask;
                 newAuthorQuestion.RespondentType = RespondentTypes.Author;
                 await _context.Questions.AddAsync(newAuthorQuestion);
             }
@@ -61,7 +61,7 @@ namespace patools.Services.Tasks
             {
                 var newPeerQuestion = _mapper.Map<Question>(peerQuestion);
                 newPeerQuestion.ID = Guid.NewGuid();
-                newPeerQuestion.Task = newTask;
+                newPeerQuestion.PeeringTask = newTask;
                 newPeerQuestion.RespondentType = RespondentTypes.Peer;
                 await _context.Questions.AddAsync(newPeerQuestion);
             }
@@ -70,21 +70,21 @@ namespace patools.Services.Tasks
 
             response.Success = true;
             response.Error = null;
-            response.Payload = _mapper.Map<GetNewTaskDTO>(newTask);
+            response.Payload = _mapper.Map<GetNewPeeringTaskDtoResponse>(newTask);
             return response;
         }
 
-        public async Task<Response<IEnumerable<GetTaskMainInfoDTO>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole)
+        public async Task<Response<IEnumerable<GetPeeringTaskMainInfoDtoResponse>>> GetCourseTasks(Guid courseId, Guid userId, UserRoles userRole)
         {
-            var response = new Response<IEnumerable<GetTaskMainInfoDTO>>();
+            var response = new Response<IEnumerable<GetPeeringTaskMainInfoDtoResponse>>();
 
             var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseId);
             if (course == null)
-                return new InvalidGuidIdResponse<IEnumerable<GetTaskMainInfoDTO>>("Invalid course id");
+                return new InvalidGuidIdResponse<IEnumerable<GetPeeringTaskMainInfoDtoResponse>>("Invalid course id");
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == userId);
             if (user == null)
-                return new InvalidGuidIdResponse<IEnumerable<GetTaskMainInfoDTO>>("Invalid user id");
+                return new InvalidGuidIdResponse<IEnumerable<GetPeeringTaskMainInfoDtoResponse>>("Invalid user id");
 
             var courseUserConnection = await _context.CourseUsers.FirstOrDefaultAsync(x => x.User.ID == user.ID && x.Course.ID == courseId);
 
@@ -96,7 +96,7 @@ namespace patools.Services.Tasks
             {
                 var tasks = await _context.Tasks
                                     .Where(t => t.Course.ID == courseId)
-                                    .Select(x => _mapper.Map<GetTaskMainInfoDTO>(x))
+                                    .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
                                     .ToListAsync();
                 response.Payload = tasks;
             }
@@ -122,7 +122,7 @@ namespace patools.Services.Tasks
             if (user.Role == UserRoles.Student)
             {
                 var taskUser =
-                    await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == user && tu.Task == task);
+                    await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
                 if (taskUser == null)
                     return new NoAccessResponse<GetAuthorFormDTO>("This task is not assigned to this user");
             }
@@ -133,7 +133,7 @@ namespace patools.Services.Tasks
             }
 
             var questions = _context.Questions
-                .Where(q => q.Task == task && q.RespondentType == RespondentTypes.Author)
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Author)
                 .OrderBy(q => q.Order)
                 .Select(q => _mapper.Map<GetQuestionDTO>(q));
 
@@ -143,39 +143,39 @@ namespace patools.Services.Tasks
             return response;
         }
 
-        public async System.Threading.Tasks.Task<Response<GetTaskOverviewDTO>> GetTaskOverview(Guid taskId, Guid teacherId)
+        public async System.Threading.Tasks.Task<Response<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview(Guid taskId, Guid teacherId)
         {
-            var response = new Response<GetTaskOverviewDTO>();
+            var response = new Response<GetPeeringTaskOverviewDtoResponse>();
 
             var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId);
             if (teacher == null)
-                return new InvalidGuidIdResponse<GetTaskOverviewDTO>("Invalid teacher id");
+                return new InvalidGuidIdResponse<GetPeeringTaskOverviewDtoResponse>("Invalid teacher id");
 
             var task = await _context.Tasks
                 .Include(x => x.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskId);
             if (task == null)
-                return new InvalidGuidIdResponse<GetTaskOverviewDTO>("Invalid task id");
+                return new InvalidGuidIdResponse<GetPeeringTaskOverviewDtoResponse>("Invalid task id");
 
             if (task.Course.Teacher.ID != teacher.ID)
-                return new NoAccessResponse<GetTaskOverviewDTO>("This teacher has no access to this task");
-            
-            var totalAssignments = await _context.TaskUsers.CountAsync(tu => tu.Task == task);
+                return new NoAccessResponse<GetPeeringTaskOverviewDtoResponse>("This teacher has no access to this task");
+
+            var totalAssignments = await _context.TaskUsers.CountAsync(tu => tu.PeeringTask == task);
             int submissionsNumber = 1;
             int reviewsNumber = 1;
             float[] grades = {10,10,10,10,10,10};
 
-            var statistics = new GetTaskStatisticsDTO
+            var statistics = new GetPeeringTaskStatisticsDtoResponse()
             {
                 Submissions = submissionsNumber,
                 Review = reviewsNumber,
                 Total = totalAssignments
             };
-            var deadlines = _mapper.Map<GetTaskDeadlinesDTO>(task);
+            var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
 
             response.Success = true;
             response.Error = null;
-            response.Payload = new GetTaskOverviewDTO
+            response.Payload = new GetPeeringTaskOverviewDtoResponse
             {
                 Statistics = statistics,
                 Deadlines = deadlines,

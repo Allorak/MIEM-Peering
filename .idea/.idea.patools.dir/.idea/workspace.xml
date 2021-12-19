@@ -5,9 +5,11 @@
     <projectFile profileName="patools">patools.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="Renamed Task to PeeringTask">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Submissions/SubmissionsService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Submissions/SubmissionsService.cs" afterDir="false" />
+    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AutoMapperProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/AutoMapperProfile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +70,16 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/AuthenticationController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/AutoMapperProfile.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/ITasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/AutoMapperProfile.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/TasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/ITasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/PeeringTasksController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/PeeringTasksController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/TasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Dtos/PeeringTask/GetAuthorFormDTO.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Dtos/PeeringTask/GetAuthorFormDTO.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="21mkjGjaWckRcMOe4jzvS37Eq57" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -123,6 +134,10 @@
         <option name="Build" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue=".NET Launch Settings Profile.patools" />
+      <item itemvalue=".NET Launch Settings Profile.patools: IIS Express" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
