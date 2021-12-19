@@ -115,6 +115,16 @@ export type ICourses = {
   name: string,
   subject: string,
   description?: string,
+  settings?: IActiveCodeCourse | IDisableCodeCourse
+}
+
+export type IActiveCodeCourse = {
+  enableCode: true,
+  code?: string
+}
+
+export type IDisableCodeCourse = {
+  enableCode: false,
 }
 
 export type IResponseCourses = {
@@ -126,6 +136,7 @@ export type IResponseCourses = {
   title: string,
   subject: string,
   description?: string,
+  settings?: IActiveCodeCourse | IDisableCodeCourse
 }
 
 export type INewCourseRequest = {
@@ -134,6 +145,10 @@ export type INewCourseRequest = {
   description?: string
 }
 
+export type IUpdateCourseRequest = INewCourseRequest & {
+  id: string
+  settings?: IActiveCodeCourse | IDisableCodeCourse
+}
 
 export type ITaskItem = {
   id: string,
@@ -171,9 +186,26 @@ export interface INewTaskSettings {
   reviewStartDateTime: Date | undefined
   reviewEndDateTime: Date | undefined
   submissionsToCheck: number
+  stepParams: IFirstStepSettings | ISecondStepSettings,
+  type: PeerTaskTypes
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck'> { }
+export enum PeerSteps {
+  FIRST_STEP = 'firstStep',
+  SECOND_STEP = 'secondStep',
+}
+
+export interface IFirstStepSettings {
+  step: PeerSteps.FIRST_STEP,
+  experts: Array<string>
+}
+
+export interface ISecondStepSettings {
+  step: PeerSteps.SECOND_STEP,
+  taskId: string
+}
+
+export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'stepParams' | 'type'> { }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
 
@@ -181,6 +213,7 @@ export type IParentQuestionRubric = {
   order: number
   title: string
   required: boolean
+  description?: string
 }
 
 export interface ITextQuestion extends IParentQuestionRubric {
@@ -199,7 +232,8 @@ export interface IMultipleQuiestion extends IParentQuestionRubric {
 export interface ISelectRatingQuestion extends IParentQuestionRubric {
   type: IQuestionTypes.SELECT_RATE,
   maxValue: number,
-  minValue: number
+  minValue: number,
+  coefficientPercentage?: number
 }
 
 export enum IQuestionTypes {
@@ -251,7 +285,10 @@ export enum IMenuTitles {
   CHECKINGS = 'Проверки',
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
-  EXPORT = 'Экспорт'
+  EXPORT = 'Экспорт',
+  MENU_1 = 'Меню 1',
+  MENU_2 = 'Меню 2',
+  MENU_3 = 'Меню 3'
 }
 
 export type IStatusBar = {
@@ -260,10 +297,19 @@ export type IStatusBar = {
   review: number
 }
 
+export type IStatusTask = {
+  count: number
+}
+
 export type IOverview = {
   statistics: IStatusBar,
   deadlines: IDeadlines,
   grades: number[]
+}
+
+export type IOverviewStudent = {
+  deadlines: IDeadlines,
+  status: IStatusTask
 }
 
 export type IOverviewResponse = IOverview & {
@@ -274,6 +320,7 @@ export type IOverviewResponse = IOverview & {
     reviewEndDateTime: string
   }
 }
+
 
 export type IWorkItem = {
   id: string,
@@ -297,4 +344,10 @@ export interface IExtpertItem {
   imgUrl?: string
   taskComplete: number,
   assignedTasks: number
+}
+
+export enum PeerTaskTypes {
+  SINGLE_BLIND = 'singleBlind',
+  DOUBLE_BLIND = 'doubleBlind',
+  OPEN = 'open'
 }

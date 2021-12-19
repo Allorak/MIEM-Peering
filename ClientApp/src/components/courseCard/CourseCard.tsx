@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { useAppSelector } from "../../app/hooks";
 import SettingsIco from '../../img/ico/setting-hover.svg'
 import DefaultAvatar from '../../img/ico/avatar.svg'
@@ -11,22 +11,25 @@ import { Delete as DeleteIcon } from "../icons/Delete";
 interface IProps {
     course: ICourses
     onCourseSelect(id: string): void
+    onCourseSettings?: (course: ICourses) => void
 }
 
 export const CourseCard: FC<IProps> = ({
     course,
-    onCourseSelect
+    onCourseSelect,
+    onCourseSettings
 }) => {
 
     const userProfile = useAppSelector(state => state.userProfile.payload)
 
-    const onSettings = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const onSettings = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         event.stopPropagation()
-    }
+        if (onCourseSettings) onCourseSettings(course)
+    }, [course])
 
-    const onDelete = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const onDelete = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         event.stopPropagation()
-    }
+    }, [course])
 
     return (
         <Box sx={styles.root}
@@ -49,15 +52,15 @@ export const CourseCard: FC<IProps> = ({
                                     alt="Settings"
                                 />
                             </Box>
-                        ) : 
-                        (
-                            <Box 
-                            sx={styles.settingBt}
-                            onClick={onDelete}
-                            >
-                                <DeleteIcon />
-                            </Box>
-                        )
+                        ) :
+                            (
+                                <Box
+                                    sx={styles.settingBt}
+                                    onClick={onDelete}
+                                >
+                                    <DeleteIcon />
+                                </Box>
+                            )
                     }
                 </Box>
 

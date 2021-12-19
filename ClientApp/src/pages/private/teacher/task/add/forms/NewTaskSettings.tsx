@@ -1,7 +1,7 @@
 //@ts-ignore
-import { FC } from "react";
+import { FC, useCallback, useState } from "react";
 import { Controller, useController, useForm } from "react-hook-form";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import DateAdapter from '@mui/lab/AdapterDateFns';
 import { LocalizationProvider, MobileDatePicker, TimePicker } from "@mui/lab";
@@ -10,19 +10,29 @@ import ruLocale from "date-fns/locale/ru";
 import { InputLabel } from "../../../../../../components/inputLabel";
 
 import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
-import { INewTaskSettings } from "../../../../../../store/types";
+import { IFirstStepSettings, INewTaskSettings, PeerSteps, PeerTaskTypes } from "../../../../../../store/types";
 
 import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
+
+import { ExpertTable } from "../components/ExpertsTable";
+import { ExpertUpdateForm } from "../components/ExpertUpdateForm";
 
 
 interface IProps {
   onSubmit(questions: INewTaskSettings): void
 }
 
-export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
+interface IIterationCatalog {
+  id: PeerSteps,
+  name: string
+}
 
-  const { control, formState, handleSubmit } = useForm<INewTaskSettings>({
+export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
+  const [popupStatus, setPopupStatus] = useState(false)
+  const [currentExpert, setCurrentExpert] = useState<string>()
+
+  const { control, formState, getValues, setValue } = useForm<INewTaskSettings>({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
@@ -31,292 +41,478 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
   })
 
   const { field: maxSubmissionProps } = useController({ control, ...fields.maxSubmissionProps })
+  const { field: peerStepProps } = useController({ control, ...fields.peerStepProps })
+  const { field: typeProps } = useController({ control, ...fields.taskTypeProps })
+  const experts = getValues('stepParams.experts')
+
+  const handleOnStepChange = useCallback((value: SelectChangeEvent<unknown>) => {
+    if (peerStepProps.value !== value.target.value) {
+      if (value.target.value === PeerSteps.FIRST_STEP) {
+        setValue('stepParams', {
+          step: PeerSteps.FIRST_STEP,
+          experts: []
+        })
+      } else {
+        setValue('stepParams', {
+          step: PeerSteps.SECOND_STEP,
+          taskId: "1" //TODO
+        })
+      }
+    }
+  }, [setValue, peerStepProps])
+
+  const handleAddOrEditExpert = useCallback((email?: string) => {
+    setCurrentExpert(email)
+    setPopupStatus(true)
+  }, [])
+
+  const handleExpertSubmit = useCallback((email: string) => {
+    if (peerStepProps.value === PeerSteps.FIRST_STEP) {
+      if (currentExpert && experts.length > 0) {
+        if (currentExpert !== email) {
+          const flag = experts.filter(expert => expert === email).length === 0
+          if (flag) {
+            const filteredExperts = experts.map(expert =>
+              expert !== currentExpert ? expert : email
+            )
+            setValue('stepParams.experts', JSON.parse(JSON.stringify(filteredExperts)))
+          }
+          setPopupStatus(false)
+          return
+        } else {
+          setPopupStatus(false)
+          return
+        }
+      }
+
+      if (!currentExpert) {
+        const flag = experts.filter(expert => expert === email).length === 0
+
+        if (flag) {
+          const pushedExpert = [...JSON.parse(JSON.stringify(experts)), email]
+          setValue('stepParams.experts', JSON.parse(JSON.stringify(pushedExpert)))
+        }
+
+        setPopupStatus(false)
+        return
+      }
+    }
+  }, [currentExpert, experts, peerStepProps])
+
+  const handleRemoveExpert = useCallback(() => {
+    if (peerStepProps.value === PeerSteps.FIRST_STEP && currentExpert && experts.length > 0) {
+      const filteredExperts = experts.filter(expert => expert !== currentExpert)
+      setValue('stepParams.experts', JSON.parse(JSON.stringify(filteredExperts)))
+      setPopupStatus(false)
+    }
+  }, [peerStepProps, currentExpert, experts])
+
+  const onSettingsFormSubmit = useCallback((event: React.FormEvent<HTMLElement>) => {
+    event.preventDefault()
+    const request = getValues()
+    if (request.stepParams.step === PeerSteps.FIRST_STEP && request.stepParams.experts.length > 0) {
+      onSubmit(request)
+    }
+    // if (request.stepParams.step === PeerSteps.SECOND_STEP && request.stepParams.taskId) //TODO
+  }, [getValues])
 
   return (
-    <Box
-      sx={styles.container}
-      component={'form'}
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <Box sx={styles.wrapper}>
-        <Box sx={styles.dateBox}>
-          <Typography variant={'h6'}>
-            {"Период сдачи работ начинается"}
-          </Typography>
+    <>
+      <Box
+        sx={styles.container}
+        component={'form'}
+        onSubmit={onSettingsFormSubmit}
+      >
+        <Box sx={styles.wrapper}>
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период сдачи работ начинается"}
+            </Typography>
 
-          <Typography variant={'body1'}>
-            {"Выберите дату и время, когда открывается период сдачи"}
-          </Typography>
+            <Typography variant={'body1'}>
+              {"Выберите дату и время, когда открывается период сдачи"}
+            </Typography>
 
-          <LocalizationProvider dateAdapter={DateAdapter}
-            locale={ruLocale}
-          >
-            <Controller
-              control={control}
-              name={'submissionStartDateTime'}
-              rules={fields.dateRules}
-              render={({ field: { ref, ...rest } }) => (
-                <Box sx={styles.fieldsContainer}>
-                  <Box sx={styles.datePicker}>
-                    <MobileDatePicker
-                      inputFormat="dd.MM.yyyy"
-                      rightArrowButtonText={'Следующий месяц'}
-                      disablePast
-                      disableCloseOnSelect={false}
-                      toolbarTitle={false}
-                      toolbarPlaceholder={false}
-                      okText={"Выбрать"}
-                      cancelText={"Отменить"}
-                      OpenPickerButtonProps={{ itemScope: true }}
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
+            <LocalizationProvider dateAdapter={DateAdapter}
+              locale={ruLocale}
+            >
+              <Controller
+                control={control}
+                name={'submissionStartDateTime'}
+                rules={fields.dateRules}
+                render={({ field: { ref, ...rest } }) => (
+                  <Box sx={styles.fieldsContainer}>
+                    <Box sx={styles.datePicker}>
+                      <MobileDatePicker
+                        inputFormat="dd.MM.yyyy"
+                        rightArrowButtonText={'Следующий месяц'}
+                        disablePast
+                        disableCloseOnSelect={false}
+                        toolbarTitle={false}
+                        toolbarPlaceholder={false}
+                        okText={"Выбрать"}
+                        cancelText={"Отменить"}
+                        OpenPickerButtonProps={{ itemScope: true }}
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
+
+                    <Box sx={styles.timePicker}>
+                      <TimePicker
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
                   </Box>
-                  <Box sx={styles.timePicker}>
-                    <TimePicker
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
+                )}
+              />
+            </LocalizationProvider>
+          </Box>
+
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период сдачи работ заканчивается"}
+            </Typography>
+
+            <Typography variant={'body1'}>
+              {"Выберите дату и время окончания периода сдачи работ"}
+            </Typography>
+
+            <LocalizationProvider dateAdapter={DateAdapter}
+              locale={ruLocale}
+            >
+              <Controller
+                control={control}
+                name={'submissionEndDateTime'}
+                rules={fields.dateRules}
+                render={({ field: { ref, ...rest } }) => (
+                  <Box sx={styles.fieldsContainer}>
+                    <Box sx={styles.datePicker}>
+                      <MobileDatePicker
+                        inputFormat="dd.MM.yyyy"
+                        rightArrowButtonText={'Следующий месяц'}
+                        disablePast
+                        disableCloseOnSelect={false}
+                        toolbarTitle={false}
+                        toolbarPlaceholder={false}
+                        okText={"Выбрать"}
+                        cancelText={"Отменить"}
+                        OpenPickerButtonProps={{ itemScope: true }}
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
+                    <Box sx={styles.timePicker}>
+                      <TimePicker
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
                   </Box>
-                </Box>
-              )}
-            />
-          </LocalizationProvider>
-        </Box>
+                )}
+              />
+            </LocalizationProvider>
+          </Box>
 
-        <Box sx={styles.dateBox}>
-          <Typography variant={'h6'}>
-            {"Период сдачи работ заканчивается"}
-          </Typography>
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период проверки начинается"}
+            </Typography>
 
-          <Typography variant={'body1'}>
-            {"Выберите дату и время окончания периода сдачи работ"}
-          </Typography>
+            <Typography variant={'body1'}>
+              {"Выберите дату и время начала периода проверки"}
+            </Typography>
 
-          <LocalizationProvider dateAdapter={DateAdapter}
-            locale={ruLocale}
-          >
-            <Controller
-              control={control}
-              name={'submissionEndDateTime'}
-              rules={fields.dateRules}
-              render={({ field: { ref, ...rest } }) => (
-                <Box sx={styles.fieldsContainer}>
-                  <Box sx={styles.datePicker}>
-                    <MobileDatePicker
-                      inputFormat="dd.MM.yyyy"
-                      rightArrowButtonText={'Следующий месяц'}
-                      disablePast
-                      disableCloseOnSelect={false}
-                      toolbarTitle={false}
-                      toolbarPlaceholder={false}
-                      okText={"Выбрать"}
-                      cancelText={"Отменить"}
-                      OpenPickerButtonProps={{ itemScope: true }}
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
+            <LocalizationProvider dateAdapter={DateAdapter}
+              locale={ruLocale}
+            >
+              <Controller
+                control={control}
+                name={'reviewStartDateTime'}
+                rules={fields.dateRules}
+                render={({ field: { ref, ...rest } }) => (
+                  <Box sx={styles.fieldsContainer}>
+                    <Box sx={styles.datePicker}>
+                      <MobileDatePicker
+                        inputFormat="dd.MM.yyyy"
+                        rightArrowButtonText={'Следующий месяц'}
+                        disablePast
+                        disableCloseOnSelect={false}
+                        toolbarTitle={false}
+                        toolbarPlaceholder={false}
+                        okText={"Выбрать"}
+                        cancelText={"Отменить"}
+                        OpenPickerButtonProps={{ itemScope: true }}
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
+                    <Box sx={styles.timePicker}>
+                      <TimePicker
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
                   </Box>
-                  <Box sx={styles.timePicker}>
-                    <TimePicker
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
+                )}
+              />
+            </LocalizationProvider>
+          </Box>
+
+          <Box sx={styles.dateBox}>
+            <Typography variant={'h6'}>
+              {"Период проверки заканчивается"}
+            </Typography>
+
+            <Typography variant={'body1'}>
+              {"Выберите дату и время закрытия периода проверки"}
+            </Typography>
+
+            <LocalizationProvider dateAdapter={DateAdapter}
+              locale={ruLocale}
+            >
+              <Controller
+                control={control}
+                name={'reviewEndDateTime'}
+                rules={fields.dateRules}
+                render={({ field: { ref, ...rest } }) => (
+                  <Box sx={styles.fieldsContainer}>
+                    <Box sx={styles.datePicker}>
+                      <MobileDatePicker
+                        inputFormat="dd.MM.yyyy"
+                        rightArrowButtonText={'Следующий месяц'}
+                        disablePast
+                        disableCloseOnSelect={false}
+                        toolbarTitle={false}
+                        toolbarPlaceholder={false}
+                        okText={"Выбрать"}
+                        cancelText={"Отменить"}
+                        OpenPickerButtonProps={{ itemScope: true }}
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
+                    <Box sx={styles.timePicker}>
+                      <TimePicker
+                        {...rest}
+                        renderInput={(params) =>
+                          <TextField
+                            variant={'outlined'}
+                            sx={{ minWidth: '0px' }}
+                            {...params}
+                          />
+                        }
+                      />
+                    </Box>
                   </Box>
-                </Box>
-              )}
-            />
-          </LocalizationProvider>
-        </Box>
+                )}
+              />
+            </LocalizationProvider>
+          </Box>
 
-        <Box sx={styles.dateBox}>
-          <Typography variant={'h6'}>
-            {"Период проверки начинается"}
-          </Typography>
+          <Box sx={styles.dateBox}>
+            <Box>
+              <InputLabel
+                title={"Количество проверок (мин):"} />
 
-          <Typography variant={'body1'}>
-            {"Выберите дату и время начала периода проверки"}
-          </Typography>
+              <TextField
+                type={'number'}
+                InputProps={{ ...maxSubmissionProps, inputProps: { min: 0 } }}
+                required
+                variant={'outlined'}
+                autoComplete={'off'}
+                {...(formState.errors.submissionsToCheck !== undefined && { error: true, helperText: formState.errors.submissionsToCheck.message })}
+              />
+            </Box>
+          </Box>
 
-          <LocalizationProvider dateAdapter={DateAdapter}
-            locale={ruLocale}
-          >
-            <Controller
-              control={control}
-              name={'reviewStartDateTime'}
-              rules={fields.dateRules}
-              render={({ field: { ref, ...rest } }) => (
-                <Box sx={styles.fieldsContainer}>
-                  <Box sx={styles.datePicker}>
-                    <MobileDatePicker
-                      inputFormat="dd.MM.yyyy"
-                      rightArrowButtonText={'Следующий месяц'}
-                      disablePast
-                      disableCloseOnSelect={false}
-                      toolbarTitle={false}
-                      toolbarPlaceholder={false}
-                      okText={"Выбрать"}
-                      cancelText={"Отменить"}
-                      OpenPickerButtonProps={{ itemScope: true }}
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
-                  </Box>
-                  <Box sx={styles.timePicker}>
-                    <TimePicker
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
-                  </Box>
-                </Box>
-              )}
-            />
-          </LocalizationProvider>
-        </Box>
+          <Box sx={styles.dateBox}>
+            <Box>
+              <InputLabel
+                title={"Выберите тип:"}
+                required
+              />
 
-        <Box sx={styles.dateBox}>
-          <Typography variant={'h6'}>
-            {"Период проверки заканчивается"}
-          </Typography>
+              <Select
+                sx={{ display: "block" }}
+                type={"text"}
+                required
+                inputProps={typeProps}
+              >
+                <MenuItem
+                  key={PeerTaskTypes.SINGLE_BLIND}
+                  value={PeerTaskTypes.SINGLE_BLIND}
+                >
+                  {"Single blind"}
+                </MenuItem>
 
-          <Typography variant={'body1'}>
-            {"Выберите дату и время закрытия периода проверки"}
-          </Typography>
+                <MenuItem
+                  key={PeerTaskTypes.DOUBLE_BLIND}
+                  value={PeerTaskTypes.DOUBLE_BLIND}
+                >
+                  {"Double blind"}
+                </MenuItem>
 
-          <LocalizationProvider dateAdapter={DateAdapter}
-            locale={ruLocale}
-          >
-            <Controller
-              control={control}
-              name={'reviewEndDateTime'}
-              rules={fields.dateRules}
-              render={({ field: { ref, ...rest } }) => (
-                <Box sx={styles.fieldsContainer}>
-                  <Box sx={styles.datePicker}>
-                    <MobileDatePicker
-                      inputFormat="dd.MM.yyyy"
-                      rightArrowButtonText={'Следующий месяц'}
-                      disablePast
-                      disableCloseOnSelect={false}
-                      toolbarTitle={false}
-                      toolbarPlaceholder={false}
-                      okText={"Выбрать"}
-                      cancelText={"Отменить"}
-                      OpenPickerButtonProps={{ itemScope: true }}
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
-                  </Box>
-                  <Box sx={styles.timePicker}>
-                    <TimePicker
-                      {...rest}
-                      renderInput={(params) =>
-                        <TextField
-                          variant={'outlined'}
-                          sx={{ minWidth: '0px' }}
-                          {...params}
-                        />
-                      }
-                    />
-                  </Box>
-                </Box>
-              )}
-            />
-          </LocalizationProvider>
-        </Box>
+                <MenuItem
+                  key={PeerTaskTypes.OPEN}
+                  value={PeerTaskTypes.OPEN}
+                >
+                  {"Open Peer review"}
+                </MenuItem>
+              </Select>
+            </Box>
+          </Box>
 
-        <Box sx={styles.dateBox}>
-          <Box>
-            <InputLabel
-              title={"Количество проверок (мин):"} />
+          <Box sx={styles.dateBox}>
+            <Box>
+              <InputLabel
+                title={"Выберите итерацию:"}
+                required
+              />
 
-            <TextField
-              type={'number'}
-              InputProps={{ ...maxSubmissionProps, inputProps: { min: 0 } }}
-              required
-              variant={'outlined'}
-              autoComplete={'off'}
-              {...(formState.errors.submissionsToCheck !== undefined && { error: true, helperText: formState.errors.submissionsToCheck.message })}
-            />
+              <Select
+                sx={{ display: "block" }}
+                type={"text"}
+                required
+                disabled
+                inputProps={peerStepProps}
+                onChange={handleOnStepChange}
+              >
+                {stepsCatalog.map(step => (
+                  <MenuItem
+                    key={step.id}
+                    value={step.id}
+                  >
+                    {step.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
           </Box>
         </Box>
+
+        {peerStepProps.value === PeerSteps.FIRST_STEP && experts && (
+          <ExpertTable
+            experts={experts}
+            onAdd={handleAddOrEditExpert}
+            onEdit={handleAddOrEditExpert}
+          />
+        )}
+
+        <Box sx={{ ...globalStyles.submitBtContainer, marginTop: "15px" }}>
+          <Button
+            type='submit'
+            variant='contained'
+          >
+            {"Создать задание"}
+          </Button>
+        </Box>
       </Box>
 
-      <Box sx={{...globalStyles.submitBtContainer, my: "15px"}}>
-        <Button
-          type='submit'
-          variant='contained'
-        >
-          {"Создать задание"}
-        </Button>
-      </Box>
-    </Box>
+      <ExpertUpdateForm
+        popupStatus={popupStatus}
+        onSubmit={handleExpertSubmit}
+        onRemove={handleRemoveExpert}
+        onCloseHandler={setPopupStatus}
+        expert={currentExpert}
+      />
+    </>
   )
 }
 
 const initialValue = (): INewTaskSettings => {
-  const taskSettings = {
-    submissionStartDateTime: new Date(),
-    submissionEndDateTime: new Date(new Date().setDate(new Date().getDate() + 1)),
-    reviewStartDateTime: new Date(new Date().setDate(new Date().getDate() + 3)),
-    reviewEndDateTime: new Date(new Date().setDate(new Date().getDate() + 4)),
-    submissionsToCheck: 2
+  var submissionStartDateTime = new Date()
+  submissionStartDateTime.setHours(23, 59, 0)
+
+  var submissionEndDateTime = new Date()
+  submissionEndDateTime.setDate(submissionStartDateTime.getDate() + 1)
+  submissionEndDateTime.setHours(23, 59, 0)
+
+  var reviewStartDateTime = new Date()
+  reviewStartDateTime.setDate(submissionStartDateTime.getDate() + 3)
+  reviewStartDateTime.setHours(23, 59, 0)
+
+  var reviewEndDateTime = new Date()
+  reviewEndDateTime.setDate(submissionStartDateTime.getDate() + 4)
+  reviewEndDateTime.setHours(23, 59, 0)
+
+  const taskSettings: INewTaskSettings = {
+    submissionStartDateTime: submissionStartDateTime,
+    submissionEndDateTime: submissionEndDateTime,
+    reviewStartDateTime: reviewStartDateTime,
+    reviewEndDateTime: reviewEndDateTime,
+    submissionsToCheck: 2,
+    stepParams: {
+      step: PeerSteps.FIRST_STEP,
+      experts: []
+    } as IFirstStepSettings,
+    type: PeerTaskTypes.DOUBLE_BLIND
   }
 
-  taskSettings.submissionStartDateTime.setHours(23, 59, 0)
-  taskSettings.submissionEndDateTime.setHours(23, 59, 0)
-  taskSettings.reviewStartDateTime.setHours(23, 59, 0)
-  taskSettings.reviewEndDateTime.setHours(23, 59, 0)
-  
   return taskSettings
 }
+
+const stepsCatalog: IIterationCatalog[] = [
+  {
+    id: PeerSteps.FIRST_STEP,
+    name: "Этап 1"
+  },
+  {
+    id: PeerSteps.SECOND_STEP,
+    name: "Этап 2"
+  }
+]
 
 const styles = {
   container: {
     maxWidth: '780px',
-    margin: "0px auto 50px auto"
+    margin: "0px auto 0 auto",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px"
   } as SxProps<Theme>,
   wrapper: {
     display: "grid",

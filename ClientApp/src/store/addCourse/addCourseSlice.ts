@@ -5,13 +5,15 @@ import { ICourse, IError } from '../types';
 export interface INewCourseState {
   isLoading: boolean,
   error: IError | undefined,
-  payload: ICourse | undefined
+  payload: ICourse | undefined,
+  udateStatus: boolean | undefined
 }
 
 const initialState: INewCourseState = {
   isLoading: false,
   error: undefined,
   payload: undefined,
+  udateStatus: undefined
 };
 
 export const addCourseSlice = createSlice({
@@ -33,11 +35,17 @@ export const addCourseSlice = createSlice({
       state.error = payload
     },
 
-    courseSetInitialState: (state) => {
-      state.isLoading =  false
+    updateSuccess: (state) => {
+      state.isLoading = false,
+        state.udateStatus = true
+    },
+
+    reset: (state) => {
+      state.isLoading = false
       state.error = undefined
       state.payload = undefined
-    }
+      state.udateStatus = undefined
+    },
   },
 });
 

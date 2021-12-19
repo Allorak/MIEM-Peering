@@ -4,19 +4,30 @@ import { api, IResponse } from '..'
 import { mock } from './mock'
 
 
-export const getCourses = async ({
-  accessToken
+export const putCourse = async ({
+  accessToken,
+  course
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = false
+  const isMock = true
+
+  const enableCode = course.settings ? course.settings.enableCode : false
 
   const requestConfig: AxiosRequestConfig = {
-    method: 'GET',
-    url: `/api/v1/Courses/getteachercourse`,
+    method: 'PUT',
+    url: `api/v1/courses/${course.id}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
-    }
+    },
+    data: {
+      title: course.name,
+      subject: course.subject,
+      description: course.description ?? undefined,
+      settings: {
+        enableCode: enableCode
+      }
+    },
   }
 
   if (isMock) {

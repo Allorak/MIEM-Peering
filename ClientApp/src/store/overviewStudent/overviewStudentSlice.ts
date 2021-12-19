@@ -1,25 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, ICourses } from '../types';
+import { IError, IOverviewStudent } from '../types';
 
 
 export interface ICoursesState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: Array<ICourses>
-  updateStatus: boolean | undefined
+  payload: IOverviewStudent
 }
 
 const initialState: ICoursesState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as Array<ICourses>,
-  updateStatus: undefined
+  payload: {} as IOverviewStudent
 };
 
-export const courses = createSlice({
-  name: 'courses',
+export const overview = createSlice({
+  name: 'overview',
   initialState,
   reducers: {
     fetchStarted: (state) => {
@@ -28,7 +26,7 @@ export const courses = createSlice({
       state.error = undefined
     },
 
-    fetchSuccess: (state, { payload }: PayloadAction<Array<ICourses>>) => {
+    fetchSuccess: (state, { payload }: PayloadAction<IOverviewStudent>) => {
       state.isLoading = false
       state.error = undefined
       state.isLock = false
@@ -40,9 +38,15 @@ export const courses = createSlice({
       state.error = payload
       state.isLock = false
     },
+    reset: (state) => {
+      state.isLoading = false
+      state.error = undefined
+      state.isLock = true
+      state.payload = {} as IOverviewStudent
+    }
   },
 });
 
-export const actions = courses.actions
+export const actions = overview.actions
 
-export const reducer = courses.reducer
+export const reducer = overview.reducer

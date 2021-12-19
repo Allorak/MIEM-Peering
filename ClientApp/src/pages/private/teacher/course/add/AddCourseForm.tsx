@@ -1,76 +1,73 @@
-import { Button, TextField, Typography } from "@mui/material";
+import { FC, useCallback } from "react";
+import { useController, useForm } from "react-hook-form";
+import { Button, FormControlLabel, Switch, TextField, Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
-import { FC, useCallback, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+
 import { InputLabel } from "../../../../../components/inputLabel";
-import { addCourse } from "../../../../../store/addCourse/thunks/addCourse";
+
+import { FormReValidateMode, FormValidateMode } from "../../../../../const/common";
+
+import { ICourses } from "../../../../../store/types";
+
+import * as fields from "./formFields"
 import * as globalStyles from "../../../../../const/styles";
 
-interface ICourseItem {
-    name: string
-    subject: string
-    description?: string
+interface IProps {
+    editCourse?: ICourses,
+    onRequest: (course: ICourses) => void
 }
-
-// interface IErrors extends Omit<ICourseItem, 'description'> { }
+interface ICourseItem extends Omit<ICourses, 'id' | 'adminName' | 'adminImageUrl'> { }
 interface IErrors {
     name: string
     subject: string
 }
 
-export const AddCourseForm: FC = () => {
-    const [course, setCourse] = useState<ICourseItem>(initialCourse)
-    const [errors, setErrors] = useState<IErrors>(initialErrors)
-    const dispatch = useAppDispatch()
+export const AddCourseForm: FC<IProps> = ({ editCourse, onRequest }) => {
+    const defaultValues: ICourseItem = editCourse ? {
+        name: editCourse.name,
+        subject: editCourse.subject,
+        description: editCourse.description,
+        settings: editCourse.settings
+    } : {
+        name: '',
+        subject: '',
+        description: ''
+    }
 
-    const onChangeCourse = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        if (typeof event.target !== 'undefined' && typeof event.target.name !== 'undefined' && typeof event.target.value !== 'undefined') {
-            const { name, value } = event.target
-            if (Object.keys(initialCourse).indexOf(name) > -1) {
-                setCourse(prev => (
-                    { ...prev, [name]: value }
-                ))
-                if (name === 'name' || name === 'subject') {
-                    const error = validate(name, value)
-                    if (errors[name] && error === "") {
-                        setErrors(prev => (
-                            { ...prev, [name]: error }
-                        ))
-                    }
+    const { control, formState, setValue, getValues, handleSubmit } = useForm<ICourseItem>({
+        mode: FormValidateMode,
+        reValidateMode: FormReValidateMode,
+        defaultValues: {
+            ...defaultValues
+        }
+    })
+
+    const { field: nameProps } = useController({ control, ...fields.nameProps })
+    const { field: descriptionProps } = useController({ control, ...fields.descriptionProps })
+    const { field: subjectProps } = useController({ control, ...fields.subjectProps })
+    const { field: enableProps } = useController({ control, ...fields.enableProps })
+    const codeSettingsProps = getValues('settings')
+    const codeProps = getValues('settings.code')
+
+    const handleCourseCodeStatusChange = useCallback((value: React.ChangeEvent<HTMLInputElement>) => {
+        const isChecked = value.target.checked
+
+        if (editCourse && editCourse.settings && isChecked !== enableProps.value) {
+            setValue('settings',
+                {
+                    enableCode: isChecked,
+                    ...(isChecked === true && editCourse.settings.enableCode && { code: editCourse.settings.code })
                 }
-            }
-        }
-    }
+            )
 
-    const onFieldBlur = (name: string, value: string) => {
-        if (Object.keys(errors).indexOf(name) > -1) {
-            const error = validate(name, value)
-            if (error) {
-                setErrors(prev => (
-                    { ...prev, [name]: error }
-                ))
-            }
         }
-    }
-
-    const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
-        event.preventDefault()
-        dispatch(addCourse(course))
-    }, [dispatch, course])
-
-    const validate = (name: string, value: string): string | undefined => {
-        switch (name) {
-            case 'name':
-            case 'subject':
-                return value ? "" : "Обязательное поле"
-        }
-    }
+    }, [editCourse, enableProps])
 
     return (
         <Box
             sx={styles.root}
             component={'form'}
-            onSubmit={submitForm}
+            onSubmit={handleSubmit(onRequest)}
         >
             <Box sx={styles.formItemContainer}>
                 <InputLabel
@@ -78,13 +75,11 @@ export const AddCourseForm: FC = () => {
                     required
                 />
                 <TextField
-                    name={'name'}
                     variant='outlined'
                     required
-                    onChange={onChangeCourse}
-                    value={course.name ? course.name : ''}
-                    onBlur={e => onFieldBlur(e.target.name, e.target.value)}
-                    {...(errors.name.length > 0 && { error: true, helperText: errors.name })}
+                    inputProps={nameProps}
+                    autoComplete={'off'}
+                    {...(formState.errors.name && { error: true, helperText: formState.errors.name.message })}
                 />
             </Box>
 
@@ -94,41 +89,80 @@ export const AddCourseForm: FC = () => {
                     required
                 />
                 <TextField
-                    name={'subject'}
                     variant='outlined'
                     required
-                    onChange={onChangeCourse}
-                    value={course.subject ? course.subject : ''}
-                    onBlur={e => onFieldBlur(e.target.name, e.target.value)}
-                    {...(errors.subject.length > 0 && { error: true, helperText: errors.subject })}
+                    inputProps={subjectProps}
+                    autoComplete={'off'}
+                    {...(formState.errors.subject && { error: true, helperText: formState.errors.subject.message })}
 
                 />
             </Box>
-            
+
             <Box sx={styles.formItemContainer}>
                 <InputLabel
                     title={'Описание'}
                 />
                 <TextField
-                    name={'description'}
+                    inputProps={descriptionProps}
                     variant='outlined'
                     type={'text'}
                     rows={3}
                     multiline
-                    onChange={onChangeCourse}
-                    value={course.description ? course.description : ''}
+                    {...(formState.errors.description && { error: true, helperText: formState.errors.description.message })}
                 />
             </Box>
-            
+
+            {codeSettingsProps && editCourse && (
+                <Box sx={styles.formItemContainer}>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={enableProps.value}
+                                onChange={handleCourseCodeStatusChange}
+                                color={"secondary"}
+                            />
+                        }
+                        label={"Доступ по коду"}
+                    />
+                </Box>
+            )}
+
+            {codeSettingsProps && editCourse && enableProps.value !== undefined && (
+                <>
+                    {
+                        enableProps.value === true && codeProps && (
+                            <Box sx={styles.formItemContainer}>
+                                <Typography
+                                    variant={"h2"}
+                                    textAlign={"center"}
+                                >
+                                    {codeProps}
+                                </Typography>
+                            </Box>
+                        )
+                    }
+
+                    {
+                        enableProps.value === true && !codeProps && (
+                            <Box sx={styles.formItemContainer}>
+                                <Typography variant={"body2"}>
+                                    {"Код курса появится после сохранения"}
+                                </Typography>
+                            </Box>
+                        )
+                    }
+                </>
+            )}
+
             <Box sx={globalStyles.submitBtContainer}>
                 <Button
                     type='submit'
                     variant='contained'
                 >
-                    Создать курс
+                    {editCourse ? "Изменить" : "Создать курс"}
                 </Button>
             </Box>
-        </Box>
+        </Box >
     )
 }
 
@@ -138,14 +172,14 @@ const styles = {
     } as SxProps<Theme>,
     formItemContainer: {
         margin: '0px 0px 10px 0px',
-
     } as SxProps<Theme>,
-}
 
-const initialCourse: ICourseItem = {
-    name: '',
-    subject: '',
-    description: ''
+    actionButtonInvisible: {
+        display: "none",
+        height: "0px",
+        width: "0px",
+        opacity: 0
+    } as SxProps<Theme>,
 }
 
 const initialErrors: IErrors = {

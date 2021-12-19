@@ -1,19 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IOverview, IError, ICourses } from '../types';
+import { IOverview, IError } from '../types';
 
 
 export interface ICoursesState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: IOverview
+  payload: IOverview,
 }
 
 const initialState: ICoursesState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as IOverview
+  payload: {} as IOverview,
 };
 
 export const overview = createSlice({

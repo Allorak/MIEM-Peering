@@ -54,7 +54,6 @@ const ExpertRow: FC<IPropsRow> = ({ expertItem, onRemove }) => {
   )
 }
 
-
 const styles = {
   tableContainer: {
     margin: "0px auto",

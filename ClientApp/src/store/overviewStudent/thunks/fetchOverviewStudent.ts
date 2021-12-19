@@ -1,11 +1,13 @@
 import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
-import { ICourse, ICourses, IErrorCode } from "../../types";
-import { getCourses } from "../../../api/getCourses";
+import { IErrorCode } from "../../types";
+
+import { getOverviewStudent } from "../../../api/getOverviewStudent";
 
 
-export const fetchCourses = (): AppThunk => async (dispatch, getState) => {
+export const fetchOverviewStudent = (taskId: string): AppThunk => async (dispatch, getState) => {
+    dispatch(actions.reset())
     const accessToken = getState().auth.accessToken
     if (!accessToken) {
         dispatch(actions.fetchFailed({
@@ -18,7 +20,7 @@ export const fetchCourses = (): AppThunk => async (dispatch, getState) => {
 
     dispatch(actions.fetchStarted())
     try {
-        const response = await getCourses({ accessToken })
+        const response = await getOverviewStudent({ accessToken, taskId })
         if (!response) {
             dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
@@ -30,16 +32,7 @@ export const fetchCourses = (): AppThunk => async (dispatch, getState) => {
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(JSON.parse(JSON.stringify(response.payload.map(course => (
-            {
-                id: course.id,
-                name: course.title,
-                subject: course.subject,
-                adminImageUrl: course.teacher.imageUrl,
-                adminName: course.teacher.fullname,
-                description: course.description,
-                settings: course.settings
-            } as ICourses))))))
+        dispatch(actions.fetchSuccess(response.payload))
         return
 
     } catch (error) {
