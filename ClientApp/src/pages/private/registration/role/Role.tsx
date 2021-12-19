@@ -54,33 +54,37 @@ export const Role: FC = () => {
         <Box sx={styles.container}>
             <Box sx={styles.root}>
                 <Box sx={styles.cardContainer}>
-                    <Typography variant='h4' >
-                        {"Преподаватель"}
-                    </Typography>
-
-                    <TeacherImg />
-
-                    <Button variant='contained'
-                        sx={styles.selectButton}
-                        onClick={() => { handleSelectRole(IRole.teacher) }}
-                    >
-                        {"Я преподаватель"}
-                    </Button>
+                    <Box>
+                        <Typography variant='h4' >
+                            {"Преподаватель"}
+                        </Typography>
+                        <TeacherImg />
+                    </Box>
+                    <Box>
+                        <Button variant='contained'
+                            sx={styles.selectButton}
+                            onClick={() => { handleSelectRole(IRole.teacher) }}
+                        >
+                            {"Я преподаватель"}
+                        </Button>
+                    </Box>
                 </Box>
 
                 <Box sx={styles.cardContainer}>
-                    <Typography variant='h4' >
-                        {"Студент"}
-                    </Typography>
-
-                    <StudentImg />
-
-                    <Button variant='outlined'
-                        sx={styles.selectButton}
-                        onClick={() => { handleSelectRole(IRole.student) }}
-                    >
-                        {"Я студент"}
-                    </Button>
+                    <Box>
+                        <Typography variant='h4' >
+                            {"Студент"}
+                        </Typography>
+                        <StudentImg />
+                    </Box>
+                    <Box>
+                        <Button variant='outlined'
+                            sx={styles.selectButton}
+                            onClick={() => { handleSelectRole(IRole.student) }}
+                        >
+                            {"Я студент"}
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
         </Box>
@@ -90,21 +94,24 @@ export const Role: FC = () => {
 const styles = {
     root: {
         maxWidth: '600px',
-        display: 'flex',
-        backgroundColor: 'transparent'
+        width: '100%',
+        display: 'block',
+        backgroundColor: 'transparent',
+        '@media (min-width: 768px)': {
+            display: 'flex',
+        },
     } as SxProps<Theme>,
     container: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        width: '100%',
         height: '100%',
         textAlign: 'center',
     } as SxProps<Theme>,
     cardContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         backgroundColor: theme => theme.palette.common.white,
         borderRadius: '4px',
         m: '10px',
@@ -121,6 +128,7 @@ const styles = {
     } as SxProps<Theme>,
     selectButton: {
         marginTop: '20px',
-        width: '100%'
+        width: '100%',
+        whiteSpace: 'nowrap'
     } as SxProps<Theme>,
 }
