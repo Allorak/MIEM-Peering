@@ -6,10 +6,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AutoMapperProfile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/AutoMapperProfile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Tasks/ITasksService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Tasks/TasksService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +18,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="task-202" />
+        <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -33,6 +32,7 @@
     </file-type-list>
   </component>
   <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="4" />
     <option name="recentBranches">
       <RecentBranches>
         <option name="branchesForRepo">
@@ -42,15 +42,15 @@
                 <list>
                   <RecentBranch>
                     <option name="branchName" value="issue-200" />
-                    <option name="lastUsedInstant" value="1638723509" />
+                    <option name="lastUsedInstant" value="1639926577" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="develop" />
+                    <option name="lastUsedInstant" value="1639926549" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="task-202" />
                     <option name="lastUsedInstant" value="1638720944" />
-                  </RecentBranch>
-                  <RecentBranch>
-                    <option name="branchName" value="develop" />
-                    <option name="lastUsedInstant" value="1638718177" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="issue-146" />
@@ -181,7 +181,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="develop" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>

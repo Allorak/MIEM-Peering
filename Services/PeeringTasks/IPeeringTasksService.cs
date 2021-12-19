@@ -11,5 +11,6 @@ namespace patools.Services.PeeringTasks
         Task<Response<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview (Guid taskId, Guid teacherId);
         Task<Response<GetNewPeeringTaskDtoResponse>> AddTask(AddPeeringTaskDto peeringTask);
         Task<Response<List<GetPeeringTaskMainInfoDtoResponse>>> GetCourseTasks(GetCourseTasksDtoRequest courseInfo);
+        Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid userId);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using patools.Models;
-using patools.Services.Tasks;
+using patools.Services.PeeringTasks;
 using patools.Errors;
 namespace patools.Controllers.v1
 {
@@ -15,11 +15,11 @@ namespace patools.Controllers.v1
     public class TasksController : ControllerBase
     {
         private readonly PAToolsContext _context;
-        private readonly ITasksService _tasksService;
+        private readonly IPeeringTasksService _peeringTasksService;
 
-        public TasksController(PAToolsContext context, ITasksService tasksService)
+        public TasksController(PAToolsContext context, IPeeringTasksService peeringTasksService)
         {
-            _tasksService = tasksService;
+            _peeringTasksService = peeringTasksService;
             _context = context;
         }
 
@@ -41,7 +41,7 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
             
-            return Ok(await _tasksService.GetTaskOverview(taskId, teacherId));
+            return Ok(await _peeringTasksService.GetTaskOverview(taskId, teacherId));
         }
 
         [HttpGet("{taskId:guid}/authorform")]
@@ -59,7 +59,7 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
 
-            return Ok(await _tasksService.GetAuthorForm(taskId, userId));
+            return Ok(await _peeringTasksService.GetAuthorForm(taskId, userId));
         }
     }
 }
