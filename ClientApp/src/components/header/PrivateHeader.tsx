@@ -7,19 +7,27 @@ import { Navbar } from "../navbar";
 import { UserAcc } from "../userIco";
 import * as constStyles from "../../const/styles"
 import { palette } from "../../theme/colors";
+import { useNavigate } from "react-router-dom";
+import { usePrivatePathT } from "../../app/hooks/usePrivatePathT";
+import { paths } from "../../app/constants/paths";
 
 export const PrivateHeader: FC = () => {
+    const history = useNavigate()
+    const { path: pathT } = usePrivatePathT()
+    
     return (
         <Box sx={styles.wrapper}>
             {/* <Box sx={constStyles.container}> */}
                 <Box sx={styles.root}>
-                    <Box sx={styles.logoContainer}>
-                        <Logo />
-                    </Box>
-                    <Box sx={styles.rightItem}>
-                        <Box>
+                    <Box sx={styles.leftContainer}
+                        onClick={() => history(pathT ? paths.teacher.main : paths.student.main)}
+                    >
+                        <Logo/>
+                        <Box sx={styles.navbarBlock}>
                             <Navbar />
                         </Box>
+                    </Box>
+                    <Box sx={styles.rightItem}>
                         <Box>
                             <UserAcc />
                         </Box>
@@ -43,18 +51,28 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'space-between'
     } as SxProps<Theme>,
-    rightItem: {
-        width: '100%',
+    navbarBlock: {
         display: 'flex',
-        justifyContent: 'space-between',
+        alignItems: 'center',
+        maxWidth: '450px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        '@media (min-width: 700px)': {
+            marginLeft: '40px',
+        }
+    } as SxProps<Theme>,
+    rightItem: {
+        width: '27%',
+        display: 'flex',
+        justifyContent: 'flex-end',
         alignItems: 'center'
     } as SxProps<Theme>,
 
-    logoContainer: {
-        margin: '0px 40px 0px 0px',
-        '@media (max-width: 700px)': {
-            margin: '0px'
-        }
+    leftContainer: {
+        display: 'flex',
+        width: '73%',
+        margin: '0px 16px 0px 0px',
     } as SxProps<Theme>
 
 }

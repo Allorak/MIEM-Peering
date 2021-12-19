@@ -172,7 +172,6 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
-        position: 'absolute',
         width: '100%'
     } as SxProps<Theme>,
     root: {

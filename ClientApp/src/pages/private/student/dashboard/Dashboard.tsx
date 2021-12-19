@@ -72,7 +72,7 @@ export const Dashboard: FC = () => {
           </Typography>
 
           <Box sx={styles.rightContainerWrapper}>
-            <Box marginRight={"15px"}>
+            <Box>
               <Routes>
                 <Route path={paths.student.dashboard.overview} element={<Overview />} />
                 {/* <Route path={paths.student.dashboard.menu1} element={<Overview />} />
@@ -95,11 +95,19 @@ const styles = {
   } as SxProps<Theme>,
 
   gridWrapper: {
-    display: 'grid',
-    margin: "30px 0px 8px 15px",
-    gridTemplateColumns: '15% 85%',
-    gridTemplateAreas: ' "leftContainer rightContainer"',
+    display: 'flex',
+    flexDirection: 'column',
     height: '100%',
+    '@media (min-width: 768px)': {
+      display: 'grid',
+      gridTemplateColumns: '10% 90%',
+      gridTemplateAreas: ' "leftContainer rightContainer"',
+      margin: "30px auto 15px",
+      padding: '0 15px 0 8px',
+    },
+    '@media (min-width: 1280px)': {
+      gridTemplateColumns: '20% 80%',
+    },
   } as SxProps<Theme>,
 
   leftContainer: {
@@ -107,6 +115,10 @@ const styles = {
     flexDirection: 'column',
     gridArea: 'leftContainer',
     overflowY: 'auto',
+    padding: '25px',
+    '@media (min-width: 768px)': {
+      padding: '0'
+    },
   } as SxProps<Theme>,
 
   rightContainer: {
@@ -115,7 +127,11 @@ const styles = {
     gridArea: 'rightContainer',
     overflowY: 'auto',
     maxWidth: "100%",
-    margin: "0px 0px 0px 25px",
+    padding: '0 25px',
+    '@media (min-width: 768px)': {
+      margin: "0px 0px 0px 25px",
+      padding: '0'
+    },
   } as SxProps<Theme>,
   rightContainerWrapper: {
     maxHeight: "calc(100vh - 183px)",

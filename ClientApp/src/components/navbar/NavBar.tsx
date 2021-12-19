@@ -21,7 +21,7 @@ export const Navbar: FC = () => {
             >
                 Мои курсы
             </Typography>
-        )
+        )   
     }
 
     const TaskItem: FC<{ courseId: string }> = ({
@@ -40,7 +40,7 @@ export const Navbar: FC = () => {
     const CourseTitle: FC<{ courseId: string, courseTitle: string }> = ({ courseId, courseTitle }) => {
         return (
             <Typography variant='h6'
-                sx={{ ...styles.item, ...styles.itemHover, ...styles.blue }}
+                sx={{ ...styles.item, ...styles.courseTitle, ...styles.itemHover, ...styles.blue }}
                 onClick={() => console.log(courseId)}
             >
                 {courseTitle}
@@ -63,7 +63,7 @@ export const Navbar: FC = () => {
         return (
             <Typography
                 variant='h6'
-                sx={styles.item}
+                sx={{...styles.item, ...styles.spanDelimeter}}
 
             >
                 {' / '}
@@ -134,11 +134,20 @@ export const Navbar: FC = () => {
 
 const styles = {
     item: {
-        fontSize: '18px',
+        fontSize: '16px',
         display: 'inline',
         lineHeight: '34px',
+        '@media (min-width: 1280px)': {
+            fontSize: '18px',
+        }
     } as SxProps<Theme>,
-
+    spanDelimeter: {
+        padding: '0 4px'
+    } as SxProps<Theme>,
+    courseTitle: {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+    } as SxProps<Theme>,
     itemHover: {
         ':hover': {
             cursor: 'pointer',
