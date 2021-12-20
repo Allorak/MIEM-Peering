@@ -3,20 +3,28 @@ import { TextField, Tooltip } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
 
-export const TextVisible: FC = () => {
+interface IProps {
+  response?: string
+  isResponse?: boolean
+}
+
+export const TextVisible: FC<IProps> = ({ response, isResponse }) => {
   return (
     <Tooltip
-      title={"Это всего лишь предварительный просмотр"}
+      title={isResponse ? (response ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
       placement={"top"}
     >
       <TextField
         sx={styles.textField}
         name={'name'}
         variant='outlined'
-        disabled
+        InputProps={{
+          readOnly: true,
+        }}
         label={"Развернутый ответ"}
-        rows={3}
         multiline
+        value={response ?? ""}
+        {...(isResponse === undefined && { rows: 3 })}
       />
     </Tooltip>
   )

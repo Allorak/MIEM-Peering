@@ -7,4 +7,4 @@ export type IRequestData = {
 
 export type IResponseData = IWorkItem[]
 
-export { getWorks } from './getWorks';
+export { getWorksList } from './getWorksList';

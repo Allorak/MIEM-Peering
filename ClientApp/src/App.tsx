@@ -12,6 +12,8 @@ import { Private } from './pages/private/Private';
 
 import { TestPage } from './pages/test';
 
+import "../node_modules/react-vis/dist/style.css";
+
 
 export default () => (
   <BrowserRouter>

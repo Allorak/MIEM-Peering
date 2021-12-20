@@ -3,38 +3,21 @@ import { FC } from "react";
 import { Box } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
-import { AnswerBox } from "../../../../../components/rubrics/answerBox";
-import { AuthorResponse } from "../../../../../components/rubrics/authorResponse";
-import { QuestionBox } from "../../../../../components/rubrics/questionBox";
+import { StudentWork } from "../checkings/StudentForm";
 
-import { IWorkResponse } from "../../../../../store/types";
+import { IStudentWork } from "../../../../../store/types";
 
 import { scrollStyles } from "../../../../../const/styles";
 
 
 interface IProps {
-  responses: IWorkResponse[]
+  responses: IStudentWork
 }
 
 export const WorkResponse: FC<IProps> = ({ responses }) => {
   return (
     <Box sx={styles.wrapper}>
-      {responses && responses.length > 0 && (
-        responses.map(response => (
-          <AnswerBox
-            id={response.order}
-            key={response.id}
-            title={response.title}
-            required={false}
-          >
-            <QuestionBox>
-              <AuthorResponse
-                response={response.response}
-              />
-            </QuestionBox>
-          </AnswerBox>
-        ))
-      )}
+      <StudentWork studentWork={responses} />
     </Box>
   )
 }

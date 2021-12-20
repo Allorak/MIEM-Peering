@@ -2,10 +2,10 @@ import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
 import { IErrorCode } from "../../types";
-import { getWorks } from "../../../api/getWorks";
+import { getWorksList } from "../../../api/getWorksList";
 
 
-export const fetchWorks = (taskId: string): AppThunk => async (dispatch, getState) => {
+export const fetchWorkList = (taskId: string): AppThunk => async (dispatch, getState) => {
     const accessToken = getState().auth.accessToken
     if (!accessToken) {
         dispatch(actions.fetchFailed({
@@ -16,9 +16,9 @@ export const fetchWorks = (taskId: string): AppThunk => async (dispatch, getStat
         return
     }
 
-    dispatch(actions.fetchStarted())
+    dispatch(actions.fetchWorkListStarted())
     try {
-        const response = await getWorks({ accessToken, taskId })
+        const response = await getWorksList({ accessToken, taskId })
         if (!response) {
             dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
@@ -30,7 +30,7 @@ export const fetchWorks = (taskId: string): AppThunk => async (dispatch, getStat
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(response.payload))
+        dispatch(actions.fetchWorkListSuccess(response.payload))
         return
 
     } catch (error) {
