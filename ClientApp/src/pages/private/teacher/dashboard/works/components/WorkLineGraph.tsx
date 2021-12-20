@@ -58,7 +58,6 @@ export const WorkLineGraph: FC<IProps> = ({ graphProps }) => {
           {title}
         </Typography>
 
-
         <Box
           sx={styles.graphContainer}
         >
@@ -66,7 +65,7 @@ export const WorkLineGraph: FC<IProps> = ({ graphProps }) => {
             height={300}
             width={860}
             xType="linear"
-            // onTouchMove={(e) => e.preventDefault()}
+            onTouchMove={(e) => e.preventDefault()}
             yDomain={[graphProps.minGrade, graphProps.maxGrade]}
           >
             <HorizontalGridLines />
@@ -107,6 +106,7 @@ export const WorkLineGraph: FC<IProps> = ({ graphProps }) => {
                 animation={{ damping: 10, stiffness: 20 }}
               />
             )}
+
             {/* {hoveredMark && (
                 <Hint
                   xType="literal"

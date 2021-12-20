@@ -48,8 +48,8 @@ export const WorkStatistics: FC<IProps> = ({ workStatistics }) => {
         {graphs.length > 0 && (
           <TabPanel value={currentTab} index={0}>
             <Box sx={styles.graphWrapper}>
-              {graphs.map(graphProps => (
-                <WorkLineGraph graphProps={graphProps} />
+              {graphs.map((graphProps, index) => (
+                <WorkLineGraph key={index} graphProps={graphProps} />
               ))}
             </Box>
           </TabPanel>
