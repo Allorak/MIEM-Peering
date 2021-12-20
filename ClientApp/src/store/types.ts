@@ -407,3 +407,55 @@ export type IPeerResponseItem = {
 export type IPeerResponses = {
   responses: Array<IPeerResponseItem>
 }
+
+export enum Reviewers {
+  TEACHER = 'teacher',
+  PEER = 'peer',
+  EXPERT = 'expert'
+}
+
+export enum WorkGraphTypes {
+  FINAL = "finalRates",
+  CRITERIA = "criteria"
+}
+
+export enum WorkStatisticsTypes {
+  GRAPH = "graph",
+  RESPONSE = "response"
+}
+
+export interface IWorkGraphByCriteriaItem {
+  title: string
+  graphType: WorkGraphTypes.CRITERIA
+}
+
+export interface IWorkGraphFinalRatesItem {
+  graphType: WorkGraphTypes.FINAL
+}
+
+export interface IWorkReviewСoordinates {
+  value: number
+  reviewer: Reviewers
+  name: string
+}
+
+export type IWorkGraphPropsItem = {
+  statisticType: WorkStatisticsTypes.GRAPH,
+  coordinates: IWorkReviewСoordinates[],
+  minGrade: number,
+  maxGrade: number
+}
+
+export interface IWorkGraphByCriteria extends IWorkGraphByCriteriaItem, IWorkGraphPropsItem {}
+
+export type IWorkGraphFinalRates = IWorkGraphFinalRatesItem & IWorkGraphPropsItem
+
+export type IWorkGraph = IWorkGraphByCriteria | IWorkGraphFinalRates
+
+export type IWorkReviewerForm = IStudentWork & {
+  statisticType: WorkStatisticsTypes.RESPONSE,
+  name: string,
+  reviewer: Reviewers
+}
+
+export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>

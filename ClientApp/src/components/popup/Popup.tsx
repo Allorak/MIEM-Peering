@@ -7,7 +7,8 @@ import { SxProps, Theme } from '@mui/system';
 interface IProps extends Omit<DialogProps, 'onClose'> {
     title: string
     onCloseHandler(value: SetStateAction<boolean>): void
-    loading?: boolean
+    loading?: boolean,
+    dialogContentSx?: SxProps<Theme>
 }
 
 export const Popup: FC<IProps> = ({
@@ -16,6 +17,7 @@ export const Popup: FC<IProps> = ({
     open: isOpen,
     onCloseHandler,
     loading,
+    dialogContentSx,
     ...props
 }) => {
 
@@ -45,6 +47,7 @@ export const Popup: FC<IProps> = ({
 
             <DialogContent
                 dividers
+                sx={dialogContentSx}
                 {...loading && ({ sx: styles.dialogContent })}
             >
 
