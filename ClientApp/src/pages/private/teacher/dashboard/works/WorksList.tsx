@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Typography, Box, useMediaQuery, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Typography, Box, useMediaQuery, FormControl, Select, MenuItem } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
 import { IWorkItem } from "../../../../../store/types";
@@ -20,7 +20,6 @@ export const WorksList: FC<IProps> = ({
 }) => {
 
   const matches = useMediaQuery('(max-width:900px)');
-
 
   return (
     <Box sx={styles.wrapper}>

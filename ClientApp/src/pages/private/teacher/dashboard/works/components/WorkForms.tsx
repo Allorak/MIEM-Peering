@@ -1,10 +1,14 @@
-import { Box, SelectChangeEvent, Theme, Typography } from "@mui/material";
-import { SxProps } from "@mui/system";
 import { FC, useCallback, useEffect, useState } from "react";
+import { Box, SelectChangeEvent, Theme } from "@mui/material";
+import { SxProps } from "@mui/system";
+
 import { InputLabel } from "../../../../../../components/inputLabel";
 import { TextSelect } from "../../../../../../components/textSelect";
-import { IWorkReviewerForm, Reviewers } from "../../../../../../store/types";
+
 import { StudentWork } from "../../checkings/StudentForm";
+
+import { IWorkReviewerForm, Reviewers } from "../../../../../../store/types";
+
 
 interface IProps {
   workResponseForm: IWorkReviewerForm[]
@@ -54,7 +58,6 @@ export const WorkForms: FC<IProps> = ({ workResponseForm }) => {
         <>
           <InputLabel
             title={"Выбор рецензента:"}
-            required
           />
 
           <TextSelect
@@ -63,24 +66,11 @@ export const WorkForms: FC<IProps> = ({ workResponseForm }) => {
             onChange={handleOnChangeReviewer}
           />
 
-          <Typography
-            variant={"body1"}
-            sx={styles.subTitle}
-          >
-            {'Работу проверил '}
-
-            <Typography
-              variant={"h6"}
-              color={'inherit'}
-              component={'span'}
-            >
-              {`${activeReviewForm.name}`}
-            </Typography>
-          </Typography>
-
-          <StudentWork
-            studentWork={{ ...activeReviewForm }}
-          />
+          <Box sx={{ margin: "20px 0px 0px 0px" }}>
+            <StudentWork
+              studentWork={{ ...activeReviewForm }}
+            />
+          </Box>
         </>
       )}
 

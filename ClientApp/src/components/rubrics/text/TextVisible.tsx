@@ -23,7 +23,7 @@ export const TextVisible: FC<IProps> = ({ response, isResponse }) => {
         }}
         label={"Развернутый ответ"}
         multiline
-        {...(response && { value: response })}
+        value={response ?? ""}
         {...(isResponse === undefined && { rows: 3 })}
       />
     </Tooltip>

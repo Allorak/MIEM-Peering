@@ -1,10 +1,13 @@
-import { Box, Tab, Theme, Typography } from "@mui/material";
+import { FC, useCallback, useState } from "react";
+import { Box, Tab, Theme } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import { SxProps } from "@mui/system";
-import { FC, useCallback, useState } from "react";
-import { IWorkGraph, IWorkReviewerForm, IWorkStatistics, WorkStatisticsTypes } from "../../../../../store/types";
+
 import { WorkForms } from "./components/WorkForms";
 import { WorkLineGraph } from "./components/WorkLineGraph";
+
+import { IWorkGraph, IWorkReviewerForm, IWorkStatistics, WorkStatisticsTypes } from "../../../../../store/types";
+
 
 interface IProps {
   workStatistics: IWorkStatistics
@@ -35,11 +38,12 @@ export const WorkStatistics: FC<IProps> = ({ workStatistics }) => {
   return (
     <Box >
       <Box sx={styles.tabsContainer}>
-        <Tabs value={currentTab} onChange={handleTabChange} aria-label="basic tabs example" sx={{display: "flex"}}>
-          <Tab label="Графики" {...a11yProps(0)} sx={styles.tabItem}/>
-          <Tab label="Проверки" {...a11yProps(1)} sx={styles.tabItem}/>
+        <Tabs value={currentTab} onChange={handleTabChange} aria-label="basic tabs example" sx={{ display: "flex" }}>
+          <Tab label="Графики" {...a11yProps(0)} sx={styles.tabItem} />
+          <Tab label="Проверки" {...a11yProps(1)} sx={styles.tabItem} />
         </Tabs>
       </Box>
+
       <Box sx={styles.wrapper}>
         {graphs.length > 0 && (
           <TabPanel value={currentTab} index={0}>
@@ -57,7 +61,6 @@ export const WorkStatistics: FC<IProps> = ({ workStatistics }) => {
           </TabPanel>
         )}
       </Box>
-
     </Box >
   )
 }
@@ -68,7 +71,6 @@ interface TabPanelProps {
 }
 
 const TabPanel: FC<TabPanelProps> = ({ index, value, children }) => {
-
   return (
     <div
       role="tabpanel"
@@ -84,7 +86,6 @@ const TabPanel: FC<TabPanelProps> = ({ index, value, children }) => {
     </div>
   );
 }
-
 
 const styles = {
   wrapper: {

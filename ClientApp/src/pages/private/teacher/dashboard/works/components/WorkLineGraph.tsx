@@ -1,10 +1,12 @@
+import { FC } from "react";
+import { HorizontalGridLines, LineMarkSeries, LineMarkSeriesPoint, LineSeries, LineSeriesPoint, VerticalGridLines, XAxis, XYPlot, YAxis } from "react-vis";
 import { Box, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
-import { useCallback } from "react";
-import { FC, useState } from "react";
-import { Hint, HorizontalGridLines, LineMarkSeries, LineMarkSeriesPoint, LineSeries, LineSeriesPoint, VerticalGridLines, XAxis, XYPlot, YAxis } from "react-vis";
+
 import { IWorkGraph, Reviewers, WorkGraphTypes } from "../../../../../../store/types";
+
 import { palette } from "../../../../../../theme/colors";
+
 import * as globalStyles from "../../../../../../const/styles"
 
 interface IProps {
@@ -42,17 +44,6 @@ export const WorkLineGraph: FC<IProps> = ({ graphProps }) => {
   const teacherColor = palette.hover.danger
   const expertColor = palette.hover.success
   const peersColor = palette.hover.info
-
-  const [hoveredMark, setHoveredMark] = useState<LineMarkSeriesPoint>()
-
-  const hanldeOnMouseMarkHover = useCallback((markProps: LineMarkSeriesPoint) => {
-    console.log(markProps)
-    setHoveredMark(markProps)
-  }, [graphProps])
-
-  const hanldeOnMouseMarkHoverOut = useCallback((markProps: LineMarkSeriesPoint) => {
-    setHoveredMark(undefined)
-  }, [graphProps])
 
   return (
     <Box sx={styles.graphBox}
@@ -114,8 +105,6 @@ export const WorkLineGraph: FC<IProps> = ({ graphProps }) => {
                 markStyle={{ fill: peersColor, strokeWidth: "0px" }}
                 data={peersData}
                 animation={{ damping: 10, stiffness: 20 }}
-                onValueMouseOver={hanldeOnMouseMarkHover}
-                onValueMouseOut={hanldeOnMouseMarkHoverOut}
               />
             )}
             {/* {hoveredMark && (

@@ -1,25 +1,30 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, IStudentWork, IWorkItem } from '../types';
+import { IError, IStudentWork, IWorkItem, IWorkStatistics } from '../types';
 
 
 export interface IWorksState {
   isWorkListLoading: boolean,
+  isWorkStatisticsLoading: boolean,
   isWorkListLock: boolean,
   isStudentWorkLoading: boolean,
   isStudentWorkLock: boolean,
   error: IError | undefined,
   workList: IWorkItem[] | undefined,
   studentWork: IStudentWork | undefined
+  workStatistics: IWorkStatistics | undefined,
+  
 }
 
 const initialState: IWorksState = {
   isWorkListLoading: false,
+  isWorkStatisticsLoading: false,
   isStudentWorkLoading: false,
   error: undefined,
   isWorkListLock: true,
   isStudentWorkLock: true,
   studentWork: undefined,
-  workList: undefined
+  workList: undefined,
+  workStatistics: undefined
 };
 
 export const works = createSlice({
@@ -33,11 +38,23 @@ export const works = createSlice({
       state.workList = undefined
     },
 
+    fetchWorkStatisticsStarted: (state) => {
+      state.isWorkStatisticsLoading = true
+      state.error = undefined
+      state.workStatistics = undefined
+    },
+
     fetchWorkListSuccess: (state, { payload }: PayloadAction<Array<IWorkItem>>) => {
       state.isWorkListLoading = false
       state.error = undefined
       state.isWorkListLock = false
       state.workList = payload
+    },
+
+    fetchWorkStatisticsSuccess: (state, { payload }: PayloadAction<IWorkStatistics>) => {
+      state.isWorkStatisticsLoading = false
+      state.error = undefined
+      state.workStatistics = payload
     },
 
     fetchStudentWorkStarted: (state) => {
@@ -67,6 +84,8 @@ export const works = createSlice({
       state.isWorkListLock = true
       state.isStudentWorkLock = true
       state.workList = undefined
+      state.isWorkStatisticsLoading = false
+      state.workStatistics = undefined
     },
   },
 });

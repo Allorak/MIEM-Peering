@@ -1,17 +1,35 @@
+import React from "react";
 import { FC, useCallback, useEffect, useState } from "react";
 import { Box, SxProps, Theme } from "@mui/system";
 import { Button, Typography } from "@mui/material";
-import BorderColorTwoToneIcon from '@mui/icons-material/BorderColorTwoTone';
+import Slide from '@mui/material/Slide';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import { TransitionProps } from '@mui/material/transitions';
 
 import { WorksList } from "./WorksList";
 import { WorkResponse } from "./WorkResponse";
+import { WorkStatistics } from "./WorkStatistics";
 
-import { IWorkItem } from "../../../../../store/types";
+import { fetchWorkList, fetchStudentWork, fetchStudentWorkStatistics } from "../../../../../store/works";
+
+import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { Popup } from "../../../../../components/popup";
+
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
-import { fetchWorkList, fetchStudentWork } from "../../../../../store/works";
-import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { IWorkItem } from "../../../../../store/types";
 
+import * as globalStyles from "../../../../../const/styles";
+
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const Works: FC = () => {
 
@@ -23,11 +41,14 @@ export const Works: FC = () => {
   const isWorkListLock = useAppSelector(state => state.works.isWorkListLock)
   const isStudentWorkLoading = useAppSelector(state => state.works.isStudentWorkLoading)
   const isStudentWorkLock = useAppSelector(state => state.works.isStudentWorkLock)
+  const isStudentWorkStatisticLoading = useAppSelector(state => state.works.isWorkStatisticsLoading)
   const workList = useAppSelector(state => state.works.workList)
   const studentWork = useAppSelector(state => state.works.studentWork)
+  const workStatistics = useAppSelector(state => state.works.workStatistics)
   const error = useAppSelector(state => state.works.error)
 
   const [activeWork, setActiveWork] = useState<IWorkItem>()
+  const [popupStatus, setPopupStatus] = useState<boolean>(false)
 
   useEffect(() => {
     if (path && path.taskId)
@@ -46,6 +67,13 @@ export const Works: FC = () => {
     if (path && path.taskId)
       dispatch(fetchStudentWork(path.taskId, workId))
   }, [path])
+
+  const handleOnStatistics = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (path && path.taskId && activeWork) {
+      setPopupStatus(prev => !prev)
+      dispatch(fetchStudentWorkStatistics(path.taskId, activeWork.workId))
+    }
+  }, [popupStatus, activeWork])
 
   const handleOnWorkChange = useCallback((workId: string) => {
     if (workList && workList.length > 0) {
@@ -87,10 +115,11 @@ export const Works: FC = () => {
               <Button
                 variant={"contained"}
                 color={"primary"}
-                startIcon={<BorderColorTwoToneIcon sx={{ margin: "0px -8px 0px 0px" }} />}
+                startIcon={<QueryStatsIcon sx={{ margin: "0px -8px 0px 0px" }} />}
                 sx={styles.addBt}
+                onClick={handleOnStatistics}
               >
-                {"Оценить"}
+                {"Метаданные"}
               </Button>
             </Box>
 
@@ -115,6 +144,24 @@ export const Works: FC = () => {
         </Box>
       )}
 
+      {activeWork && (
+        <Popup
+          title={`Метаданные результатов проверки: ${activeWork.studentName}`}
+          open={popupStatus}
+          loading={isStudentWorkStatisticLoading}
+          onCloseHandler={setPopupStatus}
+          fullScreen
+          fullWidth
+          PaperProps={{ sx: { flex: '0 1 100%' } }}
+          dialogContentSx={{ padding: "0px 10px", ...globalStyles.scrollStyles, backgroundColor: "#F5F7FD" }}
+          TransitionComponent={Transition}
+          transitionDuration={100}
+        >
+          {workStatistics && (
+            <WorkStatistics workStatistics={workStatistics} />
+          )}
+        </Popup>
+      )}
     </DashboardWorkBox>
   )
 }
