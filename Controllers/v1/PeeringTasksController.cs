@@ -5,7 +5,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using patools.Dtos.Task;
 using patools.Models;
 using patools.Services.PeeringTasks;
 using patools.Errors;
@@ -24,8 +23,8 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
-        [HttpGet("{taskId}/overview")]
-        public async System.Threading.Tasks.Task<ActionResult<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview([FromRoute]Guid taskId)
+        [HttpGet("{taskId:guid}/overview")]
+        public async System.Threading.Tasks.Task<IActionResult> GetTaskOverview([FromRoute]Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -43,6 +42,24 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidGuidIdResponse());
             
             return Ok(await _peeringTasksService.GetTaskOverview(taskId, teacherId));
+        }
+
+        [HttpGet("{taskId:guid}/authorform")]
+        public async System.Threading.Tasks.Task<IActionResult> GetAuthorForm([FromRoute] Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _peeringTasksService.GetAuthorForm(taskId, userId));
         }
     }
 }

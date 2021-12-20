@@ -11,7 +11,6 @@ namespace patools
     {
         public AutoMapperProfile()
         {
-            CreateMap<AddUserDTO, User>();
             CreateMap<User,GetRegisteredUserDtoResponse>();
             CreateMap<User, GetTeacherDtoResponse>();
             CreateMap<AddCourseDto, Course>();
@@ -20,6 +19,7 @@ namespace patools
             CreateMap<PeeringTask,GetNewPeeringTaskDtoResponse>();
             CreateMap<AddQuestionDto,Question>();
             CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
+            CreateMap<Question,GetQuestionDTO>();
         }
     }
 }

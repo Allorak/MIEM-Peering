@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using patools.Dtos.Question;
 using patools.Dtos.Task;
 using patools.Models;
 using patools.Errors;
@@ -136,6 +137,44 @@ namespace patools.Services.PeeringTasks
                     Deadlines = deadlines,
                     Grades = grades
                 });
+        }
+        
+        public async Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid userId)
+        {
+            var response = new Response<GetAuthorFormDTO>();
+
+            var task = await _context.Tasks
+                .Include(t=>t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetAuthorFormDTO>("Invalid task id");
+            
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetAuthorFormDTO>("Invalid user id");
+
+            if (user.Role == UserRoles.Student)
+            {
+                var taskUser =
+                    await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
+                if (taskUser == null)
+                    return new NoAccessResponse<GetAuthorFormDTO>("This task is not assigned to this user");
+            }
+            else if (user.Role == UserRoles.Teacher)
+            {
+                if (task.Course.Teacher != user)
+                    return new NoAccessResponse<GetAuthorFormDTO>("This teacher has no access to the task");
+            }
+
+            var questions = _context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Author)
+                .OrderBy(q => q.Order)
+                .Select(q => _mapper.Map<GetQuestionDTO>(q));
+
+            response.Success = true;
+            response.Error = null;
+            response.Payload = new GetAuthorFormDTO() {Rubrics = questions};
+            return response;
         }
     }
 }
