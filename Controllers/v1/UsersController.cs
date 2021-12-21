@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,11 @@ using Google.Apis.Auth;
 using patools.Dtos.User;
 using patools.Services.Users;
 using System.Security.Claims;
+using AutoMapper.Configuration;
 using patools.Errors;
+using Microsoft.Extensions.Configuration;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+
 namespace patools.Controllers.v1
 {
     [ApiController]
@@ -17,11 +20,13 @@ namespace patools.Controllers.v1
     {
         private readonly PAToolsContext _context;
         private readonly IUsersService _usersService;
+        private readonly IConfiguration _configuration;
 
-        public UsersController(PAToolsContext context, IUsersService usersService)
+        public UsersController(PAToolsContext context, IUsersService usersService, IConfiguration configuration)
         {
             _context = context;
             _usersService = usersService;
+            _configuration = configuration;
         }
 
         [HttpPost("google/add")]
@@ -31,7 +36,7 @@ namespace patools.Controllers.v1
             {
                 var googleUser = await GoogleJsonWebSignature.ValidateAsync(newUser.GoogleToken, new GoogleJsonWebSignature.ValidationSettings()
                 {
-                    Audience = new[] {"232154519390-nlp3m4fjjeosrvo8gld3l6lo7cd2v3na.apps.googleusercontent.com"}
+                    Audience = new[] {_configuration.GetSection("AppSettings:AppId").Value}
                 });
 
                 var user = new AddUserDTO()

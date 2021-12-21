@@ -20,6 +20,7 @@ namespace patools
             CreateMap<AddQuestionDto,Question>();
             CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
             CreateMap<Question,GetQuestionDTO>();
+            CreateMap<AddUserDTO,User>();
         }
     }
 }
