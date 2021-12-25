@@ -15,7 +15,7 @@ using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 namespace patools.Controllers.v1
 {
     [ApiController]
-    [Route("api/v1/users")]
+    [Route("api/v1/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly PAToolsContext _context;

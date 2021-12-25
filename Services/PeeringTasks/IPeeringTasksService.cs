@@ -8,9 +8,9 @@ namespace patools.Services.PeeringTasks
 {
     public interface IPeeringTasksService
     {
-        Task<Response<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview (Guid taskId, Guid teacherId);
+        Task<Response<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview (GetPeeringTaskOverviewDtoRequest taskInfo);
         Task<Response<GetNewPeeringTaskDtoResponse>> AddTask(AddPeeringTaskDto peeringTask);
-        Task<Response<List<GetPeeringTaskMainInfoDtoResponse>>> GetCourseTasks(GetCourseTasksDtoRequest courseInfo);
-        Task<Response<GetAuthorFormDTO>> GetAuthorForm(Guid taskId, Guid userId);
+        Task<Response<GetCourseTasksDtoResponse>> GetCourseTasks(GetCourseTasksDtoRequest courseInfo);
+        Task<Response<GetAuthorFormDtoResponse>> GetAuthorForm(GetAuthorFormDtoRequest taskInfo);
     }
 }

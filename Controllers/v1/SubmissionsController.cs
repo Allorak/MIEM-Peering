@@ -26,7 +26,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<string>> AddSubmission(AddSubmissionDto submission)
+        public async Task<ActionResult<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());

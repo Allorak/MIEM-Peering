@@ -20,22 +20,22 @@ namespace patools.Services.Submissions
             _context = context;
         }
         
-        public async Task<Response<string>> AddSubmission(AddSubmissionDto submission)
+        public async Task<Response<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission)
         {
             var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == submission.UserId);
             if (student == null)
-                return new InvalidGuidIdResponse<string>("Invalid user id");
+                return new InvalidGuidIdResponse<GetNewSubmissionDtoResponse>("Invalid user id");
 
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == submission.TaskId);
             if (task == null)
-                return new InvalidGuidIdResponse<string>("Invalid task id");
+                return new InvalidGuidIdResponse<GetNewSubmissionDtoResponse>("Invalid task id");
             
             var taskUser = await _context.TaskUsers
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
-                return new InvalidGuidIdResponse<string>("The task isn't assigned to this user");
+                return new InvalidGuidIdResponse<GetNewSubmissionDtoResponse>("The task isn't assigned to this user");
             if (taskUser.State != PeeringTaskState.Assigned)
-                return new OperationErrorResponse<string>("The submission for this task already exists");
+                return new OperationErrorResponse<GetNewSubmissionDtoResponse>("The submission for this task already exists");
             
             var newSubmission = new Submission()
             {
@@ -52,7 +52,7 @@ namespace patools.Services.Submissions
                     .FirstOrDefaultAsync(q => q.PeeringTask == taskUser.PeeringTask && q.Order == answer.Order);
                 
                 if (question == null)
-                    return new BadRequestDataResponse<string>($"Incorrect Order({answer.Order}) in answer");
+                    return new BadRequestDataResponse<GetNewSubmissionDtoResponse>($"Incorrect Order({answer.Order}) in answer");
                 
                 newAnswers.Add(new Answer
                 {
@@ -64,8 +64,12 @@ namespace patools.Services.Submissions
             }
             await _context.Answers.AddRangeAsync(newAnswers);
             await _context.SaveChangesAsync();
-
-            return new SuccessfulResponse<string>("Submission added successfully");
+            Console.WriteLine(newSubmission);
+            Console.WriteLine(newSubmission.ID);
+            var result = _mapper.Map<GetNewSubmissionDtoResponse>(newSubmission);
+            Console.WriteLine(result);
+            Console.WriteLine(result.SubmissionId);
+            return new SuccessfulResponse<GetNewSubmissionDtoResponse>(result);
         }
     }
 }

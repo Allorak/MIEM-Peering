@@ -33,7 +33,7 @@ namespace patools
 
         public void ConfigureServices(IServiceCollection services)
         {
-            SetupJWTServices(services);
+            SetupJwtServices(services);
             services.AddControllersWithViews();
             services.AddDbContext<PAToolsContext>();
             services.AddSpaStaticFiles(configuration =>
@@ -87,7 +87,7 @@ namespace patools
             });
         }
 
-        private void SetupJWTServices(IServiceCollection services)
+        private void SetupJwtServices(IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>

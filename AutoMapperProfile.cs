@@ -4,6 +4,7 @@ using patools.Dtos.User;
 using patools.Dtos.Course;
 using patools.Dtos.Task;
 using patools.Dtos.Question;
+using patools.Dtos.Submission;
 
 namespace patools
 {
@@ -19,8 +20,9 @@ namespace patools
             CreateMap<PeeringTask,GetNewPeeringTaskDtoResponse>();
             CreateMap<AddQuestionDto,Question>();
             CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
-            CreateMap<Question,GetQuestionDTO>();
+            CreateMap<Question,GetQuestionDto>();
             CreateMap<AddUserDTO,User>();
+            CreateMap<Submission,GetNewSubmissionDtoResponse>();
         }
     }
 }

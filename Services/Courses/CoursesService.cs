@@ -43,14 +43,14 @@ namespace patools.Services.Courses
                 .Include(x => x.Teacher)
                 .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
                     CourseCode = x.CourseCode,
                     Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher)
                 })
-                .FirstOrDefaultAsync(x => x.ID == course.ID);
+                .FirstOrDefaultAsync(x => x.Id == course.ID);
 
             if (resultCourse == null)
                 return new OperationErrorResponse<GetCourseDtoResponse>("Unexpected error while adding a new course");
@@ -76,7 +76,7 @@ namespace patools.Services.Courses
                 .Include(course => course.Teacher)
                 .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
@@ -94,14 +94,14 @@ namespace patools.Services.Courses
                 .Include(x => x.Teacher)
                 .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
                     CourseCode = x.CourseCode,
                     Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher)
                 })
-                .FirstOrDefaultAsync(x => x.ID == courseId);
+                .FirstOrDefaultAsync(x => x.Id == courseId);
 
             if (course == null)
                 return new InvalidGuidIdResponse<GetCourseDtoResponse>();
@@ -117,7 +117,7 @@ namespace patools.Services.Courses
                 .Where(x => x.Teacher.ID == teacherId)
                 .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
@@ -139,7 +139,7 @@ namespace patools.Services.Courses
                 .Where(x => x.Teacher.ID == studentId)
                 .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,

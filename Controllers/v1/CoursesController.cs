@@ -181,62 +181,7 @@ namespace patools.Controllers.v1
 
             return Ok(await _coursesService.DeleteCourse(teacherId, id));
         }
-
-        [HttpPost("{courseId:guid}/tasks/add")]
-        public async Task<ActionResult<GetNewPeeringTaskDtoResponse>> AddTask([FromRoute] Guid courseId, AddPeeringTaskDto peeringTask)
-        {
-            if(!User.Identity.IsAuthenticated)
-                return Ok(new UnauthorizedUserResponse());
-
-            if(!User.IsInRole(UserRoles.Teacher.ToString()))
-                return Ok(new IncorrectUserRoleResponse());
-
-            //The user has no id Claim
-            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(teacherIdClaim == null)
-                return Ok(new InvalidJwtTokenResponse());
-
-            //The id stored in Claim is not Guid
-            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
-                return Ok(new InvalidGuidIdResponse());
-
-            peeringTask.CourseId = courseId;
-            peeringTask.TeacherId = teacherId;
-            return Ok(await _peeringTasksService.AddTask(peeringTask));
-        }
-
-        [HttpGet("{courseId:guid}/tasks/get")]
-        public async Task<ActionResult<List<GetPeeringTaskMainInfoDtoResponse>>> GetCourseTasks([FromRoute] Guid courseId)
-        {
-            if(!User.Identity.IsAuthenticated)
-                return Ok(new UnauthorizedUserResponse());
-
-            UserRoles? role = null;
-            if(User.IsInRole(UserRoles.Teacher.ToString()))
-                role = UserRoles.Teacher;
-            if(User.IsInRole(UserRoles.Student.ToString()))
-                role = UserRoles.Student;
-            if (!role.HasValue)
-                return Ok(new InvalidJwtTokenResponse());
-            
-            
-            //The user has no id Claim
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(userIdClaim == null)
-                return Ok(new InvalidJwtTokenResponse());
-
-            //The id stored in Claim is not Guid
-            if(!Guid.TryParse(userIdClaim.Value, out var userId))
-                return Ok(new InvalidJwtTokenResponse());
-
-            var courseTasksInfo = new GetCourseTasksDtoRequest()
-            {
-                CourseId = courseId,
-                UserId = userId,
-                UserRole = role.Value
-            };
-            return Ok(await _peeringTasksService.GetCourseTasks(courseTasksInfo));
-        }
+        
         //Should be in CourseService.cs file, Remove after refactoring
         private bool CourseExists(Guid id)
         {

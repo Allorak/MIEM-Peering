@@ -6,6 +6,6 @@ namespace patools.Services.Submissions
 {
     public interface ISubmissionsService
     {
-        Task<Response<string>> AddSubmission(AddSubmissionDto submission);
+        Task<Response<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission);
     }
 }

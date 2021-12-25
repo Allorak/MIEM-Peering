@@ -3,8 +3,8 @@ using patools.Dtos.Question;
 
 namespace patools.Dtos.Task
 {
-    public class GetAuthorFormDTO
+    public class GetAuthorFormDtoResponse
     {
-        public IEnumerable<GetQuestionDTO> Rubrics { get; set; }
+        public IEnumerable<GetQuestionDto> Rubrics { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using patools.Dtos.Task;
 using patools.Models;
 using patools.Services.PeeringTasks;
 using patools.Errors;
@@ -23,8 +24,8 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
-        [HttpGet("{taskId:guid}/overview")]
-        public async System.Threading.Tasks.Task<IActionResult> GetTaskOverview([FromRoute]Guid taskId)
+        [HttpGet("overview")]
+        public async Task<ActionResult<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview(GetPeeringTaskOverviewDtoRequest taskInfo)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -41,11 +42,12 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
             
-            return Ok(await _peeringTasksService.GetTaskOverview(taskId, teacherId));
+            taskInfo.TeacherId = teacherId;
+            return Ok(await _peeringTasksService.GetTaskOverview(taskInfo));
         }
 
-        [HttpGet("{taskId:guid}/authorform")]
-        public async System.Threading.Tasks.Task<IActionResult> GetAuthorForm([FromRoute] Guid taskId)
+        [HttpGet("authorform")]
+        public async Task<ActionResult<GetAuthorFormDtoResponse>> GetAuthorForm(GetAuthorFormDtoRequest taskInfo)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -58,8 +60,59 @@ namespace patools.Controllers.v1
             //The id stored in Claim is not Guid
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
+            taskInfo.UserId = userId;
+            return Ok(await _peeringTasksService.GetAuthorForm(taskInfo));
+        }
+        
+        [HttpPost("add")]
+        public async Task<ActionResult<GetNewPeeringTaskDtoResponse>> AddTask(AddPeeringTaskDto peeringTask)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
 
-            return Ok(await _peeringTasksService.GetAuthorForm(taskId, userId));
+            if(!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
+                return Ok(new InvalidGuidIdResponse());
+
+            peeringTask.TeacherId = teacherId;
+            return Ok(await _peeringTasksService.AddTask(peeringTask));
+        }
+        
+        [HttpGet("get")]
+        public async Task<ActionResult<GetCourseTasksDtoResponse>> GetCourseTasks(GetCourseTasksDtoRequest taskCourseInfo)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            UserRoles? role = null;
+            if(User.IsInRole(UserRoles.Teacher.ToString()))
+                role = UserRoles.Teacher;
+            if(User.IsInRole(UserRoles.Student.ToString()))
+                role = UserRoles.Student;
+            if (!role.HasValue)
+                return Ok(new InvalidJwtTokenResponse());
+            
+            
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            taskCourseInfo.UserId = userId;
+            taskCourseInfo.UserRole = role.Value;
+            return Ok(await _peeringTasksService.GetCourseTasks(taskCourseInfo));
         }
     }
 }

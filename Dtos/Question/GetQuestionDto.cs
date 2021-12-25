@@ -2,7 +2,7 @@ using patools.Models;
 
 namespace patools.Dtos.Question
 {
-    public class GetQuestionDTO
+    public class GetQuestionDto
     {
         public string Title { get; set; }
         public string Description { get; set; }
