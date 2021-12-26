@@ -1,23 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, IOverviewExpert } from '../types';
+import { IError, IDashboardTaskProps } from '../types';
 
 
-export interface ICoursesState {
+export interface IDashboardState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: IOverviewExpert | undefined
+  payload: IDashboardTaskProps | undefined
 }
 
-const initialState: ICoursesState = {
+const initialState: IDashboardState = {
   isLoading: false,
   error: undefined,
   isLock: true,
   payload: undefined
 };
 
-export const overviewExpertSlice = createSlice({
-  name: 'overviewExpert',
+export const dashboard = createSlice({
+  name: 'dashboard',
   initialState,
   reducers: {
     fetchStarted: (state) => {
@@ -26,8 +26,7 @@ export const overviewExpertSlice = createSlice({
       state.error = undefined
     },
 
-    fetchSuccess: (state, { payload }: PayloadAction<IOverviewExpert>) => {
-      console.log(payload, "!")
+    fetchSuccess: (state, { payload }: PayloadAction<IDashboardTaskProps>) => {
       state.isLoading = false
       state.error = undefined
       state.isLock = false
@@ -39,15 +38,16 @@ export const overviewExpertSlice = createSlice({
       state.error = payload
       state.isLock = false
     },
-    reset: (state) => {
+
+    resetState: (state) => {
       state.isLoading = false
       state.error = undefined
-      state.isLock = true
+      state.isLock = false
       state.payload = undefined
     }
   },
 });
 
-export const actions = overviewExpertSlice.actions
+export const actions = dashboard.actions
 
-export const reducer = overviewExpertSlice.reducer
+export const reducer = dashboard.reducer

@@ -37,5 +37,11 @@ export const paths = {
       menu2: '/st/task/:taskId/menu2',
       menu3: '/st/task/:taskId/menu3'
     }
+  },
+  expert: {
+    dashboard: {
+      overview: '/ex/task/:taskId/overview',
+      checkings: '/ex/task/:taskId/checkings'
+    }
   }
 }

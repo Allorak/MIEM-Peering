@@ -1,22 +1,17 @@
 import { AxiosRequestConfig } from 'axios'
 import { IResponseData } from '.'
 import { delay, IResponse } from '..'
+import { IRole, PeerSteps } from '../../store/types'
 
 
 export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse<IResponseData>> => {
-  await delay(500)
+  await delay(10000)
 
   return {
     success: true,
     payload: {
-      deadlines: {
-        submissionStartDateTime: new Date(),
-        submissionEndDateTime: new Date(),
-        reviewStartDateTime: new Date(),
-        reviewEndDateTime: new Date()
-      },
-      assignedWorksCount: 5,
-      checkedWorksCount: 4,
+      userRole: IRole.expert,
+      // step: PeerSteps.FIRST_STEP
     }
   }
 }

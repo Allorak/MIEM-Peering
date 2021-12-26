@@ -13,6 +13,7 @@ import { reducer as overviewExpert } from '../store/overviewExpert'
 import { reducer as works } from '../store/works'
 import { reducer as experts } from '../store/experts'
 import { reducer as checkings } from '../store/checkings'
+import { reducer as dashboard } from '../store/dashboard'
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     gAuth,
     userProfile,
     registration,
+    dashboard,
     courses,
     newCourse,
     joinCourse,

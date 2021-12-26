@@ -1,1 +1,1 @@
-export { StatusBarExpert } from "./statusBarExpert";
+export { StatusBarExpert } from "./StatusBarExpert";

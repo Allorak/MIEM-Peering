@@ -3,8 +3,6 @@ import { FC } from "react";
 import { Theme, Box, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
 
-import { usePrivatePathTDashboard } from "../../../../app/hooks/usePrivatePathTDashboard";
-
 
 import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
 import { IMenu, IMenuTitles } from '../../../../store/types';
@@ -14,6 +12,7 @@ import { Checkings } from '../../teacher/dashboard/checkings';
 import { Overview } from './overview';
 
 import * as globalStyles from "../../../../const/styles"
+import { usePrivatePathExDashboard } from '../../../../app/hooks/usePrivatePathExDashboard';
 
 
 export const Dashboard: FC = () => {
@@ -21,9 +20,9 @@ export const Dashboard: FC = () => {
   const {
     location,
     path
-  } = usePrivatePathTDashboard()
+  } = usePrivatePathExDashboard()
 
-  const pathToMainDashboard = generatePath(paths.teacher.dashboard.overview, { taskId: path?.taskId })
+  const pathToMainDashboard = generatePath(paths.expert.dashboard.overview, { taskId: path?.taskId })
 
   // создать стэйт курса если нет то подиспатчить
 
@@ -77,8 +76,8 @@ export const Dashboard: FC = () => {
           <Box sx={styles.rightContainerWrapper}>
             <Box marginRight={"15px"}>
               <Routes>
-                <Route path={paths.teacher.dashboard.overview} element={<Overview />} />
-                <Route path={paths.teacher.dashboard.checkings} element={<Checkings />} />
+                <Route path={paths.expert.dashboard.overview} element={<Overview />} />
+                <Route path={paths.expert.dashboard.checkings} element={<Checkings />} />
               </Routes>
             </Box>
           </Box>
@@ -128,10 +127,10 @@ const styles = {
 const menuItems = [
   {
     title: IMenuTitles.OVERVIEW,
-    path: paths.teacher.dashboard.overview
+    path: paths.expert.dashboard.overview
   },
   {
     title: IMenuTitles.CHECKINGS,
-    path: paths.teacher.dashboard.checkings
+    path: paths.expert.dashboard.checkings
   }
 ] as IMenu[]

@@ -1,9 +1,8 @@
 import { FC } from "react";
 import { Box, SxProps, Theme } from "@mui/system";
 import { LinearProgress, Typography } from "@mui/material";
-import { palette } from "..//..//theme/colors"
 
-import { IStatusBar } from "../../store/types";
+import { palette } from "../../theme/colors"
 
 
 interface IProps {
@@ -37,7 +36,7 @@ export const StatusBarExpert: FC<IProps> = ({
     )
   }
 
-  const assignedPercentage = checkedWorksCount ?? 0 * 100 / (assignedWorksCount ?? 0)
+  const assignedPercentage = (typeof checkedWorksCount === 'number' ? checkedWorksCount : 0) * 100 / (typeof assignedWorksCount === 'number' ? assignedWorksCount : 1)
 
   return (
     <Box>
@@ -51,7 +50,7 @@ export const StatusBarExpert: FC<IProps> = ({
             variant={"h6"}
             sx={styles.progressText}
           >
-            {`${checkedWorksCount} из ${assignedWorksCount}`}
+            {`${assignedWorksCount} из ${checkedWorksCount}`}
           </Typography>
 
           <LinearProgress

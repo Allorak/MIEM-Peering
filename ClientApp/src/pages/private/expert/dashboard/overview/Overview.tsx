@@ -6,16 +6,16 @@ import { Deadlines } from "../../../../../components/deadlines"
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
 import { fetchOverviewExpert } from "../../../../../store/overviewExpert";
 import { StatusBarExpert } from "../../../../../components/statusBarExpert";
+import { usePrivatePathExDashboard } from "../../../../../app/hooks/usePrivatePathExDashboard";
 
 
 export const Overview: FC = () => {
 
   const dispatch = useAppDispatch()
-  const { path } = usePrivatePathStDashboard()
+  const { path } = usePrivatePathExDashboard()
 
   const status = useAppSelector(state => state.overviewExpert.isLoading)
   const error = useAppSelector(state => state.overviewExpert.error)
@@ -25,6 +25,10 @@ export const Overview: FC = () => {
     if (path && path.taskId)
       dispatch(fetchOverviewExpert(path.taskId))
   }, [])
+
+  useEffect(() => {
+    console.log(payload)
+  },[])
 
   return (
     <DashboardWorkBox

@@ -31,7 +31,8 @@ export type IStatus = 'EMPTY' | 'FIRST_LOADING' | 'NOT_LOADED' | 'SUCCESS' | 'LO
 
 export enum IRole {
   teacher = 'Teacher',
-  student = 'Student'
+  student = 'Student',
+  expert = 'Expert'
 }
 
 export type IPath = {
@@ -116,6 +117,16 @@ export type ICourses = {
   subject: string,
   description?: string,
   settings?: IActiveCodeCourse | IDisableCodeCourse
+}
+
+export type IDashboardTaskProps = {
+  userRole: IRole.teacher,
+  step: PeerSteps
+} | {
+  userRole: IRole.student,
+  step: PeerSteps
+} | {
+  userRole: IRole.expert,
 }
 
 export type IActiveCodeCourse = {
