@@ -111,10 +111,14 @@ namespace patools.Services.Courses
 
         public async Task<Response<List<GetCourseDtoResponse>>> GetTeacherCourses(Guid teacherId)
         {
+            var teacher =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid teacher id");
             
             var courses = await _context.Courses
                 .Include(course => course.Teacher)
-                .Where(x => x.Teacher.ID == teacherId)
+                .Where(x => x.Teacher == teacher)
                 .Select(x => new GetCourseDtoResponse
                 {
                     Id = x.ID,
@@ -126,31 +130,29 @@ namespace patools.Services.Courses
                 })
                 .ToListAsync();
 
-            if (courses == null)
-                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid teacher id");
-            
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
         public async Task<Response<List<GetCourseDtoResponse>>> GetStudentCourses(Guid studentId)
         {
-            var courses = await _context.Courses
-                .Include(course => course.Teacher)
-                .Where(x => x.Teacher.ID == studentId)
-                .Select(x => new GetCourseDtoResponse
-                {
-                    Id = x.ID,
-                    Title = x.Title,
-                    Description = x.Description,
-                    Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher)
-                })
+            var student =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == studentId && u.Role == UserRoles.Student);
+            if (student == null)
+                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid student id");
+
+            var courseUsers = await _context.CourseUsers
+                .Include(cu => cu.Course)
+                .Where(cu => cu.User == student)
                 .ToListAsync();
 
-            if (courses == null)
-                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid user id");
-
+            var courses = new List<GetCourseDtoResponse>();
+            foreach (var courseUser in courseUsers)
+            {
+                var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
+                if(course!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+            }
+            
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
     }

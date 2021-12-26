@@ -18,7 +18,8 @@ namespace patools
             CreateMap<User,GetNewUserDtoResponse>();
             CreateMap<PeeringTask,GetPeeringTaskDeadlinesDtoResponse>();
             CreateMap<PeeringTask,GetNewPeeringTaskDtoResponse>();
-            CreateMap<AddQuestionDto,Question>();
+            CreateMap<AddAuthorQuestionDto,Question>();
+            CreateMap<AddPeerQuestionDto,Question>();
             CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
             CreateMap<Question,GetQuestionDto>();
             CreateMap<AddUserDTO,User>();
