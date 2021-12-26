@@ -312,6 +312,12 @@ export type IOverviewStudent = {
   status: IStatusTask
 }
 
+export type IOverviewExpert = {
+  deadlines: IDeadlines,
+  checkedWorksCount?: number,
+  assignedWorksCount?: number
+}
+
 export type IOverviewResponse = IOverview & {
   deadlines: {
     submissionStartDateTime: string

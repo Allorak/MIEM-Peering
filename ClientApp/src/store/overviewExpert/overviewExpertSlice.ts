@@ -1,23 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, IOverviewStudent } from '../types';
+import { IError, IOverviewExpert } from '../types';
 
 
 export interface ICoursesState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: IOverviewStudent
+  payload: IOverviewExpert | undefined
 }
 
 const initialState: ICoursesState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as IOverviewStudent
+  payload: undefined
 };
 
-export const overview = createSlice({
-  name: 'overviewStudent',
+export const overviewExpertSlice = createSlice({
+  name: 'overviewExpert',
   initialState,
   reducers: {
     fetchStarted: (state) => {
@@ -26,7 +26,7 @@ export const overview = createSlice({
       state.error = undefined
     },
 
-    fetchSuccess: (state, { payload }: PayloadAction<IOverviewStudent>) => {
+    fetchSuccess: (state, { payload }: PayloadAction<IOverviewExpert>) => {
       state.isLoading = false
       state.error = undefined
       state.isLock = false
@@ -42,11 +42,11 @@ export const overview = createSlice({
       state.isLoading = false
       state.error = undefined
       state.isLock = true
-      state.payload = {} as IOverviewStudent
+      state.payload = undefined
     }
   },
 });
 
-export const actions = overview.actions
+export const actions = overviewExpertSlice.actions
 
-export const reducer = overview.reducer
+export const reducer = overviewExpertSlice.reducer
