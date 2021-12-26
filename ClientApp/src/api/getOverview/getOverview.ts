@@ -10,7 +10,7 @@ export const getOverview = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/${taskId}/overview`,
+    url: `/api/v1/tasks/overview/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
