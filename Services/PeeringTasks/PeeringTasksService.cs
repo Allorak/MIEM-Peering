@@ -62,7 +62,7 @@ namespace patools.Services.PeeringTasks
             if (course.Teacher.ID != peeringTask.TeacherId)
                 return new NoAccessResponse<GetNewPeeringTaskDtoResponse>("This teacher has no access to this course");
 
-            var newTask = new Models.PeeringTask
+            var newTask = new PeeringTask
             {
                 ID = Guid.NewGuid(),
                 Title = peeringTask.MainInfo.Title,
@@ -93,6 +93,8 @@ namespace patools.Services.PeeringTasks
                 newPeerQuestion.ID = Guid.NewGuid();
                 newPeerQuestion.PeeringTask = newTask;
                 newPeerQuestion.RespondentType = RespondentTypes.Peer;
+                if (!newPeerQuestion.Required)
+                    newPeerQuestion.CoefficientPercentage = null;
                 await _context.Questions.AddAsync(newPeerQuestion);
             }
 

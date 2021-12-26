@@ -4,6 +4,6 @@ namespace patools.Dtos.Task
 {
     public class GetNewPeeringTaskDtoResponse
     {
-        public Guid TaskId { get; set; }
+        public Guid Id { get; set; }
     }
 }
