@@ -91,15 +91,6 @@ namespace patools.Controllers.v1
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
-
-            UserRoles? role = null;
-            if(User.IsInRole(UserRoles.Teacher.ToString()))
-                role = UserRoles.Teacher;
-            if(User.IsInRole(UserRoles.Student.ToString()))
-                role = UserRoles.Student;
-            if (!role.HasValue)
-                return Ok(new InvalidJwtTokenResponse());
-            
             
             //The user has no id Claim
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -111,8 +102,14 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidJwtTokenResponse());
 
             taskCourseInfo.UserId = userId;
-            taskCourseInfo.UserRole = role.Value;
-            return Ok(await _peeringTasksService.GetCourseTasks(taskCourseInfo));
+
+            if (User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(await _peeringTasksService.GetTeacherCourseTasks(taskCourseInfo));
+
+            if(User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(await _peeringTasksService.GetStudentCourseTasks(taskCourseInfo));
+            
+            return Ok(new InvalidJwtTokenResponse());
         }
     }
 }

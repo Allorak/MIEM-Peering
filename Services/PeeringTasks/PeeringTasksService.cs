@@ -72,38 +72,56 @@ namespace patools.Services.PeeringTasks
             return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(_mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
         }
 
-        public async Task<Response<GetCourseTasksDtoResponse>> GetCourseTasks(GetCourseTasksDtoRequest courseInfo)
+        public async Task<Response<GetCourseTasksDtoResponse>> GetTeacherCourseTasks(GetCourseTasksDtoRequest courseInfo)
+        {
+            
+            var teacher = await _context.Users.FirstOrDefaultAsync(x => x.ID == courseInfo.UserId);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid teacher id");
+           
+            var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseInfo.CourseId);
+            if (course == null)
+                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid course id");
+
+            if(course.Teacher != teacher)
+                return new NoAccessResponse<GetCourseTasksDtoResponse>("This teacher has no access to the course");
+            var tasks = await _context.Tasks
+                        .Where(t => t.Course.ID == courseInfo.CourseId)
+                        .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
+                        .ToListAsync();
+            
+            return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
+            {
+                Tasks = tasks
+            });
+        }
+        
+        public async Task<Response<GetCourseTasksDtoResponse>> GetStudentCourseTasks(GetCourseTasksDtoRequest courseInfo)
         {
             var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseInfo.CourseId);
             if (course == null)
                 return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid course id");
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == courseInfo.UserId);
-            if (user == null)
+            var student = await _context.Users.FirstOrDefaultAsync(x => x.ID == courseInfo.UserId);
+            if (student == null)
                 return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid user id");
 
             var courseUserConnection = await _context.CourseUsers
-                .FirstOrDefaultAsync(x => x.User == user && x.Course == course);
+                .FirstOrDefaultAsync(x => x.User == student && x.Course == course);
             
-            switch (courseInfo.UserRole)
+            if (courseUserConnection == null)
+                return new NoAccessResponse<GetCourseTasksDtoResponse>("This user is not assigned to this course");
+                
+            var tasks = await _context.Tasks
+                .Where(t => t.Course.ID == courseInfo.CourseId)
+                .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
+                .ToListAsync();
+            
+            return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
             {
-                case UserRoles.Teacher when course.Teacher != user:
-                    return new NoAccessResponse<GetCourseTasksDtoResponse>("This teacher has no access to the course");
-                case UserRoles.Student when courseUserConnection == null:
-                    return new NoAccessResponse<GetCourseTasksDtoResponse>("This user is not assigned to this course");
-                default:
-                {
-                    var tasks = await _context.Tasks
-                        .Where(t => t.Course.ID == courseInfo.CourseId)
-                        .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
-                        .ToListAsync();
-                    var result = new GetCourseTasksDtoResponse
-                    {
-                        Tasks = tasks
-                    };
-                    return new SuccessfulResponse<GetCourseTasksDtoResponse>(result);
-                }
-            }
+                Tasks = tasks
+            });
+                
         }
 
         public async Task<Response<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview(GetPeeringTaskOverviewDtoRequest taskInfo)
