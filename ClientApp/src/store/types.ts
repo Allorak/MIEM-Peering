@@ -156,6 +156,10 @@ export type ITaskItem = {
   description?: string
 }
 
+export type ITasks = {
+  tasks: ITaskItem[]
+}
+
 export type INewTaskState = 'author-form' | 'peer-form' | 'settings' | 'main-info'
 
 export interface INewTask {
