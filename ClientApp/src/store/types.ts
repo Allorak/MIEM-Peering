@@ -286,7 +286,7 @@ export enum IMenuTitles {
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
   EXPORT = 'Экспорт',
-  MENU_1 = 'Меню 1',
+  AUTHORFORM = 'Сдать работу',
   MENU_2 = 'Меню 2',
   MENU_3 = 'Меню 3'
 }
@@ -312,6 +312,17 @@ export type IOverviewStudent = {
   status: IStatusTask
 }
 
+export type IAuthorFormItem = {
+  title: string,
+  required: boolean,
+  response? : string
+}
+
+export type IAuthorFormResponseItem = {
+  id: number,
+  response: string
+}
+
 export type IOverviewResponse = IOverview & {
   deadlines: {
     submissionStartDateTime: string
@@ -320,7 +331,6 @@ export type IOverviewResponse = IOverview & {
     reviewEndDateTime: string
   }
 }
-
 
 export type IWorkItem = {
   workId: string,
@@ -395,8 +405,23 @@ export interface IPeerFormShortTextItem extends IPeerFormItem, IShortTextQuestio
 
 export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion { }
 
+
 export type IPeerForm = {
   rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
+}
+
+export interface IAuthorFormSelectItem extends Omit<IAuthorFormItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
+
+export interface IAuthorFormTextItem extends IAuthorFormItem, ITextQuestion { }
+
+export interface IAuthorFormShortTextItem extends IAuthorFormItem, IShortTextQuestion { }
+
+export interface IAuthorFormMultipleItem extends IAuthorFormItem, IMultipleQuiestion { }
+
+export type IAuthorForm = {
+  rubrics: Array<IAuthorFormSelectItem | IAuthorFormTextItem | IAuthorFormShortTextItem | IAuthorFormMultipleItem>
 }
 
 export type IPeerResponseItem = {

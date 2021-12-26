@@ -45,6 +45,8 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
     switch (objectType) {
       case IMenuTitles.OVERVIEW:
         return (<Overview svgColor={isActive ? "white" : "#A4ADC8"} />)
+      case IMenuTitles.AUTHORFORM:
+        return (<Works svgColor={isActive ? "white" : "#A4ADC8"} />)        
       case IMenuTitles.WORKS:
         return (<Works svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.EXPERTS:
