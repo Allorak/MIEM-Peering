@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -129,7 +130,7 @@ namespace patools.Services.Users
 
         private async Task CreateFakeStudentConnections(User user)
         {
-            
+            Console.WriteLine("123");
             var courses = await _context.Courses.Select(c => c).ToListAsync();
 
             var firstCourse = courses[new Random().Next(courses.Count / 2)];
