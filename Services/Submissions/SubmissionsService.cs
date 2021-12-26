@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,38 @@ namespace patools.Services.Submissions
             Console.WriteLine(result);
             Console.WriteLine(result.SubmissionId);
             return new SuccessfulResponse<GetNewSubmissionDtoResponse>(result);
+        }
+
+        public async Task<Response<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissions(GetAllSubmissionsMainInfoDtoRequest taskInfo)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetAllSubmissionsMainInfoDtoResponse>("Invalid user id");
+
+            var task = await _context.Tasks
+                .Include(t=> t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetAllSubmissionsMainInfoDtoResponse>("Invalid task id");
+
+            if (user.Role == UserRoles.Teacher && task.Course.Teacher != user)
+                return new NoAccessResponse<GetAllSubmissionsMainInfoDtoResponse>(
+                    "The teacher has no access to this task");
+
+            var submissions = await _context.Submissions
+                .Where(s => s.PeeringTaskUserAssignment.PeeringTask == task)
+                .Select(s => new GetSubmissionMainInfoDtoResponse()
+                {
+                    SubmissionId = s.ID,
+                    StudentName = s.PeeringTaskUserAssignment.Student.Fullname
+                })
+                .ToListAsync();
+
+            return new SuccessfulResponse<GetAllSubmissionsMainInfoDtoResponse>(
+                new GetAllSubmissionsMainInfoDtoResponse()
+                {
+                    SubmissionsInfo = submissions
+                });
         }
     }
 }
