@@ -20,7 +20,7 @@ export const CourseMain: FC = () => {
     const { path } = usePrivatePathT()
     const isLoading = useAppSelector(state => state.tasks.isLoading)
     const error = useAppSelector(state => state.tasks.error)
-    const tasks = useAppSelector(state => state.tasks.payload)
+    const tasks = useAppSelector(state => state.tasks.payload?.tasks)
 
 
     useEffect(() => {
