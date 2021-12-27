@@ -25,7 +25,7 @@ namespace patools
             CreateMap<Question,GetQuestionDto>();
             CreateMap<AddUserDTO,User>();
             CreateMap<Submission,GetNewSubmissionDtoResponse>();
-            CreateMap<Course, GetCourseUserDtoResponse>();
+            CreateMap<Course, GetCourseUserStudentDtoResponse>();
         }
     }
 }

@@ -9,6 +9,6 @@ namespace patools.Dtos.CourseUser
 {
     public class GetCourseUserStudentDtoResponse
     {
-        public GetCourseDtoResponse2 Course { get; set;}
+        public GetCourseStudentDtoResponse Course { get; set;}
     }
 }
