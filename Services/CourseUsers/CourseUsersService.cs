@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using patools;
 using patools.Dtos.Course;
 using patools.Dtos.User;
+using patools.Dtos.CourseUser;
 using patools.Errors;
 using patools.Models;
 
-namespace patools.Services.Courses
+namespace patools.Services.CourseUsers
 {
     public class CourseUsersService : ICourseUsersService
     {

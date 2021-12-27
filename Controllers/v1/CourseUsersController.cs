@@ -12,7 +12,7 @@ using patools.Dtos.Task;
 using patools.Dtos.User;
 using patools.Models;
 using patools.Services.Courses;
-using patools.Services.Tasks;
+using patools.Services.CourseUsers;
 using patools.Errors;
 
 namespace patools.Controllers.v1
@@ -22,24 +22,15 @@ namespace patools.Controllers.v1
     public class CourseUsersController : ControllerBase
     {
         private readonly PAToolsContext _context;
+        private readonly ICoursesService _coursesService;
+        private readonly ICourseUsersService _courseUsersService;
 
-        public CourseUsersController(PAToolsContext context)
+        public CourseUsersController(PAToolsContext context, ICoursesService coursesService,ICourseUsersService courseUsersService)
         {
+            _coursesService = coursesService;
+            _courseUsersService = courseUsersService;
             _context = context;
         }
-
-        // GET: api/CourseUsers
-        /*
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseUser>>> GetCourseUsers()
-        {
-            return await _context.CourseUsers
-                .Include(course => course.Course)
-                //.Include(user => user.User)
-                //.Include(course => course.Course.Teacher)
-                .ToListAsync();
-        }
-        */
 
         // GET: api/v1/CourseUsers
         [HttpGet]
@@ -54,60 +45,11 @@ namespace patools.Controllers.v1
             return Ok(course.ToList());
         }
         
-        /*
-        // POST: api/v1/CourseUsers/emailStudent
-        [HttpPost("{courseID}/{emailStudent}")]
-        public async Task<ActionResult<CourseUser>> PostCourseUser(Guid courseID, string emailStudent)
-        {
-
-            var studentEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailStudent);
-
-            var course = await _context.Courses.Include(c => c.Teacher).FirstOrDefaultAsync(c => c.ID == courseID);
-
-            var newCourseUser = new Models.CourseUser
-            {
-                ID = Guid.NewGuid(),
-                Course = newCourse,
-                User = newUser
-            };
-
-            await _context.CourseUsers.AddAsync(newCourseUser);
-            await _context.SaveChangesAsync();
-
-            return Ok(newCourseUser);
-        }
-        */
-
-        // POST: api/v1/Courses/add
-        [HttpPost("add")]
-        public async Task<ActionResult<GetCourseDtoResponse>> PostCourse(AddCourseDto course)
-        {
-            //The user is not authenticated (there is no token provided or the token is incorrect)
-            if(!User.Identity.IsAuthenticated)
-                return Ok(new UnauthorizedUserResponse());
-
-            //The user's role is incorrect for this request
-            if(!User.IsInRole(UserRoles.Teacher.ToString()))
-                return Ok(new IncorrectUserRoleResponse());
-
-            //The user has no id Claim
-            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(teacherIdClaim == null)
-                return Ok(new InvalidGuidIdResponse());
-
-            //The id stored in Claim is not Guid
-            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
-                return Ok(new InvalidGuidIdResponse());
-
-            course.TeacherId = teacherId;
-            return Ok(await _coursesService.AddCourse(course));
-        }
-
-        // POST: api/v1/CourseUsers/{userID}/{courseID}
+        // POST: api/v1/CourseUsers/add
         [HttpPost("add")]
         public async Task<ActionResult<string>> PostCourseUser(AddCourseUserDto courseUsersInfo)
         {
-//          The user is not authenticated (there is no token provided or the token is incorrect)
+            //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
 
@@ -127,18 +69,6 @@ namespace patools.Controllers.v1
             courseUsersInfo.TeacherId = teacherId;
             return Ok(await _courseUsersService.AddCourseUser(courseUsersInfo));
         }
-
-        /*
-        // POST: api/CourseUsers
-        [HttpPost]
-        public async Task<ActionResult<CourseUser>> PostCourseUser(CourseUser courseUser)
-        {
-            _context.CourseUsers.Add(courseUser);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCourseUser", new { id = courseUser.ID }, courseUser);
-        }
-        */
 
         // GET: api/CourseUsers/5
         [HttpGet("{id}")]
@@ -183,19 +113,7 @@ namespace patools.Controllers.v1
 
             return NoContent();
         }
-
-        // POST: api/CourseUsers
-        /*
-        [HttpPost]
-        public async Task<ActionResult<CourseUser>> PostCourseUser(CourseUser courseUser)
-        {
-            _context.CourseUsers.Add(courseUser);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCourseUser", new { id = courseUser.ID }, courseUser);
-        }
-        */
-
+        
         // DELETE: api/CourseUsers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourseUser(Guid id)
