@@ -78,9 +78,34 @@ namespace patools.Controllers.v1
         }
         */
 
+        // POST: api/v1/Courses/add
+        [HttpPost("add")]
+        public async Task<ActionResult<GetCourseDtoResponse>> PostCourse(AddCourseDto course)
+        {
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidGuidIdResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
+                return Ok(new InvalidGuidIdResponse());
+
+            course.TeacherId = teacherId;
+            return Ok(await _coursesService.AddCourse(course));
+        }
+
         // POST: api/v1/CourseUsers/{userID}/{courseID}
         [HttpPost("add")]
-        public async Task<ActionResult<string>> PostCourseUser(AddCourseUserDto courseUsersInfo)
+        public async Task<ActionResult<GetCourseUserDtoResponse>> PostCourseUser(AddCourseUserDto courseUsersInfo)
         {
 //          The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
@@ -100,31 +125,7 @@ namespace patools.Controllers.v1
                 return Ok(new InvalidGuidIdResponse());
             
             courseUsersInfo.TeacherId = teacherId;
-            
-            var response = new Response<string>();
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userID);
-            if (user == null)
-                return new InvalidGuidIdResponse<string>("Invalid user id");
-
-            var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseID);
-            if (course == null)
-                return new InvalidGuidIdResponse<string>("Invalid course id");
-
-            var newCourseUser = new Models.CourseUser
-            {
-                ID = Guid.NewGuid(),
-                User = user,
-                Course = course
-            };
-
-            await _context.CourseUsers.AddAsync(newCourseUser);
-            await _context.SaveChangesAsync();
-
-            response.Success = true;
-            response.Error = null;
-            response.Payload = "CourseUser was added successfully";
-            return response;
+            return Ok(await _courseUsersService.AddCourseUser(courseUsersInfo));
         }
 
         /*
