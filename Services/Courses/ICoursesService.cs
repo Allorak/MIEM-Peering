@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using patools;
 using patools.Dtos.Course;
 using patools.Models;
+using patools.Dtos.CourseUser;
 
 namespace patools.Services.Courses
 {
@@ -14,7 +15,7 @@ namespace patools.Services.Courses
         Task<Response<List<GetCourseDtoResponse>>> GetAllCourses();
         Task<Response<GetCourseDtoResponse>> GetCourseById(Guid courseId);
         Task<Response<List<GetCourseDtoResponse>>> GetTeacherCourses(Guid teacherId);
-        Task<Response<List<GetCourseDtoResponse>>> GetStudentCourses(Guid studentId);
+        Task<Response<List<GetCourseUserDtoResponse>>> GetStudentCourses(Guid studentId);
         Task<Response<GetCourseDtoResponse>> AddCourse(AddCourseDto newCourse);
         Task<Response<string>> DeleteCourse(Guid teacherID, Guid courseId);
 

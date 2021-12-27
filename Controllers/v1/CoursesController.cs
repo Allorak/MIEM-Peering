@@ -40,6 +40,18 @@ namespace patools.Controllers.v1
             return Ok(await _coursesService.GetAllCourses());
         }
 
+        // GET: api/CourseUsers
+        [HttpGet("getnew")]
+        public async Task<ActionResult<IEnumerable<Course>>> GetCoursesss()
+        {
+             var courses = _context.Courses
+                .Include(course => course.Teacher)
+                .Include(course => course.Settings)
+                .Select(x => new {x.ID, x.Title, x.Description, x.Subject, x.Teacher.Fullname, x.Teacher.Role, x.Settings.enableCode, x.Settings.CourseCode});
+            
+            return Ok(courses.ToList());
+        }
+
         // GET: api/v1/Courses/get/5
         [HttpGet("get/{id:guid}")]
         public async Task<ActionResult<GetCourseDtoResponse>> GetCourse(Guid id)
@@ -81,33 +93,34 @@ namespace patools.Controllers.v1
             return NoContent();
         }
 
-        // POST: api/v1/Courses/add
-        [HttpGet("getteachercourse")]
-        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetTeacherCourse()
+        // GET: api/v1/Courses/getcourses
+        [HttpGet("getcourses")]
+        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCoursess()
         //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
         {
-            //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
-
-            //The user's role is incorrect for this request
-            if(!User.IsInRole(UserRoles.Teacher.ToString()))
-                return Ok(new IncorrectUserRoleResponse());
-
+            
             //The user has no id Claim
-            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(teacherIdClaim == null)
-                return Ok(new InvalidGuidIdResponse());
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
 
             //The id stored in Claim is not Guid
-            Guid teacherId;
-            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
-                return Ok(new InvalidGuidIdResponse());
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidJwtTokenResponse());
 
-            return Ok(await _coursesService.GetTeacherCourses(teacherId));
+            if (User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(await _coursesService.GetTeacherCourses(userId));
+
+            if(User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(await _coursesService.GetStudentCourses(userId));
+            
+            return Ok(new InvalidJwtTokenResponse());
         }
 
         // POST: api/v1/Courses/add
+        /*
         [HttpGet("getstudentcourse")]
         public async Task<ActionResult<List<GetCourseDtoResponse>>> GetStudentCourse()
         //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
@@ -132,6 +145,7 @@ namespace patools.Controllers.v1
 
             return Ok(await _coursesService.GetStudentCourses(studentId));
         }
+        */
 
         // POST: api/v1/Courses/add
         [HttpPost("add")]

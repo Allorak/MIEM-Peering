@@ -25,5 +25,8 @@ namespace patools.Models
 
         [Required]
         public string Subject { get; set; }
+
+        [Required]
+        public Setting Settings { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using patools;
 using patools.Dtos.Course;
 using patools.Dtos.User;
+using patools.Dtos.CourseUser;
 using patools.Errors;
 using patools.Models;
 
@@ -133,27 +134,27 @@ namespace patools.Services.Courses
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
-        public async Task<Response<List<GetCourseDtoResponse>>> GetStudentCourses(Guid studentId)
+        public async Task<Response<List<GetCourseUserDtoResponse>>> GetStudentCourses(Guid studentId)
         {
             var student =
                 await _context.Users.FirstOrDefaultAsync(u => u.ID == studentId && u.Role == UserRoles.Student);
             if (student == null)
-                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid student id");
+                return new InvalidGuidIdResponse<List<GetCourseUserDtoResponse>>("Invalid student id");
 
             var courseUsers = await _context.CourseUsers
                 .Include(cu => cu.Course)
                 .Where(cu => cu.User == student)
                 .ToListAsync();
 
-            var courses = new List<GetCourseDtoResponse>();
+            var courses = new List<GetCourseUserDtoResponse>();
             foreach (var courseUser in courseUsers)
             {
                 var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
                 if(course!= null)
-                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+                    courses.Add(_mapper.Map<GetCourseUserDtoResponse>(course));
             }
             
-            return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
+            return new SuccessfulResponse<List<GetCourseUserDtoResponse>>(courses);
         }
     }
 }
