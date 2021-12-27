@@ -47,9 +47,7 @@ namespace patools.Services.Courses
                     Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
-                    Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher)
+                    Subject = x.Subject
                 })
                 .FirstOrDefaultAsync(x => x.Id == course.ID);
 
@@ -80,9 +78,7 @@ namespace patools.Services.Courses
                     Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
-                    Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher)
+                    Subject = x.Subject
                 })
                 .ToListAsync();
 
@@ -98,9 +94,7 @@ namespace patools.Services.Courses
                     Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
-                    Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher)
+                    Subject = x.Subject
                 })
                 .FirstOrDefaultAsync(x => x.Id == courseId);
 
@@ -120,15 +114,18 @@ namespace patools.Services.Courses
             var courses = await _context.Courses
                 .Include(course => course.Teacher)
                 .Where(x => x.Teacher == teacher)
-                .Select(x => new GetCourseDtoResponse
+                .Select(x => _mapper.Map<GetCourseDtoResponse>(new GetCourseTeacherDtoResponse
                 {
                     Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher)
-                })
+                    Settings = new GetCourseSettingsDtoResponse()
+                    {
+                        CourseCode = x.EnableCode ? x.CourseCode : null,
+                        EnableCode = x.EnableCode
+                    }
+                }))
                 .ToListAsync();
 
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);

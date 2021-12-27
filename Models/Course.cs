@@ -16,17 +16,18 @@ namespace patools.Models
         [DisplayFormat(NullDisplayText = "No description set")]
         public string Description { get; set; }
 
-        [MaxLength(10)]
+        [MaxLength(6)]
         [DisplayFormat(NullDisplayText = "No course code set")]
         public string CourseCode { get; set; }
+        
+        [Required]
+        public bool EnableCode { get; set; }
 
         [Required]
         public User Teacher { get; set; }
 
         [Required]
         public string Subject { get; set; }
-
-        [Required]
-        public Setting Settings { get; set; }
+        
     }
 }

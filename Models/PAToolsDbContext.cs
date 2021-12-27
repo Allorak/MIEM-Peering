@@ -19,8 +19,6 @@ namespace patools.Models
         public DbSet<GroupUser> GroupUsers { get; set; }
         public DbSet<PeeringTaskUser> TaskUsers { get; set; }
 
-        public DbSet<Setting> Settings { get; set; }
-
         public string DbPath { get; private set; }
 
         public PAToolsContext()

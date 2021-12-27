@@ -46,8 +46,7 @@ namespace patools.Controllers.v1
         {
              var courses = _context.Courses
                 .Include(course => course.Teacher)
-                .Include(course => course.Settings)
-                .Select(x => new {x.ID, x.Title, x.Description, x.Subject, x.Teacher.Fullname, x.Teacher.Role, x.Settings.enableCode, x.Settings.CourseCode});
+                .Select(x => new {x.ID, x.Title, x.Description, x.Subject, x.Teacher.Fullname, x.Teacher.Role});
             
             return Ok(courses.ToList());
         }
