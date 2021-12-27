@@ -1,50 +1,91 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, IWorkItem } from '../types';
+import { IError, IStudentWork, IWorks, IWorkStatistics } from '../types';
 
 
-export interface ICoursesState {
-  isLoading: boolean,
-  isLock: boolean,
+export interface IWorksState {
+  isWorkListLoading: boolean,
+  isWorkStatisticsLoading: boolean,
+  isWorkListLock: boolean,
+  isStudentWorkLoading: boolean,
+  isStudentWorkLock: boolean,
   error: IError | undefined,
-  payload: IWorkItem[] | undefined
+  workList: IWorks | undefined,
+  studentWork: IStudentWork | undefined
+  workStatistics: IWorkStatistics | undefined,
+  
 }
 
-const initialState: ICoursesState = {
-  isLoading: false,
+const initialState: IWorksState = {
+  isWorkListLoading: false,
+  isWorkStatisticsLoading: false,
+  isStudentWorkLoading: false,
   error: undefined,
-  isLock: true,
-  payload: undefined
+  isWorkListLock: true,
+  isStudentWorkLock: true,
+  studentWork: undefined,
+  workList: undefined,
+  workStatistics: undefined
 };
 
 export const works = createSlice({
-  name: 'works',
+  name: 'teacherWorks',
   initialState,
   reducers: {
-    fetchStarted: (state) => {
-      state.isLoading = true
-      state.isLock = true
+    fetchWorkListStarted: (state) => {
+      state.isWorkListLoading = true
+      state.isWorkListLock = true
       state.error = undefined
-      state.payload = undefined
+      state.workList = undefined
     },
 
-    fetchSuccess: (state, { payload }: PayloadAction<Array<IWorkItem>>) => {
-      state.isLoading = false
+    fetchWorkStatisticsStarted: (state) => {
+      state.isWorkStatisticsLoading = true
       state.error = undefined
-      state.isLock = false
-      state.payload = payload
+      state.workStatistics = undefined
+    },
+
+    fetchWorkListSuccess: (state, { payload }: PayloadAction<IWorks>) => {
+      state.isWorkListLoading = false
+      state.error = undefined
+      state.isWorkListLock = false
+      state.workList = payload
+    },
+
+    fetchWorkStatisticsSuccess: (state, { payload }: PayloadAction<IWorkStatistics>) => {
+      state.isWorkStatisticsLoading = false
+      state.error = undefined
+      state.workStatistics = payload
+    },
+
+    fetchStudentWorkStarted: (state) => {
+      state.isStudentWorkLoading = true
+      state.isStudentWorkLock = true
+      state.error = undefined
+      state.studentWork = undefined
+    },
+
+    fetchStudentWorkSuccess: (state, { payload }: PayloadAction<IStudentWork>) => {
+      state.isStudentWorkLoading = false
+      state.error = undefined
+      state.isStudentWorkLock = false
+      state.studentWork = payload
     },
 
     fetchFailed: (state, { payload }: PayloadAction<IError>) => {
-      state.isLoading = false
+      state.isWorkListLoading = false
       state.error = payload
-      state.isLock = false
+      state.isWorkListLock = false
     },
 
     reset: (state) => {
-      state.isLoading = false
+      state.isWorkListLoading = false
+      state.isStudentWorkLoading = false
       state.error = undefined
-      state.isLock = true
-      state.payload = undefined
+      state.isWorkListLock = true
+      state.isStudentWorkLock = true
+      state.workList = undefined
+      state.isWorkStatisticsLoading = false
+      state.workStatistics = undefined
     },
   },
 });

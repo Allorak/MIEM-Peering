@@ -189,18 +189,18 @@ namespace patools
             return courses;
         }
 
-        private static List<patools.Models.Task> CreateFakeTasks(PAToolsContext db)
+        private static List<patools.Models.PeeringTask> CreateFakeTasks(PAToolsContext db)
         {
-            var tasks = new List<patools.Models.Task>
+            var tasks = new List<patools.Models.PeeringTask>
             {
-                new Models.Task
+                new Models.PeeringTask
                 {
                     ID = Guid.NewGuid(),
                     Title = "Польза ООП в промышленных предприятиях",
                     SubmissionsToCheck = 3,
                     Course = db.Courses.Where(course => course.Title == "Объектноориентрованное программирование на языке C++").First()
                 },
-                new Models.Task
+                new Models.PeeringTask
                 {
                     ID = Guid.NewGuid(),
                     Title = "История изучения квантовой физики",
@@ -211,7 +211,7 @@ namespace patools
                     ReviewEndDateTime = DateTime.Now.AddDays(15),
                     Course = db.Courses.Where(course => course.Title == "Квантовая физика").First()
                 },
-                new Models.Task
+                new Models.PeeringTask
                 {
                     ID = Guid.NewGuid(),
                     Title = "Комплексные числа в линейной алгебре",
@@ -238,7 +238,7 @@ namespace patools
                     Required = true,
                     Type = QuestionTypes.Text,
                     RespondentType = RespondentTypes.Author,
-                    Task = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").First()
+                    PeeringTask = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").First()
                 },
                 new Question
                 {
@@ -249,7 +249,7 @@ namespace patools
                     Required = false,
                     Type = QuestionTypes.ShortText,
                     RespondentType = RespondentTypes.Author,
-                    Task = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").First()
+                    PeeringTask = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").First()
                 },
                 new Question
                 {
@@ -259,7 +259,7 @@ namespace patools
                     Required = true,
                     Type = QuestionTypes.MultipleChoices,
                     RespondentType = RespondentTypes.Author,
-                    Task = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").First()
+                    PeeringTask = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").First()
                 },
 
             };
@@ -368,30 +368,30 @@ namespace patools
             return groupUsers;
         }
 
-        private static List<TaskUser> CreateFakeTaskUsers(PAToolsContext db)
+        private static List<PeeringTaskUser> CreateFakeTaskUsers(PAToolsContext db)
         {
-            var taskUsers = new List<TaskUser>
+            var taskUsers = new List<PeeringTaskUser>
             {
-                new TaskUser
+                new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
-                    Task = db.Tasks.First(),
+                    PeeringTask = db.Tasks.First(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
-                    State = TaskState.Assigned
+                    State = PeeringTaskState.Assigned
                 },
-                new TaskUser
+                new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
-                    Task = db.Tasks.First(),
+                    PeeringTask = db.Tasks.First(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student).First(),
-                    State = TaskState.Checking
+                    State = PeeringTaskState.Checking
                 },
-                new TaskUser
+                new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
-                    Task = db.Tasks.Skip(1).First(),
+                    PeeringTask = db.Tasks.Skip(1).First(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
-                    State = TaskState.Assigned
+                    State = PeeringTaskState.Assigned
                 }
             };
 

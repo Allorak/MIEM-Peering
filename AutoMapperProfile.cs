@@ -4,6 +4,7 @@ using patools.Dtos.User;
 using patools.Dtos.Course;
 using patools.Dtos.Task;
 using patools.Dtos.Question;
+using patools.Dtos.Submission;
 
 namespace patools
 {
@@ -11,14 +12,18 @@ namespace patools
     {
         public AutoMapperProfile()
         {
-            CreateMap<User,GetRegisteredUserDTO>();
-            CreateMap<User, GetTeacherDTO>();
-            CreateMap<AddCourseDTO, Course>();
-            CreateMap<User,GetNewUserDTO>();
-            CreateMap<Task,GetTaskDeadlinesDTO>();
-            CreateMap<Task,GetNewTaskDTO>();
-            CreateMap<AddQuestionDTO,Question>();
-            CreateMap<Task,GetTaskMainInfoDTO>();
+            CreateMap<User,GetRegisteredUserDtoResponse>();
+            CreateMap<User, GetTeacherDtoResponse>();
+            CreateMap<AddCourseDto, Course>();
+            CreateMap<User,GetNewUserDtoResponse>();
+            CreateMap<PeeringTask,GetPeeringTaskDeadlinesDtoResponse>();
+            CreateMap<PeeringTask,GetNewPeeringTaskDtoResponse>();
+            CreateMap<AddAuthorQuestionDto,Question>();
+            CreateMap<AddPeerQuestionDto,Question>();
+            CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
+            CreateMap<Question,GetQuestionDto>();
+            CreateMap<AddUserDTO,User>();
+            CreateMap<Submission,GetNewSubmissionDtoResponse>();
         }
     }
 }

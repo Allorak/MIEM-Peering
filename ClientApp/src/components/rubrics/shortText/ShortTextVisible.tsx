@@ -2,10 +2,15 @@ import { TextField, Tooltip } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import { FC } from "react";
 
-export const ShortTextVisible: FC = () => {
+interface IProps {
+  response?: string
+  isResponse?: boolean,
+}
+
+export const ShortTextVisible: FC<IProps> = ({ response, isResponse }) => {
   return (
     <Tooltip
-      title={"Это всего лишь предварительный просмотр"}
+      title={isResponse ? (response ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
       placement={"top"}
     >
       <TextField
@@ -14,6 +19,7 @@ export const ShortTextVisible: FC = () => {
         variant='outlined'
         disabled
         label={"Краткий ответ"}
+        {...(response && { value: response })}
       />
     </Tooltip>
   )

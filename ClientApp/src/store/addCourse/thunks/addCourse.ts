@@ -1,5 +1,4 @@
 import { actions } from "..";
-import { postAuth } from "../../../api/postAuth";
 import { postNewCourse } from "../../../api/postNewCourse";
 import { AppThunk } from "../../../app/store";
 
@@ -8,7 +7,7 @@ import { IErrorCode, INewCourseRequest, IRole } from "../../types";
 
 
 export const addCourse = (payload: INewCourseRequest): AppThunk => async (dispatch, getState) => {
-    console.log(payload)
+
     dispatch(actions.addCourseStarted())
     try {
         const accessToken = getState().auth.accessToken

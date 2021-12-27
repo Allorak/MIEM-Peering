@@ -1,6 +1,6 @@
 import { Button, Typography } from "@mui/material"
 import { Box, SxProps, Theme } from "@mui/system"
-import { FC, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { generatePath } from "react-router"
 import { paths } from "../../../../../app/constants/paths"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
@@ -11,6 +11,7 @@ import { fetchCourses } from "../../../../../store/courses/thunks/courses"
 import { AddCourse } from "../add"
 import * as constStyles from '../../../../../const/styles'
 import { useNavigate } from "react-router-dom"
+import { ICourses } from "../../../../../store/types"
 
 export const TCourseList: FC = () => {
     const dispatch = useAppDispatch()
@@ -19,23 +20,31 @@ export const TCourseList: FC = () => {
     const isLock = useAppSelector(state => state.courses.isLock)
     const error = useAppSelector(state => state.courses.error)
     const courses = useAppSelector(state => state.courses.payload)
-    const [newCourse, setNewCourse] = useState(false)
+
+    const [popupCourseStatus, setPopupCourseStatus] = useState(false)
+    const [currentCourse, setCurrentCourse] = useState<ICourses>()
 
     useEffect(() => {
         dispatch(fetchCourses())
-        setNewCourse(false)
+        setPopupCourseStatus(false)
     }, [dispatch])
 
-    const onAddNewCourse = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const onAddNewCourse = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.stopPropagation()
-        setNewCourse(prev => !prev)
-    }
+        setCurrentCourse(undefined)
+        setPopupCourseStatus(prev => !prev)
+    }, [])
 
     const onCourse = (id: string) => {
         history(generatePath(
             paths.teacher.courses.course, { courseId: id }
         ))
     }
+
+    const onCourseSettings = useCallback((course: ICourses) => {
+        setCurrentCourse(course)
+        setPopupCourseStatus(prev => !prev)
+    }, [])
 
     return (<>
         <Box sx={constStyles.container}>
@@ -58,7 +67,7 @@ export const TCourseList: FC = () => {
                             sx={styles.addBt}
                             onClick={onAddNewCourse}
                         >
-                            Добавить
+                            {"Добавить"}
                         </Button>
                     </Box>
 
@@ -72,6 +81,7 @@ export const TCourseList: FC = () => {
                                             onCourseSelect={onCourse}
                                             key={course.id}
                                             course={course}
+                                            onCourseSettings={onCourseSettings}
                                         />
                                 }
                             />
@@ -82,8 +92,9 @@ export const TCourseList: FC = () => {
         </Box>
 
         <AddCourse
-            popupOpen={newCourse}
-            onCloseHandler={setNewCourse}
+            popupOpen={popupCourseStatus}
+            onCloseHandler={setPopupCourseStatus}
+            editCourse={currentCourse}
         />
     </>)
 }

@@ -1,54 +1,99 @@
+import React from "react";
 import { FC, useCallback, useEffect, useState } from "react";
 import { Box, SxProps, Theme } from "@mui/system";
 import { Button, Typography } from "@mui/material";
-import BorderColorTwoToneIcon from '@mui/icons-material/BorderColorTwoTone';
+import Slide from '@mui/material/Slide';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import { TransitionProps } from '@mui/material/transitions';
 
 import { WorksList } from "./WorksList";
 import { WorkResponse } from "./WorkResponse";
+import { WorkStatistics } from "./WorkStatistics";
 
-import { IWorkItem, IWorkResponse } from "../../../../../store/types";
+import { fetchWorkList, fetchStudentWork, fetchStudentWorkStatistics } from "../../../../../store/works";
+
+import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { Popup } from "../../../../../components/popup";
+
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
-import { fetchWorks } from "../../../../../store/works";
-import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { IWorkItem } from "../../../../../store/types";
 
+import * as globalStyles from "../../../../../const/styles";
+
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const Works: FC = () => {
 
   const dispatch = useAppDispatch()
 
-  const isLoading = useAppSelector(state => state.works.isLoading)
-  const isLock = useAppSelector(state => state.works.isLock)
-  const payload = useAppSelector(state => state.works.payload)
+  const { path } = usePrivatePathTDashboard()
+
+  const isWorkListLoading = useAppSelector(state => state.works.isWorkListLoading)
+  const isWorkListLock = useAppSelector(state => state.works.isWorkListLock)
+  const isStudentWorkLoading = useAppSelector(state => state.works.isStudentWorkLoading)
+  const isStudentWorkLock = useAppSelector(state => state.works.isStudentWorkLock)
+  const isStudentWorkStatisticLoading = useAppSelector(state => state.works.isWorkStatisticsLoading)
+  const workList = useAppSelector(state => state.works.workList?.submissionsInfo)
+  const studentWork = useAppSelector(state => state.works.studentWork)
+  const workStatistics = useAppSelector(state => state.works.workStatistics)
   const error = useAppSelector(state => state.works.error)
 
-  const { path } = usePrivatePathTDashboard()
+  const [activeWork, setActiveWork] = useState<IWorkItem>()
+  const [popupStatus, setPopupStatus] = useState<boolean>(false)
 
   useEffect(() => {
     if (path && path.taskId)
-      dispatch(fetchWorks(path.taskId))
+      dispatch(fetchWorkList(path.taskId))
   }, [])
 
-  const [activeWork, setActiveWork] = useState<IWorkItem>()
+  useEffect(() => {
+    if (workList && workList.length > 0 && !activeWork) {
+      const defaultSelectedWork = workList[0]
+      requestWorkResponsesById(defaultSelectedWork.submissionId)
+      setActiveWork(JSON.parse(JSON.stringify(defaultSelectedWork)))
+    }
+  }, [workList])
+
+  const requestWorkResponsesById = useCallback((workId: string) => {
+    if (path && path.taskId)
+      dispatch(fetchStudentWork(path.taskId, workId))
+  }, [path])
+
+  const handleOnStatistics = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (path && path.taskId && activeWork) {
+      setPopupStatus(prev => !prev)
+      dispatch(fetchStudentWorkStatistics(path.taskId, activeWork.submissionId))
+    }
+  }, [popupStatus, activeWork])
 
   const handleOnWorkChange = useCallback((workId: string) => {
-    if (payload && payload.length > 0) {
-      const workItem = payload.find(work => work.id === workId)
+    if (workList && workList.length > 0) {
+      const workItem = workList.find(work => work.submissionId === workId)
       if (workItem) {
         setActiveWork(
           JSON.parse(JSON.stringify(workItem))
         )
+        requestWorkResponsesById(workItem.submissionId)
       }
     }
-  }, [activeWork, setActiveWork, payload])
+  }, [activeWork, workList])
 
   return (
     <DashboardWorkBox
-      isLoading={isLoading}
-      isLock={isLock}
+      isLoading={isWorkListLoading}
+      isLock={isWorkListLock}
       error={error}
     >
-      {payload && payload.length > 0 && (
+      {workList && workList.length > 0 && activeWork && (
         <Box sx={styles.gridContainer}>
           <Box sx={styles.leftContainer}>
             <Box sx={styles.topActionBox}>
@@ -63,35 +108,60 @@ export const Works: FC = () => {
                   color={'inherit'}
                   component={'span'}
                 >
-                  {activeWork ? activeWork.author.name : payload[0].author.name}
+                  {activeWork.studentName}
                 </Typography>
               </Typography>
 
               <Button
                 variant={"contained"}
                 color={"primary"}
-                startIcon={<BorderColorTwoToneIcon sx={{ margin: "0px -8px 0px 0px" }} />}
+                startIcon={<QueryStatsIcon sx={{ margin: "0px -8px 0px 0px" }} />}
                 sx={styles.addBt}
+                onClick={handleOnStatistics}
               >
-                {"Оценить"}
+                {"Метаданные"}
               </Button>
             </Box>
 
-            <WorkResponse
-              responses={JSON.parse(JSON.stringify(activeWork ? activeWork.responses : payload[0].responses))}
-            />
+            <DashboardWorkBox
+              isLoading={isStudentWorkLoading}
+              isLock={isStudentWorkLock}
+              error={error}
+            >
+              {studentWork && (
+                <WorkResponse responses={studentWork} />
+              )}
+            </DashboardWorkBox>
           </Box>
 
           <Box sx={styles.rightContainer}>
             <WorksList
-              worksCatalog={payload}
-              activeWorkId={activeWork ? activeWork.id : payload[0].id}
+              worksCatalog={workList}
+              activeWorkId={activeWork.submissionId}
               onWorkChange={handleOnWorkChange}
             />
           </Box>
         </Box>
       )}
 
+      {activeWork && (
+        <Popup
+          title={`Метаданные результатов проверки: ${activeWork.studentName}`}
+          open={popupStatus}
+          loading={isStudentWorkStatisticLoading}
+          onCloseHandler={setPopupStatus}
+          fullScreen
+          fullWidth
+          PaperProps={{ sx: { flex: '0 1 100%' } }}
+          dialogContentSx={{ padding: "0px 10px", ...globalStyles.scrollStyles, backgroundColor: "#F5F7FD" }}
+          TransitionComponent={Transition}
+          transitionDuration={100}
+        >
+          {workStatistics && (
+            <WorkStatistics workStatistics={workStatistics} />
+          )}
+        </Popup>
+      )}
     </DashboardWorkBox>
   )
 }

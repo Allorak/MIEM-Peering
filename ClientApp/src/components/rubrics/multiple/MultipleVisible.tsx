@@ -1,39 +1,48 @@
-import { Box, FormControlLabel, Radio, Tooltip, Typography } from "@mui/material";
+import { Box, FormControlLabel, Radio, RadioGroup, Tooltip, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import { FC } from "react";
 import { IMultipleResponse } from "../../../store/types";
 
 
 interface IProps {
-  responses: IMultipleResponse[]
+  responses: IMultipleResponse[],
+  response?: string,
+  isResponse?: boolean
 }
 
 export const MultipleVisible: FC<IProps> = ({
-  responses
+  responses,
+  response,
+  isResponse
 }) => {
 
   return (
     <Tooltip
-      title={"Это всего лишь предварительный просмотр"}
+      title={isResponse ? (response ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
       placement={"top"}
     >
       <Box>
-        {responses.map((item, index) => (
-          <FormControlLabel
-            key={index}
-            sx={styles.root}
-            id={item.id.toString()}
-            value={item.response}
-            control={
-              <Radio value={false} disabled />
-            }
-            label={
-              <Typography variant={'h6'}>
-                {item.response}
-              </Typography>
-            }
-          />
-        ))}
+        <RadioGroup
+          name="radio-buttons-group"
+          {...(response && {value: response})}
+        >
+          {responses.map((item, index) => (
+            <FormControlLabel
+              key={index}
+              sx={styles.root}
+              id={item.id.toString()}
+              value={item.response}
+              control={
+                <Radio value={item.response} readOnly/>
+              }
+              label={
+                <Typography variant={'h6'}>
+                  {item.response}
+                </Typography>
+              }
+            />
+          ))}
+        </RadioGroup>
       </Box>
     </Tooltip>
   )

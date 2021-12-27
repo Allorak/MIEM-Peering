@@ -1,41 +1,77 @@
-import { FC, SetStateAction, useState } from "react";
+import { FC, SetStateAction, useCallback, useEffect } from "react";
 import { useNavigate, generatePath } from "react-router-dom";
 
 import { Popup } from "../../../../../components/popup";
 import { AddCourseForm } from "./AddCourseForm";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { actions } from '../../../../../store/addCourse';
+import { actions, addCourse, updateCourse } from '../../../../../store/addCourse';
 import { paths } from "../../../../../app/constants/paths";
+import { ICourses } from "../../../../../store/types";
+import { fetchCourses } from "../../../../../store/courses/thunks/courses";
 
 
 interface IProps {
     popupOpen: boolean,
     onCloseHandler(value: SetStateAction<boolean>): void
+    editCourse?: ICourses
 }
 
-export const AddCourse: FC<IProps> = ({ popupOpen, onCloseHandler }) => {
+export const AddCourse: FC<IProps> = ({ popupOpen, onCloseHandler, editCourse }) => {
 
     const dispatch = useAppDispatch()
-    const loading = useAppSelector(state => state.newCourse.isLoading)
-    const errorState = useAppSelector(state => state.newCourse.error)
-    const payload = useAppSelector(state => state.newCourse.payload)
     const history = useNavigate()
 
-    if (payload && payload.id) {
-        history(generatePath(paths.teacher.courses.course, { courseId: payload.id }))
-        dispatch(actions.courseSetInitialState())
+    const loading = useAppSelector(state => state.newCourse.isLoading)
+    const payload = useAppSelector(state => state.newCourse.payload)
+    const udateStatus = useAppSelector(state => state.newCourse.udateStatus)
 
-    }
+    useEffect(() => {
+        if (payload && payload.id) {
+            history(generatePath(paths.teacher.courses.course, { courseId: payload.id }))
+            dispatch(actions.reset())
+        }
+    }, [payload])
+
+    useEffect(() => {
+        if (udateStatus) {
+            dispatch(actions.reset())
+            dispatch(fetchCourses())
+            onCloseHandler(false)
+        }
+    }, [udateStatus])
+
+    const handleRequest = useCallback((course: ICourses) => {
+        if (editCourse && course.settings) {
+            dispatch(updateCourse({
+                id: course.id,
+                name: course.name.trim(),
+                subject: course.subject.trim(),
+                description: course.description && course.description.trim() !== "" ? course.description.trim() : undefined,
+                settings: {
+                    enableCode: course.settings.enableCode
+                }
+            }))
+        } else {
+            dispatch(addCourse({
+                name: course.name.trim(),
+                subject: course.subject.trim(),
+                description: course.description !== undefined && course.description.trim() !== "" ? course.description.trim() : undefined
+            }))
+        }
+    }, [editCourse])
 
     return (
         <Popup
-            title={'Создать курс'}
+            title={editCourse ? 'Изменить' : 'Создать курс'}
             open={popupOpen}
             loading={loading}
             onCloseHandler={onCloseHandler}
         >
-            <AddCourseForm />
+            <AddCourseForm
+                editCourse={editCourse}
+                onRequest={handleRequest}
+            />
         </Popup>
     )
 }
