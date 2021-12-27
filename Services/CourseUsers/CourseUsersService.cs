@@ -1,11 +1,3 @@
-namespace peer_assessment_tools.Services.CourseUser
-{
-    public class CourseUsersService
-    {
-        
-    }
-}
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,17 +24,36 @@ namespace patools.Services.Courses
             _context = context;
         }
 
-        public async Task<Response<GetCourseUserDtoResponse>> AddCourseUser(AddCourseUserDto newCourseUser)
+        public async Task<Response<string>> AddCourseUser(AddCourseUserDto newCourseUser)
         {
-            var courseUser = _mapper.Map<CourseUser>(newCourseUser);
-            courseUser.ID = Guid.NewGuid();
+            var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(u => u.ID == newCourseUser.CourseId);
+            if(course == null)
+                return new BadRequestDataResponse<string>("Invalid course id");
 
-            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == newCourse.TeacherId && u.Role == UserRoles.Teacher);
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == newCourseUser.TeacherId && u.Role == UserRoles.Teacher);
             if(teacher == null)
-                return new BadRequestDataResponse<GetCourseDtoResponse>("Invalid teacher id");
+                return new BadRequestDataResponse<string>("Invalid teacher id");
 
-            _context.Courses.Add(courseUser);
+            if(course.Teacher != teacher)
+                return new NoAccessResponse<string>("Teacher has no access to the course");
+            
+            foreach(var user in newCourseUser.Users)
+            {
+                var connectingUser = await _context.Users.FirstOrDefaultAsync(e => e.Email == user.Email);
+                if (connectingUser == null)
+                    return new BadRequestDataResponse<string>("Invalid user email");
+                var newCourseUserConnection = new CourseUser()
+                {
+                    ID = Guid.NewGuid(),
+                    Course = course,
+                    User = connectingUser
+                };
+                await _context.CourseUsers.AddAsync(newCourseUserConnection);
+            }
+
             await _context.SaveChangesAsync();
+
+            return new SuccessfulResponse<string>("CourseUsers added successfully");
         }
     }
 }

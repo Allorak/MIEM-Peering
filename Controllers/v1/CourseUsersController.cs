@@ -105,7 +105,7 @@ namespace patools.Controllers.v1
 
         // POST: api/v1/CourseUsers/{userID}/{courseID}
         [HttpPost("add")]
-        public async Task<ActionResult<GetCourseUserDtoResponse>> PostCourseUser(AddCourseUserDto courseUsersInfo)
+        public async Task<ActionResult<string>> PostCourseUser(AddCourseUserDto courseUsersInfo)
         {
 //          The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
