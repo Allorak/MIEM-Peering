@@ -5,6 +5,7 @@ using patools.Dtos.Course;
 using patools.Dtos.Task;
 using patools.Dtos.Question;
 using patools.Dtos.Submission;
+using patools.Dtos.CourseUser;
 
 namespace patools
 {
@@ -24,6 +25,7 @@ namespace patools
             CreateMap<Question,GetQuestionDto>();
             CreateMap<AddUserDTO,User>();
             CreateMap<Submission,GetNewSubmissionDtoResponse>();
+            CreateMap<Course, GetCourseUserDtoResponse>();
         }
     }
 }
