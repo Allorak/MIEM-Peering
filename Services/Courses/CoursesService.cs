@@ -165,7 +165,7 @@ namespace patools.Services.Courses
                 if(course!= null)
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
-            
+
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
