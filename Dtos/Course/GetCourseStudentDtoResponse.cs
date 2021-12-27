@@ -6,7 +6,7 @@ using patools.Dtos.User;
 
 namespace patools.Dtos.Course
 {
-    public class GetCourseDtoResponse2
+    public class GetCourseStudentDtoResponse
     {
         public Guid Id { get; set;}
         public string Title { get; set;}

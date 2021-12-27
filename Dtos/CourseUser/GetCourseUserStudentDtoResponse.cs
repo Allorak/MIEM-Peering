@@ -7,7 +7,7 @@ using patools.Dtos.Course;
 
 namespace patools.Dtos.CourseUser
 {
-    public class GetCourseUserDtoResponse
+    public class GetCourseUserStudentDtoResponse
     {
         public GetCourseDtoResponse2 Course { get; set;}
     }
