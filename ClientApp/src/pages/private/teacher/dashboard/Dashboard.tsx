@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
-import { FC } from "react";
-import { Theme, Box, Typography } from "@mui/material";
+import { FC, useState } from "react";
+import { Theme, Box, Typography, useMediaQuery } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import { usePrivatePathTDashboard } from "../../../../app/hooks/usePrivatePathTDashboard";
 
-
 import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
+import { Burger } from '../../../../components/icons/Burger';
 import { IMenu, IMenuTitles } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
 
@@ -17,7 +17,6 @@ import { Experts } from './experts';
 
 import * as globalStyles from "../../../../const/styles"
 
-
 export const Dashboard: FC = () => {
 
   const {
@@ -26,6 +25,8 @@ export const Dashboard: FC = () => {
   } = usePrivatePathTDashboard()
 
   const pathToMainDashboard = generatePath(paths.teacher.dashboard.overview, { taskId: path?.taskId })
+  const [activeMenu, setActiveMenu] = useState(false)
+  const matches = useMediaQuery('(max-width:767px)')
 
   // создать стэйт курса если нет то подиспатчить
 
@@ -55,19 +56,24 @@ export const Dashboard: FC = () => {
 
   return (
     <Box sx={styles.container}>
+      <Box sx={styles.menuItemBurger}
+        onClick={() => {setActiveMenu(!activeMenu)}} 
+      >
+        <Burger />
+      </Box>
       <Box sx={styles.gridWrapper}>
-        <Box sx={styles.leftContainer}>
+        <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : styles.leftContainer }>
           <Typography variant={"h5"} marginBottom={"30px"}>
             {"Меню"}
           </Typography>
-
           <DashboardMenu
             activeMenu={path.activeMenuId}
             items={menuItemsP}
           />
         </Box>
-
-        <Box sx={styles.rightContainer}>
+        <Box 
+          sx={styles.rightContainer} 
+          onClick={() => {setActiveMenu(false)}} >
           <Typography
             variant={"h5"}
             marginBottom={"30px"}
@@ -100,7 +106,14 @@ const styles = {
     maxWidth: "1800px",
     margin: "0 auto",
   } as SxProps<Theme>,
-
+  menuItemBurger: {
+    position: 'absolute',
+    top: '28px',
+    right: '85px',
+    '@media (min-width: 768px)': {
+      display: 'none'
+    }
+  } as SxProps<Theme>,
   gridWrapper: {
     display: 'flex',
     flexDirection: 'column',
@@ -116,24 +129,43 @@ const styles = {
       gridTemplateColumns: '20% 80%',
     },
   } as SxProps<Theme>,
-
   leftContainer: {
+    position: 'fixed',
+    zIndex: '600',
+    width: '170px',
+    height: '100%',
+    backgroundColor: 'white',
     display: 'flex',
     flexDirection: 'column',
     gridArea: 'leftContainer',
     padding: '25px',
+    transform: 'TranslateX(-100%)',
+    transition: 'TranslateX 3s',
     '@media (min-width: 768px)': {
-      padding: '0'
+      position: 'static',
+      display: 'flex',
+      flexDirection: 'column',
+      gridArea: 'leftContainer',
+      width: '100%',
+      height: 'auto',
+      overflowY: 'auto',
+      transform: 'TranslateX(0)',
+      transition: 'all 0.5s',
+      padding: '0',
+      backgroundColor: 'transparent'
     },
   } as SxProps<Theme>,
-
+  menuActive: {
+    transform: 'TranslateX(0)',
+    transition: 'all 0.5s'
+  } as SxProps<Theme>,
   rightContainer: {
     display: 'flex',
     flexDirection: 'column',
     gridArea: 'rightContainer',
     overflowY: 'auto',
     maxWidth: "100%",
-    padding: '0 25px',
+    padding: '25px 25px 0',
     '@media (min-width: 768px)': {
       margin: "0px 0px 0px 25px",
       padding: '0'

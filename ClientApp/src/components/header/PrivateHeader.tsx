@@ -1,28 +1,38 @@
+import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
+import { paths } from "../../app/constants/paths";
+import { useNavigate } from 'react-router-dom';
+import { IRole } from '../../store/types';
 
 import { Box, SxProps, Theme } from "@mui/system";
-import { FC } from "react";
+import * as constStyles from "../../const/styles"
+import { palette } from "../../theme/colors";
+
+import { FC, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { Logo } from "../logo";
 import { Navbar } from "../navbar";
 import { UserAcc } from "../userIco";
-import * as constStyles from "../../const/styles"
-import { palette } from "../../theme/colors";
-import { useNavigate } from "react-router-dom";
-import { usePrivatePathT } from "../../app/hooks/usePrivatePathT";
-import { paths } from "../../app/constants/paths";
+import { Burger } from '../icons/Burger';
 
 export const PrivateHeader: FC = () => {
     const history = useNavigate()
-    const { path: pathT } = usePrivatePathT()
-    
+    const userProfile = useAppSelector(state => state.userProfile.payload)
+
+    const goToHome = () => { if (userProfile)
+        userProfile.role === IRole.teacher ? history(paths.teacher.main) : history(paths.student.main)
+    }
+
     return (
         <Box sx={styles.wrapper}>
             {/* <Box sx={constStyles.container}> */}
                 <Box sx={styles.root}>
                     <Box sx={styles.leftContainer}
-                        onClick={() => history(pathT ? paths.teacher.main : paths.student.main)}
+                    >   
+                    <Box sx={styles.pointer}
+                        onClick={goToHome}
                     >
                         <Logo/>
+                    </Box>
                         <Box sx={styles.navbarBlock}>
                             <Navbar />
                         </Box>
@@ -68,11 +78,13 @@ const styles = {
         justifyContent: 'flex-end',
         alignItems: 'center'
     } as SxProps<Theme>,
-
     leftContainer: {
         display: 'flex',
         width: '73%',
         margin: '0px 16px 0px 0px',
+    } as SxProps<Theme>,
+    pointer: {
+        cursor: 'pointer',
     } as SxProps<Theme>
 
 }
