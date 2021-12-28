@@ -176,21 +176,32 @@ namespace patools.Services.Courses
             if (course == null)
                 return new InvalidGuidIdResponse<string>();
 
-            var courseNew = _mapper.Map<Course>(updateCourse);
-            courseNew.ID = Guid.NewGuid();
+            var courseNew = _mapper.Map<PutCourseDto>(updateCourse);
+            //courseNew.ID = Guid.NewGuid();
 
             var teacher =
                 await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
             if (teacher == null)
                 return new BadRequestDataResponse<string>("Invalid teacher id");
 
-            courseNew.Teacher = teacher;
+            if (course.Teacher.ID != teacherId)
+                return new BadRequestDataResponse<string>("The teacher did not create the course");
 
-            if (courseNew.EnableCode == true && course.EnableCode == false)
+            if (courseNew.Settings.EnableCode == true && course.EnableCode == false)
+            {
                 course.CourseCode = RandomString(8);
-
-            if (courseNew.EnableCode == false && course.EnableCode == true)
+                course.EnableCode = true;
+            }
+                
+            if (courseNew.Settings.EnableCode == false && course.EnableCode == true)
+            {
                 course.CourseCode = null;
+                course.EnableCode = false;
+            }
+
+            course.Title = courseNew.Title;
+            course.Subject = courseNew.Subject;
+            course.Description = courseNew.Description;
 
             await _context.SaveChangesAsync();
 
