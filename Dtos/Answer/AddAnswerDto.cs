@@ -1,9 +1,11 @@
+using System;
+
 namespace patools.Dtos.Answer
 {
     public class AddAnswerDto
     {
-        public int Order { get; set; }
+        public Guid QuestionId { get; set; }
         
-        public string Text { get; set; }
+        public string Response { get; set; }
     }
 }
