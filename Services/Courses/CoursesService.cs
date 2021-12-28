@@ -192,11 +192,10 @@ namespace patools.Services.Courses
             if (courseNew.Settings.EnableCode == true && course.EnableCode == true)
                 return new BadRequestDataResponse<string>("No updates available");
 
-            if (course.EnableCode == false)
-                course.CourseCode = "7TV39K";
-                course.EnableCode = true;
-
-            if (course.EnableCode == true)
+            if (courseNew.Settings.EnableCode == true && course.EnableCode == false)
+                return new BadRequestDataResponse<string>("First true Second False");
+                
+            if (courseNew.Settings.EnableCode == false && course.EnableCode == true)
                 course.CourseCode = null;
                 course.EnableCode = false;
 
