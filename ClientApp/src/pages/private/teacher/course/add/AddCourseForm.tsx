@@ -47,7 +47,7 @@ export const AddCourseForm: FC<IProps> = ({ editCourse, onRequest }) => {
     const { field: subjectProps } = useController({ control, ...fields.subjectProps })
     const { field: enableProps } = useController({ control, ...fields.enableProps })
     const codeSettingsProps = getValues('settings')
-    const codeProps = getValues('settings.code')
+    const codeProps = getValues('settings.courseCode')
 
     const handleCourseCodeStatusChange = useCallback((value: React.ChangeEvent<HTMLInputElement>) => {
         const isChecked = value.target.checked
@@ -56,7 +56,7 @@ export const AddCourseForm: FC<IProps> = ({ editCourse, onRequest }) => {
             setValue('settings',
                 {
                     enableCode: isChecked,
-                    ...(isChecked === true && editCourse.settings.enableCode && { code: editCourse.settings.code })
+                    ...(isChecked === true && editCourse.settings.enableCode && { courseCode: editCourse.settings.courseCode })
                 }
             )
 
