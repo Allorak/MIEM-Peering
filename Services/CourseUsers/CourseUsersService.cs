@@ -59,7 +59,7 @@ namespace patools.Services.CourseUsers
 
         public async Task<Response<string>> AddCourseUserStudent(AddCourseUserStudentDto newCourseUserStudent)
         {
-            var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(u => u.ID == newCourseUserStudent.CourseId);
+            var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(u => u.CourseCode == newCourseUserStudent.CourseCode);
             if(course == null)
                 return new BadRequestDataResponse<string>("Invalid course id");
 

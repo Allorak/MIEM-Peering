@@ -70,8 +70,8 @@ namespace patools.Controllers.v1
             return Ok(await _courseUsersService.AddCourseUser(courseUsersInfo));
         }
 
-        // POST: api/v1/CourseUsers/addstudenttocourse
-        [HttpPost("addstudenttocourse")]
+        // POST: api/v1/CourseUsers/join
+        [HttpPost("join")]
         public async Task<ActionResult<string>> PostCourseUserStudent(AddCourseUserStudentDto courseUsersStudentInfo)
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)
