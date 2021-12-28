@@ -8,23 +8,26 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
 
   return {
     success: true,
-    payload: [
-      {
-        workId: "123",
-        studentName: "Мухаммад Юсупов",
-      },
-      {
-        workId: "234",
-        studentName: "Иван Иванов"
-      },
-      {
-        workId: "345",
-        studentName: "Вася Пупкин"
-      },
-      {
-        workId: "456",
-        studentName: "Вася Иванов"
-      },
-    ]
+    payload: {
+      submissionsInfo:
+        [
+          {
+            submissionId: "123",
+            studentName: "Мухаммад Юсупов",
+          },
+          {
+            submissionId: "234",
+            studentName: "Иван Иванов"
+          },
+          {
+            submissionId: "345",
+            studentName: "Вася Пупкин"
+          },
+          {
+            submissionId: "456",
+            studentName: "Вася Иванов"
+          },
+        ]
+    }
   }
 }

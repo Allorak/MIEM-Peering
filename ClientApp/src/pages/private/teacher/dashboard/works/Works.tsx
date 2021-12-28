@@ -42,7 +42,7 @@ export const Works: FC = () => {
   const isStudentWorkLoading = useAppSelector(state => state.works.isStudentWorkLoading)
   const isStudentWorkLock = useAppSelector(state => state.works.isStudentWorkLock)
   const isStudentWorkStatisticLoading = useAppSelector(state => state.works.isWorkStatisticsLoading)
-  const workList = useAppSelector(state => state.works.workList)
+  const workList = useAppSelector(state => state.works.workList?.submissionsInfo)
   const studentWork = useAppSelector(state => state.works.studentWork)
   const workStatistics = useAppSelector(state => state.works.workStatistics)
   const error = useAppSelector(state => state.works.error)
@@ -58,7 +58,7 @@ export const Works: FC = () => {
   useEffect(() => {
     if (workList && workList.length > 0 && !activeWork) {
       const defaultSelectedWork = workList[0]
-      requestWorkResponsesById(defaultSelectedWork.workId)
+      requestWorkResponsesById(defaultSelectedWork.submissionId)
       setActiveWork(JSON.parse(JSON.stringify(defaultSelectedWork)))
     }
   }, [workList])
@@ -71,18 +71,18 @@ export const Works: FC = () => {
   const handleOnStatistics = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (path && path.taskId && activeWork) {
       setPopupStatus(prev => !prev)
-      dispatch(fetchStudentWorkStatistics(path.taskId, activeWork.workId))
+      dispatch(fetchStudentWorkStatistics(path.taskId, activeWork.submissionId))
     }
   }, [popupStatus, activeWork])
 
   const handleOnWorkChange = useCallback((workId: string) => {
     if (workList && workList.length > 0) {
-      const workItem = workList.find(work => work.workId === workId)
+      const workItem = workList.find(work => work.submissionId === workId)
       if (workItem) {
         setActiveWork(
           JSON.parse(JSON.stringify(workItem))
         )
-        requestWorkResponsesById(workItem.workId)
+        requestWorkResponsesById(workItem.submissionId)
       }
     }
   }, [activeWork, workList])
@@ -137,7 +137,7 @@ export const Works: FC = () => {
           <Box sx={styles.rightContainer}>
             <WorksList
               worksCatalog={workList}
-              activeWorkId={activeWork.workId}
+              activeWorkId={activeWork.submissionId}
               onWorkChange={handleOnWorkChange}
             />
           </Box>

@@ -7,6 +7,5 @@ namespace patools.Dtos.Task
     {
         public Guid CourseId { get; set; }
         public Guid UserId { get; set; }
-        public UserRoles UserRole { get; set; }
     }
 }

@@ -9,11 +9,11 @@ export const getWorksList = async ({
   taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/t/${taskId}works`,
+    url: `/api/v1/submissions/get/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
@@ -24,7 +24,6 @@ export const getWorksList = async ({
     const response = await mock(requestConfig)
     return response
   }
-
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data

@@ -120,7 +120,7 @@ export type ICourses = {
 
 export type IActiveCodeCourse = {
   enableCode: true,
-  code?: string
+  courseCode?: string
 }
 
 export type IDisableCodeCourse = {
@@ -154,6 +154,10 @@ export type ITaskItem = {
   id: string,
   title: string,
   description?: string
+}
+
+export type ITasks = {
+  tasks: ITaskItem[]
 }
 
 export type INewTaskState = 'author-form' | 'peer-form' | 'settings' | 'main-info'
@@ -333,8 +337,12 @@ export type IOverviewResponse = IOverview & {
 }
 
 export type IWorkItem = {
-  workId: string,
+  submissionId: string,
   studentName: string
+}
+
+export type IWorks = {
+  submissionsInfo: IWorkItem[]
 }
 
 export type IWorkResponse = {

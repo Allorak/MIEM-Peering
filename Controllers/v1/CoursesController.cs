@@ -30,16 +30,6 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
-        // GET: api/v1/Courses/get
-        [HttpGet("get")]
-        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCourses()
-        {
-            if(!User.Identity.IsAuthenticated)
-                return Ok(new UnauthorizedUserResponse());
-
-            return Ok(await _coursesService.GetAllCourses());
-        }
-
         // GET: api/v1/Courses/get/5
         [HttpGet("get/{id:guid}")]
         public async Task<ActionResult<GetCourseDtoResponse>> GetCourse(Guid id)
@@ -50,41 +40,9 @@ namespace patools.Controllers.v1
             return Ok(await _coursesService.GetCourseById(id));
         }
 
-        // PUT: api/v1/Courses/put/5
-        //Refactoring is needed
-        [HttpPut("put/{id:guid}")]
-        public async Task<IActionResult> PutCourse(Guid id, Course course)
-        {
-            if (id != course.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(course).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CourseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/v1/Courses/add
-        [HttpGet("getteachercourse")]
-        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetTeacherCourse()
-        //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
+        // PUT: api/v1/Courses/put/courseId
+        [HttpPut("put/course={courseId}")]
+        public async Task<IActionResult> PutCourse(Guid courseId, PutCourseDto updateCourse)
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
@@ -97,40 +55,38 @@ namespace patools.Controllers.v1
             //The user has no id Claim
             var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if(teacherIdClaim == null)
-                return Ok(new InvalidGuidIdResponse());
+                return Ok(new InvalidJwtTokenResponse());
 
             //The id stored in Claim is not Guid
-            Guid teacherId;
-            if(!Guid.TryParse(teacherIdClaim.Value, out teacherId))
-                return Ok(new InvalidGuidIdResponse());
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
+                return Ok(new InvalidJwtTokenResponse());
 
-            return Ok(await _coursesService.GetTeacherCourses(teacherId));
+            return Ok(await _coursesService.PutCourse(teacherId, courseId, updateCourse));
         }
 
-        // POST: api/v1/Courses/add
-        [HttpGet("getstudentcourse")]
-        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetStudentCourse()
-        //public async Task<ActionResult<GetCourseDTO>> GetTeacherCourse()
+        // GET: api/v1/Courses/get
+        [HttpGet("get")]
+        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCoursess()
         {
-            //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
-
-            //The user's role is incorrect for this request
-            if(!User.IsInRole(UserRoles.Student.ToString()))
-                return Ok(new IncorrectUserRoleResponse());
-
+            
             //The user has no id Claim
-            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(studentIdClaim == null)
-                return Ok(new InvalidGuidIdResponse());
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
 
             //The id stored in Claim is not Guid
-            Guid studentId;
-            if(!Guid.TryParse(studentIdClaim.Value, out studentId))
-                return Ok(new InvalidGuidIdResponse());
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidJwtTokenResponse());
 
-            return Ok(await _coursesService.GetStudentCourses(studentId));
+            if (User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(await _coursesService.GetTeacherCourses(userId));
+
+            if(User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(await _coursesService.GetStudentCourses(userId));
+            
+            return Ok(new InvalidJwtTokenResponse());
         }
 
         // POST: api/v1/Courses/add

@@ -25,7 +25,7 @@ export const StudentsListSelect: FC<IProps> = ({
     <Box>
       <TextSelect
         value={selectedStudentId}
-        items={studentsList.map(student => ({ id: student.workId, name: student.studentName }))}
+        items={studentsList.map(student => ({ id: student.submissionId, name: student.studentName }))}
         onChange={handleStudentChange}
       />
     </Box>
