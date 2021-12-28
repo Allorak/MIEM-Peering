@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ICourse, IError } from '../types';
+import { IError } from '../types';
 
 
 export interface INewCourseState {
   isLoading: boolean,
   error: IError | undefined,
-  payload: ICourse
+  joinStatus: boolean | undefined
 }
 
 const initialState: INewCourseState = {
   isLoading: false,
   error: undefined,
-  payload: {} as ICourse,
+  joinStatus: undefined,
 };
 
 export const joinCourseSlice = createSlice({
@@ -23,9 +23,9 @@ export const joinCourseSlice = createSlice({
       state.error = undefined
     },
 
-    courseJoinSuccess: (state, { payload }: PayloadAction<ICourse>) => {
+    courseJoinSuccess: (state, { payload }: PayloadAction<boolean>) => {
       state.isLoading = false
-      state.payload = payload
+      state.joinStatus = payload
     },
 
     courseJoinFailed: (state, { payload }: PayloadAction<IError>) => {
@@ -36,7 +36,7 @@ export const joinCourseSlice = createSlice({
     courseSetInitialState: (state) => {
       state.isLoading =  false
       state.error = undefined
-      state.payload = { } as ICourse
+      state.joinStatus = undefined
     }
   },
 });

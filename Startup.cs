@@ -16,6 +16,7 @@ using System;
 using patools.Models;
 using patools.Services.Authentication;
 using patools.Services.Courses;
+using patools.Services.CourseUsers;
 using patools.Services.Submissions;
 using patools.Services.Users;
 using patools.Services.PeeringTasks;
@@ -46,6 +47,7 @@ namespace patools
             services.AddScoped<IUsersService,UsersService>();
             services.AddScoped<IPeeringTasksService,PeeringTasksService>();
             services.AddScoped<ISubmissionsService, SubmissionsService>();
+            services.AddScoped<ICourseUsersService, CourseUsersService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
