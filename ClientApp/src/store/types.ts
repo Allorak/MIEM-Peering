@@ -120,7 +120,7 @@ export type ICourses = {
 
 export type IActiveCodeCourse = {
   enableCode: true,
-  code?: string
+  courseCode?: string
 }
 
 export type IDisableCodeCourse = {

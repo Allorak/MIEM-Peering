@@ -7,7 +7,6 @@ namespace patools.Dtos.User
 {
     public class GetTeacherDtoResponse
     {
-        public Guid Id  { get; set;}
         public string Fullname { get; set;}
         public string ImageUrl { get; set;}
     }

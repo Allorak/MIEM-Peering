@@ -135,6 +135,7 @@ namespace patools.Services.Courses
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
+                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher),
                     Settings = new GetCourseSettingsDtoResponse()
                     {
                         CourseCode = x.EnableCode ? x.CourseCode : null,
@@ -161,7 +162,7 @@ namespace patools.Services.Courses
             var courses = new List<GetCourseDtoResponse>();
             foreach (var courseUser in courseUsers)
             {
-                var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
                 if(course!= null)
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
