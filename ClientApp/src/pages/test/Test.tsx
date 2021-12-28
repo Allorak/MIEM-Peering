@@ -1,39 +1,237 @@
-import { Button, CircularProgress } from "@mui/material";
-import { Box, SxProps, Theme } from "@mui/system";
+import { Box, Theme } from "@mui/material";
+import { SxProps } from "@mui/system";
 import { FC, useState } from "react";
-import { CourseCard } from "../../components/courseCard";
 import { Popup } from "../../components/popup";
-import { WorkBox } from "../../components/workBox";
-import { Wrapper } from "../../components/wrapper";
-import { AddCourseForm } from "../private/teacher/course/add/AddCourseForm";
-import { CourseMain } from "../private/teacher/course/main";
+import { IQuestionTypes, IWorkStatistics, Reviewers, WorkGraphTypes, WorkStatisticsTypes } from "../../store/types";
+import { WorkLineGraph } from "../private/teacher/dashboard/works/components/WorkLineGraph";
+import { WorkStatistics } from "../private/teacher/dashboard/works/WorkStatistics";
+
+import Slide from '@mui/material/Slide';
+import { TransitionProps } from '@mui/material/transitions';
+import * as React from 'react';
+import { scrollStyles } from "../../const/styles";
+
+
 
 
 export const TestPage: FC = () => {
-    const fakeData = {
-        id: '1',
-        adminName: 'Мухаммад Юсупов gahsghagshgahsghagshagshgh',
-        name: 'AngularJS ahsjhajsh ashajshjas tgtgtgtg',
-        subject: 'Web Devolepment Front Front',
-        description: "Master Angular 5 from the basics to building an advanced application with Firebase's Firestore as well sas ha sghgasg ahsgahsgh"
-    }
-    const [isopen, setOpen] = useState(false)
+
+
+    const fakeData: IWorkStatistics = [
+        {
+            statisticType: WorkStatisticsTypes.GRAPH,
+            graphType: WorkGraphTypes.FINAL,
+            coordinates: [
+                {
+                    reviewer: Reviewers.TEACHER,
+                    name: "Иван Иванов",
+                    value: 7
+                },
+                {
+                    reviewer: Reviewers.EXPERT,
+                    name: "Мухаммад Юсупов",
+                    value: 6
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Вася",
+                    value: 1
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Петя",
+                    value: 9
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Федя",
+                    value: 3
+                },
+            ],
+            minGrade: 0,
+            maxGrade: 9
+        },
+        {
+            statisticType: WorkStatisticsTypes.GRAPH,
+            graphType: WorkGraphTypes.FINAL,
+            coordinates: [
+                {
+                    reviewer: Reviewers.TEACHER,
+                    name: "Иван Иванов",
+                    value: 7
+                },
+                {
+                    reviewer: Reviewers.EXPERT,
+                    name: "Мухаммад Юсупов",
+                    value: 6
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Вася",
+                    value: 1
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Петя",
+                    value: 9
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Федя",
+                    value: 3
+                },
+            ],
+            minGrade: 0,
+            maxGrade: 9
+        },
+        {
+            statisticType: WorkStatisticsTypes.GRAPH,
+            graphType: WorkGraphTypes.FINAL,
+            coordinates: [
+                {
+                    reviewer: Reviewers.TEACHER,
+                    name: "Иван Иванов",
+                    value: 7
+                },
+                {
+                    reviewer: Reviewers.EXPERT,
+                    name: "Мухаммад Юсупов",
+                    value: 6
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Вася",
+                    value: 1
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Петя",
+                    value: 9
+                },
+                {
+                    reviewer: Reviewers.PEER,
+                    name: "Федя",
+                    value: 3
+                },
+            ],
+            minGrade: 0,
+            maxGrade: 9
+        },
+        {
+            statisticType: WorkStatisticsTypes.RESPONSE,
+            name: "Юсупов М А",
+            reviewer: Reviewers.TEACHER,
+            responses: [
+                {
+                    questionId: "123",
+                    description: "Описание 1",
+                    order: 0,
+                    title: "Title 1",
+                    type: IQuestionTypes.TEXT,
+                    response: "Мухаммад Юсупов ответ 1",
+                    required: false
+                },
+                {
+                    questionId: "234",
+                    order: 1,
+                    title: "Title 2",
+                    type: IQuestionTypes.TEXT,
+                    response: "Мухаммад Юсупов ответ 2",
+                    required: true
+                },
+            ]
+        },
+        {
+            statisticType: WorkStatisticsTypes.RESPONSE,
+            name: "Петров ",
+            reviewer: Reviewers.TEACHER,
+            responses: [
+
+                {
+                    questionId: "123",
+                    order: 0,
+                    title: "Title 1",
+                    type: IQuestionTypes.TEXT,
+                    required: false
+                },
+                {
+                    questionId: "234",
+                    order: 1,
+                    title: "Title 2",
+                    type: IQuestionTypes.TEXT,
+                    response: "Иван Иванов ответ 2",
+                    required: true
+                },
+                {
+                    questionId: "345",
+                    order: 3,
+                    title: "Title 3",
+                    type: IQuestionTypes.MULTIPLE,
+                    responses: [
+                        {
+                            id: 1,
+                            response: "Иван Иванов",
+                        },
+                        {
+                            id: 2,
+                            response: "Вариант 2",
+                        },
+                        {
+                            id: 3,
+                            response: "Вариант 3",
+                        },
+                        {
+                            id: 4,
+                            response: "Вариант 4",
+                        }
+                    ],
+                    response: "Иван Иванов",
+                    required: false
+                },
+                {
+                    questionId: "456",
+                    order: 4,
+                    title: "Title 4",
+                    type: IQuestionTypes.SELECT_RATE,
+                    response: 2,
+                    required: true,
+                    minValue: 0,
+                    maxValue: 5
+                },
+            ]
+        }
+    ]
+
+    const [popustatus, steasas] = useState(true)
+
     return (
-        <Wrapper>
-            <CourseMain />
-        </Wrapper>
+        <Popup
+            title={"TTTT"}
+            open={true}
+            loading={false}
+            onCloseHandler={steasas}
+            fullScreen
+            fullWidth
+            PaperProps={{ sx: { flex: '0 1 100%' } }}
+            dialogContentSx={{ padding: "0px 10px", ...scrollStyles }}
+        >
+
+            <WorkStatistics workStatistics={fakeData} />
+        </Popup >
+
+
     )
 }
 
-console.log(new Date("2021-12-10T20:59:00.913").toDateString(), "TTT")
-
 const styles = {
-    boxCon: {
-        backdropFilter: 'blur(2px)',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '200px',
-        height: '200px'
+    wrapper: {
+        maxWidth: "1800px",
+        display: "grid",
+        gridGap: "10px",
+        margin: "0px auto",
+        gridTemplateColumns: "repeat(auto-fill, minmax(890px, 1fr) )",
+        '@media (max-width: 910px)': {
+            gridTemplateColumns: "repeat(auto-fill, minmax(100%, 100%) )",
+        }
     } as SxProps<Theme>
 }

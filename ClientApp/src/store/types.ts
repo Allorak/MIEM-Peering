@@ -120,7 +120,7 @@ export type ICourses = {
 
 export type IActiveCodeCourse = {
   enableCode: true,
-  code?: string
+  courseCode?: string
 }
 
 export type IDisableCodeCourse = {
@@ -154,6 +154,10 @@ export type ITaskItem = {
   id: string,
   title: string,
   description?: string
+}
+
+export type ITasks = {
+  tasks: ITaskItem[]
 }
 
 export type INewTaskState = 'author-form' | 'peer-form' | 'settings' | 'main-info'
@@ -286,7 +290,7 @@ export enum IMenuTitles {
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
   EXPORT = 'Экспорт',
-  MENU_1 = 'Меню 1',
+  AUTHORFORM = 'Сдать работу',
   MENU_2 = 'Меню 2',
   MENU_3 = 'Меню 3'
 }
@@ -312,6 +316,11 @@ export type IOverviewStudent = {
   status: IStatusTask
 }
 
+export type IAuthorFormResponseItem = {
+  id: number,
+  response: string
+}
+
 export type IOverviewResponse = IOverview & {
   deadlines: {
     submissionStartDateTime: string
@@ -321,14 +330,13 @@ export type IOverviewResponse = IOverview & {
   }
 }
 
-
 export type IWorkItem = {
-  id: string,
-  responses: IWorkResponse[],
-  author: {
-    name: string,
-    id: string
-  }
+  submissionId: string,
+  studentName: string
+}
+
+export type IWorks = {
+  submissionsInfo: IWorkItem[]
 }
 
 export type IWorkResponse = {
@@ -351,3 +359,136 @@ export enum PeerTaskTypes {
   DOUBLE_BLIND = 'doubleBlind',
   OPEN = 'open'
 }
+export interface ICatalog {
+  id: string,
+  name: string
+}
+
+
+/* Chickings */
+
+export interface IStudentWorkItem {
+  questionId: string,
+  order: number,
+  title: string,
+  required: boolean
+  response?: string
+}
+
+export interface IStudentWorkSelectItem extends Omit<IStudentWorkItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
+
+export interface IStudentWorkTextItem extends IStudentWorkItem, ITextQuestion { }
+
+export interface IStudentWorkShortTextItem extends IStudentWorkItem, IShortTextQuestion { }
+
+export interface IStudentWorkMultipleItem extends IStudentWorkItem, IMultipleQuiestion { }
+
+export type IStudentWork = {
+  responses: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+}
+
+export interface IPeerFormItem {
+  id: string,
+  order: number,
+  required: boolean,
+  title: string,
+  response?: string
+}
+
+export interface IPeerFormSelectItem extends Omit<IPeerFormItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
+
+export interface IPeerFormTextItem extends IPeerFormItem, ITextQuestion { }
+
+export interface IPeerFormShortTextItem extends IPeerFormItem, IShortTextQuestion { }
+
+export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion { }
+
+
+export type IPeerForm = {
+  rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
+}
+
+export type IAuthorFormItem = {
+  title: string,
+  required: boolean,
+  response? : string
+}
+
+export interface IAuthorFormSelectItem extends Omit<IAuthorFormItem, 'response'>, ISelectRatingQuestion {
+  response?: number
+}
+
+export interface IAuthorFormTextItem extends IAuthorFormItem, ITextQuestion { }
+
+export interface IAuthorFormShortTextItem extends IAuthorFormItem, IShortTextQuestion { }
+
+export interface IAuthorFormMultipleItem extends IAuthorFormItem, IMultipleQuiestion { }
+
+export type IAuthorForm = {
+  rubrics: Array<IAuthorFormSelectItem | IAuthorFormTextItem | IAuthorFormShortTextItem | IAuthorFormMultipleItem>
+}
+
+export type IPeerResponseItem = {
+  questionId: string,
+  response?: string | number
+}
+
+export type IPeerResponses = {
+  responses: Array<IPeerResponseItem>
+}
+
+export enum Reviewers {
+  TEACHER = 'teacher',
+  PEER = 'peer',
+  EXPERT = 'expert'
+}
+
+export enum WorkGraphTypes {
+  FINAL = "finalRates",
+  CRITERIA = "criteria"
+}
+
+export enum WorkStatisticsTypes {
+  GRAPH = "graph",
+  RESPONSE = "response"
+}
+
+export interface IWorkGraphByCriteriaItem {
+  title: string
+  graphType: WorkGraphTypes.CRITERIA
+}
+
+export interface IWorkGraphFinalRatesItem {
+  graphType: WorkGraphTypes.FINAL
+}
+
+export interface IWorkReviewСoordinates {
+  value: number
+  reviewer: Reviewers
+  name: string
+}
+
+export type IWorkGraphPropsItem = {
+  statisticType: WorkStatisticsTypes.GRAPH,
+  coordinates: IWorkReviewСoordinates[],
+  minGrade: number,
+  maxGrade: number
+}
+
+export interface IWorkGraphByCriteria extends IWorkGraphByCriteriaItem, IWorkGraphPropsItem {}
+
+export type IWorkGraphFinalRates = IWorkGraphFinalRatesItem & IWorkGraphPropsItem
+
+export type IWorkGraph = IWorkGraphByCriteria | IWorkGraphFinalRates
+
+export type IWorkReviewerForm = IStudentWork & {
+  statisticType: WorkStatisticsTypes.RESPONSE,
+  name: string,
+  reviewer: Reviewers
+}
+
+export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>

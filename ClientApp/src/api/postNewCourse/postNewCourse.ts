@@ -12,7 +12,7 @@ export const postNewCourse = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `api/v1/Courses/add`,
+    url: `api/v1/courses/add`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

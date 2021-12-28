@@ -13,7 +13,7 @@ export const getTasks = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/courses/${courseId}/tasks/get`,
+    url: `/api/v1/tasks/get/course=${courseId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

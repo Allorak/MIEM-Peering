@@ -4,6 +4,8 @@ using patools.Dtos.User;
 using patools.Dtos.Course;
 using patools.Dtos.Task;
 using patools.Dtos.Question;
+using patools.Dtos.Submission;
+using patools.Dtos.CourseUser;
 
 namespace patools
 {
@@ -11,14 +13,23 @@ namespace patools
     {
         public AutoMapperProfile()
         {
-            CreateMap<User,GetRegisteredUserDTO>();
-            CreateMap<User, GetTeacherDTO>();
-            CreateMap<AddCourseDTO, Course>();
-            CreateMap<User,GetNewUserDTO>();
-            CreateMap<Task,GetTaskDeadlinesDTO>();
-            CreateMap<Task,GetNewTaskDTO>();
-            CreateMap<AddQuestionDTO,Question>();
-            CreateMap<Task,GetTaskMainInfoDTO>();
+            CreateMap<User,GetRegisteredUserDtoResponse>();
+            CreateMap<GetCourseTeacherDtoResponse, GetCourseDtoResponse>();
+            CreateMap<Course, GetCourseDtoResponse>();
+            CreateMap<User, GetTeacherDtoResponse>();
+            CreateMap<AddCourseDto, Course>();
+            CreateMap<User,GetNewUserDtoResponse>();
+            CreateMap<PeeringTask,GetPeeringTaskDeadlinesDtoResponse>();
+            CreateMap<PeeringTask,GetNewPeeringTaskDtoResponse>();
+            CreateMap<AddAuthorQuestionDto,Question>();
+            CreateMap<AddPeerQuestionDto,Question>();
+            CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
+            CreateMap<Question,GetQuestionDto>();
+            CreateMap<AddUserDTO,User>();
+            CreateMap<Submission,GetNewSubmissionDtoResponse>();
+            CreateMap<Course, GetCourseUserStudentDtoResponse>();
+            CreateMap<PutCourseDto, Course>();
+            CreateMap<GetCourseTeacherDtoResponse, GetCourseDtoResponse>();
         }
     }
 }

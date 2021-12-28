@@ -54,7 +54,7 @@ export const usePrivatePathStDashboard = (): IUsePrivatePathResult => {
 const convertActiveMenu = (activeMenuId: string | undefined) => {
   switch (activeMenuId) {
     case "overview": return IMenuTitles.OVERVIEW
-    case "menu1": return IMenuTitles.MENU_1
+    case "authorform": return IMenuTitles.AUTHORFORM
     case "menu2": return IMenuTitles.MENU_2
     case "menu3": return IMenuTitles.MENU_3
     default: return undefined
