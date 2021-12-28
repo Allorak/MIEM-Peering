@@ -135,6 +135,7 @@ namespace patools.Services.Courses
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
+                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher),
                     Settings = new GetCourseSettingsDtoResponse()
                     {
                         CourseCode = x.EnableCode ? x.CourseCode : null,
@@ -161,11 +162,11 @@ namespace patools.Services.Courses
             var courses = new List<GetCourseDtoResponse>();
             foreach (var courseUser in courseUsers)
             {
-                var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
                 if(course!= null)
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
-            
+
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
@@ -175,8 +176,8 @@ namespace patools.Services.Courses
             if (course == null)
                 return new InvalidGuidIdResponse<string>();
 
-            var courseNew = _mapper.Map<Course>(updateCourse);
-            courseNew.ID = Guid.NewGuid();
+            var courseNew = _mapper.Map<PutCourseDto>(updateCourse);
+            //courseNew.ID = Guid.NewGuid();
 
             var teacher =
                 await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
@@ -186,13 +187,22 @@ namespace patools.Services.Courses
             if (course.Teacher.ID != teacherId)
                 return new BadRequestDataResponse<string>("The teacher did not create the course");
 
-            courseNew.Teacher = teacher;
+            //courseNew.Teacher = teacher;
 
-            if (courseNew.EnableCode == true && course.EnableCode == false)
-                course.CourseCode = RandomString(8);
+            if (courseNew.Settings.EnableCode == true && course.EnableCode == true)
+                return new BadRequestDataResponse<string>("No updates available");
 
-            if (courseNew.EnableCode == false && course.EnableCode == true)
+            if (course.EnableCode == false)
+                course.CourseCode = "7TV39K";
+                course.EnableCode = true;
+
+            if (course.EnableCode == true)
                 course.CourseCode = null;
+                course.EnableCode = false;
+
+            course.Title = courseNew.Title;
+            course.Subject = courseNew.Subject;
+            course.Description = courseNew.Description;
 
             await _context.SaveChangesAsync();
 

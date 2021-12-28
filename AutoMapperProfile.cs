@@ -14,6 +14,8 @@ namespace patools
         public AutoMapperProfile()
         {
             CreateMap<User,GetRegisteredUserDtoResponse>();
+            CreateMap<GetCourseTeacherDtoResponse, GetCourseDtoResponse>();
+            CreateMap<Course, GetCourseDtoResponse>();
             CreateMap<User, GetTeacherDtoResponse>();
             CreateMap<AddCourseDto, Course>();
             CreateMap<User,GetNewUserDtoResponse>();
@@ -27,6 +29,7 @@ namespace patools
             CreateMap<Submission,GetNewSubmissionDtoResponse>();
             CreateMap<Course, GetCourseUserStudentDtoResponse>();
             CreateMap<PutCourseDto, Course>();
+            CreateMap<GetCourseTeacherDtoResponse, GetCourseDtoResponse>();
         }
     }
 }

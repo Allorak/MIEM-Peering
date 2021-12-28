@@ -66,7 +66,7 @@ namespace patools.Controllers.v1
 
         // GET: api/v1/Courses/get
         [HttpGet("get")]
-        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCourses()
+        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCoursess()
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());

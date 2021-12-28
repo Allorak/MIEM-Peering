@@ -19,7 +19,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         description: "Master Angular 5 from the basics to building an advanced application with Firebase's Firestore as well",
         settings: {
           enableCode: true,
-          code: "GhTk3Ls"
+          courseCode: "GhTk3Ls"
         },
       },
       {
