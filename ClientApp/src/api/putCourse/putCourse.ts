@@ -9,13 +9,13 @@ export const putCourse = async ({
   course
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const enableCode = course.settings ? course.settings.enableCode : false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'PUT',
-    url: `api/v1/courses/${course.id}`,
+    url: `/api/v1/courses/put/course=${course.id}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
