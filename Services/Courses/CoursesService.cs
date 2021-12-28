@@ -187,17 +187,17 @@ namespace patools.Services.Courses
             if (course.Teacher.ID != teacherId)
                 return new BadRequestDataResponse<string>("The teacher did not create the course");
 
-            //courseNew.Teacher = teacher;
-
-            if (courseNew.Settings.EnableCode == true && course.EnableCode == true)
-                return new BadRequestDataResponse<string>("No updates available");
-
             if (courseNew.Settings.EnableCode == true && course.EnableCode == false)
-                return new BadRequestDataResponse<string>("First true Second False");
+            {
+                course.CourseCode = RandomString(8);
+                course.EnableCode = true;
+            }
                 
             if (courseNew.Settings.EnableCode == false && course.EnableCode == true)
+            {
                 course.CourseCode = null;
                 course.EnableCode = false;
+            }
 
             course.Title = courseNew.Title;
             course.Subject = courseNew.Subject;
