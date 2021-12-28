@@ -316,12 +316,6 @@ export type IOverviewStudent = {
   status: IStatusTask
 }
 
-export type IAuthorFormItem = {
-  title: string,
-  required: boolean,
-  response? : string
-}
-
 export type IAuthorFormResponseItem = {
   id: number,
   response: string
@@ -416,6 +410,12 @@ export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion
 
 export type IPeerForm = {
   rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
+}
+
+export type IAuthorFormItem = {
+  title: string,
+  required: boolean,
+  response? : string
 }
 
 export interface IAuthorFormSelectItem extends Omit<IAuthorFormItem, 'response'>, ISelectRatingQuestion {

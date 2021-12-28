@@ -9,9 +9,9 @@ export const getAuthorform = async ({
   taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
-  const requestConfig: AxiosRequestConfig = {
+  const requestConfig: AxiosRequestConfig = { 
     method: 'GET',
     url: `/api/v1/tasks/authorform/task=${taskId}`,
     headers: {
@@ -20,7 +20,6 @@ export const getAuthorform = async ({
     }
   }
 
-  console.log('[request authorform]', requestConfig)
   if (isMock) return await mock(requestConfig)
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
