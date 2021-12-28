@@ -50,17 +50,17 @@ namespace patools.Services.Submissions
             foreach (var answer in submission.Answers)
             {
                 var question = await _context.Questions
-                    .FirstOrDefaultAsync(q => q.PeeringTask == taskUser.PeeringTask && q.Order == answer.Order);
+                    .FirstOrDefaultAsync(q => q.PeeringTask == taskUser.PeeringTask && q.ID == answer.QuestionId);
                 
                 if (question == null)
-                    return new BadRequestDataResponse<GetNewSubmissionDtoResponse>($"Incorrect Order({answer.Order}) in answer");
+                    return new BadRequestDataResponse<GetNewSubmissionDtoResponse>($"Incorrect QuestionId in answer");
                 
                 newAnswers.Add(new Answer
                 {
                     ID = Guid.NewGuid(),
                     Submission = newSubmission,
                     Question = question,
-                    Text = answer.Text
+                    Text = answer.Response
                 });
             }
             await _context.Answers.AddRangeAsync(newAnswers);
