@@ -1,3 +1,4 @@
+#nullable enable
 namespace patools.Errors
 {
     public class Error

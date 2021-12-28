@@ -38,9 +38,5 @@ namespace patools.Models
 
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
-
-        public List<CourseUser> CourseUsers { get; set; }
-        public List<GroupUser> GroupUsers { get; set; }
-        public List<TaskUser> TaskUsers { get; set; }
     }
 }

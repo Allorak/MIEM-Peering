@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using patools;
 using patools.Dtos.Course;
 using patools.Dtos.User;
+using patools.Dtos.CourseUser;
 using patools.Errors;
 using patools.Models;
 
@@ -24,48 +25,55 @@ namespace patools.Services.Courses
             _context = context;
         }
 
-        public async Task<Response<GetCourseDTO>> AddCourse(Guid teacherId, AddCourseDTO newCourse)
-        {
-            var response = new Response<GetCourseDTO>();
+        public static Random random = new Random();
 
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public async Task<Response<GetCourseDtoResponse>> AddCourse(AddCourseDto newCourse)
+        {
             var course = _mapper.Map<Course>(newCourse);
             course.ID = Guid.NewGuid();
 
-
-            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == newCourse.TeacherId && u.Role == UserRoles.Teacher);
             if(teacher == null)
-                return new BadRequestDataResponse<GetCourseDTO>("Invalid teacher id");
+                return new BadRequestDataResponse<GetCourseDtoResponse>("Invalid teacher id");
             
             course.Teacher = teacher;
+            course.CourseCode = RandomString(8);
+            course.EnableCode = true;
 
             _context.Courses.Add(course);
             await _context.SaveChangesAsync();
 
             var resultCourse = await _context.Courses
                 .Include(x => x.Teacher)
-                .Select(x => new GetCourseDTO
+                .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
+                    Settings = new GetCourseSettingsDtoResponse()
+                    {
+                        CourseCode = x.CourseCode,
+                        EnableCode = x.EnableCode
+                    }
                 })
-                .FirstOrDefaultAsync(x => x.ID == course.ID);
+                .FirstOrDefaultAsync(x => x.Id == course.ID);
 
             if (resultCourse == null)
-                return new OperationErrorResponse<GetCourseDTO>("Unexpected error while adding a new course");
+                return new OperationErrorResponse<GetCourseDtoResponse>("Unexpected error while adding a new course");
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = resultCourse;
-            return response;
+            return new SuccessfulResponse<GetCourseDtoResponse>(resultCourse);
         }
 
         public async Task<Response<string>> DeleteCourse(Guid teacherId, Guid courseId)
         {
-            var response = new Response<string>();
             var course = await _context.Courses.FindAsync(courseId);
             if (course == null)
                 return new InvalidGuidIdResponse<string>();
@@ -73,110 +81,131 @@ namespace patools.Services.Courses
             _context.Courses.Remove(course);
             await _context.SaveChangesAsync();
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = "Course was removed successfully";
-            return response;
+            return new SuccessfulResponse<string>("Course was removed successfully");
         }
 
-        public async Task<Response<List<GetCourseDTO>>> GetAllCourses()
+        public async Task<Response<List<GetCourseDtoResponse>>> GetAllCourses()
         {
-            var response = new Response<List<GetCourseDTO>>();
             var courses = await _context.Courses
                 .Include(course => course.Teacher)
-                .Select(x => new GetCourseDTO
+                .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
-                    Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
+                    Subject = x.Subject
                 })
                 .ToListAsync();
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = courses;
-            return response;
+            return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
-        public async Task<Response<GetCourseDTO>> GetCourseById(Guid courseId)
+        public async Task<Response<GetCourseDtoResponse>> GetCourseById(Guid courseId)
         {
-            var response = new Response<GetCourseDTO>();
             var course = await _context.Courses
                 .Include(x => x.Teacher)
-                .Select(x => new GetCourseDTO
+                .Select(x => new GetCourseDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
-                    Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
+                    Subject = x.Subject
                 })
-                .FirstOrDefaultAsync(x => x.ID == courseId);
+                .FirstOrDefaultAsync(x => x.Id == courseId);
 
             if (course == null)
-                return new InvalidGuidIdResponse<GetCourseDTO>();
+                return new InvalidGuidIdResponse<GetCourseDtoResponse>();
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload =  course;
-            return response;
+            return new SuccessfulResponse<GetCourseDtoResponse>(course);
         }
 
-        public async Task<Response<List<GetCourseDTO>>> GetTeacherCourses(Guid teacherId)
+        public async Task<Response<List<GetCourseDtoResponse>>> GetTeacherCourses(Guid teacherId)
         {
-            var response = new Response<List<GetCourseDTO>>();
+            var teacher =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid teacher id");
             
             var courses = await _context.Courses
                 .Include(course => course.Teacher)
-                .Where(x => x.Teacher.ID == teacherId)
-                .Select(x => new GetCourseDTO
+                .Where(x => x.Teacher == teacher)
+                .Select(x => _mapper.Map<GetCourseDtoResponse>(new GetCourseTeacherDtoResponse
                 {
-                    ID = x.ID,
+                    Id = x.ID,
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
-                })
+                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher),
+                    Settings = new GetCourseSettingsDtoResponse()
+                    {
+                        CourseCode = x.EnableCode ? x.CourseCode : null,
+                        EnableCode = x.EnableCode
+                    }
+                }))
                 .ToListAsync();
 
-            if (courses == null)
-                return new InvalidGuidIdResponse<List<GetCourseDTO>>("Invalid teacher id");
-            
-            response.Success = true;
-            response.Error = null;
-            response.Payload = courses;
-            return response;
+            return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
-        public async Task<Response<List<GetCourseDTO>>> GetStudentCourses(Guid studentId)
+        public async Task<Response<List<GetCourseDtoResponse>>> GetStudentCourses(Guid studentId)
         {
-            var response = new Response<List<GetCourseDTO>>();
-            var courses = await _context.Courses
-                .Include(course => course.Teacher)
-                .Where(x => x.Teacher.ID == studentId)
-                .Select(x => new GetCourseDTO
-                {
-                    ID = x.ID,
-                    Title = x.Title,
-                    Description = x.Description,
-                    Subject = x.Subject,
-                    CourseCode = x.CourseCode,
-                    Teacher = _mapper.Map<GetTeacherDTO>(x.Teacher)
-                })
+            var student =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == studentId && u.Role == UserRoles.Student);
+            if (student == null)
+                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid student id");
+
+            var courseUsers = await _context.CourseUsers
+                .Include(cu => cu.Course)
+                .Where(cu => cu.User == student)
                 .ToListAsync();
 
-            if (courses == null)
-                return new InvalidGuidIdResponse<List<GetCourseDTO>>("Invalid user id");
+            var courses = new List<GetCourseDtoResponse>();
+            foreach (var courseUser in courseUsers)
+            {
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
+                if(course!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+            }
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = courses;
-            return response;
+            return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
+        }
+
+        public async Task<Response<string>> PutCourse(Guid teacherId, Guid courseId, PutCourseDto updateCourse)
+        {
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course == null)
+                return new InvalidGuidIdResponse<string>();
+
+            var courseNew = _mapper.Map<PutCourseDto>(updateCourse);
+            //courseNew.ID = Guid.NewGuid();
+
+            var teacher =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
+            if (teacher == null)
+                return new BadRequestDataResponse<string>("Invalid teacher id");
+
+            if (course.Teacher.ID != teacherId)
+                return new BadRequestDataResponse<string>("The teacher did not create the course");
+
+            if (courseNew.Settings.EnableCode == true && course.EnableCode == false)
+            {
+                course.CourseCode = RandomString(8);
+                course.EnableCode = true;
+            }
+                
+            if (courseNew.Settings.EnableCode == false && course.EnableCode == true)
+            {
+                course.CourseCode = null;
+                course.EnableCode = false;
+            }
+
+            course.Title = courseNew.Title;
+            course.Subject = courseNew.Subject;
+            course.Description = courseNew.Description;
+
+            await _context.SaveChangesAsync();
+
+            return new SuccessfulResponse<string>("Course was updated successfully");
         }
     }
 }

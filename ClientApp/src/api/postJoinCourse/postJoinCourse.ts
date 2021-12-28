@@ -5,11 +5,11 @@ import { mock } from './mock'
 
 export const postJoinCourse = async ({accessToken, courseCode}: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/course/create`,
+    url: `/api/v1/courseusers/join`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

@@ -16,8 +16,10 @@ using System;
 using patools.Models;
 using patools.Services.Authentication;
 using patools.Services.Courses;
+using patools.Services.CourseUsers;
+using patools.Services.Submissions;
 using patools.Services.Users;
-using patools.Services.Tasks;
+using patools.Services.PeeringTasks;
 
 namespace patools
 {
@@ -32,7 +34,7 @@ namespace patools
 
         public void ConfigureServices(IServiceCollection services)
         {
-            SetupJWTServices(services);
+            SetupJwtServices(services);
             services.AddControllersWithViews();
             services.AddDbContext<PAToolsContext>();
             services.AddSpaStaticFiles(configuration =>
@@ -43,7 +45,9 @@ namespace patools
             services.AddScoped<IAuthenticationService,AuthenticationService>();
             services.AddScoped<ICoursesService,CoursesService>();
             services.AddScoped<IUsersService,UsersService>();
-            services.AddScoped<ITasksService,TasksService>();
+            services.AddScoped<IPeeringTasksService,PeeringTasksService>();
+            services.AddScoped<ISubmissionsService, SubmissionsService>();
+            services.AddScoped<ICourseUsersService, CourseUsersService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -85,7 +89,7 @@ namespace patools
             });
         }
 
-        private void SetupJWTServices(IServiceCollection services)
+        private void SetupJwtServices(IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>

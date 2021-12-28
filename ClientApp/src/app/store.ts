@@ -11,6 +11,7 @@ import { reducer as overview } from '../store/overview'
 import { reducer as overviewStudent } from '../store/overviewStudent'
 import { reducer as works } from '../store/works'
 import { reducer as experts } from '../store/experts'
+import { reducer as checkings } from '../store/checkings'
 
 export const store = configureStore({
   reducer: {
@@ -25,7 +26,8 @@ export const store = configureStore({
     overview,
     overviewStudent,
     works,
-    experts
+    experts,
+    checkings
   }
 })
 

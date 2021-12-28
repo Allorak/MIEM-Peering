@@ -6,17 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 using patools;
 using patools.Dtos.Course;
 using patools.Models;
+using patools.Dtos.CourseUser;
 
 namespace patools.Services.Courses
 {
     public interface ICoursesService
     {
-        Task<Response<List<GetCourseDTO>>> GetAllCourses();
-        Task<Response<GetCourseDTO>> GetCourseById(Guid courseId);
-        Task<Response<List<GetCourseDTO>>> GetTeacherCourses(Guid teacherId);
-        Task<Response<List<GetCourseDTO>>> GetStudentCourses(Guid studentId);
-        Task<Response<GetCourseDTO>> AddCourse(Guid teacherID, AddCourseDTO newCourse);
+        Task<Response<List<GetCourseDtoResponse>>> GetAllCourses();
+        Task<Response<GetCourseDtoResponse>> GetCourseById(Guid courseId);
+        Task<Response<List<GetCourseDtoResponse>>> GetTeacherCourses(Guid teacherId);
+        Task<Response<List<GetCourseDtoResponse>>> GetStudentCourses(Guid studentId);
+        Task<Response<GetCourseDtoResponse>> AddCourse(AddCourseDto newCourse);
         Task<Response<string>> DeleteCourse(Guid teacherID, Guid courseId);
-
+        Task<Response<string>> PutCourse(Guid teacherID, Guid courseId, PutCourseDto updateCourse);
     }
 }

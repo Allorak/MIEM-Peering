@@ -44,7 +44,7 @@ export const AddCourse: FC<IProps> = ({ popupOpen, onCloseHandler, editCourse })
     const handleRequest = useCallback((course: ICourses) => {
         if (editCourse && course.settings) {
             dispatch(updateCourse({
-                id: course.id,
+                id: editCourse.id,
                 name: course.name.trim(),
                 subject: course.subject.trim(),
                 description: course.description && course.description.trim() !== "" ? course.description.trim() : undefined,

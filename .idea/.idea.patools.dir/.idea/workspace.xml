@@ -6,8 +6,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/dataSources/068c3f83-3a40-499c-b17e-363f280c9afd.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/Courses/CoursesService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/Courses/CoursesService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +18,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="task-202" />
+        <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -31,6 +32,7 @@
     </file-type-list>
   </component>
   <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="4" />
     <option name="recentBranches">
       <RecentBranches>
         <option name="branchesForRepo">
@@ -40,15 +42,15 @@
                 <list>
                   <RecentBranch>
                     <option name="branchName" value="issue-200" />
-                    <option name="lastUsedInstant" value="1638723509" />
+                    <option name="lastUsedInstant" value="1639926577" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="develop" />
+                    <option name="lastUsedInstant" value="1639926549" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="task-202" />
                     <option name="lastUsedInstant" value="1638720944" />
-                  </RecentBranch>
-                  <RecentBranch>
-                    <option name="branchName" value="develop" />
-                    <option name="lastUsedInstant" value="1638718177" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="issue-146" />
@@ -68,7 +70,16 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/AuthenticationController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/AutoMapperProfile.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/ITasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/AutoMapperProfile.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/TasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/ITasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/PeeringTasksController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/PeeringTasksController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/TasksService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Dtos/PeeringTask/GetAuthorFormDTO.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/allorak/Documents/C#/patools/Dtos/PeeringTask/GetAuthorFormDTO.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="21mkjGjaWckRcMOe4jzvS37Eq57" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -82,12 +93,14 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.34979424" />
+    <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.0" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected=".NET Launch Settings Profile.patools">
@@ -121,6 +134,10 @@
         <option name="Build" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue=".NET Launch Settings Profile.patools" />
+      <item itemvalue=".NET Launch Settings Profile.patools: IIS Express" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -136,6 +153,21 @@
       <workItem from="1638707810589" duration="3963000" />
       <workItem from="1638715471215" duration="5928000" />
     </task>
+    <task id="LOCAL-00001" summary="Added Submissions">
+      <created>1638997995427</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1638997995427</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Renamed Task to PeeringTask">
+      <created>1638998549505</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1638998549505</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -149,7 +181,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="develop" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -159,5 +203,8 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Added Submissions" />
+    <MESSAGE value="Renamed Task to PeeringTask" />
+    <option name="LAST_COMMIT_MESSAGE" value="Renamed Task to PeeringTask" />
   </component>
 </project>
