@@ -15,7 +15,7 @@ export const joinCourse = (courseCode: string): AppThunk => async (dispatch, get
             console.log("Join course error: No access or Role")
             return
         }
-        const response = await postJoinCourse({accessToken, courseCode})
+        const response = await postJoinCourse({ accessToken, courseCode })
         if (!response) {
             dispatch(actions.courseJoinFailed({
                 code: IErrorCode.RESPONSE,
@@ -23,13 +23,13 @@ export const joinCourse = (courseCode: string): AppThunk => async (dispatch, get
             }))
             return
         }
-        if (!response.success) {            
+        if (!response.success) {
             dispatch(actions.courseJoinFailed(response.error))
             return
         }
 
-        dispatch(actions.courseJoinSuccess(response.payload))
-        
+        dispatch(actions.courseJoinSuccess(response.success))
+
     } catch (error) {
         dispatch(actions.courseJoinFailed({
             code: IErrorCode.REQUEST,
