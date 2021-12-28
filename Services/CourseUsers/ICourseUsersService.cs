@@ -13,5 +13,6 @@ namespace patools.Services.CourseUsers
     public interface ICourseUsersService
     {
         Task<Response<string>> AddCourseUser(AddCourseUserDto newCourseUser);
+        Task<Response<string>> AddCourseUserStudent(AddCourseUserStudentDto newCourseUserStudent);
     }
 }

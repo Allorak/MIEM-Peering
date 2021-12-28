@@ -56,5 +56,31 @@ namespace patools.Services.CourseUsers
 
             return new SuccessfulResponse<string>("CourseUsers added successfully");
         }
+
+        public async Task<Response<string>> AddCourseUserStudent(AddCourseUserStudentDto newCourseUserStudent)
+        {
+            var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(u => u.ID == newCourseUserStudent.CourseId);
+            if(course == null)
+                return new BadRequestDataResponse<string>("Invalid course id");
+
+            if(course.EnableCode == false)
+                return new BadRequestDataResponse<string>("No access to the course");
+
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == newCourseUserStudent.StudentId && u.Role == UserRoles.Student);
+            if(student == null)
+                return new BadRequestDataResponse<string>("Invalid student id");
+            
+            var newCourseUserStudentToCourse = new CourseUser()
+            {
+                ID = Guid.NewGuid(),
+                Course = course,
+                User = student
+            };
+
+            await _context.CourseUsers.AddAsync(newCourseUserStudentToCourse);
+            await _context.SaveChangesAsync();
+
+            return new SuccessfulResponse<string>("Student added successfully");
+        }
     }
 }

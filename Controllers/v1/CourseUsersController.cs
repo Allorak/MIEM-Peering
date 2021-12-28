@@ -70,6 +70,31 @@ namespace patools.Controllers.v1
             return Ok(await _courseUsersService.AddCourseUser(courseUsersInfo));
         }
 
+        // POST: api/v1/CourseUsers/addstudenttocourse
+        [HttpPost("addstudenttocourse")]
+        public async Task<ActionResult<string>> PostCourseUserStudent(AddCourseUserStudentDto courseUsersStudentInfo)
+        {
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(studentIdClaim == null)
+                return Ok(new InvalidGuidIdResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(studentIdClaim.Value, out var studentId))
+                return Ok(new InvalidGuidIdResponse());
+            
+            courseUsersStudentInfo.StudentId = studentId;
+            return Ok(await _courseUsersService.AddCourseUserStudent(courseUsersStudentInfo));
+        }
+
         // GET: api/CourseUsers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CourseUser>> GetCourseUser(Guid id)
