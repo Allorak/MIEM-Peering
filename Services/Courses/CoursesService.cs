@@ -183,6 +183,9 @@ namespace patools.Services.Courses
             if (teacher == null)
                 return new BadRequestDataResponse<string>("Invalid teacher id");
 
+            if (course.Teacher.ID != teacherId)
+                return new BadRequestDataResponse<string>("The teacher did not create the course");
+
             courseNew.Teacher = teacher;
 
             if (courseNew.EnableCode == true && course.EnableCode == false)
