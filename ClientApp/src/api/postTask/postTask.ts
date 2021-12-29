@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
+import { PeerSteps } from '../../store/types'
 import { mock } from './mock'
 
 
@@ -21,6 +22,11 @@ export const postTask = async ({
     },
     data: {
       ...task,
+      stepParams: {
+        step: task.settings.stepParams.step,
+        ...(task.settings.stepParams.step === PeerSteps.FIRST_STEP && {experts: task.settings.stepParams.experts}),
+        ...(task.settings.stepParams.step === PeerSteps.SECOND_STEP && {experts: task.settings.stepParams.taskId})
+      },
       courseId
     }
   }
