@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, ITaskItem, INewTaskResponse } from '../types';
+import { IError, ITaskItem, INewTaskResponse, ITasks } from '../types';
 
 
 export interface ITaskState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: Array<ITaskItem>,
+  payload: ITasks | undefined,
   newTaskPayload: INewTaskResponse | undefined
 }
 
@@ -14,7 +14,7 @@ const initialState: ITaskState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as Array<ITaskItem>,
+  payload: undefined,
   newTaskPayload: undefined
 };
 
@@ -28,7 +28,7 @@ export const tasks = createSlice({
       state.error = undefined
     },
 
-    fetchSuccess: (state, { payload }: PayloadAction<Array<ITaskItem>>) => {
+    fetchSuccess: (state, { payload }: PayloadAction<ITasks>) => {
       state.isLoading = false
       state.error = undefined
       state.isLock = false

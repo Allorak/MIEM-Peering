@@ -31,7 +31,7 @@ export const fetchTasks = (id: string): AppThunk => async (dispatch, getState) =
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(response.payload))
+        dispatch(actions.fetchSuccess(JSON.parse(JSON.stringify(response.payload))))
         return
 
     } catch (error) {

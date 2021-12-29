@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material"
 import { Box, SxProps, Theme } from "@mui/system"
 import { FC } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, matchPath } from "react-router-dom"
 import { paths } from "../../app/constants/paths"
 import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
 import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
@@ -12,6 +12,7 @@ export const Navbar: FC = () => {
     const { location, path: pathT } = usePrivatePathT()
     const { path: pathSt } = usePrivatePathSt()
     const history = useNavigate()
+    const pathTaskAdd = matchPath('/t/course/:courseId/task/add', location.pathname)
 
     const CourseItem: FC = () => {
         return (
@@ -21,7 +22,7 @@ export const Navbar: FC = () => {
             >
                 Мои курсы
             </Typography>
-        )
+        )   
     }
 
     const TaskItem: FC<{ courseId: string }> = ({
@@ -40,7 +41,7 @@ export const Navbar: FC = () => {
     const CourseTitle: FC<{ courseId: string, courseTitle: string }> = ({ courseId, courseTitle }) => {
         return (
             <Typography variant='h6'
-                sx={{ ...styles.item, ...styles.itemHover, ...styles.blue }}
+                sx={{ ...styles.item, ...styles.courseTitle, ...styles.itemHover, ...styles.blue }}
                 onClick={() => console.log(courseId)}
             >
                 {courseTitle}
@@ -63,7 +64,7 @@ export const Navbar: FC = () => {
         return (
             <Typography
                 variant='h6'
-                sx={styles.item}
+                sx={{...styles.item, ...styles.spanDelimeter}}
 
             >
                 {' / '}
@@ -75,7 +76,7 @@ export const Navbar: FC = () => {
         return <CourseItem />
     }
 
-    if (pathT && pathT.courseId && !pathT.taskId) {
+    if (pathT && pathT.courseId && !pathT.taskId && !pathTaskAdd) {
         //получаем title у курса с помощью redux по path.courseId
         const courseItem = FakeData[0]
         return (<>
@@ -134,11 +135,20 @@ export const Navbar: FC = () => {
 
 const styles = {
     item: {
-        fontSize: '18px',
+        fontSize: '16px',
         display: 'inline',
         lineHeight: '34px',
+        '@media (min-width: 1280px)': {
+            fontSize: '18px',
+        }
     } as SxProps<Theme>,
-
+    spanDelimeter: {
+        padding: '0 4px'
+    } as SxProps<Theme>,
+    courseTitle: {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+    } as SxProps<Theme>,
     itemHover: {
         ':hover': {
             cursor: 'pointer',

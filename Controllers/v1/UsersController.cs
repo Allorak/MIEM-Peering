@@ -72,5 +72,7 @@ namespace patools.Controllers.v1
 
             return Ok(await _usersService.GetUserProfile(userId));
         }
+
+        
     }
 }

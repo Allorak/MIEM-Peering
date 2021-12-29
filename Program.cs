@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using patools.Models;
 using patools.Controllers;
+using patools.Enums;
 
 namespace patools
 {
@@ -377,21 +378,21 @@ namespace patools
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.First(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
-                    State = PeeringTaskState.Assigned
+                    States = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.First(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student).First(),
-                    State = PeeringTaskState.Checking
+                    States = PeeringTaskStates.Checking
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Skip(1).First(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student).Skip(1).First(),
-                    State = PeeringTaskState.Assigned
+                    States = PeeringTaskStates.Assigned
                 }
             };
 

@@ -7,7 +7,7 @@ type IProps = SVGProps<SVGSVGElement> & {
 export const EStudieses: FC<IProps> = memo(({ svgColor = "#183B56", ...props }) => {
   return (
     <svg
-      width="149"
+      width="100%"
       height="22"
       viewBox="0 0 149 22"
       fill="none"

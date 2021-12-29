@@ -204,6 +204,7 @@ function PrivateRoute(props: RouteProps): React.ReactElement {
 
 const styles = {
   wrapper: {
+    width: '100%',
     height: '100vh',
     overflow: 'hidden'
   } as SxProps<Theme>,

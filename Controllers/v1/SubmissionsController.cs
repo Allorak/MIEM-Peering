@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using patools.Dtos.Submission;
+using patools.Enums;
 using patools.Errors;
 using patools.Models;
 using patools.Services.Courses;
@@ -46,6 +47,27 @@ namespace patools.Controllers.v1
             submission.UserId = studentId;
             return Ok(await _submissionsService.AddSubmission(submission));
         }
-        
+
+        [HttpGet("get/task={taskId}")]
+        public async Task<ActionResult<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissionsInfo(Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+            
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidGuidIdResponse());
+
+            var taskInfo = new GetAllSubmissionsMainInfoDtoRequest()
+            {
+                TaskId = taskId,
+                UserId = userId
+            };
+            return Ok(await _submissionsService.GetSubmissions(taskInfo));
+        }
     }
 }

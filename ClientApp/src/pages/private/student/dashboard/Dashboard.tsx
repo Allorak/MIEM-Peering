@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
-import { FC } from "react";
-import { Theme, Box, Typography } from "@mui/material";
+import { FC, useState } from "react";
+import { Theme, Box, Typography, useMediaQuery } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import { usePrivatePathStDashboard } from "../../../../app/hooks/usePrivatePathStDashboard";
@@ -11,16 +11,17 @@ import { paths } from "../../../../app/constants/paths";
 
 import * as globalStyles from "../../../../const/styles"
 import { Overview } from './Overview';
-
+import { Burger } from '../../../../components/icons/Burger';
 
 export const Dashboard: FC = () => {
-
   const {
     location,
     path
   } = usePrivatePathStDashboard()
 
   const pathToMainDashboard = generatePath(paths.student.dashboard.overview, { taskId: path?.taskId })
+  const [activeMenu, setActiveMenu] = useState(false)
+  const matches = useMediaQuery('(max-width:767px)')
 
   // создать стэйт курса если нет то подиспатчить
 
@@ -50,8 +51,13 @@ export const Dashboard: FC = () => {
 
   return (
     <Box sx={styles.container}>
+      <Box sx={styles.menuItemBurger}
+        onClick={() => {setActiveMenu(!activeMenu)}} 
+      >
+        <Burger />
+      </Box>
       <Box sx={styles.gridWrapper}>
-        <Box sx={styles.leftContainer}>
+        <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : styles.leftContainer }>
           <Typography variant={"h5"} marginBottom={"30px"}>
             {"Меню"}
           </Typography>
@@ -62,7 +68,9 @@ export const Dashboard: FC = () => {
           />
         </Box>
 
-        <Box sx={styles.rightContainer}>
+        <Box 
+          sx={styles.rightContainer} 
+          onClick={() => {setActiveMenu(false)}} >
           <Typography
             variant={"h5"}
             marginBottom={"30px"}
@@ -72,7 +80,7 @@ export const Dashboard: FC = () => {
           </Typography>
 
           <Box sx={styles.rightContainerWrapper}>
-            <Box marginRight={"15px"}>
+            <Box>
               <Routes>
                 <Route path={paths.student.dashboard.overview} element={<Overview />} />
                 {/* <Route path={paths.student.dashboard.menu1} element={<Overview />} />
@@ -93,29 +101,70 @@ const styles = {
     maxWidth: "1800px",
     margin: "0 auto",
   } as SxProps<Theme>,
-
-  gridWrapper: {
-    display: 'grid',
-    margin: "30px 0px 8px 15px",
-    gridTemplateColumns: '15% 85%',
-    gridTemplateAreas: ' "leftContainer rightContainer"',
-    height: '100%',
+  menuItemBurger: {
+    position: 'absolute',
+    top: '28px',
+    right: '85px',
+    '@media (min-width: 768px)': {
+      display: 'none'
+    }
   } as SxProps<Theme>,
-
+  gridWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    '@media (min-width: 768px)': {
+      display: 'grid',
+      gridTemplateColumns: '10% 90%',
+      gridTemplateAreas: ' "leftContainer rightContainer"',
+      margin: "30px auto 15px",
+      padding: '0 15px 0 8px',
+    },
+    '@media (min-width: 1280px)': {
+      gridTemplateColumns: '20% 80%',
+    },
+  } as SxProps<Theme>,
   leftContainer: {
+    position: 'fixed',
+    zIndex: '600',
+    width: '170px',
+    height: '100%',
+    backgroundColor: 'white',
     display: 'flex',
     flexDirection: 'column',
     gridArea: 'leftContainer',
-    overflowY: 'auto',
+    padding: '25px',
+    transform: 'TranslateX(-100%)',
+    transition: 'TranslateX 3s',
+    '@media (min-width: 768px)': {
+      position: 'static',
+      display: 'flex',
+      flexDirection: 'column',
+      gridArea: 'leftContainer',
+      width: '100%',
+      height: 'auto',
+      overflowY: 'auto',
+      transform: 'TranslateX(0)',
+      transition: 'all 0.5s',
+      padding: '0',
+      backgroundColor: 'transparent'
+    },
   } as SxProps<Theme>,
-
+  menuActive: {
+    transform: 'TranslateX(0)',
+    transition: 'all 0.5s'
+  } as SxProps<Theme>,
   rightContainer: {
     display: 'flex',
     flexDirection: 'column',
     gridArea: 'rightContainer',
     overflowY: 'auto',
     maxWidth: "100%",
-    margin: "0px 0px 0px 25px",
+    padding: '25px 25px 0',
+    '@media (min-width: 768px)': {
+      margin: "0px 0px 0px 25px",
+      padding: '0'
+    },
   } as SxProps<Theme>,
   rightContainerWrapper: {
     maxHeight: "calc(100vh - 183px)",

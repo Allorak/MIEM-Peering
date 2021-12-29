@@ -61,8 +61,8 @@ export const Checkings: FC = () => {
 
   useEffect(() => {
     if (studentList && studentList.length > 0) {
-      setCurrentWorkIdStudent(studentList[0].workId)
-      getStudentWork(studentList[0].workId)
+      setCurrentWorkIdStudent(studentList[0].submissionId)
+      getStudentWork(studentList[0].submissionId)
     }
   }, [studentList])
 

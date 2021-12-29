@@ -1,10 +1,10 @@
-import { IWorkItem } from "../../store/types";
+import { IWorks } from "../../store/types";
 
 export type IRequestData = {
   accessToken: string,
   taskId: string
 }
 
-export type IResponseData = IWorkItem[]
+export type IResponseData = IWorks
 
 export { getWorksList } from './getWorksList';

@@ -11,15 +11,15 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
     payload:
       [
         {
-          workId: "123",
+          submissionId: "123",
           studentName: "Мухаммад Юсупов",
         },
         {
-          workId: "234",
+          submissionId: "234",
           studentName: "Иван Иванов"
         },
         {
-          workId: "345",
+          submissionId: "345",
           studentName: "Вася Пупкин"
         },
       ]

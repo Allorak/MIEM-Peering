@@ -50,12 +50,15 @@ namespace patools.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CourseCode")
-                        .HasMaxLength(10)
+                        .HasMaxLength(6)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .HasMaxLength(300)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("EnableCode")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Subject")
                         .IsRequired()
@@ -95,6 +98,31 @@ namespace patools.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("CourseUsers");
+                });
+
+            modelBuilder.Entity("patools.Models.Expert", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PeeringTaskID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("UserID")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PeeringTaskID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Experts");
                 });
 
             modelBuilder.Entity("patools.Models.Group", b =>
@@ -137,66 +165,7 @@ namespace patools.Migrations
                     b.ToTable("GroupUsers");
                 });
 
-            modelBuilder.Entity("patools.Models.Question", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("MaxValue")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MinValue")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Required")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RespondentType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid?>("TaskID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("TaskID");
-
-                    b.ToTable("Questions");
-                });
-
-            modelBuilder.Entity("patools.Models.Submission", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("TaskUserAssignmentID")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("TaskUserAssignmentID");
-
-                    b.ToTable("Submissions");
-                });
-
-            modelBuilder.Entity("patools.Models.Task", b =>
+            modelBuilder.Entity("patools.Models.PeeringTask", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
@@ -235,28 +204,90 @@ namespace patools.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("patools.Models.TaskUser", b =>
+            modelBuilder.Entity("patools.Models.PeeringTaskUser", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("State")
+                    b.Property<Guid?>("PeeringTaskID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("States")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("StudentID")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("TaskID")
+                    b.HasKey("ID");
+
+                    b.HasIndex("PeeringTaskID");
+
+                    b.HasIndex("StudentID");
+
+                    b.ToTable("TaskUsers");
+                });
+
+            modelBuilder.Entity("patools.Models.Question", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<float?>("CoefficientPercentage")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxValue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MinValue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("PeeringTaskID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RespondentType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PeeringTaskID");
+
+                    b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("patools.Models.Submission", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PeeringTaskUserAssignmentID")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("StudentID");
+                    b.HasIndex("PeeringTaskUserAssignmentID");
 
-                    b.HasIndex("TaskID");
-
-                    b.ToTable("TaskUsers");
+                    b.ToTable("Submissions");
                 });
 
             modelBuilder.Entity("patools.Models.User", b =>
@@ -352,6 +383,21 @@ namespace patools.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("patools.Models.Expert", b =>
+                {
+                    b.HasOne("patools.Models.PeeringTask", "PeeringTask")
+                        .WithMany()
+                        .HasForeignKey("PeeringTaskID");
+
+                    b.HasOne("patools.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID");
+
+                    b.Navigation("PeeringTask");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("patools.Models.GroupUser", b =>
                 {
                     b.HasOne("patools.Models.Group", "Group")
@@ -367,25 +413,7 @@ namespace patools.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("patools.Models.Question", b =>
-                {
-                    b.HasOne("patools.Models.Task", "Task")
-                        .WithMany()
-                        .HasForeignKey("TaskID");
-
-                    b.Navigation("Task");
-                });
-
-            modelBuilder.Entity("patools.Models.Submission", b =>
-                {
-                    b.HasOne("patools.Models.TaskUser", "TaskUserAssignment")
-                        .WithMany()
-                        .HasForeignKey("TaskUserAssignmentID");
-
-                    b.Navigation("TaskUserAssignment");
-                });
-
-            modelBuilder.Entity("patools.Models.Task", b =>
+            modelBuilder.Entity("patools.Models.PeeringTask", b =>
                 {
                     b.HasOne("patools.Models.Course", "Course")
                         .WithMany()
@@ -394,19 +422,37 @@ namespace patools.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("patools.Models.TaskUser", b =>
+            modelBuilder.Entity("patools.Models.PeeringTaskUser", b =>
                 {
+                    b.HasOne("patools.Models.PeeringTask", "PeeringTask")
+                        .WithMany()
+                        .HasForeignKey("PeeringTaskID");
+
                     b.HasOne("patools.Models.User", "Student")
                         .WithMany()
                         .HasForeignKey("StudentID");
 
-                    b.HasOne("patools.Models.Task", "Task")
-                        .WithMany()
-                        .HasForeignKey("TaskID");
+                    b.Navigation("PeeringTask");
 
                     b.Navigation("Student");
+                });
 
-                    b.Navigation("Task");
+            modelBuilder.Entity("patools.Models.Question", b =>
+                {
+                    b.HasOne("patools.Models.PeeringTask", "PeeringTask")
+                        .WithMany()
+                        .HasForeignKey("PeeringTaskID");
+
+                    b.Navigation("PeeringTask");
+                });
+
+            modelBuilder.Entity("patools.Models.Submission", b =>
+                {
+                    b.HasOne("patools.Models.PeeringTaskUser", "PeeringTaskUserAssignment")
+                        .WithMany()
+                        .HasForeignKey("PeeringTaskUserAssignmentID");
+
+                    b.Navigation("PeeringTaskUserAssignment");
                 });
 
             modelBuilder.Entity("patools.Models.Variant", b =>

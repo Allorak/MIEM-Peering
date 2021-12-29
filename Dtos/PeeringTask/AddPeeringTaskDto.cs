@@ -1,4 +1,5 @@
 using System;
+using patools.Dtos.Experts;
 
 namespace patools.Dtos.Task
 {
@@ -8,7 +9,8 @@ namespace patools.Dtos.Task
         public Guid TeacherId { get; set; }
         public AddPeeringTaskMainInfoDto MainInfo { get; set;}
         public AddPeeringTaskSettingsDto Settings { get; set;}
-        public AddPeeringTaskQuestionFormDto AuthorForm { get; set;}
-        public AddPeeringTaskQuestionFormDto PeerForm { get; set;}
+        public AddPeeringTaskAuthorFormDto AuthorForm { get; set;}
+        public AddPeeringTaskPeerFormDto PeerForm { get; set;}
+        public AddExpertsDto StepParams { get; set; }
     }
 }

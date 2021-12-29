@@ -5,11 +5,20 @@ import logo from "../../img/logo.svg"
 import { SxProps } from '@mui/system';
 import { EStudieses } from "../icons/EStudieses";
 
+import { useLocation, matchPath } from 'react-router-dom'
+import { paths } from "../../app/constants/paths";
+
 export const Logo: FC = () => {
+    const location = useLocation();
+    const path = matchPath(paths.teacher.main, location.pathname)
+            ?? matchPath(paths.teacher.courses.course, location.pathname)
+            ?? matchPath(paths.student.main, location.pathname)
+            ?? matchPath(paths.student.courses.course, location.pathname)
+    
     return (
         <Box sx={styles.root} >
             <img src={logo} alt="Peer Assessment Tools" />
-            <Box sx={styles.logoTextContainer}>
+            <Box sx={ path ? styles.logoTextContainerHidden : styles.logoTextContainer}>
                 <EStudieses />
             </Box>
         </Box>
@@ -25,11 +34,15 @@ const styles = {
         }
     } as SxProps<Theme>,
     logoTextContainer: {
-       '@media (max-width: 700px)': {
-           display: 'none',
-           opacity: '0',
-           width: '0',
-           height: '0'
+        display: 'flex',
+        maxWidth: '100px',
+       '@media (min-width: 700px)': {
+           maxWidth: '120px'
        }
     } as SxProps<Theme>,
+    logoTextContainerHidden: {
+        '@media (max-width: 700px)': {
+            display: 'none',
+        }
+     } as SxProps<Theme>,
 }

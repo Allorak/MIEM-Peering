@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using patools.Enums;
 
 namespace patools.Models
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum PeeringTaskState
-    {
-        Assigned = 0,
-        Checking = 1,
-        Graded = 2
-    }
 
     public class PeeringTaskUser
     {
@@ -24,6 +19,6 @@ namespace patools.Models
         public User Student { get; set; }
 
         [Required]
-        public PeeringTaskState State { get; set; }
+        public PeeringTaskStates States { get; set; }
     }
 }

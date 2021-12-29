@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.User;
+using patools.Enums;
 using patools.Models;
 using patools.Errors;
 namespace patools.Services.Users
@@ -29,6 +31,10 @@ namespace patools.Services.Users
             var user = _mapper.Map<User>(newUser);
             user.ID = Guid.NewGuid();
             await _context.Users.AddAsync(user);
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.Email == user.Email);
+            if (expert != null)
+                expert.User = user;
 
             if (user.Role == UserRoles.Teacher)
                 await CreateFakeTeacherConnections(user);
@@ -129,7 +135,7 @@ namespace patools.Services.Users
 
         private async Task CreateFakeStudentConnections(User user)
         {
-            
+            Console.WriteLine("123");
             var courses = await _context.Courses.Select(c => c).ToListAsync();
 
             var firstCourse = courses[new Random().Next(courses.Count / 2)];
@@ -163,7 +169,7 @@ namespace patools.Services.Users
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = firstTasks[i],
-                    State = PeeringTaskState.Assigned,
+                    States = PeeringTaskStates.Assigned,
                     Student = user
                 });
             }
@@ -174,7 +180,7 @@ namespace patools.Services.Users
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = secondTasks[i],
-                    State = PeeringTaskState.Assigned,
+                    States = PeeringTaskStates.Assigned,
                     Student = user
                 });
             }

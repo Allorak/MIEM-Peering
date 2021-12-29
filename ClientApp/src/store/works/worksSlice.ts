@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, IStudentWork, IWorkItem, IWorkStatistics } from '../types';
+import { IError, IStudentWork, IWorks, IWorkStatistics } from '../types';
 
 
 export interface IWorksState {
@@ -9,7 +9,7 @@ export interface IWorksState {
   isStudentWorkLoading: boolean,
   isStudentWorkLock: boolean,
   error: IError | undefined,
-  workList: IWorkItem[] | undefined,
+  workList: IWorks | undefined,
   studentWork: IStudentWork | undefined
   workStatistics: IWorkStatistics | undefined,
   
@@ -44,7 +44,7 @@ export const works = createSlice({
       state.workStatistics = undefined
     },
 
-    fetchWorkListSuccess: (state, { payload }: PayloadAction<Array<IWorkItem>>) => {
+    fetchWorkListSuccess: (state, { payload }: PayloadAction<IWorks>) => {
       state.isWorkListLoading = false
       state.error = undefined
       state.isWorkListLock = false
