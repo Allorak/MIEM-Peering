@@ -11,7 +11,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
     success: true,
     payload: {
       userRole: IRole.expert,
-      // step: PeerSteps.FIRST_STEP
+      // step: PeerSteps.SECOND_STEP
     }
   }
 }

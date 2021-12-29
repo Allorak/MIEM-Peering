@@ -23,8 +23,6 @@ export const Dashboard: FC = () => {
   const [activeMenu, setActiveMenu] = useState(false)
   const matches = useMediaQuery('(max-width:767px)')
 
-  // создать стэйт курса если нет то подиспатчить
-
   if (!path) {
     return (
       <Navigate
@@ -52,12 +50,12 @@ export const Dashboard: FC = () => {
   return (
     <Box sx={styles.container}>
       <Box sx={styles.menuItemBurger}
-        onClick={() => {setActiveMenu(!activeMenu)}} 
+        onClick={() => { setActiveMenu(!activeMenu) }}
       >
         <Burger />
       </Box>
       <Box sx={styles.gridWrapper}>
-        <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : styles.leftContainer }>
+        <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : styles.leftContainer}>
           <Typography variant={"h5"} marginBottom={"30px"}>
             {"Меню"}
           </Typography>
@@ -68,9 +66,9 @@ export const Dashboard: FC = () => {
           />
         </Box>
 
-        <Box 
-          sx={styles.rightContainer} 
-          onClick={() => {setActiveMenu(false)}} >
+        <Box
+          sx={styles.rightContainer}
+          onClick={() => { setActiveMenu(false) }} >
           <Typography
             variant={"h5"}
             marginBottom={"30px"}

@@ -215,6 +215,7 @@ const styles = {
     maxHeight: 'calc(100vh - 80px)',
     ...globalStyles.scrollStyles,
   } as SxProps<Theme>,
+
   loadingRoot: {
     width: '100%',
     position: 'fixed',
@@ -229,6 +230,7 @@ const styles = {
     zIndex: 5001,
     backgroundColor: 'rgba(0,0,0, 0.77)'
   } as SxProps<Theme>,
+
   progress: {
     color: "primary.main",
   } as SxProps<Theme>,

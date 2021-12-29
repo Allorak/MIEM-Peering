@@ -29,7 +29,6 @@ export const Login: FC = () => {
     const accessToken = useAppSelector(state => state.auth.accessToken)
 
     if (payload && payload.status === GoogleAuthStatus.newUser) {
-        console.log("NEW USER")
         return (
             <Navigate
                 to={paths.registration.main}
@@ -39,7 +38,6 @@ export const Login: FC = () => {
     }
 
     if (payload && payload.status === GoogleAuthStatus.registeredUser && accessToken && userProfile) {
-        console.log("REGISTERED USER")
         return (
             <Navigate
                 to={userProfile.role === IRole.teacher ? paths.teacher.main : paths.student.main}
@@ -50,8 +48,6 @@ export const Login: FC = () => {
 
     const onGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ('accessToken' in response) {
-            console.log(response, "Google response")
-            console.log(response.accessToken, 'Google access token')
             dispatch(fetchGAuth(response.tokenId))
         }
     }
