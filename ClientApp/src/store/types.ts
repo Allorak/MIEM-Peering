@@ -31,7 +31,8 @@ export type IStatus = 'EMPTY' | 'FIRST_LOADING' | 'NOT_LOADED' | 'SUCCESS' | 'LO
 
 export enum IRole {
   teacher = 'Teacher',
-  student = 'Student'
+  student = 'Student',
+  expert = 'Expert'
 }
 
 export type IPath = {
@@ -118,6 +119,16 @@ export type ICourses = {
   settings?: IActiveCodeCourse | IDisableCodeCourse
 }
 
+export type IDashboardTaskProps = {
+  userRole: IRole.teacher,
+  step: PeerSteps
+} | {
+  userRole: IRole.student,
+  step: PeerSteps
+} | {
+  userRole: IRole.expert,
+}
+
 export type IActiveCodeCourse = {
   enableCode: true,
   courseCode?: string
@@ -195,8 +206,8 @@ export interface INewTaskSettings {
 }
 
 export enum PeerSteps {
-  FIRST_STEP = 'firstStep',
-  SECOND_STEP = 'secondStep',
+  FIRST_STEP = 'FirstStep',
+  SECOND_STEP = 'SecondStep',
 }
 
 export interface IFirstStepSettings {
@@ -316,6 +327,12 @@ export type IOverviewStudent = {
   status: IStatusTask
 }
 
+export type IOverviewExpert = {
+  deadlines: IDeadlines,
+  checkedWorksCount?: number,
+  assignedWorksCount?: number
+}
+
 export type IOverviewResponse = IOverview & {
   deadlines: {
     submissionStartDateTime: string
@@ -325,6 +342,14 @@ export type IOverviewResponse = IOverview & {
   }
 }
 
+export type IOverviewStudentResponse = IOverviewStudent & {
+  deadlines: {
+    submissionStartDateTime: string
+    submissionEndDateTime: string
+    reviewStartDateTime: string
+    reviewEndDateTime: string
+  }
+}
 
 export type IWorkItem = {
   submissionId: string,

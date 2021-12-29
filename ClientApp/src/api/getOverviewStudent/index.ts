@@ -1,10 +1,10 @@
-import { IOverviewStudent } from "../../store/types";
+import { IOverviewStudentResponse } from "../../store/types";
 
 export type IRequestData = {
     accessToken: string,
     taskId: string
 }
 
-export type IResponseData = IOverviewStudent
+export type IResponseData = IOverviewStudentResponse
 
 export { getOverviewStudent } from './getOverviewStudent';

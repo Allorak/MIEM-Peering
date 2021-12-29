@@ -1,4 +1,4 @@
-import {Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
 import { FC, useEffect } from "react";
 import List from "../../../../../components/list/List";
@@ -25,7 +25,6 @@ export const CourseMain: FC = () => {
     }, [dispatch])
 
     const onTaskClick = (id: string) => {
-        console.log("Task clicked:", id)
         if (path?.courseId) {
             const taskPath = generatePath(paths.student.dashboard.overview, { taskId: id })
             history(taskPath)

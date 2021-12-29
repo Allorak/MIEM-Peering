@@ -1,48 +1,45 @@
-import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
-import { paths } from "../../app/constants/paths";
+import { FC, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
-import { IRole } from '../../store/types';
-
 import { Box, SxProps, Theme } from "@mui/system";
-import * as constStyles from "../../const/styles"
+
+import { useAppSelector } from "../../app/hooks";
+import { paths } from "../../app/constants/paths";
+
+import { IRole } from '../../store/types';
 import { palette } from "../../theme/colors";
 
-import { FC, useState } from "react";
-import { useAppSelector } from "../../app/hooks";
 import { Logo } from "../logo";
 import { Navbar } from "../navbar";
 import { UserAcc } from "../userIco";
-import { Burger } from '../icons/Burger';
 
 export const PrivateHeader: FC = () => {
     const history = useNavigate()
     const userProfile = useAppSelector(state => state.userProfile.payload)
 
-    const goToHome = () => { if (userProfile)
-        userProfile.role === IRole.teacher ? history(paths.teacher.main) : history(paths.student.main)
-    }
+    const goToHome = useCallback(() => {
+        if (userProfile)
+            history(userProfile.role === IRole.teacher ? paths.teacher.main : paths.student.main)
+    }, [userProfile])
 
     return (
         <Box sx={styles.wrapper}>
-            {/* <Box sx={constStyles.container}> */}
-                <Box sx={styles.root}>
-                    <Box sx={styles.leftContainer}
-                    >   
-                    <Box sx={styles.pointer}
+            <Box sx={styles.root}>
+                <Box sx={styles.leftContainer}>
+                    <Box
+                        sx={styles.pointer}
                         onClick={goToHome}
                     >
-                        <Logo/>
+                        <Logo />
                     </Box>
-                        <Box sx={styles.navbarBlock}>
-                            <Navbar />
-                        </Box>
+                    <Box sx={styles.navbarBlock}>
+                        <Navbar />
                     </Box>
-                    <Box sx={styles.rightItem}>
-                        <Box>
-                            <UserAcc />
-                        </Box>
+                </Box>
+                <Box sx={styles.rightItem}>
+                    <Box>
+                        <UserAcc />
                     </Box>
-                {/* </Box> */}
+                </Box>
             </Box>
         </Box>
     )

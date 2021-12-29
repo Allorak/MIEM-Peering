@@ -24,7 +24,7 @@ export const Overview: FC = () => {
     if (path && path.taskId)
       dispatch(fetchOverviewStudent(path.taskId))
   }, [])
-  console.log(payload)
+
   return (
     <DashboardWorkBox
       isLoading={status}

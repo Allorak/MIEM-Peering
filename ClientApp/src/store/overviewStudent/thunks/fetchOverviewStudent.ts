@@ -32,7 +32,17 @@ export const fetchOverviewStudent = (taskId: string): AppThunk => async (dispatc
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(response.payload))
+        dispatch(actions.fetchSuccess(
+            {
+                ...response.payload,
+                deadlines: {
+                    submissionEndDateTime: new Date(response.payload.deadlines.submissionEndDateTime),
+                    submissionStartDateTime: new Date(response.payload.deadlines.submissionStartDateTime),
+                    reviewEndDateTime: new Date(response.payload.deadlines.reviewEndDateTime),
+                    reviewStartDateTime: new Date(response.payload.deadlines.reviewStartDateTime),
+                }
+            }
+        ))
         return
 
     } catch (error) {
