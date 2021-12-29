@@ -72,7 +72,8 @@ namespace patools.Services.Users
             {
                 return new SuccessfulResponse<GetUserRoleDtoResponse>(new GetUserRoleDtoResponse()
                 {
-                    UserRole = UserRoles.Expert
+                    UserRole = UserRoles.Expert,
+                    Step = null
                 });
             }
 
