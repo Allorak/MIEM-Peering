@@ -76,6 +76,20 @@ namespace patools.Services.CourseUsers
             if (courseUser != null)
                 return new BadRequestDataResponse<string>("User is already assigned to this course");
             
+            //TODO: Убрать на релизе
+            var tasks = await _context.Tasks.Where(t => t.Course == course).ToListAsync();
+            foreach (var task in tasks)
+            {
+                var newTaskUser = new PeeringTaskUser()
+                {
+                    ID = Guid.NewGuid(),
+                    PeeringTask = task,
+                    Student = student,
+                    States = PeeringTaskStates.Assigned
+                };
+                await _context.TaskUsers.AddAsync(newTaskUser);
+            }
+            
             var newCourseUser = new CourseUser()
             {
                 ID = Guid.NewGuid(),
