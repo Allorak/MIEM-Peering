@@ -66,6 +66,7 @@ namespace patools.Services.Courses
                     Title = x.Title,
                     Description = x.Description,
                     Subject = x.Subject,
+                    Teacher = _mapper.Map<GetTeacherDtoResponse>(x.Teacher),
                     Settings = new GetCourseSettingsDtoResponse()
                     {
                         CourseCode = x.CourseCode,
