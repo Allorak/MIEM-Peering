@@ -26,13 +26,16 @@ namespace patools.Services.Courses
             _context = context;
         }
 
-        public static Random random = new Random();
-
         public static string RandomString(int length)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            var code = Guid.NewGuid().ToString().Replace("-", "");
+            var result = "";
+            for (var i = 0; i < length; i++)
+            {
+                result += code[new Random().Next(code.Length)];
+            }
+
+            return result;
         }
 
         public async Task<Response<GetCourseDtoResponse>> AddCourse(AddCourseDto newCourse)
@@ -45,7 +48,11 @@ namespace patools.Services.Courses
                 return new BadRequestDataResponse<GetCourseDtoResponse>("Invalid teacher id");
             
             course.Teacher = teacher;
-            course.CourseCode = RandomString(8);
+            var courseCodes = await _context.Courses.Select(c => c.CourseCode).ToListAsync();
+            do
+            {
+                course.CourseCode = RandomString(8);
+            } while (courseCodes.Contains(course.CourseCode));
             course.EnableCode = true;
 
             _context.Courses.Add(course);
@@ -186,18 +193,22 @@ namespace patools.Services.Courses
                 return new BadRequestDataResponse<string>("Invalid teacher id");
 
             if (course.Teacher.ID != teacherId)
-                return new BadRequestDataResponse<string>("The teacher did not create the course");
+                return new NoAccessResponse<string>("This teacher has no access to this task");
 
-            if (courseNew.Settings.EnableCode == true && course.EnableCode == false)
+            switch (courseNew.Settings.EnableCode)
             {
-                course.CourseCode = RandomString(8);
-                course.EnableCode = true;
-            }
-                
-            if (courseNew.Settings.EnableCode == false && course.EnableCode == true)
-            {
-                course.CourseCode = null;
-                course.EnableCode = false;
+                case true when !course.EnableCode:
+                    var courseCodes = await _context.Courses.Select(c => c.CourseCode).ToListAsync();
+                    do
+                    {
+                        course.CourseCode = RandomString(8);
+                    } while (courseCodes.Contains(course.CourseCode));
+                    course.EnableCode = true;
+                    break;
+                case false when course.EnableCode:
+                    course.CourseCode = null;
+                    course.EnableCode = false;
+                    break;
             }
 
             course.Title = courseNew.Title;
