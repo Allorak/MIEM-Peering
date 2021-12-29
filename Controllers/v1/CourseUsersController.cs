@@ -10,6 +10,7 @@ using patools.Dtos.Course;
 using patools.Dtos.CourseUser;
 using patools.Dtos.Task;
 using patools.Dtos.User;
+using patools.Enums;
 using patools.Models;
 using patools.Services.Courses;
 using patools.Services.CourseUsers;

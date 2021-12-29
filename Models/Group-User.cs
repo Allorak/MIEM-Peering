@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using patools.Enums;
 
 namespace patools.Models
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum Subgroups
-    {
-        First = 1,
-        Second = 2
-    }
 
     public class GroupUser
     {

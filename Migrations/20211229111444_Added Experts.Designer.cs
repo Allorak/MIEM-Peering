@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20211229111444_Added Experts")]
+    partial class AddedExperts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,31 +100,6 @@ namespace patools.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("CourseUsers");
-                });
-
-            modelBuilder.Entity("patools.Models.Expert", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("PeeringTaskID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("UserID")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("PeeringTaskID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("Experts");
                 });
 
             modelBuilder.Entity("patools.Models.Group", b =>
@@ -213,7 +190,7 @@ namespace patools.Migrations
                     b.Property<Guid?>("PeeringTaskID")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("States")
+                    b.Property<int>("State")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("StudentID")
@@ -379,21 +356,6 @@ namespace patools.Migrations
                         .HasForeignKey("UserID");
 
                     b.Navigation("Course");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("patools.Models.Expert", b =>
-                {
-                    b.HasOne("patools.Models.PeeringTask", "PeeringTask")
-                        .WithMany()
-                        .HasForeignKey("PeeringTaskID");
-
-                    b.HasOne("patools.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID");
-
-                    b.Navigation("PeeringTask");
 
                     b.Navigation("User");
                 });

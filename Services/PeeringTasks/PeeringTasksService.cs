@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Question;
 using patools.Dtos.Task;
+using patools.Enums;
 using patools.Models;
 using patools.Errors;
 namespace patools.Services.PeeringTasks
@@ -96,6 +97,39 @@ namespace patools.Services.PeeringTasks
                 if (!newPeerQuestion.Required)
                     newPeerQuestion.CoefficientPercentage = null;
                 await _context.Questions.AddAsync(newPeerQuestion);
+            }
+
+            switch (peeringTask.StepParams)
+            {
+                case {Step: PeeringSteps.FirstStep, Experts: null}:
+                    return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Experts required but no info provided");
+                case {Step: PeeringSteps.FirstStep}:
+                {
+                    foreach (var email in peeringTask.StepParams.Experts)
+                    {
+                        var expertUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                        var expert = new Expert()
+                        {
+                            ID = Guid.NewGuid(),
+                            Email = email,
+                            User = expertUser,
+                            PeeringTask = newTask
+                        };
+
+                        await _context.Experts.AddAsync(expert);
+                    }
+
+                    break;
+                }
+                case {Step: PeeringSteps.SecondStep, TaskId: null}:
+                    return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("No expert task id provided");
+                case {Step: PeeringSteps.SecondStep}:
+                    var expertTask = await _context.Tasks
+                        .FirstOrDefaultAsync(t => t.ID == peeringTask.StepParams.TaskId);
+                    if (expertTask == null)
+                        return new InvalidGuidIdResponse<GetNewPeeringTaskDtoResponse>("Invalid expert task id provided");
+                    //TODO: Использовать экспертные оценки
+                    break;
             }
 
             await _context.SaveChangesAsync();

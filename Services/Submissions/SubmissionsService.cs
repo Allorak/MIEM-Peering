@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Submission;
+using patools.Enums;
 using patools.Errors;
 using patools.Models;
 
@@ -35,7 +36,7 @@ namespace patools.Services.Submissions
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
                 return new InvalidGuidIdResponse<GetNewSubmissionDtoResponse>("The task isn't assigned to this user");
-            if (taskUser.State != PeeringTaskState.Assigned)
+            if (taskUser.States != PeeringTaskStates.Assigned)
                 return new OperationErrorResponse<GetNewSubmissionDtoResponse>("The submission for this task already exists");
             
             var newSubmission = new Submission()
@@ -43,7 +44,7 @@ namespace patools.Services.Submissions
                 ID = Guid.NewGuid(),
                 PeeringTaskUserAssignment = taskUser
             };
-            taskUser.State = PeeringTaskState.Checking;
+            taskUser.States = PeeringTaskStates.Checking;
             await _context.Submissions.AddAsync(newSubmission);
 
             var newAnswers = new List<Answer>();

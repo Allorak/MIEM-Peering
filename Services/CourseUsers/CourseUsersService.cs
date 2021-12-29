@@ -9,6 +9,7 @@ using patools;
 using patools.Dtos.Course;
 using patools.Dtos.User;
 using patools.Dtos.CourseUser;
+using patools.Enums;
 using patools.Errors;
 using patools.Models;
 
