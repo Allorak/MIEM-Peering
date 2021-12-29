@@ -65,20 +65,39 @@ namespace patools.Services.CourseUsers
                 return new BadRequestDataResponse<string>("Invalid course id");
 
             if(course.EnableCode == false)
-                return new BadRequestDataResponse<string>("No access to the course");
+                return new NoAccessResponse<string>("Can't join by code");
 
             var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == newCourseUserStudent.StudentId && u.Role == UserRoles.Student);
             if(student == null)
                 return new BadRequestDataResponse<string>("Invalid student id");
+
+            var courseUser = await _context.CourseUsers
+                .FirstOrDefaultAsync(cu => cu.Course == course && cu.User == student);
+            if (courseUser != null)
+                return new BadRequestDataResponse<string>("User is already assigned to this course");
             
-            var newCourseUserStudentToCourse = new CourseUser()
+            //TODO: Убрать на релизе
+            var tasks = await _context.Tasks.Where(t => t.Course == course).ToListAsync();
+            foreach (var task in tasks)
+            {
+                var newTaskUser = new PeeringTaskUser()
+                {
+                    ID = Guid.NewGuid(),
+                    PeeringTask = task,
+                    Student = student,
+                    States = PeeringTaskStates.Assigned
+                };
+                await _context.TaskUsers.AddAsync(newTaskUser);
+            }
+            
+            var newCourseUser = new CourseUser()
             {
                 ID = Guid.NewGuid(),
                 Course = course,
                 User = student
             };
 
-            await _context.CourseUsers.AddAsync(newCourseUserStudentToCourse);
+            await _context.CourseUsers.AddAsync(newCourseUser);
             await _context.SaveChangesAsync();
 
             return new SuccessfulResponse<string>("Student added successfully");

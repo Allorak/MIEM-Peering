@@ -10,5 +10,6 @@ namespace patools.Services.Users
         Task<Response<GetNewUserDtoResponse>> AddGoogleUser(AddUserDTO newUser);
         Task<Response<GetRegisteredUserDtoResponse>> GetUserProfile(Guid userId);
 
+        Task<Response<GetUserRoleDtoResponse>> GetUserRole(GetUserRoleDtoRequest userInfo);
     }
 }

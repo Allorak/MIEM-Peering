@@ -55,6 +55,55 @@ namespace patools.Services.Users
             return new SuccessfulResponse<GetRegisteredUserDtoResponse>(_mapper.Map<GetRegisteredUserDtoResponse>(user));
         }
 
+        public async Task<Response<GetUserRoleDtoResponse>> GetUserRole(GetUserRoleDtoRequest userInfo)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetUserRoleDtoResponse>("Invalid user id");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == userInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetUserRoleDtoResponse>("Invalid task id");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+            if (expert != null)
+            {
+                return new SuccessfulResponse<GetUserRoleDtoResponse>(new GetUserRoleDtoResponse()
+                {
+                    UserRole = UserRoles.Expert
+                });
+            }
+
+            switch (user.Role)
+            {
+                case UserRoles.Teacher when task.Course.Teacher == user:
+                    return new SuccessfulResponse<GetUserRoleDtoResponse>(new GetUserRoleDtoResponse()
+                    {
+                        UserRole = UserRoles.Teacher,
+                        Step = task.Step
+                    });
+                case UserRoles.Teacher:
+                    return new NoAccessResponse<GetUserRoleDtoResponse>("This teacher has no access to this task");
+                case UserRoles.Student:
+                {
+                    var courseUser = await _context.TaskUsers
+                        .FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
+                    if (courseUser == null)
+                        return new NoAccessResponse<GetUserRoleDtoResponse>("This user isn't assigned to this task");
+
+                    return new SuccessfulResponse<GetUserRoleDtoResponse>(new GetUserRoleDtoResponse()
+                    {
+                        Step = task.Step,
+                        UserRole = UserRoles.Student
+                    });
+                }
+                default:
+                    return new OperationErrorResponse<GetUserRoleDtoResponse>("Unknown user role");
+            }
+        }
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using var hmac = new System.Security.Cryptography.HMACSHA512();
