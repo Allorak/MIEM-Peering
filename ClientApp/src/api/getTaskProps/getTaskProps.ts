@@ -9,16 +9,15 @@ export const getTaskProps = async ({
   taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/task/props/get`,
+    url: `/api/v1/users/getrole/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
-    },
-    data: { taskId }
+    }
   }
 
   if (isMock) {

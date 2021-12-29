@@ -206,8 +206,8 @@ export interface INewTaskSettings {
 }
 
 export enum PeerSteps {
-  FIRST_STEP = 'firstStep',
-  SECOND_STEP = 'secondStep',
+  FIRST_STEP = 'FirstStep',
+  SECOND_STEP = 'SecondStep',
 }
 
 export interface IFirstStepSettings {
@@ -342,6 +342,14 @@ export type IOverviewResponse = IOverview & {
   }
 }
 
+export type IOverviewStudentResponse = IOverviewStudent & {
+  deadlines: {
+    submissionStartDateTime: string
+    submissionEndDateTime: string
+    reviewStartDateTime: string
+    reviewEndDateTime: string
+  }
+}
 
 export type IWorkItem = {
   submissionId: string,
