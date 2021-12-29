@@ -1,7 +1,7 @@
+import { FC } from "react";
 import { SxProps } from '@mui/system';
 import { Box, Theme } from "@mui/material";
 
-import { FC } from "react";
 import { palette } from '../../theme/colors';
 
 

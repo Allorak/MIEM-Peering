@@ -1,14 +1,17 @@
+
+import { FC } from "react"
 import { Typography } from "@mui/material"
 import { Box, SxProps, Theme } from "@mui/system"
-import { FC } from "react"
 import { useNavigate, matchPath } from "react-router-dom"
+
 import { paths } from "../../app/constants/paths"
 import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
 import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
+
 import { palette } from "../../theme/colors"
 
-export const Navbar: FC = () => {
 
+export const Navbar: FC = () => {
     const { location, path: pathT } = usePrivatePathT()
     const { path: pathSt } = usePrivatePathSt()
     const history = useNavigate()
@@ -22,7 +25,7 @@ export const Navbar: FC = () => {
             >
                 Мои курсы
             </Typography>
-        )   
+        )
     }
 
     const TaskItem: FC<{ courseId: string }> = ({
@@ -64,8 +67,7 @@ export const Navbar: FC = () => {
         return (
             <Typography
                 variant='h6'
-                sx={{...styles.item, ...styles.spanDelimeter}}
-
+                sx={{ ...styles.item, ...styles.spanDelimeter }}
             >
                 {' / '}
             </Typography>
@@ -77,7 +79,6 @@ export const Navbar: FC = () => {
     }
 
     if (pathT && pathT.courseId && !pathT.taskId && !pathTaskAdd) {
-        //получаем title у курса с помощью redux по path.courseId
         const courseItem = FakeData[0]
         return (<>
             <CourseItem />
@@ -102,7 +103,6 @@ export const Navbar: FC = () => {
     }
 
     if (pathSt && pathSt.courseId && !pathSt.taskId) {
-        //получаем title у курса с помощью redux по path.courseId
         const courseItem = FakeData[0]
         return (<>
             <CourseItem />
@@ -127,8 +127,6 @@ export const Navbar: FC = () => {
 
         </>)
     }
-
-    console.log('Navbar return null...', pathSt, pathSt?.courseId, pathSt?.taskId)
 
     return null
 }

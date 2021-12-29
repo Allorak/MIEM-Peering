@@ -1,14 +1,15 @@
+
+import { FC } from "react";
 import { Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
-import { FC } from "react";
+
 import { useAppSelector } from "../../app/hooks";
 import Avatar from '../../img/ico/avatar.svg'
 
-export const UserAcc: FC = () => {
 
+export const UserAcc: FC = () => {
     const payload = useAppSelector(state => state.userProfile.payload)
-    console.log(payload?.imageUrl, "IMG")
-    console.log(payload?.fullname, "FULLNAME")
+
     return (
         <Box sx={styles.profileBlock}>
             <Box sx={styles.usernameBlock}>
@@ -16,7 +17,7 @@ export const UserAcc: FC = () => {
                     {payload && payload.fullname ? payload.fullname : "Гость"}
                 </Typography>
             </Box>
-            <Box sx={{...styles.avatarImage, backgroundImage: `url(${payload && payload.imageUrl ? payload.imageUrl : Avatar})`}}/>
+            <Box sx={{ ...styles.avatarImage, backgroundImage: `url(${payload && payload.imageUrl ? payload.imageUrl : Avatar})` }} />
         </Box>
     )
 }

@@ -1,32 +1,37 @@
-import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
 import { FC, useState } from "react";
+import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
 import { Theme, Box, Typography, useMediaQuery } from "@mui/material";
 import { SxProps } from "@mui/system";
 
-import { usePrivatePathStDashboard } from "../../../../app/hooks/usePrivatePathStDashboard";
+import { usePrivatePathExDashboard } from '../../../../app/hooks/usePrivatePathExDashboard';
 
 import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
+import { Burger } from "../../../../components/icons/Burger";
+
 import { IMenu, IMenuTitles } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
 
+import { Checkings } from '../../teacher/dashboard/checkings';
+import { Overview } from './overview';
+
 import * as globalStyles from "../../../../const/styles"
-import { Overview } from './Overview';
-import { Burger } from '../../../../components/icons/Burger';
+
 
 export const Dashboard: FC = () => {
+
   const {
     location,
     path
-  } = usePrivatePathStDashboard()
+  } = usePrivatePathExDashboard()
 
-  const pathToMainDashboard = generatePath(paths.student.dashboard.overview, { taskId: path?.taskId })
+  const pathToMainDashboard = generatePath(paths.expert.dashboard.overview, { taskId: path?.taskId })
   const [activeMenu, setActiveMenu] = useState(false)
   const matches = useMediaQuery('(max-width:767px)')
 
   if (!path) {
     return (
       <Navigate
-        to={paths.student.main}
+        to={paths.teacher.main}
         replace
         state={{
           from: location
@@ -80,17 +85,15 @@ export const Dashboard: FC = () => {
           <Box sx={styles.rightContainerWrapper}>
             <Box>
               <Routes>
-                <Route path={paths.student.dashboard.overview} element={<Overview />} />
-                {/* <Route path={paths.student.dashboard.menu1} element={<Overview />} />
-                <Route path={paths.student.dashboard.menu2} element={<Overview />} />
-                <Route path={paths.student.dashboard.menu1} element={<Overview />} /> */}
+                <Route path={paths.expert.dashboard.overview} element={<Overview />} />
+                <Route path={paths.expert.dashboard.checkings} element={<Checkings />} />
               </Routes>
             </Box>
           </Box>
         </Box>
-
       </Box>
     </Box>
+
   )
 }
 
@@ -174,18 +177,10 @@ const styles = {
 const menuItems = [
   {
     title: IMenuTitles.OVERVIEW,
-    path: paths.student.dashboard.overview
+    path: paths.expert.dashboard.overview
   },
   {
-    title: IMenuTitles.MENU_1,
-    path: paths.student.dashboard.menu1
-  },
-  {
-    title: IMenuTitles.MENU_2,
-    path: paths.student.dashboard.menu2
-  },
-  {
-    title: IMenuTitles.MENU_3,
-    path: paths.student.dashboard.menu3
-  },
+    title: IMenuTitles.CHECKINGS,
+    path: paths.expert.dashboard.checkings
+  }
 ] as IMenu[]
