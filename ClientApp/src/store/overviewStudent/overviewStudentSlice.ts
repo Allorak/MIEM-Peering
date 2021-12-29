@@ -17,7 +17,7 @@ const initialState: ICoursesState = {
 };
 
 export const overview = createSlice({
-  name: 'overview',
+  name: 'overviewStudent',
   initialState,
   reducers: {
     fetchStarted: (state) => {

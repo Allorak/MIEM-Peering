@@ -72,5 +72,30 @@ namespace patools.Controllers.v1
 
             return Ok(await _usersService.GetUserProfile(userId));
         }
+
+        [HttpGet("getrole/task={taskId}")]
+        public async Task<ActionResult<GetUserRoleDtoResponse>> GetUserRole(Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            var userInfo = new GetUserRoleDtoRequest()
+            {
+                UserId = userId,
+                TaskId = taskId
+            };
+
+            return Ok(await _usersService.GetUserRole(userInfo));
+        }
+        
     }
 }

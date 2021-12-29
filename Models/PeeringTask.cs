@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using patools.Enums;
 
 namespace patools.Models
 {
@@ -50,11 +51,15 @@ namespace patools.Models
         )]
         public DateTime? ReviewEndDateTime { get; set; }
 
-        //Todo: Проверка что значение >=1
         public int SubmissionsToCheck { get; set; }
 
         [Required]
         public Course Course { get; set; }
+        
+        [Required] 
+        public PeeringSteps Step { get; set; }
+
+        public PeeringTask ExpertTask { get; set; }
 
     }
 }

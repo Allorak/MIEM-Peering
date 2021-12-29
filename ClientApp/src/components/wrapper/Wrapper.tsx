@@ -1,7 +1,7 @@
+import { FC } from "react";
 import { SxProps } from '@mui/system';
 import { Box, Theme } from "@mui/material";
 
-import { FC } from "react";
 import { palette } from '../../theme/colors';
 
 
@@ -18,6 +18,9 @@ export const Wrapper: FC = ({
 const styles = {
     root: {
         position: 'absolute',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         width: '100%',
         minHeight: '100%',
         zIndex: '-100',

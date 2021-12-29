@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Course;
 using patools.Dtos.Task;
+using patools.Enums;
 using patools.Models;
 using patools.Services.Courses;
 using patools.Services.PeeringTasks;

@@ -84,6 +84,7 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
       <Typography
         variant={"h6"}
         color={"inherit"}
+        sx={styles.textRow}
       >
         {item.title}
       </Typography>
@@ -108,22 +109,41 @@ const styles = {
     }
   } as SxProps<Theme>,
   generalMenu: {
-    height: "54px",
     display: "flex",
-    padding: "0px 10px 0px 30px",
     alignItems: "center",
+    justifyContent: 'center',
+    width: 'auto',
+    height: "54px",
+    padding: "0",
     gap: "19px",
     borderRadius: '4px',
-    textDecoration: 'none'
-    //медиазапрос
+    textDecoration: 'none',
+    '@media (min-width: 1280px)': {
+      justifyContent: 'flex-start',
+      width: 'auto',
+      padding: "0px 10px 0px 30px",
+    },
   } as SxProps<Theme>,
   iconContainer: {
-    color: "inherit",
-    width: "25px",
+    fontSize: "25px",
+
     display: "flex",
     overflow: "hidden",
+    flexShrink: '0',
     justifyContent: "center",
-    fontSize: "25px"
-  } as SxProps<Theme>,
 
+    width: "25px",
+    color: "inherit"
+  } as SxProps<Theme>,
+  textRow: {
+    display: 'block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    '@media (min-width: 768px)': {
+      display: 'none',
+    },
+    '@media (min-width: 1280px)': {
+      display: 'block',
+    },
+  } as SxProps<Theme>,
 }

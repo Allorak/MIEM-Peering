@@ -2,25 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using patools.Enums;
 
 namespace patools.Models
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum QuestionTypes
-    {
-        Text = 0,
-        ShortText = 1,
-        MultipleChoices = 2,
-        Select = 3
-    }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum RespondentTypes
-    {
-        Author = 0,
-        Peer = 1
-    }
+    
 
     public class Question
     {

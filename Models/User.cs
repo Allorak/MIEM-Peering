@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using patools.Enums;
 
 namespace patools.Models
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum UserRoles
-    {
-        Student = 0,
-        Teacher = 1,
-        Expert = 2
-    }
-
+    
     public class User
     {
         public Guid ID { get; set; }

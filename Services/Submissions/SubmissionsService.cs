@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Submission;
+using patools.Enums;
 using patools.Errors;
 using patools.Models;
 
@@ -35,7 +36,7 @@ namespace patools.Services.Submissions
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
                 return new InvalidGuidIdResponse<GetNewSubmissionDtoResponse>("The task isn't assigned to this user");
-            if (taskUser.State != PeeringTaskState.Assigned)
+            if (taskUser.States != PeeringTaskStates.Assigned)
                 return new OperationErrorResponse<GetNewSubmissionDtoResponse>("The submission for this task already exists");
             
             var newSubmission = new Submission()
@@ -43,24 +44,24 @@ namespace patools.Services.Submissions
                 ID = Guid.NewGuid(),
                 PeeringTaskUserAssignment = taskUser
             };
-            taskUser.State = PeeringTaskState.Checking;
+            taskUser.States = PeeringTaskStates.Checking;
             await _context.Submissions.AddAsync(newSubmission);
 
             var newAnswers = new List<Answer>();
             foreach (var answer in submission.Answers)
             {
                 var question = await _context.Questions
-                    .FirstOrDefaultAsync(q => q.PeeringTask == taskUser.PeeringTask && q.Order == answer.Order);
+                    .FirstOrDefaultAsync(q => q.PeeringTask == taskUser.PeeringTask && q.ID == answer.QuestionId);
                 
                 if (question == null)
-                    return new BadRequestDataResponse<GetNewSubmissionDtoResponse>($"Incorrect Order({answer.Order}) in answer");
+                    return new BadRequestDataResponse<GetNewSubmissionDtoResponse>($"Incorrect QuestionId in answer");
                 
                 newAnswers.Add(new Answer
                 {
                     ID = Guid.NewGuid(),
                     Submission = newSubmission,
                     Question = question,
-                    Text = answer.Text
+                    Text = answer.Response
                 });
             }
             await _context.Answers.AddRangeAsync(newAnswers);

@@ -100,6 +100,31 @@ namespace patools.Migrations
                     b.ToTable("CourseUsers");
                 });
 
+            modelBuilder.Entity("patools.Models.Expert", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PeeringTaskID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("UserID")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PeeringTaskID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Experts");
+                });
+
             modelBuilder.Entity("patools.Models.Group", b =>
                 {
                     b.Property<Guid>("ID")
@@ -152,11 +177,17 @@ namespace patools.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("ExpertTaskID")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("ReviewEndDateTime")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("ReviewStartDateTime")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Step")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("SubmissionEndDateTime")
                         .HasColumnType("TEXT");
@@ -176,6 +207,8 @@ namespace patools.Migrations
 
                     b.HasIndex("CourseID");
 
+                    b.HasIndex("ExpertTaskID");
+
                     b.ToTable("Tasks");
                 });
 
@@ -188,7 +221,7 @@ namespace patools.Migrations
                     b.Property<Guid?>("PeeringTaskID")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("State")
+                    b.Property<int>("States")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("StudentID")
@@ -358,6 +391,21 @@ namespace patools.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("patools.Models.Expert", b =>
+                {
+                    b.HasOne("patools.Models.PeeringTask", "PeeringTask")
+                        .WithMany()
+                        .HasForeignKey("PeeringTaskID");
+
+                    b.HasOne("patools.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID");
+
+                    b.Navigation("PeeringTask");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("patools.Models.GroupUser", b =>
                 {
                     b.HasOne("patools.Models.Group", "Group")
@@ -379,7 +427,13 @@ namespace patools.Migrations
                         .WithMany()
                         .HasForeignKey("CourseID");
 
+                    b.HasOne("patools.Models.PeeringTask", "ExpertTask")
+                        .WithMany()
+                        .HasForeignKey("ExpertTaskID");
+
                     b.Navigation("Course");
+
+                    b.Navigation("ExpertTask");
                 });
 
             modelBuilder.Entity("patools.Models.PeeringTaskUser", b =>

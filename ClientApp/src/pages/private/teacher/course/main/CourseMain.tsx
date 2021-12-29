@@ -29,7 +29,6 @@ export const CourseMain: FC = () => {
     }, [dispatch])
 
     const onTaskClick = (id: string) => {
-        console.log("Task clicked:", id)
         if (path?.courseId) {
             const taskPath = generatePath(paths.teacher.dashboard.overview, { taskId: id })
             history(taskPath)
