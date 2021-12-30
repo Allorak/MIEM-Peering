@@ -252,10 +252,10 @@ export interface ISelectRatingQuestion extends IParentQuestionRubric {
 }
 
 export enum IQuestionTypes {
-  TEXT = 'text',
-  MULTIPLE = 'multiple',
-  SELECT_RATE = 'select',
-  SHORT_TEXT = 'shortText',
+  TEXT = 'Text',
+  MULTIPLE = 'Multiple',
+  SELECT_RATE = 'Select',
+  SHORT_TEXT = 'ShortText',
 }
 
 export const defaultResponses = {
