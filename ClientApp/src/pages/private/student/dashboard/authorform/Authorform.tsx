@@ -13,7 +13,7 @@ import { TextEditable } from "../../../../../components/rubrics/text";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
-import { fetchAuthorformStudent } from "../../../../../store/authorformStudent";
+import { fetchAuthorformStudent, postAuthorformStudent } from "../../../../../store/authorformStudent";
 import { IAuthorForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
@@ -44,9 +44,14 @@ export const Authorform: FC = () => {
           return { questionId: `${index}` }
         })
       }
-      console.log(formResponses)
+      onRequest(formResponses)
     }
   }, [responses])
+
+  const onRequest = useCallback((formResponses: IPeerResponses) => {
+    if (path && path.taskId && formResponses.responses)
+      dispatch(postAuthorformStudent(path.taskId, formResponses))
+  }, [path])
 
   const handleOnFormEdit = useCallback((value: string | number | undefined, questionId: string) => {
     setResponses(prev => {

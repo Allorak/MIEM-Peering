@@ -22,14 +22,14 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
           "order": 1,
           "title": "Пример приложений",
           "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
-          "required": false,
-          "type": IQuestionTypes.TEXT,
+          "required": true,
+          "type": IQuestionTypes.SHORT_TEXT,
         },
         {
           "order": 2,
           "title": "Пример приложений",
           "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
-          "required": true,
+          "required": false,
           "type": IQuestionTypes.SELECT_RATE,
           "minValue": 0,
           "maxValue": 5 
@@ -40,6 +40,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
           "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
           "required": true,
           "type": IQuestionTypes.SELECT_RATE,
+          "response": 1,
           "minValue": 0,
           "maxValue": 4 
         },
@@ -49,6 +50,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
           "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
           "required": true,
           "type": IQuestionTypes.MULTIPLE,
+          "response": 'Киров',
           "responses": [
             {
               id: 1,
