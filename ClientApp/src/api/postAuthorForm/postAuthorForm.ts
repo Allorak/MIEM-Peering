@@ -10,7 +10,7 @@ export const postAuthorForm = async ({
   responses
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = false
+  const isMock = true
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',

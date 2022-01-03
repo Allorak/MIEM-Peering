@@ -1,7 +1,7 @@
 import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
-import { IErrorCode } from "../../types";
+import { IErrorCode, IQuestionTypes } from "../../types";
 
 import { getAuthorform } from "../../../api/getAuthorform";
 
@@ -32,7 +32,15 @@ export const fetchAuthorformStudent = (taskId: string): AppThunk => async (dispa
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(response.payload))
+        dispatch(actions.fetchAuthorFormSuccess({
+            rubrics: response.payload.rubrics.map(rubric => {
+                if (rubric.type === IQuestionTypes.MULTIPLE && rubric.required)
+                    return { ...rubric, response: rubric.responses[0].response }
+                if (rubric.type === IQuestionTypes.SELECT_RATE && rubric.required)
+                    return { ...rubric, response: rubric.minValue }
+                return rubric
+            })
+        }))
         return
 
     } catch (error) {

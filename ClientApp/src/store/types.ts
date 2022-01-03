@@ -1,3 +1,5 @@
+import { format } from "path/posix"
+
 export interface IEmployee {
   id: string | undefined
   fullName: string
@@ -252,10 +254,10 @@ export interface ISelectRatingQuestion extends IParentQuestionRubric {
 }
 
 export enum IQuestionTypes {
-  TEXT = 'text',
-  MULTIPLE = 'multiple',
-  SELECT_RATE = 'select',
-  SHORT_TEXT = 'shortText',
+  TEXT = 'Text',
+  MULTIPLE = 'Multiple',
+  SELECT_RATE = 'Select',
+  SHORT_TEXT = 'ShortText',
 }
 
 export const defaultResponses = {
@@ -437,26 +439,6 @@ export type IPeerForm = {
   rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
 }
 
-export type IAuthorFormItem = {
-  title: string,
-  required: boolean,
-  response? : string
-}
-
-export interface IAuthorFormSelectItem extends Omit<IAuthorFormItem, 'response'>, ISelectRatingQuestion {
-  response?: number
-}
-
-export interface IAuthorFormTextItem extends IAuthorFormItem, ITextQuestion { }
-
-export interface IAuthorFormShortTextItem extends IAuthorFormItem, IShortTextQuestion { }
-
-export interface IAuthorFormMultipleItem extends IAuthorFormItem, IMultipleQuiestion { }
-
-export type IAuthorForm = {
-  rubrics: Array<IAuthorFormSelectItem | IAuthorFormTextItem | IAuthorFormShortTextItem | IAuthorFormMultipleItem>
-}
-
 export type IPeerResponseItem = {
   questionId: string,
   response?: string | number
@@ -517,3 +499,9 @@ export type IWorkReviewerForm = IStudentWork & {
 }
 
 export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>
+
+/* Author form */
+
+export interface IAuthorForm extends IPeerForm {}
+
+export interface IAuthorFormResponses extends IPeerResponses {}

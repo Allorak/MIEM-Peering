@@ -1,12 +1,12 @@
-import { actions, fetchAuthorformStudent } from "..";
+import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
-import { IErrorCode, IPeerResponses } from "../../types";
+import { IErrorCode, IAuthorFormResponses } from "../../types";
 
 import { postAuthorForm } from "../../../api/postAuthorForm";
 
 
-export const postAuthorformStudent = (taskId: string, responses: IPeerResponses): AppThunk => async (dispatch, getState) => {
+export const postAuthorformStudent = (taskId: string, responses: IAuthorFormResponses): AppThunk => async (dispatch, getState) => {
     dispatch(actions.reset())
     const accessToken = getState().auth.accessToken
     if (!accessToken) {
@@ -34,7 +34,6 @@ export const postAuthorformStudent = (taskId: string, responses: IPeerResponses)
         }
         dispatch(actions.reset())
         console.log('send successfully')
-        dispatch(fetchAuthorformStudent(taskId))
         return
 
     } catch (error) {

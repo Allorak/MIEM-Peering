@@ -1,9 +1,9 @@
-import { IPeerResponses } from "../../store/types";
+import { IAuthorFormResponses } from "../../store/types";
 
 export type IRequestData = {
     accessToken: string,
     taskId: string,
-    responses: IPeerResponses
+    responses: IAuthorFormResponses
 }
 
 export type IResponseData = {}

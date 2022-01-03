@@ -11,65 +11,90 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
     success: true,
     payload: {
       rubrics: [
-          {
-            "order": 0,
-            "title": "Эссе о полезности",
-            "description": 'Напишите эссе длиной не менее 300 символов на тему : \"Почему ООП полезно в промышленных предприятиях"',
-            "required": true,
-            "type": IQuestionTypes.TEXT
+        {
+          id: "123",
+          order: 0,
+          title: "Title 1",
+          type: IQuestionTypes.TEXT,
+          required: false
         },
         {
-          "order": 1,
-          "title": "Пример приложений",
-          "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
-          "required": true,
-          "type": IQuestionTypes.SHORT_TEXT,
+          id: "234",
+          order: 1,
+          title: "Title 2",
+          type: IQuestionTypes.TEXT,
+          required: true
         },
         {
-          "order": 2,
-          "title": "Пример приложений",
-          "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
-          "required": false,
-          "type": IQuestionTypes.SELECT_RATE,
-          "minValue": 0,
-          "maxValue": 5 
-        },
-        {
-          "order": 3,
-          "title": "Пример приложений",
-          "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
-          "required": true,
-          "type": IQuestionTypes.SELECT_RATE,
-          "response": 1,
-          "minValue": 0,
-          "maxValue": 4 
-        },
-        {
-          "order": 4,
-          "title": "Пример приложений",
-          "description": "Приведите пример приложений, которым Вы пользуетесь, использующих ООП",
-          "required": true,
-          "type": IQuestionTypes.MULTIPLE,
-          "response": 'Киров',
-          "responses": [
+          id: "345",
+          order: 3,
+          title: "Title 3",
+          type: IQuestionTypes.MULTIPLE,
+          responses: [
             {
               id: 1,
-              response: "Вологда",
+              response: "Вариант 1",
             },
             {
               id: 2,
-              response: "Москва",
+              response: "Вариант 2",
             },
             {
               id: 3,
-              response: "Киев",
+              response: "Вариант 3",
             },
             {
               id: 4,
-              response: "Киров",
+              response: "Вариант 4",
             }
           ],
-        }
+          required: false
+        },
+
+        {
+          id: "asydasd",
+          order: 5,
+          title: "Title 33",
+          type: IQuestionTypes.MULTIPLE,
+          responses: [
+            {
+              id: 1,
+              response: "hasjkdhjaskd",
+            },
+            {
+              id: 2,
+              response: "hjnn",
+            },
+            {
+              id: 3,
+              response: "bbhbh 3",
+            },
+            {
+              id: 4,
+              response: "zxzx 4",
+            }
+          ],
+          required: true
+        },
+        {
+          id: "423456",
+          order: 4,
+          title: "Title 4",
+          type: IQuestionTypes.SELECT_RATE,
+          required: true,
+          minValue: 0,
+          maxValue: 5
+        },
+
+        {
+          id: "852",
+          order: 6,
+          title: "Title 44",
+          type: IQuestionTypes.SELECT_RATE,
+          required: false,
+          minValue: 0,
+          maxValue: 5
+        },
       ]
     }
   }

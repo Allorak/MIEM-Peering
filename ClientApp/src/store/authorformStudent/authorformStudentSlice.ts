@@ -6,14 +6,14 @@ export interface IAuthorformState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  authorform: IAuthorForm | undefined
+  authorFormPayload: IAuthorForm | undefined
 }
 
 const initialState: IAuthorformState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  authorform: undefined 
+  authorFormPayload: undefined 
 };
 
 export const authorform = createSlice({
@@ -25,11 +25,11 @@ export const authorform = createSlice({
       state.isLock = true
       state.error = undefined
     },
-    fetchSuccess: (state, { payload }: PayloadAction<IAuthorForm>) => {
+    fetchAuthorFormSuccess: (state, { payload }: PayloadAction<IAuthorForm>) => {
       state.isLoading = false
       state.error = undefined
       state.isLock = false
-      state.authorform = JSON.parse(JSON.stringify(payload))
+      state.authorFormPayload = JSON.parse(JSON.stringify(payload))
     },
     fetchFailed: (state, { payload }: PayloadAction<IError>) => {
       state.isLoading = false
@@ -40,7 +40,7 @@ export const authorform = createSlice({
       state.isLoading = false
       state.error = undefined
       state.isLock = true
-      state.authorform = {} as IAuthorForm
+      state.authorFormPayload = {} as IAuthorForm
     }
   },
 });
