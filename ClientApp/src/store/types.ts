@@ -373,12 +373,12 @@ export type IWorkResponse = {
   response?: string
 }
 
-export interface IExtpertItem {
+export interface IExpertItem {
   email: string,
-  name: string,
+  name?: string,
   imgUrl?: string
-  taskComplete: number,
-  assignedTasks: number
+  taskComplete?: number,
+  assignedTasks?: number
 }
 
 export enum PeerTaskTypes {
