@@ -22,14 +22,14 @@ export const Authorform: FC = () => {
   const onRequest = useCallback((formResponses: IAuthorFormResponses) => {
     if (path && path.taskId && formResponses.responses)
       dispatch(postAuthorformStudent(path.taskId, formResponses))
-  }, [path])  
+  }, [path])
 
   const handleOnFormEdit = useCallback((value: string | number | undefined, questionId: string) => {
     setResponses(prev => {
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
           rubrics: JSON.parse(JSON.stringify(prev.rubrics.map((item) => {
-            if (item.id !== questionId) return  item
+            if (item.id !== questionId) return item
             if (item.type === IQuestionTypes.SELECT_RATE && (typeof value === 'number' || typeof value === 'undefined'))
               return { ...item, response: value }
             if (item.type !== IQuestionTypes.SELECT_RATE && (typeof value === 'string' || typeof value === 'undefined'))
@@ -42,9 +42,9 @@ export const Authorform: FC = () => {
 
   useEffect(() => {
     if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0) {
-        setResponses(JSON.parse(JSON.stringify(authorForm)))
-      }
-    }, [authorForm])
+      setResponses(JSON.parse(JSON.stringify(authorForm)))
+    }
+  }, [authorForm])
 
   useEffect(() => {
     if (path && path.taskId) {
@@ -59,13 +59,13 @@ export const Authorform: FC = () => {
       error={error}
     >
       {responses && responses.rubrics && responses.rubrics.length > 0 && (
-      <>
-        <FormAuthor 
-          authorForm={responses}
-          onSubmit={onRequest}
-          onEdit={handleOnFormEdit}        
-        />
-      </>
+        <>
+          <FormAuthor
+            authorForm={responses}
+            onSubmit={onRequest}
+            onEdit={handleOnFormEdit}
+          />
+        </>
       )}
     </DashboardWorkBox>
   )
