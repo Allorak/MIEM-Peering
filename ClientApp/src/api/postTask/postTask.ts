@@ -25,7 +25,7 @@ export const postTask = async ({
       stepParams: {
         step: task.settings.stepParams.step,
         ...(task.settings.stepParams.step === PeerSteps.FIRST_STEP && {experts: task.settings.stepParams.experts}),
-        ...(task.settings.stepParams.step === PeerSteps.SECOND_STEP && {experts: task.settings.stepParams.taskId})
+        ...(task.settings.stepParams.step === PeerSteps.SECOND_STEP && {taskId: task.settings.stepParams.taskId})
       },
       courseId
     }
