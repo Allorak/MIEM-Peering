@@ -11,6 +11,7 @@ import { paths } from "../../../../app/constants/paths";
 
 import { Overview } from './Overview';
 import { Authorform } from './authorform';
+import { MyWork } from './myWork';
 
 import * as globalStyles from "../../../../const/styles"
 
@@ -85,6 +86,7 @@ export const Dashboard: FC = () => {
               <Routes>
                 <Route path={paths.student.dashboard.overview} element={<Overview />} />
                 <Route path={paths.student.dashboard.authorform} element={<Authorform />} />
+                <Route path={paths.student.dashboard.work} element={<MyWork />} />
                 {/* // <Route path={paths.student.dashboard.menu2} element={<Overview />} />
                 // <Route path={paths.student.dashboard.menu1} element={<Overview />} /> */}
               </Routes>

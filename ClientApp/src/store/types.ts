@@ -439,6 +439,10 @@ export type IPeerForm = {
   rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
 }
 
+export type IMyWorkForm = {
+  answers: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+}
+
 export type IPeerResponseItem = {
   questionId: string,
   response?: string | number

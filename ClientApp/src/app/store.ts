@@ -16,6 +16,7 @@ import { reducer as checkings } from '../store/checkings'
 import { reducer as authorForm } from '../store/authorformStudent'
 import { reducer as dashboard } from '../store/dashboard'
 import { reducer as deadlineStatus } from '../store/deadlineStatus'
+import { reducer as myWork } from '../store/myWork'
 
 
 export const store = configureStore({
@@ -36,7 +37,8 @@ export const store = configureStore({
     works,
     experts,
     checkings,
-    authorForm
+    authorForm,
+    myWork
   }
 })
 
