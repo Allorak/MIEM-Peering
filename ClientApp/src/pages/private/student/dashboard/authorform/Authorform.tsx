@@ -1,21 +1,30 @@
 import { FC, useCallback, useEffect, useState } from "react";
+import { generatePath, NavLink as RouterLink } from 'react-router-dom'
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
-import { fetchAuthorformStudent, postAuthorformStudent } from "../../../../../store/authorformStudent";
-import { IAuthorForm, IAuthorFormResponses, IQuestionTypes } from "../../../../../store/types";
+import { fetchAuthorformStudent, fetchWorkSubmissionStatus, postAuthorformStudent } from "../../../../../store/authorformStudent";
+import { DeadlineStatus, IAuthorForm, IAuthorFormResponses, IQuestionTypes, ISubmissionStatus } from "../../../../../store/types";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { FormAuthor } from "./FormAuthor";
+import { fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
+import { AccessTime } from "../../../../../components/assessTime";
+import { Link, Theme, Typography } from "@mui/material";
+import { SxProps } from "@mui/system";
+import { paths } from "../../../../../app/constants/paths";
 
 export const Authorform: FC = () => {
 
   const dispatch = useAppDispatch()
   const { path } = usePrivatePathStDashboard()
 
+  const statusDeadline = useAppSelector(state => state.deadlineStatus.isLoading)
+  const submissionStatus = useAppSelector(state => state.deadlineStatus.submissionStatus)
+  const submissionWorkStatus = useAppSelector(state => state.authorForm.submissionWorkStatus)
+  const submissionError = useAppSelector(state => state.deadlineStatus.error)
   const status = useAppSelector(state => state.authorForm.isLoading)
   const error = useAppSelector(state => state.authorForm.error)
-  const lock = useAppSelector(state => state.authorForm.isLock)
   const authorForm = useAppSelector(state => state.authorForm.authorFormPayload)
   const [responses, setResponses] = useState<IAuthorForm>()
 
@@ -25,6 +34,7 @@ export const Authorform: FC = () => {
   }, [path])
 
   const handleOnFormEdit = useCallback((value: string | number | undefined, questionId: string) => {
+    console.log(questionId)
     setResponses(prev => {
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
@@ -47,18 +57,36 @@ export const Authorform: FC = () => {
   }, [authorForm])
 
   useEffect(() => {
-    if (path && path.taskId) {
+    if (path && path.taskId && submissionStatus === DeadlineStatus.START && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED) {
       dispatch(fetchAuthorformStudent(path.taskId))
+    }
+  }, [submissionStatus, submissionWorkStatus])
+
+  useEffect(() => {
+    if (path && path.taskId && submissionStatus !== DeadlineStatus.NOT_STARTED) {
+      dispatch(fetchSubmissionStatus(path.taskId))
     }
   }, [])
 
+  useEffect(() => {
+    if (path && path.taskId) {
+      dispatch(fetchWorkSubmissionStatus(path.taskId))
+    }
+  }, [])
+
+  console.log(responses?.rubrics)
+
+  const mainStatus = submissionStatus ? status : statusDeadline
+  const mainError = submissionStatus ? error : submissionError
+
+  const pathToWork = generatePath(paths.student.dashboard.work, { taskId: path?.taskId })
+
   return (
     <DashboardWorkBox
-      isLoading={status}
-      isLock={lock}
-      error={error}
+      isLoading={mainStatus}
+      error={mainError}
     >
-      {responses && responses.rubrics && responses.rubrics.length > 0 && (
+      {responses && responses.rubrics && responses.rubrics.length > 0 && submissionStatus === DeadlineStatus.START && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED && (
         <>
           <FormAuthor
             authorForm={responses}
@@ -67,6 +95,41 @@ export const Authorform: FC = () => {
           />
         </>
       )}
+
+      {submissionStatus && submissionStatus !== DeadlineStatus.START && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED && (
+        <AccessTime label={"Доступ ограничен"} />
+      )}
+
+      {submissionStatus && submissionWorkStatus === ISubmissionStatus.COMPLETED && (submissionStatus === DeadlineStatus.START || submissionStatus === DeadlineStatus.END) && (
+        <>
+          <AccessTime label={"Работа успешно сдана!"} />
+
+          <Link
+            to={pathToWork}
+            component={RouterLink}
+            sx={styles.linkToWorks}
+          >
+            <Typography
+              variant={"body1"}
+              color={"inherit"}
+            >
+              {"Моя работа"}
+            </Typography>
+          </Link>
+        </>
+      )}
     </DashboardWorkBox>
   )
+}
+
+const styles = {
+  linkToWorks: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: 'center',
+    color: "primary.main",
+    ":hover": {
+      textDecoration: "underline"
+    }
+  } as SxProps<Theme>,
 }

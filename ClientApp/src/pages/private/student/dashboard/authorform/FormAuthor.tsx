@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { Box, Button, Theme } from "@mui/material";
+import { Box, Button, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import { AnswerBox } from "../../../../../components/rubrics/answerBox";
@@ -101,12 +101,17 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
           </QuestionBox>
         </AnswerBox>
       ))}
-      <Box sx={{ ...globalStyles.submitBtContainer, ...{ marginTop: "20px" } }}>
+      <Box sx={styles.footerContainer}>
+        <Typography
+          variant={"body1"}
+        >
+          {"* Работу можно сдать только один раз"}
+        </Typography>
         <Button
           type='submit'
           variant='contained'
         >
-          {"Отправить"}
+          {"Сдать работу"}
         </Button>
       </Box>
     </Box>
@@ -118,5 +123,11 @@ const styles = {
     display: "flex",
     gap: "5px",
     flexDirection: "column"
-  } as SxProps<Theme>
+  } as SxProps<Theme>,
+  footerContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: "center",
+    marginTop: "20px"
+  } as SxProps<Theme>,
 }

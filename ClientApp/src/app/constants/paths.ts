@@ -34,7 +34,7 @@ export const paths = {
     dashboard: {
       overview: '/st/task/:taskId/overview',
       authorform: '/st/task/:taskId/authorform',
-      menu2: '/st/task/:taskId/menu2',
+      work: '/st/task/:taskId/work',
       menu3: '/st/task/:taskId/menu3'
     }
   },

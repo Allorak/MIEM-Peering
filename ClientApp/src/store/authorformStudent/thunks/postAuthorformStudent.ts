@@ -1,9 +1,10 @@
-import { actions } from "..";
+import { actions, fetchWorkSubmissionStatus } from "..";
 import { AppThunk } from "../../../app/store";
 
 import { IErrorCode, IAuthorFormResponses } from "../../types";
 
 import { postAuthorForm } from "../../../api/postAuthorForm";
+import { fetchSubmissionStatus } from "../../deadlineStatus";
 
 
 export const postAuthorformStudent = (taskId: string, responses: IAuthorFormResponses): AppThunk => async (dispatch, getState) => {
@@ -33,6 +34,8 @@ export const postAuthorformStudent = (taskId: string, responses: IAuthorFormResp
             return
         }
         dispatch(actions.reset())
+        dispatch(fetchSubmissionStatus(taskId))
+        dispatch(fetchWorkSubmissionStatus(taskId))
         console.log('send successfully')
         return
 

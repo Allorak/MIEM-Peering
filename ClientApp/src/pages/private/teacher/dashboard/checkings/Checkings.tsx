@@ -31,7 +31,6 @@ export const Checkings: FC = () => {
   const submissionStatus = useAppSelector(state => state.deadlineStatus.submissionStatus)
   const submissionError = useAppSelector(state => state.deadlineStatus.error)
   const statusList = useAppSelector(state => state.checkings.isListLoading)
-  // const lockList = useAppSelector(state => state.checkings.isListLock)
   const statusReview = useAppSelector(state => state.checkings.isAddReviewLoading)
   const lockReview = useAppSelector(state => state.checkings.isAddReviewLock)
   const statusStudentWork = useAppSelector(state => state.checkings.isWorkLoading)

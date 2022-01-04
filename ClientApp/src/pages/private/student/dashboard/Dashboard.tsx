@@ -9,9 +9,10 @@ import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
 import { IMenu, IMenuTitles } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
 
-import * as globalStyles from "../../../../const/styles"
 import { Overview } from './Overview';
 import { Authorform } from './authorform';
+
+import * as globalStyles from "../../../../const/styles"
 
 import { Burger } from '../../../../components/icons/Burger';
 
@@ -183,8 +184,8 @@ const menuItems = [
     path: paths.student.dashboard.authorform
   },
   {
-    title: IMenuTitles.MENU_2,
-    path: paths.student.dashboard.menu2
+    title: IMenuTitles.WORK,
+    path: paths.student.dashboard.work
   },
   {
     title: IMenuTitles.MENU_3,

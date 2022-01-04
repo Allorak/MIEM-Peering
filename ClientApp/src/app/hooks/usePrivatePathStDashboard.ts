@@ -55,7 +55,7 @@ const convertActiveMenu = (activeMenuId: string | undefined) => {
   switch (activeMenuId) {
     case "overview": return IMenuTitles.OVERVIEW
     case "authorform": return IMenuTitles.AUTHORFORM
-    case "menu2": return IMenuTitles.MENU_2
+    case "work": return IMenuTitles.WORK
     case "menu3": return IMenuTitles.MENU_3
     default: return undefined
   }

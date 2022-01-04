@@ -304,7 +304,7 @@ export enum IMenuTitles {
   GRADES = 'Успеваемость',
   EXPORT = 'Экспорт',
   AUTHORFORM = 'Сдать работу',
-  MENU_2 = 'Меню 2',
+  WORK = 'Моя работа',
   MENU_3 = 'Меню 3'
 }
 
@@ -503,6 +503,11 @@ export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>
 /* Author form */
 
 export interface IAuthorForm extends IPeerForm {}
+
+export enum ISubmissionStatus {
+  COMPLETED = 'Completed',
+  NOT_COMPLETED = 'NotCompleted'
+}
 
 export interface IAuthorFormResponses extends IPeerResponses {}
 
