@@ -505,3 +505,9 @@ export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>
 export interface IAuthorForm extends IPeerForm {}
 
 export interface IAuthorFormResponses extends IPeerResponses {}
+
+export enum DeadlineStatus {
+  START = 'Start',
+  END = 'End',
+  NOT_STARTED = 'NotStarted'
+}

@@ -6,14 +6,17 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { AccessTime } from "../../../../../components/assessTime";
+import { NoData } from "../../../../../components/noData";
 
 import { actions, createReview, fetchStudentWork, fetchCheckingsWorkList, fetchPeerForm } from "../../../../../store/checkings";
+import { fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
 
 import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
 import { CheckingsForm } from "./CheckingForm";
 
-import { IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
+import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
 
 import * as globalStyles from "../../../../../const/styles"
 
@@ -23,8 +26,12 @@ export const Checkings: FC = () => {
 
   const { path } = usePrivatePathTDashboard()
 
+
+  const statusDeadline = useAppSelector(state => state.deadlineStatus.isLoading)
+  const submissionStatus = useAppSelector(state => state.deadlineStatus.submissionStatus)
+  const submissionError = useAppSelector(state => state.deadlineStatus.error)
   const statusList = useAppSelector(state => state.checkings.isListLoading)
-  const lockList = useAppSelector(state => state.checkings.isListLock)
+  // const lockList = useAppSelector(state => state.checkings.isListLock)
   const statusReview = useAppSelector(state => state.checkings.isAddReviewLoading)
   const lockReview = useAppSelector(state => state.checkings.isAddReviewLock)
   const statusStudentWork = useAppSelector(state => state.checkings.isWorkLoading)
@@ -41,10 +48,16 @@ export const Checkings: FC = () => {
   const [responses, setResponses] = useState<IPeerForm>()
 
   useEffect(() => {
-    if (path && path.taskId) {
+    if (path && path.taskId && submissionStatus === DeadlineStatus.END) {
       dispatch(actions.reset())
       dispatch(fetchCheckingsWorkList(path.taskId))
       dispatch(fetchPeerForm(path.taskId))
+    }
+  }, [submissionStatus])
+
+  useEffect(() => {
+    if (path && path.taskId && submissionStatus !== DeadlineStatus.END) {
+      dispatch(fetchSubmissionStatus(path.taskId))
     }
   }, [])
 
@@ -98,13 +111,19 @@ export const Checkings: FC = () => {
       dispatch(createReview(path.taskId, currentWorkId, formResponses))
   }, [currentWorkId, path])
 
+  const status = submissionStatus ? statusList : statusDeadline
+  const mainError = submissionStatus ? error : submissionError
+
   return (
     <DashboardWorkBox
-      isLoading={statusList}
-      isLock={lockList}
-      error={error}
+      isLoading={status}
+      error={mainError}
     >
-      {studentList && studentList.length > 0 && currentWorkId ? (
+      {submissionStatus && submissionStatus !== DeadlineStatus.END && (
+        <AccessTime label={"Сдача работ еще не закончена"}/>
+      )}
+
+      {studentList && studentList.length > 0 && currentWorkId && (
         <Box sx={styles.container}>
           <StudentsListSelect
             selectedStudentId={currentWorkId}
@@ -163,9 +182,10 @@ export const Checkings: FC = () => {
             </Box>
           </DashboardWorkBox>
         </Box>
+      )}
 
-      ) : (
-        <>{"Пусто"}</>
+      {studentList && studentList.length === 0 && submissionStatus === DeadlineStatus.END && (
+        <NoData label={"Работы для проверки не найдены"}/>
       )}
     </DashboardWorkBox>
   )
@@ -209,5 +229,15 @@ const styles = {
       width: "0px",
       height: "0px"
     }
+  } as SxProps<Theme>,
+  errorDeadlineContainer: {
+    margin: "50px 0px 0px 0px",
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    gap: "10px",
+    flexDirection: "column",
+    color: "#A4ADC8",
+    fontSize: "58px"
   } as SxProps<Theme>,
 }
