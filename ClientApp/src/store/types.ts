@@ -1,3 +1,5 @@
+import { format } from "path/posix"
+
 export interface IEmployee {
   id: string | undefined
   fullName: string
@@ -252,10 +254,10 @@ export interface ISelectRatingQuestion extends IParentQuestionRubric {
 }
 
 export enum IQuestionTypes {
-  TEXT = 'text',
-  MULTIPLE = 'multiple',
-  SELECT_RATE = 'select',
-  SHORT_TEXT = 'shortText',
+  TEXT = 'Text',
+  MULTIPLE = 'Multiple',
+  SELECT_RATE = 'Select',
+  SHORT_TEXT = 'ShortText',
 }
 
 export const defaultResponses = {
@@ -301,7 +303,7 @@ export enum IMenuTitles {
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
   EXPORT = 'Экспорт',
-  MENU_1 = 'Меню 1',
+  AUTHORFORM = 'Сдать работу',
   MENU_2 = 'Меню 2',
   MENU_3 = 'Меню 3'
 }
@@ -327,6 +329,10 @@ export type IOverviewStudent = {
   status: IStatusTask
 }
 
+export type IAuthorFormResponseItem = {
+  id: number,
+  response: string
+}
 export type IOverviewExpert = {
   deadlines: IDeadlines,
   checkedWorksCount?: number,
@@ -428,6 +434,7 @@ export interface IPeerFormShortTextItem extends IPeerFormItem, IShortTextQuestio
 
 export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion { }
 
+
 export type IPeerForm = {
   rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
 }
@@ -492,3 +499,9 @@ export type IWorkReviewerForm = IStudentWork & {
 }
 
 export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>
+
+/* Author form */
+
+export interface IAuthorForm extends IPeerForm {}
+
+export interface IAuthorFormResponses extends IPeerResponses {}

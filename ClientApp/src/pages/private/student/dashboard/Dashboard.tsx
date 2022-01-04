@@ -11,6 +11,8 @@ import { paths } from "../../../../app/constants/paths";
 
 import * as globalStyles from "../../../../const/styles"
 import { Overview } from './Overview';
+import { Authorform } from './authorform';
+
 import { Burger } from '../../../../components/icons/Burger';
 
 export const Dashboard: FC = () => {
@@ -81,9 +83,9 @@ export const Dashboard: FC = () => {
             <Box>
               <Routes>
                 <Route path={paths.student.dashboard.overview} element={<Overview />} />
-                {/* <Route path={paths.student.dashboard.menu1} element={<Overview />} />
-                <Route path={paths.student.dashboard.menu2} element={<Overview />} />
-                <Route path={paths.student.dashboard.menu1} element={<Overview />} /> */}
+                <Route path={paths.student.dashboard.authorform} element={<Authorform />} />
+                {/* // <Route path={paths.student.dashboard.menu2} element={<Overview />} />
+                // <Route path={paths.student.dashboard.menu1} element={<Overview />} /> */}
               </Routes>
             </Box>
           </Box>
@@ -177,8 +179,8 @@ const menuItems = [
     path: paths.student.dashboard.overview
   },
   {
-    title: IMenuTitles.MENU_1,
-    path: paths.student.dashboard.menu1
+    title: IMenuTitles.AUTHORFORM,
+    path: paths.student.dashboard.authorform
   },
   {
     title: IMenuTitles.MENU_2,

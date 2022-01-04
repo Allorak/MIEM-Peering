@@ -33,7 +33,7 @@ export const paths = {
     },
     dashboard: {
       overview: '/st/task/:taskId/overview',
-      menu1: '/st/task/:taskId/menu1',
+      authorform: '/st/task/:taskId/authorform',
       menu2: '/st/task/:taskId/menu2',
       menu3: '/st/task/:taskId/menu3'
     }

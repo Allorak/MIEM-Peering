@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, useCallback } from "react";
 import { SxProps, Theme } from "@mui/system";
-import { Box, Button, FormControl, FormControlLabel, FormHelperText, Radio, RadioGroup, Typography } from "@mui/material";
+import { Box, Button, FormControlLabel, FormHelperText, Radio, RadioGroup, Typography } from "@mui/material";
 
 import { IMultipleResponse } from "../../../store/types";
 
@@ -31,36 +31,36 @@ export const MultipleEditable: FC<IProps> = ({
 
   return (
     <>
-      <RadioGroup
-        defaultValue={value}
-        onChange={handleRadioChange}
-        name={id}
-      >
-        {responses.map((item, index) => (
-          <FormControlLabel
-            key={`${id}+${index}`}
-            sx={styles.root}
-            id={`${id}+${index}`}
-            value={item.response}
-            control={
-              <Radio />
-            }
-            label={
-              <Typography variant={'h6'}>
-                {item.response}
-              </Typography>
-            }
-            checked={value === item.response}
-          />
-        ))}
-      </RadioGroup>
-      {!required && typeof value !== 'undefined' && (
-        <Box sx={styles.cancelContainer}>
-          <Button variant="text" sx={styles.cancelButton} onClick={onReset}>
-            {"Отменить выбор"}
-          </Button>
-        </Box>
-      )}
+        <RadioGroup
+          defaultValue={value}
+          onChange={handleRadioChange}
+          name={id}
+        >
+          {responses.map((item, index) => (
+            <FormControlLabel
+              key={`${id}+${index}`}
+              sx={styles.root}
+              id={`${id}+${index}`}
+              value={item.response}
+              control={
+                <Radio required={required}/>
+              }
+              label={
+                <Typography variant={'h6'}>
+                  {item.response}
+                </Typography>
+              }
+              checked={value === item.response}
+            />
+          ))}
+        </RadioGroup>
+        {!required && typeof value !== 'undefined' && (
+          <Box sx={styles.cancelContainer}>
+            <Button variant="text" sx={styles.cancelButton} onClick={onReset}>
+              {"Отменить выбор"}
+            </Button>
+          </Box>
+        )}
     </>
   )
 }

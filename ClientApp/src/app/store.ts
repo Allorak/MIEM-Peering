@@ -13,6 +13,7 @@ import { reducer as overviewExpert } from '../store/overviewExpert'
 import { reducer as works } from '../store/works'
 import { reducer as experts } from '../store/experts'
 import { reducer as checkings } from '../store/checkings'
+import { reducer as authorForm } from '../store/authorformStudent'
 import { reducer as dashboard } from '../store/dashboard'
 
 export const store = configureStore({
@@ -31,7 +32,8 @@ export const store = configureStore({
     overviewExpert,
     works,
     experts,
-    checkings
+    checkings,
+    authorForm
   }
 })
 
