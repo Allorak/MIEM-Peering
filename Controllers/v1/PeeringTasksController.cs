@@ -134,6 +134,9 @@ namespace patools.Controllers.v1
 
             if(User.IsInRole(UserRoles.Student.ToString()))
                 return Ok(await _peeringTasksService.GetStudentCourseTasks(taskCourseInfo));
+
+            if(User.IsInRole(UserRoles.Expert.ToString()))
+                return Ok(await _peeringTasksService.GetExpertCourseTasks(taskCourseInfo));
             
             return Ok(new InvalidJwtTokenResponse());
         }

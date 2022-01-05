@@ -179,6 +179,28 @@ namespace patools.Services.Courses
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
+        public async Task<Response<List<GetCourseDtoResponse>>> GetExpertCourses(Guid userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
+            if (user == null)
+                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid user id");
+
+            var expertRecords = await _context.Experts
+                .Include(x => x.PeeringTask.Course)
+                .Where(x => x.User == user)
+                .ToListAsync();
+
+            var courses = new List<GetCourseDtoResponse>();
+            foreach (var courseExpert in expertRecords)
+            {
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
+                if(course!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+            }
+
+            return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
+        }
+
         public async Task<Response<string>> PutCourse(Guid teacherId, Guid courseId, PutCourseDto updateCourse)
         {
             var course = await _context.Courses.FindAsync(courseId);

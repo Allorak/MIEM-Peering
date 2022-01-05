@@ -193,6 +193,32 @@ namespace patools.Services.PeeringTasks
                 
         }
 
+        public async Task<Response<GetCourseTasksDtoResponse>> GetExpertCourseTasks(GetCourseTasksDtoRequest courseInfo)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == courseInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid user id");
+
+            var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseInfo.CourseId);
+            if (course == null)
+                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid course id");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == user);
+            if (expert == null)
+                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("The user is not an expert");
+           
+            var tasks = await _context.Experts
+                        .Where(x => x == expert && x.PeeringTask.Course == course)
+                        .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x.PeeringTask))
+                        .ToListAsync();
+            
+            return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
+            {
+                Tasks = tasks
+            });
+                
+        }
+
         public async Task<Response<GetPeeringTaskTeacherOverviewDtoResponse>> GetTaskTeacherOverview(GetPeeringTaskTeacherOverviewDtoRequest taskInfo)
         {
 

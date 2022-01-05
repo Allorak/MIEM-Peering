@@ -16,6 +16,7 @@ namespace patools.Services.Courses
         Task<Response<GetCourseDtoResponse>> GetCourseById(Guid courseId);
         Task<Response<List<GetCourseDtoResponse>>> GetTeacherCourses(Guid teacherId);
         Task<Response<List<GetCourseDtoResponse>>> GetStudentCourses(Guid studentId);
+        Task<Response<List<GetCourseDtoResponse>>> GetExpertCourses(Guid userId);
         Task<Response<GetCourseDtoResponse>> AddCourse(AddCourseDto newCourse);
         Task<Response<string>> DeleteCourse(Guid teacherID, Guid courseId);
         Task<Response<string>> PutCourse(Guid teacherID, Guid courseId, PutCourseDto updateCourse);
