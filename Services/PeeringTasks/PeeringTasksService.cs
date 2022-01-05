@@ -73,7 +73,8 @@ namespace patools.Services.PeeringTasks
                 SubmissionEndDateTime = peeringTask.Settings.SubmissionEndDateTime,
                 ReviewStartDateTime = peeringTask.Settings.ReviewStartDateTime,
                 ReviewEndDateTime = peeringTask.Settings.ReviewEndDateTime,
-                SubmissionsToCheck = peeringTask.Settings.SubmissionsToCheck
+                SubmissionsToCheck = peeringTask.Settings.SubmissionsToCheck,
+                
             };
             await _context.Tasks.AddAsync(newTask);
             await _context.SaveChangesAsync();
@@ -85,6 +86,29 @@ namespace patools.Services.PeeringTasks
                 newAuthorQuestion.ID = Guid.NewGuid();
                 newAuthorQuestion.PeeringTask = newTask;
                 newAuthorQuestion.RespondentType = RespondentTypes.Author;
+                if (newAuthorQuestion.Type == QuestionTypes.Multiple)
+                {
+                    if(authorQuestion.Responses == null || authorQuestion.Responses.Count < 2)
+                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                            "Not enough variants provided in multiple-type question");
+                    var variantIds = new List<int>();
+                    foreach (var variant in authorQuestion.Responses)
+                    {
+                        
+                        var newVariant = new Variant()
+                        {
+                            ID = Guid.NewGuid(),
+                            Response = variant.Response,
+                            Question = newAuthorQuestion,
+                            ChoiceId = variant.ChoiceId
+                        };
+                        if (variantIds.Contains(newVariant.ChoiceId))
+                            return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                                "Incorrect choice id provided");
+                        variantIds.Add(newVariant.ChoiceId);
+                        await _context.Variants.AddAsync(newVariant);
+                    }
+                }
                 await _context.Questions.AddAsync(newAuthorQuestion);
             }
 
@@ -96,6 +120,28 @@ namespace patools.Services.PeeringTasks
                 newPeerQuestion.RespondentType = RespondentTypes.Peer;
                 if (!newPeerQuestion.Required)
                     newPeerQuestion.CoefficientPercentage = null;
+                if (newPeerQuestion.Type == QuestionTypes.Multiple)
+                {
+                    if(peerQuestion.Responses == null || peerQuestion.Responses.Count < 2)
+                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                            "Not enough variants provided in multiple-type question");
+                    var variantIds = new List<int>();
+                    foreach (var variant in peerQuestion.Responses)
+                    {
+                        var newVariant = new Variant()
+                        {
+                            ID = Guid.NewGuid(),
+                            Response = variant.Response,
+                            Question = newPeerQuestion,
+                            ChoiceId = variant.ChoiceId
+                        };
+                        if (variantIds.Contains(newVariant.ChoiceId))
+                            return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                                "Incorrect choice id provided");
+                        variantIds.Add(newVariant.ChoiceId);
+                        await _context.Variants.AddAsync(newVariant);
+                    }
+                }
                 await _context.Questions.AddAsync(newPeerQuestion);
             }
 

@@ -11,7 +11,7 @@ namespace patools.Enums
         [EnumMember(Value = "shortText")]
         ShortText = 1,
         [EnumMember(Value = "multiple")]
-        MultipleChoices = 2,
+        Multiple = 2,
         [EnumMember(Value = "select")]
         Select = 3
     }

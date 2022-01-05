@@ -258,7 +258,7 @@ namespace patools
                     Title = "В каком веке была открыта квантовая физика",
                     Order = 0,
                     Required = true,
-                    Type = QuestionTypes.MultipleChoices,
+                    Type = QuestionTypes.Multiple,
                     RespondentType = RespondentTypes.Author,
                     PeeringTask = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").First()
                 },
@@ -274,31 +274,31 @@ namespace patools
                 new Variant
                 {
                     ID = Guid.NewGuid(),
-                    Content = "XV",
+                    Response = "XV",
                     Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
-                    Content = "XIX",
+                    Response = "XIX",
                     Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
-                    Content = "XX",
+                    Response = "XX",
                     Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
-                    Content = "XXI",
+                    Response = "XXI",
                     Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 },
                 new Variant
                 {
                     ID = Guid.NewGuid(),
-                    Content = "XVIII",
+                    Response = "XVIII",
                     Question = db.Questions.Where(question => question.Title == "В каком веке была открыта квантовая физика").First()
                 }
             };
