@@ -443,6 +443,16 @@ export type IMyWorkForm = {
   answers: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
 }
 
+export type IMyWorkReviewsItem = {
+  reviewer: IRole,
+  reviewerName: string,
+  submissionId: string,
+  finalGrade: number,
+  answers: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+}
+
+export type IMyWorkReviews = Array<IMyWorkReviewsItem>
+
 export type IPeerResponseItem = {
   questionId: string,
   response?: string | number
@@ -490,7 +500,7 @@ export type IWorkGraphPropsItem = {
   maxGrade: number
 }
 
-export interface IWorkGraphByCriteria extends IWorkGraphByCriteriaItem, IWorkGraphPropsItem {}
+export interface IWorkGraphByCriteria extends IWorkGraphByCriteriaItem, IWorkGraphPropsItem { }
 
 export type IWorkGraphFinalRates = IWorkGraphFinalRatesItem & IWorkGraphPropsItem
 
@@ -506,14 +516,14 @@ export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>
 
 /* Author form */
 
-export interface IAuthorForm extends IPeerForm {}
+export interface IAuthorForm extends IPeerForm { }
 
 export enum ISubmissionStatus {
   COMPLETED = 'Completed',
   NOT_COMPLETED = 'NotCompleted'
 }
 
-export interface IAuthorFormResponses extends IPeerResponses {}
+export interface IAuthorFormResponses extends IPeerResponses { }
 
 export enum DeadlineStatus {
   START = 'Start',

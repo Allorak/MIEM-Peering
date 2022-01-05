@@ -1,7 +1,7 @@
-export { fetchMyWork } from "./thunks/fetchMyWork"
-
+export { fetchMyWork } from "./thunks/fetchMyWork";
+export { fetchReviews } from "./thunks/fetchReviews";
 
 export {
   actions,
   reducer,
-} from './myWorkSlice'
+} from './myWorkSlice';

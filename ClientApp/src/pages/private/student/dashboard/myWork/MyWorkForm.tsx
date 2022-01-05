@@ -12,11 +12,13 @@ import { TextVisible } from "../../../../../components/rubrics/text";
 import { IQuestionTypes, IMyWorkForm } from "../../../../../store/types";
 
 interface IProps {
-  myWork: IMyWorkForm
+  myWork: IMyWorkForm,
+  answerBoxColor?: string
 }
 
 export const MyWorkForm: FC<IProps> = ({
-  myWork
+  myWork,
+  answerBoxColor
 }) => {
 
   const sorted = myWork.answers
@@ -28,9 +30,13 @@ export const MyWorkForm: FC<IProps> = ({
           <AnswerBox
             id={item.order}
             key={item.questionId}
-            title={item.title}
+            title={item.type === IQuestionTypes.SELECT_RATE && item.coefficientPercentage !== undefined ?
+              `${item.title} (коэф. ${item.coefficientPercentage}%)` :
+              item.title
+            }
             required={item.required}
             description={item.description}
+            borderColor={answerBoxColor}
           >
             <QuestionBox>
               {item.type === IQuestionTypes.MULTIPLE && (

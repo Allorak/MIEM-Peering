@@ -74,8 +74,6 @@ export const Authorform: FC = () => {
     }
   }, [])
 
-  console.log(responses?.rubrics)
-
   const mainStatus = submissionStatus ? status : statusDeadline
   const mainError = submissionStatus ? error : submissionError
 
@@ -96,7 +94,7 @@ export const Authorform: FC = () => {
         </>
       )}
 
-      {submissionStatus && submissionStatus !== DeadlineStatus.START && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED && (
+      {submissionStatus && submissionStatus === DeadlineStatus.NOT_STARTED && (
         <AccessTime label={"Доступ ограничен"} />
       )}
 
