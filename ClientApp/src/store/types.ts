@@ -304,7 +304,7 @@ export enum IMenuTitles {
   GRADES = 'Успеваемость',
   EXPORT = 'Экспорт',
   AUTHORFORM = 'Сдать работу',
-  MENU_2 = 'Меню 2',
+  WORK = 'Моя работа',
   MENU_3 = 'Меню 3'
 }
 
@@ -373,12 +373,12 @@ export type IWorkResponse = {
   response?: string
 }
 
-export interface IExtpertItem {
+export interface IExpertItem {
   email: string,
-  name: string,
+  name?: string,
   imgUrl?: string
-  taskComplete: number,
-  assignedTasks: number
+  taskComplete?: number,
+  assignedTasks?: number
 }
 
 export enum PeerTaskTypes {
@@ -416,6 +416,15 @@ export type IStudentWork = {
   responses: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
 }
 
+export type IMyReviewsItem = {
+  studentName: string,
+  submissionId: string,
+  answers: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>,
+  expertAnswers?: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>,
+}
+
+export type IMyReviews = Array<IMyReviewsItem>
+
 export interface IPeerFormItem {
   id: string,
   order: number,
@@ -438,6 +447,20 @@ export interface IPeerFormMultipleItem extends IPeerFormItem, IMultipleQuiestion
 export type IPeerForm = {
   rubrics: Array<IPeerFormSelectItem | IPeerFormTextItem | IPeerFormShortTextItem | IPeerFormMultipleItem>
 }
+
+export type IMyWorkForm = {
+  answers: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+}
+
+export type IMyWorkReviewsItem = {
+  reviewer: IRole,
+  reviewerName: string,
+  submissionId: string,
+  finalGrade: number,
+  answers: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
+}
+
+export type IMyWorkReviews = Array<IMyWorkReviewsItem>
 
 export type IPeerResponseItem = {
   questionId: string,
@@ -486,7 +509,7 @@ export type IWorkGraphPropsItem = {
   maxGrade: number
 }
 
-export interface IWorkGraphByCriteria extends IWorkGraphByCriteriaItem, IWorkGraphPropsItem {}
+export interface IWorkGraphByCriteria extends IWorkGraphByCriteriaItem, IWorkGraphPropsItem { }
 
 export type IWorkGraphFinalRates = IWorkGraphFinalRatesItem & IWorkGraphPropsItem
 
@@ -502,6 +525,17 @@ export type IWorkStatistics = Array<IWorkGraph | IWorkReviewerForm>
 
 /* Author form */
 
-export interface IAuthorForm extends IPeerForm {}
+export interface IAuthorForm extends IPeerForm { }
 
-export interface IAuthorFormResponses extends IPeerResponses {}
+export enum ISubmissionStatus {
+  COMPLETED = 'Completed',
+  NOT_COMPLETED = 'NotCompleted'
+}
+
+export interface IAuthorFormResponses extends IPeerResponses { }
+
+export enum DeadlineStatus {
+  START = 'Start',
+  END = 'End',
+  NOT_STARTED = 'NotStarted'
+}

@@ -7,6 +7,7 @@ import { IErrorCode } from "../../types";
 
 
 export const fetchExperts = (taskId: string): AppThunk => async (dispatch, getState) => {
+    dispatch(actions.fetchStarted())
     const accessToken = getState().auth.accessToken
 
     if (!accessToken) {
@@ -18,7 +19,6 @@ export const fetchExperts = (taskId: string): AppThunk => async (dispatch, getSt
         return
     }
 
-    dispatch(actions.fetchStarted())
     try {
         const response = await getExperts({ accessToken, taskId })
         if (!response) {

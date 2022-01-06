@@ -1,5 +1,5 @@
 
-import { FC, useCallback, useEffect } from "react";
+import { FC, useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
@@ -7,7 +7,7 @@ import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePat
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { ExpertsTable } from "./ExpertsTable";
 
-import { fetchExperts, deleteExpert } from "../../../../../store/experts";
+import { fetchExperts } from "../../../../../store/experts";
 
 
 export const Experts: FC = () => {
@@ -21,22 +21,16 @@ export const Experts: FC = () => {
   const experts = useAppSelector(state => state.experts.payload)
 
   useEffect(() => {
-    console.log(path)
     if (path && path.taskId)
       dispatch(fetchExperts(path.taskId))
   }, [])
-
-  const handleRemove = useCallback((expertEmail: string) => {
-    if (path && path.taskId)
-      dispatch(deleteExpert(path.taskId, expertEmail))
-  }, [path])
 
   return (
     <DashboardWorkBox
       isLoading={status}
       error={error}
     >
-      <ExpertsTable experts={experts ?? []} onRemove={handleRemove} />
+      <ExpertsTable experts={experts ?? []} />
     </DashboardWorkBox>
   )
 }

@@ -11,7 +11,7 @@ import { Burger } from "../../../../components/icons/Burger";
 import { IMenu, IMenuTitles } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
 
-import { Checkings } from '../../teacher/dashboard/checkings';
+import { Checkings } from "./checkings";
 import { Overview } from './overview';
 
 import * as globalStyles from "../../../../const/styles"

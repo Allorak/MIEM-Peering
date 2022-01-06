@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { IError, IExtpertItem } from '../types';
+import { IError, IExpertItem } from '../types';
 
 
 export interface ICoursesState {
   isLoading: boolean,
   error: IError | undefined,
-  payload: Array<IExtpertItem> | undefined
+  payload: Array<IExpertItem> | undefined
 }
 
 const initialState: ICoursesState = {
@@ -24,7 +24,7 @@ export const experts = createSlice({
       state.error = undefined
     },
 
-    fetchSuccess: (state, { payload }: PayloadAction<Array<IExtpertItem>>) => {
+    fetchSuccess: (state, { payload }: PayloadAction<Array<IExpertItem>>) => {
       state.isLoading = false
       state.error = undefined
       state.payload = payload
@@ -34,19 +34,7 @@ export const experts = createSlice({
       state.isLoading = false
       state.error = payload
       state.payload = undefined
-    },
-    deleteStarted: (state) => {
-      state.isLoading = true
-      state.error = undefined
-    },
-    deleteFailed: (state, { payload }: PayloadAction<IError>) => {
-      state.isLoading = false
-      state.error = payload
-    },
-    deleteSuccess: (state) => {
-      state.isLoading = false
-      state.error = undefined
-    },
+    }
   },
 });
 

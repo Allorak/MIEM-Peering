@@ -1,20 +1,18 @@
 
 import { FC } from "react";
-import { TableBody, TableHead } from "@mui/material";
+import { Box, TableBody, TableHead, Tooltip } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
 import { Progress } from "../../../../../components/progress";
 import { Table, TableBodyCell, TableBodyCellUser, TableBodyRow, TableHeadCell, TableHeadRow } from "../../../../../components/table";
-import { IExtpertItem } from "../../../../../store/types";
-import { RemoveButton } from "../../../../../components/actionButtons";
+import { IExpertItem } from "../../../../../store/types";
 
 
 interface IProps {
-  experts: IExtpertItem[]
-  onRemove: (email: string) => void
+  experts: IExpertItem[]
 }
 
-export const ExpertsTable: FC<IProps> = ({ experts, onRemove }) => {
+export const ExpertsTable: FC<IProps> = ({ experts }) => {
   return (
     <Table sx={styles.tableContainer}>
       <TableHead>
@@ -27,7 +25,7 @@ export const ExpertsTable: FC<IProps> = ({ experts, onRemove }) => {
       </TableHead>
       <TableBody>
         {experts.map(expert => (
-          <ExpertRow expertItem={expert} onRemove={onRemove} />
+          <ExpertRow expertItem={expert} />
         ))}
       </TableBody>
     </Table>
@@ -35,20 +33,27 @@ export const ExpertsTable: FC<IProps> = ({ experts, onRemove }) => {
 }
 
 interface IPropsRow {
-  expertItem: IExtpertItem
-  onRemove: (email: string) => void
+  expertItem: IExpertItem
 }
 
-const ExpertRow: FC<IPropsRow> = ({ expertItem, onRemove }) => {
+const ExpertRow: FC<IPropsRow> = ({ expertItem }) => {
   return (
     <TableBodyRow>
       <TableBodyCell>{expertItem.email}</TableBodyCell>
-      <TableBodyCellUser name={expertItem.name} img={expertItem.imgUrl}></TableBodyCellUser>
+      <TableBodyCellUser name={expertItem.name ?? "No Name"} img={expertItem.imgUrl} />
       <TableBodyCell isCentered >
-        <Progress progress={expertItem.taskComplete / expertItem.assignedTasks * 100} />
-      </TableBodyCell>
-      <TableBodyCell isCentered>
-        <RemoveButton onClick={() => onRemove(expertItem.email)} />
+        {expertItem.taskComplete !== undefined && expertItem.assignedTasks !== undefined ? (
+          <Tooltip
+            title={`Назначено: ${expertItem.assignedTasks}; Проверено: ${expertItem.taskComplete}`}
+            placement={"top"}
+          >
+            <Box>
+              <Progress progress={expertItem.taskComplete / expertItem.assignedTasks * 100} />
+            </Box>
+          </Tooltip>
+        ) : (
+          <>{"?"}</>
+        )}
       </TableBodyCell>
     </TableBodyRow>
   )

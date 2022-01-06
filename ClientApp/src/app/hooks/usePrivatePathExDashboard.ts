@@ -54,10 +54,6 @@ export const usePrivatePathExDashboard = (): IUsePrivatePathResult => {
 const convertActiveMenu = (activeMenuId: string | undefined) => {
   switch (activeMenuId) {
     case "overview": return IMenuTitles.OVERVIEW
-    case "grades": return IMenuTitles.GRADES
-    case "export": return IMenuTitles.EXPORT
-    case "experts": return IMenuTitles.EXPERTS
-    case "works": return IMenuTitles.WORKS
     case "checkings": return IMenuTitles.CHECKINGS
     default: return undefined
   }

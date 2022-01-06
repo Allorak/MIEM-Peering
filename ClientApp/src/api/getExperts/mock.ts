@@ -18,9 +18,9 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
       },
       {
         email: "iivanov@miem.hse.ru",
-        name: "Иван Иванов",
-        taskComplete: 5,
-        assignedTasks: 10
+        // name: "Иван Иванов",
+        // taskComplete: 5,
+        // assignedTasks: 10
       },
       {
         email: "vpupkin@miem.hse.ru",
