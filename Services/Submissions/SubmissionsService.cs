@@ -55,22 +55,30 @@ namespace patools.Services.Submissions
                 
                 if (question == null)
                     return new BadRequestDataResponse<GetNewSubmissionDtoResponse>($"Incorrect QuestionId in answer");
-                
+                if (question.Required)
+                {
+                    switch (question.Type)
+                    {
+                        case QuestionTypes.Select or QuestionTypes.Multiple when answer.Value == null:
+                            return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                                "There is no answer for a required question");
+                        case QuestionTypes.Text or QuestionTypes.ShortText when answer.Response == null:
+                            return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                                "There is no answer for a required question");
+                    }
+                }
                 newAnswers.Add(new Answer
                 {
                     ID = Guid.NewGuid(),
                     Submission = newSubmission,
                     Question = question,
-                    Text = answer.Response
+                    Review = answer.Response,
+                    Value = answer.Value
                 });
             }
             await _context.Answers.AddRangeAsync(newAnswers);
             await _context.SaveChangesAsync();
-            Console.WriteLine(newSubmission);
-            Console.WriteLine(newSubmission.ID);
             var result = _mapper.Map<GetNewSubmissionDtoResponse>(newSubmission);
-            Console.WriteLine(result);
-            Console.WriteLine(result.SubmissionId);
             return new SuccessfulResponse<GetNewSubmissionDtoResponse>(result);
         }
 
