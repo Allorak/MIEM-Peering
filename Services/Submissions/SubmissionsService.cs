@@ -39,6 +39,12 @@ namespace patools.Services.Submissions
             if (taskUser.States != PeeringTaskStates.Assigned)
                 return new OperationErrorResponse<GetNewSubmissionDtoResponse>("The submission for this task already exists");
             
+            if (task.SubmissionEndDateTime < DateTime.Now)
+                return new OperationErrorResponse<GetNewSubmissionDtoResponse>("The deadline has already passed");
+            if (task.SubmissionStartDateTime > DateTime.Now)
+                return new OperationErrorResponse<GetNewSubmissionDtoResponse>("Submissioning hasn't started yet");
+
+            
             var newSubmission = new Submission()
             {
                 ID = Guid.NewGuid(),

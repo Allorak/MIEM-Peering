@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Question;
 using patools.Dtos.Task;
+using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Models;
 using patools.Errors;
@@ -291,27 +292,49 @@ namespace patools.Services.PeeringTasks
             if (user == null)
                 return new InvalidGuidIdResponse<GetAuthorFormDtoResponse>("Invalid user id");
 
-            if (user.Role == UserRoles.Student)
+            switch (user.Role)
             {
-                var taskUser =
-                    await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
-                if (taskUser == null)
-                    return new NoAccessResponse<GetAuthorFormDtoResponse>("This task is not assigned to this user");
-            }
-            else if (user.Role == UserRoles.Teacher)
-            {
-                if (task.Course.Teacher != user)
+                case UserRoles.Student:
+                {
+                    var taskUser =
+                        await _context.TaskUsers.FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
+                    if (taskUser == null)
+                        return new NoAccessResponse<GetAuthorFormDtoResponse>("This task is not assigned to this user");
+                    if (task.SubmissionEndDateTime < DateTime.Now)
+                        return new OperationErrorResponse<GetAuthorFormDtoResponse>("The deadline has already passed");
+                    if (task.SubmissionStartDateTime > DateTime.Now)
+                        return new OperationErrorResponse<GetAuthorFormDtoResponse>("Submissioning hasn't started yet");
+                    break;
+                }
+                case UserRoles.Teacher when task.Course.Teacher != user:
                     return new NoAccessResponse<GetAuthorFormDtoResponse>("This teacher has no access to the task");
+                default:
+                    return new OperationErrorResponse<GetAuthorFormDtoResponse>(
+                        "Incorrect user role stored in database");
             }
 
             var questions = _context.Questions
                 .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Author)
-                .OrderBy(q => q.Order)
-                .Select(q => _mapper.Map<GetQuestionDto>(q));
+                .OrderBy(q => q.Order);
+
+            var resultQuestions = new List<GetQuestionDto>();
+            foreach (var question in questions)
+            {
+                var resultQuestion = _mapper.Map<GetQuestionDto>(question);
+                if (question.Type == QuestionTypes.Multiple)
+                {
+                    var variants = await _context.Variants
+                        .Where(v => v.Question == question)
+                        .Select(v => _mapper.Map<GetVariantDtoResponse>(v))
+                        .ToListAsync();
+                    resultQuestion.Responses = variants;
+                }
+                resultQuestions.Add(resultQuestion);
+            }
 
             response.Success = true;
             response.Error = null;
-            response.Payload = new GetAuthorFormDtoResponse() {Rubrics = questions};
+            response.Payload = new GetAuthorFormDtoResponse() {Rubrics = resultQuestions};
             return response;
         }
     }
