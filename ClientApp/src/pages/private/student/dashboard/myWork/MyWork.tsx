@@ -1,19 +1,25 @@
+import { FC, useCallback, useEffect, useState } from "react";
 import { Box, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
-import { FC, useCallback, useEffect, useState } from "react";
+
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
+
 import { AccessTime } from "../../../../../components/assessTime";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { NoData } from "../../../../../components/noData";
+
 import { fetchWorkSubmissionStatus } from "../../../../../store/authorformStudent";
 import { fetchReviewStatus, fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
 import { fetchMyWork, fetchReviews } from "../../../../../store/myWork";
 import { DeadlineStatus, IMyWorkReviewsItem, IRole, ISubmissionStatus } from "../../../../../store/types";
+
 import { MyWorkForm } from "./MyWorkForm";
 import { ReviewsList } from "./ReviewsList";
-import * as globalStyles from "../../../../../const/styles"
+
 import { palette } from "../../../../../theme/colors";
+import * as globalStyles from "../../../../../const/styles"
+
 
 export const MyWork: FC = () => {
   const dispatch = useAppDispatch()
@@ -164,7 +170,7 @@ export const MyWork: FC = () => {
                   variant={"h6"}
                   sx={styles.subTitle}
                 >
-                  {`Результаты проверок (${currentReview.reviewerName}):`}
+                  {`Результаты проверок (${currentReview.reviewerName}, оценка - ${currentReview.finalGrade}):`}
                 </Typography>
 
                 <MyWorkForm

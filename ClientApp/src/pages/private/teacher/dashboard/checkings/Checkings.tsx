@@ -18,6 +18,7 @@ import { CheckingsForm } from "./CheckingForm";
 
 import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
 
+import { palette } from "../../../../../theme/colors";
 import * as globalStyles from "../../../../../const/styles"
 
 export const Checkings: FC = () => {
@@ -147,7 +148,10 @@ export const Checkings: FC = () => {
                       >
                         {"Форма с ответами:"}
                       </Typography>
-                      <StudentWork studentWork={studentWork} />
+                      <StudentWork
+                        studentWork={studentWork}
+                        answerBoxColor={palette.fill.success}
+                      />
                     </>
                   )}
                 </DashboardWorkBox>
