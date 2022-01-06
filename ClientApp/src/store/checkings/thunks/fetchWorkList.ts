@@ -21,6 +21,7 @@ export const fetchCheckingsWorkList = (taskId: string): AppThunk => async (dispa
 
     try {
         const response = await getCheckingsWorkList({ accessToken, taskId })
+
         if (!response) {
             dispatch(actions.fetchListFailed({
                 code: IErrorCode.RESPONSE,
@@ -28,10 +29,12 @@ export const fetchCheckingsWorkList = (taskId: string): AppThunk => async (dispa
             }))
             return
         }
+
         if (!response.success) {
             dispatch(actions.fetchListFailed(response.error))
             return
         }
+
         dispatch(actions.fetchStudentListSuccess(response.payload))
         return
 

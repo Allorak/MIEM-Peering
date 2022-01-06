@@ -15,6 +15,9 @@ import { reducer as experts } from '../store/experts'
 import { reducer as checkings } from '../store/checkings'
 import { reducer as authorForm } from '../store/authorformStudent'
 import { reducer as dashboard } from '../store/dashboard'
+import { reducer as deadlineStatus } from '../store/deadlineStatus'
+import { reducer as myWork } from '../store/myWork'
+
 
 export const store = configureStore({
   reducer: {
@@ -23,6 +26,7 @@ export const store = configureStore({
     userProfile,
     registration,
     dashboard,
+    deadlineStatus,
     courses,
     newCourse,
     joinCourse,
@@ -33,7 +37,8 @@ export const store = configureStore({
     works,
     experts,
     checkings,
-    authorForm
+    authorForm,
+    myWork
   }
 })
 

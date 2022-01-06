@@ -14,6 +14,7 @@ import { fetchWorkList, fetchStudentWork, fetchStudentWorkStatistics } from "../
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { Popup } from "../../../../../components/popup";
+import { NoData } from "../../../../../components/noData";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
@@ -161,6 +162,10 @@ export const Works: FC = () => {
             <WorkStatistics workStatistics={workStatistics} />
           )}
         </Popup>
+      )}
+
+      {workList && workList.length === 0 && (
+        <NoData label={"Пока никто не сдал работу..."} />
       )}
     </DashboardWorkBox>
   )

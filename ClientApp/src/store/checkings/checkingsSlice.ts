@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IError, IStudentWork, IPeerForm, IWorkItem } from '../types';
+import { IError, IStudentWork, IPeerForm, IWorkItem, IMyReviews } from '../types';
 
 
 export interface ICheckingsState {
@@ -14,7 +14,8 @@ export interface ICheckingsState {
   error: IError | undefined,
   studentList: IWorkItem[] | undefined,
   studentWork: IStudentWork | undefined,
-  peerForm: IPeerForm | undefined
+  peerForm: IPeerForm | undefined,
+  myReviews: IMyReviews | undefined
 }
 
 const initialState: ICheckingsState = {
@@ -29,7 +30,8 @@ const initialState: ICheckingsState = {
   isPeerFormLock: true,
   studentList: undefined,
   studentWork: undefined,
-  peerForm: undefined
+  peerForm: undefined,
+  myReviews: undefined
 };
 
 export const checkings = createSlice({
@@ -41,6 +43,13 @@ export const checkings = createSlice({
       state.isListLock = true
       state.error = undefined
       state.studentList = undefined
+    },
+
+    fetchMyReviewsStarted: (state) => {
+      state.isListLoading = true
+      state.isListLock = true
+      state.error = undefined
+      state.myReviews = undefined
     },
 
     createReviewStarted: (state) => {
@@ -68,6 +77,13 @@ export const checkings = createSlice({
       state.error = undefined
       state.isListLock = false
       state.studentList = JSON.parse(JSON.stringify(payload))
+    },
+
+    fetchReviewsSuccess: (state, { payload }: PayloadAction<IMyReviews>) => {
+      state.isListLoading = false
+      state.error = undefined
+      state.isListLock = false
+      state.myReviews = payload
     },
 
     createReviewSuccess: (state) => {

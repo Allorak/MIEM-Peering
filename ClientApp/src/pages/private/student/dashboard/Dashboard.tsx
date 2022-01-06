@@ -9,11 +9,14 @@ import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
 import { IMenu, IMenuTitles } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
 
-import * as globalStyles from "../../../../const/styles"
 import { Overview } from './Overview';
 import { Authorform } from './authorform';
+import { MyWork } from './myWork';
+
+import * as globalStyles from "../../../../const/styles"
 
 import { Burger } from '../../../../components/icons/Burger';
+import { Checkings } from './checkings';
 
 export const Dashboard: FC = () => {
   const {
@@ -84,6 +87,8 @@ export const Dashboard: FC = () => {
               <Routes>
                 <Route path={paths.student.dashboard.overview} element={<Overview />} />
                 <Route path={paths.student.dashboard.authorform} element={<Authorform />} />
+                <Route path={paths.student.dashboard.work} element={<MyWork />} />
+                <Route path={paths.student.dashboard.checkings} element={<Checkings />} />
                 {/* // <Route path={paths.student.dashboard.menu2} element={<Overview />} />
                 // <Route path={paths.student.dashboard.menu1} element={<Overview />} /> */}
               </Routes>
@@ -183,11 +188,11 @@ const menuItems = [
     path: paths.student.dashboard.authorform
   },
   {
-    title: IMenuTitles.MENU_2,
-    path: paths.student.dashboard.menu2
+    title: IMenuTitles.WORK,
+    path: paths.student.dashboard.work
   },
   {
-    title: IMenuTitles.MENU_3,
-    path: paths.student.dashboard.menu3
+    title: IMenuTitles.CHECKINGS,
+    path: paths.student.dashboard.checkings
   },
 ] as IMenu[]

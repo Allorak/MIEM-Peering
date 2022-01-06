@@ -1,12 +1,12 @@
-import { actions, fetchExperts } from "..";
+import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
-import { deleteExpert as apiDeleteExpert } from "../../../api/deleteExpert";
-
 import { IErrorCode } from "../../types";
+import { getSubmissionDeadlineStatus } from "../../../api/getSubmissionDeadlineStatus";
 
 
-export const deleteExpert = (taskId: string, email: string): AppThunk => async (dispatch, getState) => {
+export const fetchSubmissionStatus = (taskId: string): AppThunk => async (dispatch, getState) => {
+    dispatch(actions.fetchSubmissionStatusStarted())
     const accessToken = getState().auth.accessToken
 
     if (!accessToken) {
@@ -14,30 +14,31 @@ export const deleteExpert = (taskId: string, email: string): AppThunk => async (
             code: IErrorCode.NO_ACCESS,
             message: 'Ошибка аутентификации', // TODO
         }))
-        console.log("Delete expert error: No access token")
+        console.log("Fetch status error")
         return
     }
 
-    dispatch(actions.deleteStarted())
     try {
-        const response = await apiDeleteExpert({ accessToken, taskId, email })
+        const response = await getSubmissionDeadlineStatus({ accessToken, taskId })
+
         if (!response) {
-            dispatch(actions.deleteFailed({
+            dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
                 message: 'Некорректный ответ сервера', // TODO: i18n
             }))
             return
         }
+
         if (!response.success) {
-            dispatch(actions.deleteFailed(response.error))
+            dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.deleteSuccess())
-        dispatch(fetchExperts(taskId))
+
+        dispatch(actions.fetchSubmissionStatusSuccess(response.payload))
         return
 
     } catch (error) {
-        dispatch(actions.deleteFailed({
+        dispatch(actions.fetchFailed({
             code: IErrorCode.REQUEST,
             message: 'Не удалось выполнить запрос'
         }));
