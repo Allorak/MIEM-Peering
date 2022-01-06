@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Google.Apis.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -94,6 +95,30 @@ namespace patools.Controllers.v1
             
             courseUsersStudentInfo.StudentId = studentId;
             return Ok(await _courseUsersService.AddCourseUserStudent(courseUsersStudentInfo));
+        }
+
+        [HttpPost("joinbycode")]
+        public async Task<ActionResult<string>> JoinToCourseByCode(AddCourseUserByCourseCodeDto courseUserInfo)
+        {
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(studentIdClaim == null)
+                return Ok(new InvalidGuidIdResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(studentIdClaim.Value, out var studentId))
+                return Ok(new InvalidGuidIdResponse());
+            
+            courseUserInfo.StudentId = studentId;
+            return Ok(await _courseUsersService.JoinByCourseCode(courseUserInfo));
         }
 
         // GET: api/CourseUsers/5
