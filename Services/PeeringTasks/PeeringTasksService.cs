@@ -100,7 +100,7 @@ namespace patools.Services.PeeringTasks
                             ID = Guid.NewGuid(),
                             Response = variant.Response,
                             Question = newAuthorQuestion,
-                            ChoiceId = variant.ChoiceId
+                            ChoiceId = variant.Id
                         };
                         if (variantIds.Contains(newVariant.ChoiceId))
                             return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
@@ -133,7 +133,7 @@ namespace patools.Services.PeeringTasks
                             ID = Guid.NewGuid(),
                             Response = variant.Response,
                             Question = newPeerQuestion,
-                            ChoiceId = variant.ChoiceId
+                            ChoiceId = variant.Id
                         };
                         if (variantIds.Contains(newVariant.ChoiceId))
                             return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
