@@ -119,5 +119,10 @@ namespace patools.Services.Submissions
                     SubmissionsInfo = submissions
                 });
         }
+
+        public Task<Response<GetSubmissionDtoResponse>> GetSubmission()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

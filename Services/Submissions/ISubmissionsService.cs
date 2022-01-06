@@ -10,5 +10,7 @@ namespace patools.Services.Submissions
 
         Task<Response<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissions(
             GetAllSubmissionsMainInfoDtoRequest taskInfo);
+
+        Task<Response<GetSubmissionDtoResponse>> GetSubmission();
     }
 }
