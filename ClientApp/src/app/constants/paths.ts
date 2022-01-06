@@ -35,7 +35,7 @@ export const paths = {
       overview: '/st/task/:taskId/overview',
       authorform: '/st/task/:taskId/authorform',
       work: '/st/task/:taskId/work',
-      menu3: '/st/task/:taskId/menu3'
+      checkings: '/st/task/:taskId/checkings'
     }
   },
   expert: {

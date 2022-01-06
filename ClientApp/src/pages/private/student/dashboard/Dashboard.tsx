@@ -16,6 +16,7 @@ import { MyWork } from './myWork';
 import * as globalStyles from "../../../../const/styles"
 
 import { Burger } from '../../../../components/icons/Burger';
+import { Checkings } from './checkings';
 
 export const Dashboard: FC = () => {
   const {
@@ -87,6 +88,7 @@ export const Dashboard: FC = () => {
                 <Route path={paths.student.dashboard.overview} element={<Overview />} />
                 <Route path={paths.student.dashboard.authorform} element={<Authorform />} />
                 <Route path={paths.student.dashboard.work} element={<MyWork />} />
+                <Route path={paths.student.dashboard.checkings} element={<Checkings />} />
                 {/* // <Route path={paths.student.dashboard.menu2} element={<Overview />} />
                 // <Route path={paths.student.dashboard.menu1} element={<Overview />} /> */}
               </Routes>
@@ -190,7 +192,7 @@ const menuItems = [
     path: paths.student.dashboard.work
   },
   {
-    title: IMenuTitles.MENU_3,
-    path: paths.student.dashboard.menu3
+    title: IMenuTitles.CHECKINGS,
+    path: paths.student.dashboard.checkings
   },
 ] as IMenu[]

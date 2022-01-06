@@ -416,6 +416,15 @@ export type IStudentWork = {
   responses: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>
 }
 
+export type IMyReviewsItem = {
+  studentName: string,
+  submissionId: string,
+  answers: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>,
+  expertAnswers?: Array<IStudentWorkSelectItem | IStudentWorkTextItem | IStudentWorkShortTextItem | IStudentWorkMultipleItem>,
+}
+
+export type IMyReviews = Array<IMyReviewsItem>
+
 export interface IPeerFormItem {
   id: string,
   order: number,

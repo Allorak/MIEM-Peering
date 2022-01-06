@@ -79,13 +79,11 @@ export const Checkings: FC = () => {
   }, [studentList])
 
   const handleStudentChange = useCallback((studentId: string) => {
-    if (currentWorkId !== studentId) {
-      setCurrentWorkIdStudent(studentId)
-      getStudentWork(studentId)
-      if (path && path.taskId) {
-        setResponses(undefined)
-        dispatch(fetchPeerForm(path.taskId))
-      }
+    setCurrentWorkIdStudent(studentId)
+    getStudentWork(studentId)
+    if (path && path.taskId) {
+      setResponses(undefined)
+      dispatch(fetchPeerForm(path.taskId))
     }
   }, [])
 
@@ -119,7 +117,7 @@ export const Checkings: FC = () => {
       error={mainError}
     >
       {submissionStatus && submissionStatus !== DeadlineStatus.END && (
-        <AccessTime label={"Сдача работ еще не закончена"}/>
+        <AccessTime label={"Сдача работ еще не закончена"} />
       )}
 
       {studentList && studentList.length > 0 && currentWorkId && (
@@ -184,7 +182,7 @@ export const Checkings: FC = () => {
       )}
 
       {studentList && studentList.length === 0 && submissionStatus === DeadlineStatus.END && (
-        <NoData label={"Работы для проверки не найдены"}/>
+        <NoData label={"Работы для проверки не найдены"} />
       )}
     </DashboardWorkBox>
   )

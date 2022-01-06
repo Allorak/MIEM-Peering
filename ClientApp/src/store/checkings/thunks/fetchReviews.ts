@@ -1,13 +1,12 @@
 import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
-import { getCheckingsWorkList } from "../../../api/getCheckingsWorkList";
-
 import { IErrorCode } from "../../types";
+import { getMyReviews } from "../../../api/getMyReviews";
 
 
-export const fetchCheckingsWorkList = (taskId: string): AppThunk => async (dispatch, getState) => {
-    dispatch(actions.fetchStudentListStarted())
+export const fetchReviews = (taskId: string): AppThunk => async (dispatch, getState) => {
+    dispatch(actions.fetchMyReviewsStarted())
 
     const accessToken = getState().auth.accessToken
     if (!accessToken) {
@@ -15,13 +14,11 @@ export const fetchCheckingsWorkList = (taskId: string): AppThunk => async (dispa
             code: IErrorCode.NO_ACCESS,
             message: 'Ошибка аутентификации', // TODO
         }))
-        console.log("Fetch course error: No access or Role")
         return
     }
 
     try {
-        const response = await getCheckingsWorkList({ accessToken, taskId })
-
+        const response = await getMyReviews({ accessToken, taskId })
         if (!response) {
             dispatch(actions.fetchListFailed({
                 code: IErrorCode.RESPONSE,
@@ -29,13 +26,11 @@ export const fetchCheckingsWorkList = (taskId: string): AppThunk => async (dispa
             }))
             return
         }
-
         if (!response.success) {
             dispatch(actions.fetchListFailed(response.error))
             return
         }
-
-        dispatch(actions.fetchStudentListSuccess(response.payload))
+        dispatch(actions.fetchReviewsSuccess(response.payload))
         return
 
     } catch (error) {

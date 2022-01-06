@@ -33,7 +33,6 @@ export const createReview = (taskId: string, workId: string, responses: IPeerRes
         dispatch(actions.createReviewSuccess())
         dispatch(actions.reset())
         dispatch(fetchCheckingsWorkList(taskId))
-        dispatch(fetchPeerForm(taskId))
         return
 
     } catch (error) {

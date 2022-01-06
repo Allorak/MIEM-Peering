@@ -56,7 +56,7 @@ const convertActiveMenu = (activeMenuId: string | undefined) => {
     case "overview": return IMenuTitles.OVERVIEW
     case "authorform": return IMenuTitles.AUTHORFORM
     case "work": return IMenuTitles.WORK
-    case "menu3": return IMenuTitles.MENU_3
+    case "checkings": return IMenuTitles.CHECKINGS
     default: return undefined
   }
 }
