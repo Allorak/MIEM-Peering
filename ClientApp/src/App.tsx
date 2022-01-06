@@ -11,6 +11,7 @@ import { Wrapper } from './components/wrapper';
 import { Private } from './pages/private/Private';
 
 import { TestPage } from './pages/test';
+import { Error404 } from './pages/error404';
 
 import "../node_modules/react-vis/dist/style.css";
 
@@ -23,7 +24,7 @@ export default () => (
           <Route path={paths.login} element={<Login />} />
           <Route path={paths.registration.main} element={<Registration />} />
           <Route path={paths.registration.selectRole} element={<Role />} />
-          <Route path={'/test'} element={<TestPage />} />
+          <Route path={'/test'} element={<Error404 />} />
           <PrivateRoute path={'*'} element={<Private />} />
         </Routes>
       </Wrapper>
