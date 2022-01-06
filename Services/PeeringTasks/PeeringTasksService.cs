@@ -110,13 +110,14 @@ namespace patools.Services.PeeringTasks
                         await _context.Variants.AddAsync(newVariant);
                     }
 
+                    /*
                     if (!variantIds.Contains(0))
                         return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id 0");
                     foreach (var variantId in variantIds.Where(variantId => variantId!=0 && !variantIds.Contains(variantId-1)))
                     {
                         return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id " +
                             (variantId - 1));
-                    }
+                    }*/
                 }
                 await _context.Questions.AddAsync(newAuthorQuestion);
             }
@@ -150,6 +151,14 @@ namespace patools.Services.PeeringTasks
                         variantIds.Add(newVariant.ChoiceId);
                         await _context.Variants.AddAsync(newVariant);
                     }
+                    /*
+                    if (!variantIds.Contains(0))
+                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id 0");
+                    foreach (var variantId in variantIds.Where(variantId => variantId!=0 && !variantIds.Contains(variantId-1)))
+                    {
+                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id " +
+                            (variantId - 1));
+                    }*/
                 }
                 await _context.Questions.AddAsync(newPeerQuestion);
             }
