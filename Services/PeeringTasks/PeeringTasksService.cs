@@ -112,7 +112,7 @@ namespace patools.Services.PeeringTasks
 
                     if (!variantIds.Contains(0))
                         return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id 0");
-                    foreach (var variantId in variantIds.Where(variantId => !variantIds.Contains(variantId-1)))
+                    foreach (var variantId in variantIds.Where(variantId => variantId!=0 && !variantIds.Contains(variantId-1)))
                     {
                         return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id " +
                             (variantId - 1));
@@ -333,7 +333,11 @@ namespace patools.Services.PeeringTasks
                 {
                     var variants = await _context.Variants
                         .Where(v => v.Question == question)
-                        .Select(v => _mapper.Map<GetVariantDtoResponse>(v))
+                        .Select(v => new GetVariantDtoResponse()
+                        {
+                            Id = v.ChoiceId,
+                            Response = v.Response
+                        })
                         .OrderBy(v => v.Id)
                         .ToListAsync();
                     resultQuestion.Responses = variants;
