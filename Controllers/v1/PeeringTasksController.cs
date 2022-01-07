@@ -113,7 +113,6 @@ namespace patools.Controllers.v1
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
             
-            
             //The user has no id Claim
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             if(userIdClaim == null)
@@ -136,6 +135,50 @@ namespace patools.Controllers.v1
                 return Ok(await _peeringTasksService.GetStudentCourseTasks(taskCourseInfo));
             
             return Ok(new InvalidJwtTokenResponse());
+        }
+
+        [HttpGet("submissionDeadline/task={taskId}")]
+        public async Task<ActionResult<GetCourseTasksDtoResponse>> GetSubmissionDeadline([FromRoute] Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+            
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            return Ok(await _peeringTasksService.GetTaskSubmissionDeadline(new GetTaskDeadlineDtoRequest()
+            {
+                TaskId = taskId,
+                UserId = userId
+            }));
+        }
+        
+        [HttpGet("reviewDeadline/task={taskId}")]
+        public async Task<ActionResult<GetCourseTasksDtoResponse>> GetReviewDeadline([FromRoute] Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+            
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            return Ok(await _peeringTasksService.GetTaskReviewDeadline(new GetTaskDeadlineDtoRequest()
+            {
+                TaskId = taskId,
+                UserId = userId
+            }));
         }
     }
 }

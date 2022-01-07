@@ -376,5 +376,111 @@ namespace patools.Services.PeeringTasks
             response.Payload = new GetAuthorFormDtoResponse() {Rubrics = resultQuestions};
             return response;
         }
+
+        public async Task<Response<GetTaskDeadlineDtoResponse>> GetTaskSubmissionDeadline(GetTaskDeadlineDtoRequest taskInfo)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetTaskDeadlineDtoResponse>("Invalid user id provided");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetTaskDeadlineDtoResponse>("Invalid task id provided");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+            if (expert != null)
+                return new SuccessfulResponse<GetTaskDeadlineDtoResponse>(new GetTaskDeadlineDtoResponse()
+                {
+                    State = GetTaskSubmissionDeadlineState(task)
+                });
+
+            switch (user.Role)
+            {
+                case UserRoles.Student:
+                {
+                    var taskUser = await _context.TaskUsers
+                        .FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
+                    if (taskUser == null)
+                        return new NoAccessResponse<GetTaskDeadlineDtoResponse>(
+                            "This student is not assigned to this task");
+                    return new SuccessfulResponse<GetTaskDeadlineDtoResponse>(new GetTaskDeadlineDtoResponse()
+                    {
+                        State = GetTaskSubmissionDeadlineState(task)
+                    });
+                }
+                case UserRoles.Teacher when task.Course.Teacher != user:
+                    return new NoAccessResponse<GetTaskDeadlineDtoResponse>("This teacher has no access to this task");
+                case UserRoles.Teacher:
+                    return new SuccessfulResponse<GetTaskDeadlineDtoResponse>(new GetTaskDeadlineDtoResponse()
+                    {
+                        State = GetTaskSubmissionDeadlineState(task)
+                    });
+                default:
+                    return new OperationErrorResponse<GetTaskDeadlineDtoResponse>("Incorrect user role stored in token");
+            }
+        }
+
+        public async Task<Response<GetTaskDeadlineDtoResponse>> GetTaskReviewDeadline(GetTaskDeadlineDtoRequest taskInfo)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetTaskDeadlineDtoResponse>("Invalid user id provided");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetTaskDeadlineDtoResponse>("Invalid task id provided");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+            if (expert != null)
+                return new SuccessfulResponse<GetTaskDeadlineDtoResponse>(new GetTaskDeadlineDtoResponse()
+                {
+                    State = GetTaskReviewDeadlineState(task)
+                });
+
+            switch (user.Role)
+            {
+                case UserRoles.Student:
+                {
+                    var taskUser = await _context.TaskUsers
+                        .FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
+                    if (taskUser == null)
+                        return new NoAccessResponse<GetTaskDeadlineDtoResponse>(
+                            "This student is not assigned to this task");
+                    return new SuccessfulResponse<GetTaskDeadlineDtoResponse>(new GetTaskDeadlineDtoResponse()
+                    {
+                        State = GetTaskReviewDeadlineState(task)
+                    });
+                }
+                case UserRoles.Teacher when task.Course.Teacher != user:
+                    return new NoAccessResponse<GetTaskDeadlineDtoResponse>("This teacher has no access to this task");
+                case UserRoles.Teacher:
+                    return new SuccessfulResponse<GetTaskDeadlineDtoResponse>(new GetTaskDeadlineDtoResponse()
+                    {
+                        State = GetTaskReviewDeadlineState(task)
+                    });
+                default:
+                    return new OperationErrorResponse<GetTaskDeadlineDtoResponse>("Incorrect user role stored in token");
+            }
+        }
+
+        private static TaskDeadlineStates GetTaskSubmissionDeadlineState(PeeringTask task)
+        {
+            if (task.SubmissionStartDateTime > DateTime.Now)
+                return TaskDeadlineStates.NotStarted;
+
+            return task.SubmissionEndDateTime > DateTime.Now ? TaskDeadlineStates.Start : TaskDeadlineStates.End;
+        }
+        
+        private static TaskDeadlineStates GetTaskReviewDeadlineState(PeeringTask task)
+        {
+            if (task.ReviewStartDateTime > DateTime.Now)
+                return TaskDeadlineStates.NotStarted;
+
+            return task.ReviewEndDateTime > DateTime.Now ? TaskDeadlineStates.Start : TaskDeadlineStates.End;
+        }
     }
 }
