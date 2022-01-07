@@ -20,19 +20,19 @@ import * as globalStyles from "../../../../../../const/styles";
 
 import {
   defaultResponses,
-  IMultipleQuiestion,
-  IQuestionRubrics,
+  INewMultipleQuiestion,
+  INewQuestionRubrics,
   IQuestionTypes,
-  ISelectRatingQuestion,
-  IShortTextQuestion,
-  ITextQuestion
+  INewSelectRatingQuestion,
+  INewShortTextQuestion,
+  INewTextQuestion
 } from "../../../../../../store/types";
 import { RatingScaleVisible } from "../../../../../../components/rubrics/ratingScale";
 
 
 interface IProps {
-  rubrics: IQuestionRubrics,
-  onSubmit(questions: IQuestionRubrics): void,
+  rubrics: INewQuestionRubrics,
+  onSubmit(questions: INewQuestionRubrics): void,
   isPeerForm?: boolean
 }
 
@@ -42,8 +42,8 @@ export const NewTaskAuthorForm: FC<IProps> = ({
   onSubmit
 }) => {
 
-  const [questions, setQuestions] = useState<IQuestionRubrics>([])
-  const [currentQuestion, setCurrentQuestion] = useState<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>()
+  const [questions, setQuestions] = useState<INewQuestionRubrics>([])
+  const [currentQuestion, setCurrentQuestion] = useState<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion>()
   const [popupStatus, setPopupStatus] = useState(false)
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     })
   }, [rubrics])
 
-  const onUpdate = useCallback((request: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion) => {
+  const onUpdate = useCallback((request: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion) => {
     if (currentQuestion) {
       setQuestions(prev => {
         return prev.map(question => {
@@ -129,7 +129,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     setQuestions(prev => {
       const findQuestion = prev.find(rubric => rubric.order === id)
       if (findQuestion) {
-        const newRubrics = [] as IQuestionRubrics
+        const newRubrics = [] as INewQuestionRubrics
 
         for (const item of prev) {
           if (item.order > id) {
@@ -154,7 +154,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     setQuestions(prev => {
       const findQuestion = prev.find(rubric => rubric.order === id)
       if (findQuestion) {
-        const newRubrics = [] as IQuestionRubrics
+        const newRubrics = [] as INewQuestionRubrics
 
         for (const item of prev) {
           if (item.order > id) {
@@ -279,10 +279,10 @@ export const NewTaskAuthorForm: FC<IProps> = ({
 }
 
 interface IQuestionItem {
-  question?: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion
+  question?: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion
   popupStatus: boolean,
   closePopup(value: SetStateAction<boolean>): void,
-  onSubmit: (rubric: ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion) => void,
+  onSubmit: (rubric: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion) => void,
   isPeerForm?: boolean
 }
 
@@ -296,7 +296,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
 
   const [isSelectRate, setIsSelectRate] = useState<boolean>()
 
-  const { control, formState, reset, setValue, getValues } = useForm<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>({
+  const { control, formState, reset, setValue, getValues } = useForm<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion>({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
@@ -756,7 +756,7 @@ const styles = {
   } as SxProps<Theme>,
 }
 
-const initialQuestion: IShortTextQuestion = {
+const initialQuestion: INewShortTextQuestion = {
   order: 999,
   title: "Введите свой вопрос",
   type: IQuestionTypes.SHORT_TEXT,

@@ -12,6 +12,7 @@ export const postTask = async ({
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
   const isMock = false
+  console.log(task)
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',

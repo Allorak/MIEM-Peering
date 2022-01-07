@@ -52,7 +52,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: false,
-            response: "Ответ 123-3",
+            value: 2,
           },
 
           {
@@ -79,7 +79,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: true,
-            response: "Ответ 123-4",
+            value: 2,
           },
         ]
       },
@@ -126,7 +126,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: false,
-            response: "Ответ 123-3",
+            value: 2,
           },
 
           {
@@ -153,7 +153,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: true,
-            response: "Ответ 123-4",
+            value: 2,
           },
         ],
         expertAnswers: [
@@ -196,7 +196,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: false,
-            response: "Ответ эксперта 234-3",
+            value: 2,
           },
 
           {
@@ -223,7 +223,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: true,
-            response: "Ответ эксперта 234-4",
+            value: 2,
           },
         ],
       }

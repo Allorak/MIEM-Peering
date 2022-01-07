@@ -14,7 +14,7 @@ import { actions, createTasks } from "../../../../../store/tasks"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
 import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
 import { paths } from "../../../../../app/constants/paths";
-import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, IQuestionRubrics, IQuestionTypes, PeerSteps, PeerTaskTypes } from "../../../../../store/types"
+import { INewTask, INewTaskMainInfo, INewTaskSettings, INewTaskState, INewQuestionRubrics, IQuestionTypes, PeerSteps, PeerTaskTypes } from "../../../../../store/types"
 
 import * as globalStyles from "../../../../../const/styles"
 
@@ -40,7 +40,7 @@ export const TaskAdd: FC = () => {
     setStpep('author-form')
   }, [newTaskItem.mainInfo, step])
 
-  const setFormRubrics = useCallback((responses: IQuestionRubrics) => {
+  const setFormRubrics = useCallback((responses: INewQuestionRubrics) => {
     if (step === 'author-form') {
       setNewTaskItem(prev => ({
         ...prev,
@@ -68,11 +68,18 @@ export const TaskAdd: FC = () => {
   }, [dispatch])
 
   const setSettings = useCallback((response: INewTaskSettings) => {
-    if (pathT && pathT.courseId)
-      dispatch(createTasks({
-        ...JSON.parse(JSON.stringify(newTaskItem)),
-        settings: JSON.parse(JSON.stringify(response))
-      }, pathT.courseId))
+    if (response.submissionStartDateTime && response.submissionEndDateTime && response.reviewEndDateTime && response.reviewStartDateTime) {
+      const submissionStartDateTime = new Date(response.submissionStartDateTime.getTime() - (response.submissionStartDateTime.getTimezoneOffset() * 60000))
+      const submissionEndDateTime = new Date(response.submissionEndDateTime.getTime() - (response.submissionEndDateTime.getTimezoneOffset() * 60000))
+      const reviewStartDateTime = new Date(response.reviewStartDateTime.getTime() - (response.reviewStartDateTime.getTimezoneOffset() * 60000))
+      const reviewEndDateTime = new Date(response.reviewEndDateTime.getTime() - (response.reviewEndDateTime.getTimezoneOffset() * 60000))
+
+      if (pathT && pathT.courseId)
+        dispatch(createTasks({
+          ...JSON.parse(JSON.stringify(newTaskItem)),
+          settings: JSON.parse(JSON.stringify({ ...response, submissionStartDateTime, submissionEndDateTime, reviewStartDateTime, reviewEndDateTime }))
+        }, pathT.courseId))
+    }
   }, [step, newTaskItem, pathT])
 
   if (newTaskPayload && newTaskPayload.id
@@ -180,7 +187,8 @@ const initialTask: INewTask = {
         type: IQuestionTypes.SELECT_RATE,
         required: true,
         minValue: 0,
-        maxValue: 10
+        maxValue: 10,
+        coefficientPercentage: 100
       },
       {
         order: 1,

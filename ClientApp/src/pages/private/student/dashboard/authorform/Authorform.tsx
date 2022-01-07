@@ -29,21 +29,34 @@ export const Authorform: FC = () => {
   const [responses, setResponses] = useState<IAuthorForm>()
 
   const onRequest = useCallback((formResponses: IAuthorFormResponses) => {
+    console.log("formResponses:", formResponses)
     if (path && path.taskId && formResponses.responses)
       dispatch(postAuthorformStudent(path.taskId, formResponses))
   }, [path])
 
   const handleOnFormEdit = useCallback((value: string | number | undefined, questionId: string) => {
-    console.log(questionId)
     setResponses(prev => {
+      console.log(prev)
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
           rubrics: JSON.parse(JSON.stringify(prev.rubrics.map((item) => {
-            if (item.id !== questionId) return item
-            if (item.type === IQuestionTypes.SELECT_RATE && (typeof value === 'number' || typeof value === 'undefined'))
-              return { ...item, response: value }
-            if (item.type !== IQuestionTypes.SELECT_RATE && (typeof value === 'string' || typeof value === 'undefined'))
-              return { ...item, response: value }
+            if (item.questionId !== questionId) return item
+
+            switch (item.type) {
+              case IQuestionTypes.SELECT_RATE:
+              case IQuestionTypes.MULTIPLE:
+                return {
+                  ...item,
+                  ...(typeof value !== 'string' && { value: value })
+                }
+
+              case IQuestionTypes.SHORT_TEXT:
+              case IQuestionTypes.TEXT:
+                return {
+                  ...item,
+                  ...(typeof value !== 'number' && { response: value?.trim() })
+                }
+            }
           })))
         }
       }
@@ -51,7 +64,7 @@ export const Authorform: FC = () => {
   }, [responses])
 
   useEffect(() => {
-    if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0) {
+    if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0 && !responses) {
       setResponses(JSON.parse(JSON.stringify(authorForm)))
     }
   }, [authorForm])
@@ -63,16 +76,16 @@ export const Authorform: FC = () => {
   }, [submissionStatus, submissionWorkStatus])
 
   useEffect(() => {
-    if (path && path.taskId && submissionStatus !== DeadlineStatus.NOT_STARTED) {
+    if (path && path.taskId) {
       dispatch(fetchSubmissionStatus(path.taskId))
     }
   }, [])
 
   useEffect(() => {
-    if (path && path.taskId) {
+    if (path && path.taskId && submissionStatus && submissionStatus !== DeadlineStatus.NOT_STARTED) {
       dispatch(fetchWorkSubmissionStatus(path.taskId))
     }
-  }, [])
+  }, [submissionStatus])
 
   const mainStatus = submissionStatus ? status : statusDeadline
   const mainError = submissionStatus ? error : submissionError
@@ -96,6 +109,10 @@ export const Authorform: FC = () => {
 
       {submissionStatus && submissionStatus === DeadlineStatus.NOT_STARTED && (
         <AccessTime label={"Доступ ограничен"} />
+      )}
+
+      {submissionStatus && submissionStatus === DeadlineStatus.END && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED && (
+        <AccessTime label={"Доступ ограничен. Работа не сдана"} />
       )}
 
       {submissionStatus && submissionWorkStatus === ISubmissionStatus.COMPLETED && (submissionStatus === DeadlineStatus.START || submissionStatus === DeadlineStatus.END) && (
