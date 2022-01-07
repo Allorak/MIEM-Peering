@@ -1,14 +1,18 @@
 import { actions } from "..";
-import { getUserProfile } from "../../../api/getUserProfile";
 import { AppThunk } from "../../../app/store";
-
 
 import { IErrorCode } from "../../types";
 
+import { actions as authActions } from "../../auth";
 
-export const fetchUserProfile = (): AppThunk => async (dispatch, getState) => {
+import Cookies from 'universal-cookie';
+import { getUserProfile } from "../../../api/getUserProfile";
+
+
+export const fetchUserProfileCookiesJWT = (): AppThunk => async (dispatch) => {
     dispatch(actions.userProfileStarted())
-    const accessToken = getState().auth.accessToken
+    const cookies = new Cookies();
+    const accessToken = cookies.get('JWT')
 
     try {
         if (!accessToken) {
@@ -20,6 +24,7 @@ export const fetchUserProfile = (): AppThunk => async (dispatch, getState) => {
         }
 
         const response = await getUserProfile({ accessToken })
+        console.log(response)
         if (!response) {
             dispatch(actions.userProfileFailed({
                 code: IErrorCode.RESPONSE,
@@ -31,6 +36,8 @@ export const fetchUserProfile = (): AppThunk => async (dispatch, getState) => {
             dispatch(actions.userProfileFailed(response.error))
             return
         }
+        
+        dispatch(authActions.authSuccess(accessToken))
         dispatch(actions.userProfileSuccess(response.payload))
 
 
