@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using patools.Dtos.Answer;
 using patools.Dtos.Submission;
+using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
@@ -78,13 +80,16 @@ namespace patools.Services.Submissions
                     ID = Guid.NewGuid(),
                     Submission = newSubmission,
                     Question = question,
-                    Review = answer.Response,
+                    Response = answer.Response,
                     Value = answer.Value
                 });
             }
             await _context.Answers.AddRangeAsync(newAnswers);
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<GetNewSubmissionDtoResponse>(newSubmission);
+            var result = new GetNewSubmissionDtoResponse()
+            {
+                SubmissionId = newSubmission.ID
+            };
             return new SuccessfulResponse<GetNewSubmissionDtoResponse>(result);
         }
 
@@ -118,6 +123,98 @@ namespace patools.Services.Submissions
                 {
                     SubmissionsInfo = submissions
                 });
+        }
+
+        public async Task<Response<GetSubmissionDtoResponse>> GetSubmission(GetSubmissionDtoRequest submissionInfo)
+        {
+            var submission = await _context.Submissions
+                .Include(s => s.PeeringTaskUserAssignment)
+                .Include(s => s.PeeringTaskUserAssignment.Student)
+                .Include(s => s.PeeringTaskUserAssignment.PeeringTask)
+                .FirstOrDefaultAsync(t => t.ID == submissionInfo.SubmissionId);
+            if (submission == null)
+                return new InvalidGuidIdResponse<GetSubmissionDtoResponse>("Invalid submission id provided");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == submissionInfo.StudentId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetSubmissionDtoResponse>("Invalid student id provided");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e =>
+                e.User == user && e.PeeringTask == submission.PeeringTaskUserAssignment.PeeringTask);
+            
+            switch (user.Role)
+            {
+                case UserRoles.Student when submission.PeeringTaskUserAssignment.Student != user && expert == null:
+                    return new NoAccessResponse<GetSubmissionDtoResponse>("This submission doesn't belong to this user");
+                case UserRoles.Student when submission.PeeringTaskUserAssignment.States == PeeringTaskStates.Assigned:
+                    return new OperationErrorResponse<GetSubmissionDtoResponse>("There is an error in stored data (TaskUsers table)");
+                case UserRoles.Teacher when expert == null:
+                {
+                    var task = await _context.Tasks
+                        .Include(t => t.Course.Teacher)
+                        .FirstOrDefaultAsync(t => t == submission.PeeringTaskUserAssignment.PeeringTask);
+
+                    if (task.Course.Teacher != user)
+                        return new NoAccessResponse<GetSubmissionDtoResponse>(
+                            "This teacher has no access to this submission");
+                    break;
+                }
+                default:
+                    return new OperationErrorResponse<GetSubmissionDtoResponse>("Incorrect user role in token");
+            }
+
+            var answers = await _context.Answers
+                .Include(a => a.Question)
+                .Where(a => a.Submission == submission)
+                .ToListAsync();
+
+            var resultAnswers = new List<GetAnswerDtoResponse>();
+            foreach (var answer in answers)
+            {
+                var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
+                if(question==null)
+                    return new OperationErrorResponse<GetSubmissionDtoResponse>("There is an error in stored data (Questions table)");
+                
+                var resultAnswer = new GetAnswerDtoResponse()
+                {
+                    QuestionId = question.ID,
+                    Order = question.Order,
+                    Title = question.Title,
+                    Description = question.Description,
+                    MinValue = question.MinValue,
+                    MaxValue = question.MaxValue,
+                    Required = question.Required,
+                    Type = question.Type
+                };
+                switch (resultAnswer.Type)
+                {
+                    case QuestionTypes.Text or QuestionTypes.ShortText:
+                        resultAnswer.Response = answer.Response;
+                        break;
+                    case QuestionTypes.Select:
+                        resultAnswer.Value = answer.Value;
+                        break;
+                    case QuestionTypes.Multiple:
+                        resultAnswer.Value = answer.Value;
+                        var responses = await _context.Variants
+                            .Where(v => v.Question == question)
+                            .Select(v => new GetVariantDtoResponse()
+                            {
+                                Id=v.ChoiceId,
+                                Response = v.Response
+                            })
+                            .OrderBy(v=>v.Id)
+                            .ToListAsync();
+                        resultAnswer.Responses = responses;
+                        break;
+                }
+                resultAnswers.Add(resultAnswer);
+            }
+
+            return new SuccessfulResponse<GetSubmissionDtoResponse>(new GetSubmissionDtoResponse()
+            {
+                Answers = resultAnswers
+            });
         }
     }
 }

@@ -14,7 +14,7 @@ namespace patools.Models
         public Question Question { get; set; }
 
         public int? Value { get; set; }
-        public string Review { get; set; }
+        public string Response { get; set; }
 
         public int Grade { get; set; }
     }
