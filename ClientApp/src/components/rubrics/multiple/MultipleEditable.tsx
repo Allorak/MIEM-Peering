@@ -7,8 +7,8 @@ import { IMultipleResponse } from "../../../store/types";
 
 interface IProps {
   responses: IMultipleResponse[],
-  value?: string
-  onEdit: (value: string | undefined, id: string) => void,
+  value?: number
+  onEdit: (value: number | undefined, id: string) => void,
   required: boolean,
   id: string
 }
@@ -22,7 +22,9 @@ export const MultipleEditable: FC<IProps> = ({
 }) => {
 
   const handleRadioChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    onEdit(event.target.value, id)
+    const choiceId = event.target.value
+    if (!isNaN(Number(choiceId)))
+      onEdit(Number(choiceId), id)
   }, [])
 
   const onReset = useCallback(() => {
@@ -31,36 +33,37 @@ export const MultipleEditable: FC<IProps> = ({
 
   return (
     <>
-        <RadioGroup
-          defaultValue={value}
-          onChange={handleRadioChange}
-          name={id}
-        >
-          {responses.map((item, index) => (
-            <FormControlLabel
-              key={`${id}+${index}`}
-              sx={styles.root}
-              id={`${id}+${index}`}
-              value={item.response}
-              control={
-                <Radio required={required}/>
-              }
-              label={
-                <Typography variant={'h6'}>
-                  {item.response}
-                </Typography>
-              }
-              checked={value === item.response}
-            />
-          ))}
-        </RadioGroup>
-        {!required && typeof value !== 'undefined' && (
-          <Box sx={styles.cancelContainer}>
-            <Button variant="text" sx={styles.cancelButton} onClick={onReset}>
-              {"Отменить выбор"}
-            </Button>
-          </Box>
-        )}
+      <RadioGroup
+        defaultValue={value}
+        onChange={handleRadioChange}
+        name={id}
+      >
+        {responses.map((item, index) => (
+          <FormControlLabel
+            key={`${id}+${index}`}
+            sx={styles.root}
+            id={`${id}+${index}`}
+            value={item.id}
+            control={
+              <Radio required={required} />
+            }
+            label={
+              <Typography variant={'h6'}>
+                {item.response}
+              </Typography>
+            }
+            checked={value === item.id}
+          />
+        ))}
+      </RadioGroup>
+
+      {!required && typeof value !== 'undefined' && (
+        <Box sx={styles.cancelContainer}>
+          <Button variant="text" sx={styles.cancelButton} onClick={onReset}>
+            {"Отменить выбор"}
+          </Button>
+        </Box>
+      )}
     </>
   )
 }

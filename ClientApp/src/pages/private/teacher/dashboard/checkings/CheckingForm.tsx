@@ -11,7 +11,6 @@ import { TextEditable } from "../../../../../components/rubrics/text";
 
 import { IPeerForm, IQuestionTypes, IPeerResponses } from "../../../../../store/types";
 
-
 import * as globalStyles from "../../../../../const/styles";
 
 interface IProps {
@@ -25,16 +24,36 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
   const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
     for (const item of peerForm.rubrics) {
-      if (item.required && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
+      const isResponse = item.type === IQuestionTypes.SHORT_TEXT || item.type === IQuestionTypes.TEXT
+      const isValue = item.type === IQuestionTypes.MULTIPLE || item.type === IQuestionTypes.SELECT_RATE
+
+      if (item.required && isResponse && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
         console.log(item, "!", typeof item.response === 'undefined')
+        return
+      }
+
+      if (item.required && isValue && typeof item.value === 'undefined') {
+        console.log(item, "!", typeof item.value === 'undefined')
         return
       }
     }
     const formResponses: IPeerResponses = {
-      responses: peerForm.rubrics.map(response => {
-        if (response.response !== undefined)
-          return { questionId: response.id, response: typeof response.response === 'string' ? response.response.trim() : response.response }
-        return { questionId: response.id }
+      responses: peerForm.rubrics.map((response) => {
+        switch (response.type) {
+          case IQuestionTypes.TEXT:
+          case IQuestionTypes.SHORT_TEXT:
+            return {
+              questionId: response.questionId,
+              response: response.response?.trim()
+            }
+
+          case IQuestionTypes.SELECT_RATE:
+          case IQuestionTypes.MULTIPLE:
+            return {
+              questionId: response.questionId,
+              value: response.value
+            }
+        }
       })
     }
     onSubmit(formResponses)
@@ -49,7 +68,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
       {peerForm.rubrics.map((item, index) => (
         <AnswerBox
           id={index}
-          key={item.id}
+          key={item.questionId}
           title={item.title}
           required={item.required}
           description={item.description}
@@ -57,7 +76,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
           <QuestionBox>
             {item.type === IQuestionTypes.SHORT_TEXT && (
               <ShortTextEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 value={item.response}
                 onEdit={onEdit}
@@ -66,7 +85,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
 
             {item.type === IQuestionTypes.TEXT && (
               <TextEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 value={item.response}
                 onEdit={onEdit}
@@ -75,20 +94,20 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
 
             {item.type === IQuestionTypes.MULTIPLE && (
               <MultipleEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 onEdit={onEdit}
-                value={item.response}
+                value={item.value}
                 responses={JSON.parse(JSON.stringify(item.responses))}
               />
             )}
 
             {item.type === IQuestionTypes.SELECT_RATE && (
               <RatingScaleEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 onEdit={onEdit}
-                value={item.response}
+                value={item.value}
                 maxValue={item.maxValue}
                 minValue={item.minValue}
               />

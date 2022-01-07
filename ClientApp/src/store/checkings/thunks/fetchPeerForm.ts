@@ -34,9 +34,9 @@ export const fetchPeerForm = (taskId: string): AppThunk => async (dispatch, getS
         dispatch(actions.fetchPeerFormSuccess({
             rubrics: response.payload.rubrics.map(rubric => {
                 if (rubric.type === IQuestionTypes.MULTIPLE && rubric.required)
-                    return { ...rubric, response: rubric.responses[0].response }
+                    return { ...rubric, value: rubric.responses[0].id }
                 if (rubric.type === IQuestionTypes.SELECT_RATE && rubric.required)
-                    return { ...rubric, response: rubric.minValue }
+                    return { ...rubric, value: rubric.minValue }
                 return rubric
             })
         }))

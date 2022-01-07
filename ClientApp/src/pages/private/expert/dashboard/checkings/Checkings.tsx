@@ -97,11 +97,23 @@ export const Checkings: FC = () => {
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
           rubrics: JSON.parse(JSON.stringify(prev.rubrics.map(item => {
-            if (item.id !== questionId) return item
-            if (item.type === IQuestionTypes.SELECT_RATE && (typeof value === 'number' || typeof value === 'undefined'))
-              return { ...item, response: value }
-            if (item.type !== IQuestionTypes.SELECT_RATE && (typeof value === 'string' || typeof value === 'undefined'))
-              return { ...item, response: value }
+            if (item.questionId !== questionId) return item
+
+            switch (item.type) {
+              case IQuestionTypes.SELECT_RATE:
+              case IQuestionTypes.MULTIPLE:
+                return {
+                  ...item,
+                  ...(typeof value !== 'string' && { value: value })
+                }
+
+              case IQuestionTypes.SHORT_TEXT:
+              case IQuestionTypes.TEXT:
+                return {
+                  ...item,
+                  ...(typeof value !== 'number' && { response: value?.trim() })
+                }
+            }
           })))
         }
       }

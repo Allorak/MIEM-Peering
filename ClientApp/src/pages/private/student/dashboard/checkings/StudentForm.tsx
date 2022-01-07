@@ -39,7 +39,7 @@ export const StudentWork: FC<IProps> = ({
               {item.type === IQuestionTypes.MULTIPLE && (
                 <MultipleVisible
                   responses={item.responses}
-                  response={item.response}
+                  response={item.value}
                   isResponse
                 />
               )}
@@ -60,7 +60,7 @@ export const StudentWork: FC<IProps> = ({
 
               {item.type === IQuestionTypes.SELECT_RATE && (
                 <RatingScaleVisible
-                  response={item.response}
+                  response={item.value}
                   isResponse
                 />
               )}

@@ -10,7 +10,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
     success: true,
     payload: {
       responses: [
-        {"questionId":"0","response":"stte"},
+        {questionId:"0", response:"stte"},
         {"questionId":"1","response":"st"},
         {"questionId":"2"},
         {"questionId":"3","response":1},

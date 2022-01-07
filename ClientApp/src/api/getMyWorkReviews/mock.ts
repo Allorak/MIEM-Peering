@@ -55,7 +55,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: false,
-            response: "Вариант 4"
+            value: 4
           },
           {
             questionId: "asydasd",
@@ -81,7 +81,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: true,
-            response: "zxzx 4",
+            value: 3
           },
           {
             questionId: "456",
@@ -91,7 +91,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
             required: true,
             minValue: 0,
             maxValue: 5,
-            response: 5,
+            value: 5,
             coefficientPercentage: 50
           },
           {
@@ -151,7 +151,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: false,
-            response: "Виктор Петров"
+            value: 1
           },
           {
             questionId: "asydasd",
@@ -177,7 +177,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
               }
             ],
             required: true,
-            response: "zxzx 4",
+            value: 2
           },
           {
             questionId: "456",
@@ -187,7 +187,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
             required: true,
             minValue: 0,
             maxValue: 5,
-            response: 5,
+            value: 5,
             coefficientPercentage: 40
           },
           {
