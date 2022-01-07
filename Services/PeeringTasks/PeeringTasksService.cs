@@ -78,8 +78,25 @@ namespace patools.Services.PeeringTasks
                 
             };
             await _context.Tasks.AddAsync(newTask);
-            await _context.SaveChangesAsync();
+            //TODO: Feature should be changed later
 
+            var students = await _context.CourseUsers
+                .Where(cu => cu.Course == course)
+                .Select(cu => cu.User)
+                .ToListAsync();
+
+            foreach (var student in students)
+            {
+                var taskUser = new PeeringTaskUser()
+                {
+                    ID = Guid.NewGuid(),
+                    PeeringTask = newTask,
+                    Student = student,
+                    States = PeeringTaskStates.Assigned
+                };
+
+                await _context.TaskUsers.AddAsync(taskUser);
+            }
 
             foreach(var authorQuestion in peeringTask.AuthorForm.Rubrics)
             {
