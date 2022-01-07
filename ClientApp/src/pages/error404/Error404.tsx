@@ -1,11 +1,28 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import { Button, Typography } from '@mui/material';
 import { Box, Theme, SxProps} from '@mui/system';
 
+import { useAppSelector } from '../../app/hooks';
+
 import { IconErorr404 } from '../../components/icons/404';
 
-export const Error404: FC = () => {
+import { paths } from '../../app/constants/paths';
+import { IRole } from '../../store/types';
 
+export const Error404: FC = () => {
+    const history = useNavigate()
+
+    const userProfile = useAppSelector(state => state.userProfile.payload)
+
+    const goToHome = useCallback(() => {
+        console.log('Return to Home')
+        if (userProfile)
+            history(userProfile.role === IRole.teacher ? paths.teacher.main : paths.student.main)
+        else history(paths.root)
+    }, [userProfile])
+    
     return (
         <Box sx={styles.container}>
             <Box sx={styles.root}>
@@ -27,6 +44,7 @@ export const Error404: FC = () => {
                     </Box>
                     <Button variant='contained'
                             sx={styles.infoblock__button}
+                            onClick={goToHome}
                     >
                         {"Вернуться на Главную"}
                     </Button>
