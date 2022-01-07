@@ -21,10 +21,19 @@ namespace patools.Services.Experts
         
         public async Task<Response<GetExpertDtoResponse[]>> GetExperts(GetExpertDtoRequest info)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == info.TaskId);
+            var task = await _context.Tasks
+                .Include(t=>t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == info.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<GetExpertDtoResponse[]>("Invalid task id provided");
 
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == info.TeacherId);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<GetExpertDtoResponse[]>("Invalid teacher id");
+
+            if (task.Course.Teacher != teacher)
+                return new NoAccessResponse<GetExpertDtoResponse[]>("This teacher has no access to this task");
+            
             var experts = await _context.Experts
                 .Include(e =>e.User)
                 .Where(e => e.PeeringTask == task)

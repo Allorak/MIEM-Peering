@@ -6,6 +6,7 @@ namespace patools.Dtos.Answer
     {
         public Guid QuestionId { get; set; }
         
-        public string Response { get; set; }
+        public string Response { get; set; }    
+        public int? Value { get; set; }
     }
 }
