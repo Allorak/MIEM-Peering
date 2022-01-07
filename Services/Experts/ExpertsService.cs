@@ -42,7 +42,7 @@ namespace patools.Services.Experts
                     Email = e.Email,
                     Name = e.User.Fullname ?? "Эксперт",
                     ImageUrl = e.User.ImageUrl ?? "",
-                    TasksComplete = 1,
+                    TasksCompleted = 1,
                     TasksAssigned = 1
                 })
                 .ToArrayAsync();

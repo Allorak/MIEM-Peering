@@ -28,7 +28,7 @@ namespace patools.Migrations
                     b.Property<Guid?>("QuestionID")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Review")
+                    b.Property<string>("Response")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("SubmissionID")

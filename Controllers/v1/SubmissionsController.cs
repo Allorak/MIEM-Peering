@@ -48,7 +48,7 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.AddSubmission(submission));
         }
 
-        [HttpGet("get/task={taskId}")]
+        [HttpGet("getall/task={taskId}")]
         public async Task<ActionResult<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissionsInfo(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -68,6 +68,27 @@ namespace patools.Controllers.v1
                 UserId = userId
             };
             return Ok(await _submissionsService.GetSubmissions(taskInfo));
+        }
+
+        [HttpGet("get/submission={submissionId}")]
+        public async Task<ActionResult<GetSubmissionDtoResponse>> GetSubmission([FromRoute] Guid submissionId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+            
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _submissionsService.GetSubmission(new GetSubmissionDtoRequest()
+            {
+                StudentId = userId,
+                SubmissionId = submissionId
+            }));
         }
     }
 }
