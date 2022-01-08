@@ -3,19 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace patools.Models
 {
-    public class Answer
+    public class SubmissionPeer
     {
+        [Required]
         public Guid ID { get; set; }
-        
         [Required]
         public Submission Submission { get; set; }
-        
         [Required]
-        public Question Question { get; set; }
-
-        public int? Value { get; set; }
-        public string Response { get; set; }
-
-        public int Grade { get; set; }
+        public User Peer { get; set; }
     }
 }

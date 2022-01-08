@@ -7,7 +7,7 @@ import { PrivateHeader } from '../../components/header'
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { paths } from '../../app/constants/paths'
-import { fetchUserProfile } from '../../store/userProfile'
+import { fetchUserProfile, fetchUserProfileCookiesJWT } from '../../store/userProfile'
 
 import { IRole } from '../../store/types'
 
@@ -23,9 +23,10 @@ import { STCourseList as StudentCourseList } from './student/course/list'
 import { fetchDashboard, actions as DashboardActions } from '../../store/dashboard'
 import { CircularProgress, Typography } from '@mui/material'
 
+import Cookies from 'universal-cookie';
 
 export function Private() {
-
+  const cookies = new Cookies();  
   const location = useLocation()
   const dispatch = useAppDispatch()
 
@@ -38,6 +39,16 @@ export function Private() {
   const path = matchPath('/:role/task/:taskId/*', location.pathname)
   const role = path?.params?.role
   const taskId = path?.params?.taskId
+
+  if (!cookies.get('JWT')) { 
+    cookies.set('JWT', accessToken)
+  }
+
+  useEffect(() => {
+    if (!accessToken && cookies.get('JWT') !== 'undefined' && !userProfilePayload) {
+      dispatch(fetchUserProfileCookiesJWT())
+    }
+  }, [dispatch, accessToken])
 
   useEffect(() => {
     if (accessToken && !userProfilePayload) {
@@ -52,7 +63,7 @@ export function Private() {
     }
   }, [taskId])
 
-  if ((!isAuthorized || !accessToken) && !registrationToken) {
+  if ((!isAuthorized || !accessToken) && !registrationToken && cookies.get('JWT') == 'undefined') {
     console.log('Navigate to login')
     return (
       <Navigate

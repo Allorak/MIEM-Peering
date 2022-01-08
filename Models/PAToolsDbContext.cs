@@ -19,6 +19,7 @@ namespace patools.Models
         public DbSet<CourseUser> CourseUsers { get; set; }
         public DbSet<GroupUser> GroupUsers { get; set; }
         public DbSet<PeeringTaskUser> TaskUsers { get; set; }
+        public DbSet<SubmissionPeer> SubmissionPeers { get; set; }
 
         public string DbPath { get; private set; }
 

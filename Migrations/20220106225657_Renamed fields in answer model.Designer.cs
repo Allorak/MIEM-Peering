@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220106225657_Renamed fields in answer model")]
+    partial class Renamedfieldsinanswermodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,9 +185,6 @@ namespace patools.Migrations
                     b.Property<Guid?>("ExpertTaskID")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("PeersAssigned")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime?>("ReviewEndDateTime")
                         .HasColumnType("TEXT");
 
@@ -302,27 +301,6 @@ namespace patools.Migrations
                     b.HasIndex("PeeringTaskUserAssignmentID");
 
                     b.ToTable("Submissions");
-                });
-
-            modelBuilder.Entity("patools.Models.SubmissionPeer", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("PeerID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("SubmissionID")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("PeerID");
-
-                    b.HasIndex("SubmissionID");
-
-                    b.ToTable("SubmissionPeers");
                 });
 
             modelBuilder.Entity("patools.Models.User", b =>
@@ -497,21 +475,6 @@ namespace patools.Migrations
                         .HasForeignKey("PeeringTaskUserAssignmentID");
 
                     b.Navigation("PeeringTaskUserAssignment");
-                });
-
-            modelBuilder.Entity("patools.Models.SubmissionPeer", b =>
-                {
-                    b.HasOne("patools.Models.User", "Peer")
-                        .WithMany()
-                        .HasForeignKey("PeerID");
-
-                    b.HasOne("patools.Models.Submission", "Submission")
-                        .WithMany()
-                        .HasForeignKey("SubmissionID");
-
-                    b.Navigation("Peer");
-
-                    b.Navigation("Submission");
                 });
 
             modelBuilder.Entity("patools.Models.Variant", b =>
