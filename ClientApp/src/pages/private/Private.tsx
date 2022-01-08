@@ -40,7 +40,7 @@ export function Private() {
   const role = path?.params?.role
   const taskId = path?.params?.taskId
 
-  if (!cookies.get('JWT') || cookies.get('JWT') == 'undefined') { 
+  if (!cookies.get('JWT')) { 
     cookies.set('JWT', accessToken)
   }
 
