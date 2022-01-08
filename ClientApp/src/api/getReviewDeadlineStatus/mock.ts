@@ -8,6 +8,8 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
   await delay(1500)
   return {
     success: true,
-    payload: DeadlineStatus.START
+    payload: {
+      state: DeadlineStatus.START
+    }
   }
 }

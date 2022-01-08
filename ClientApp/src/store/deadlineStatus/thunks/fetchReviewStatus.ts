@@ -31,7 +31,7 @@ export const fetchReviewStatus = (taskId: string): AppThunk => async (dispatch, 
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchReviewStatusSuccess(response.payload))
+        dispatch(actions.fetchReviewStatusSuccess(response.payload.state))
         return
 
     } catch (error) {

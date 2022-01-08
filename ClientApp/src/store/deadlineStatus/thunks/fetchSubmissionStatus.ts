@@ -34,7 +34,7 @@ export const fetchSubmissionStatus = (taskId: string): AppThunk => async (dispat
             return
         }
 
-        dispatch(actions.fetchSubmissionStatusSuccess(response.payload))
+        dispatch(actions.fetchSubmissionStatusSuccess(response.payload.state))
         return
 
     } catch (error) {

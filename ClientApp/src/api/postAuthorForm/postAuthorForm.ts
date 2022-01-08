@@ -1,4 +1,3 @@
-import { TrainRounded } from '@mui/icons-material'
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'

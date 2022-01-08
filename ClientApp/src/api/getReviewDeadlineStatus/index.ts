@@ -5,6 +5,8 @@ export type IRequestData = {
     taskId: string
 }
 
-export type IResponseData = DeadlineStatus
+export type IResponseData = {
+    state: DeadlineStatus
+}
 
 export { getReviewDeadlineStatus } from './getReviewDeadlineStatus';

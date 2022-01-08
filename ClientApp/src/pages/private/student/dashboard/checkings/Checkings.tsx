@@ -199,7 +199,7 @@ export const Checkings: FC = () => {
       error={mainError}
     >
       {(invalidDeadline || myReviewsInvalid) && (
-        <AccessTime label={"Досутп ограничен"} />
+        <AccessTime label={"Доступ ограничен"} />
       )}
 
       {studentList && studentList.length > 0 && currentWorkId && validDeadline && (

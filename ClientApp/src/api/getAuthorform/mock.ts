@@ -50,6 +50,31 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
           ],
           required: false
         },
+        {
+          questionId: "ashdjhsda",
+          order: 3,
+          title: "Title 3",
+          type: IQuestionTypes.MULTIPLE,
+          responses: [
+            {
+              id: 1,
+              response: "Вариант 1",
+            },
+            {
+              id: 2,
+              response: "Вариант 2",
+            },
+            {
+              id: 3,
+              response: "Вариант 3",
+            },
+            {
+              id: 4,
+              response: "Вариант 4",
+            }
+          ],
+          required: false
+        },
 
         {
           questionId: "asydasd",
