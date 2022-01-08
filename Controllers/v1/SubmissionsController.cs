@@ -48,7 +48,7 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.AddSubmission(submission));
         }
 
-        [HttpGet("getall/task={taskId}")]
+        [HttpGet("get/task={taskId}")]
         public async Task<ActionResult<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissionsInfo(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
