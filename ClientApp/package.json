@@ -34,7 +34,8 @@
         "reactstrap": "8.10.0",
         "redux": "4.1.1",
         "redux-thunk": "2.3.0",
-        "svgo": "2.7.0"
+        "svgo": "2.7.0",
+        "universal-cookie": "^4.0.4"
     },
     "devDependencies": {
         "@types/history": "4.7.9",

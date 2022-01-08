@@ -21,6 +21,7 @@ import { Dashboard as StudentDashboard } from './student/dashboard/Dashboard'
 import { Dashboard as ExpertDashboard } from './expert/dashboard/Dashboard'
 import { STCourseList as StudentCourseList } from './student/course/list'
 import { fetchDashboard, actions as DashboardActions } from '../../store/dashboard'
+import { actions as authActions } from '../../store/auth'
 import { CircularProgress, Typography } from '@mui/material'
 
 import Cookies from 'universal-cookie';
@@ -45,8 +46,10 @@ export function Private() {
   }
 
   useEffect(() => {
-    if (!accessToken && cookies.get('JWT') !== 'undefined' && !userProfilePayload) {
-      dispatch(fetchUserProfileCookiesJWT())
+    const accessTokenFromCookies = cookies.get('JWT')
+    if (!accessToken && accessTokenFromCookies !== 'undefined' && !userProfilePayload) {
+      dispatch(authActions.authSuccess(accessTokenFromCookies))
+      // dispatch(fetchUserProfileCookiesJWT())
     }
   }, [dispatch, accessToken])
 
@@ -57,11 +60,11 @@ export function Private() {
   }, [dispatch, accessToken])
 
   useEffect(() => {
-    if (taskId && role) {
+    if (taskId && role && accessToken) {
       dispatch(DashboardActions.resetState())
       dispatch(fetchDashboard(taskId))
     }
-  }, [taskId])
+  }, [taskId, accessToken])
 
   if ((!isAuthorized || !accessToken) && !registrationToken && cookies.get('JWT') == 'undefined') {
     console.log('Navigate to login')
