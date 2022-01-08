@@ -5,11 +5,7 @@
     <projectFile profileName="patools">patools.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.patools.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/IPeeringTasksService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/PeeringTasks/PeeringTasksService.cs" afterDir="false" />
-    </list>
+    <list default="true" id="629144cc-0b19-4fe6-a107-841b58ef5868" name="Changes" comment="Fixed bugs" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,7 +14,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="develop" />
+        <entry key="$PROJECT_DIR$" value="task-279" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -41,12 +37,12 @@
               <option name="branches">
                 <list>
                   <RecentBranch>
-                    <option name="branchName" value="issue-200" />
-                    <option name="lastUsedInstant" value="1639926577" />
+                    <option name="branchName" value="develop" />
+                    <option name="lastUsedInstant" value="1641507675" />
                   </RecentBranch>
                   <RecentBranch>
-                    <option name="branchName" value="develop" />
-                    <option name="lastUsedInstant" value="1639926549" />
+                    <option name="branchName" value="issue-200" />
+                    <option name="lastUsedInstant" value="1639926577" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="task-202" />
@@ -70,16 +66,10 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Users/allorak/Documents/C#/patools/AutoMapperProfile.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/ITasksService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/allorak/Documents/C#/patools/AutoMapperProfile.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/TasksService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/ITasksService.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/PeeringTasksController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ClientApp/package-lock.json" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/allorak/Documents/C#/patools/Controllers/v1/PeeringTasksController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Services/Tasks/TasksService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Dtos/PeeringTask/GetAuthorFormDTO.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/allorak/Documents/C#/patools/Dtos/PeeringTask/GetAuthorFormDTO.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c1ca262d468b4bcb96b7e2aae3a36d848d7e00/402/List.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="21mkjGjaWckRcMOe4jzvS37Eq57" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">

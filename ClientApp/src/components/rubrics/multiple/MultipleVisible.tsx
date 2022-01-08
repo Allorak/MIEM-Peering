@@ -6,7 +6,7 @@ import { IMultipleResponse } from "../../../store/types";
 
 interface IProps {
   responses: IMultipleResponse[],
-  response?: string,
+  response?: number,
   isResponse?: boolean
 }
 
@@ -24,16 +24,16 @@ export const MultipleVisible: FC<IProps> = ({
       <Box>
         <RadioGroup
           name="radio-buttons-group"
-          {...(response && {value: response})}
+          {...(response !== undefined && {value: response})}
         >
           {responses.map((item, index) => (
             <FormControlLabel
               key={index}
               sx={styles.root}
               id={item.id.toString()}
-              value={item.response}
+              value={item.id}
               control={
-                <Radio value={item.response} readOnly/>
+                <Radio value={item.id} readOnly/>
               }
               label={
                 <Typography variant={'h6'}>

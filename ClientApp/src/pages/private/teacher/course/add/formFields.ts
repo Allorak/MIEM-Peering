@@ -1,6 +1,5 @@
-import { RegisterOptions, UseControllerProps } from "react-hook-form";
-import { InputRules } from "../../../../../const/inputRules";
-import { ICourses, IParentQuestionRubric, ITextQuestion, IShortTextQuestion, IMultipleQuiestion, ISelectRatingQuestion, INewTaskSettings } from "../../../../../store/types";
+import { UseControllerProps } from "react-hook-form";
+import { ICourses } from "../../../../../store/types";
 
 interface ICourseItem extends Omit<ICourses, 'id' | 'adminName' | 'adminImageUrl'> { }
 

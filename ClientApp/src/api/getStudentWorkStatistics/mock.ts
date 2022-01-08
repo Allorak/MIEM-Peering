@@ -178,7 +178,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
                   response: "Вариант 4",
                 }
               ],
-              response: "Ответ эксперта 3 МЮ",
+              value: 1,
               required: false
             },
             {
@@ -186,7 +186,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
               order: 4,
               title: "Title 4",
               type: IQuestionTypes.SELECT_RATE,
-              response: 2,
+              value: 2,
               required: true,
               minValue: 0,
               maxValue: 5
@@ -368,7 +368,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
                 response: "Вариант 4",
               }
             ],
-            response: "Ответ эксперта 3 ИИ",
+            value: 1,
             required: false
           },
           {
@@ -376,7 +376,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
             order: 4,
             title: "Title 4",
             type: IQuestionTypes.SELECT_RATE,
-            response: 2,
+            value: 2,
             required: true,
             minValue: 0,
             maxValue: 5
@@ -556,7 +556,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
                 response: "Вариант 4",
               }
             ],
-            response: "Иван Иванов",
+            value: 1,
             required: false
           },
           {
@@ -564,7 +564,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
             order: 4,
             title: "Title 4",
             type: IQuestionTypes.SELECT_RATE,
-            response: 2,
+            value: 2,
             required: true,
             minValue: 0,
             maxValue: 5

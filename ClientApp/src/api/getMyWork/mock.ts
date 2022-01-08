@@ -50,7 +50,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
             }
           ],
           required: false,
-          response: "Вариант 4"
+          value: 4
         },
         {
           questionId: "asydasd",
@@ -76,7 +76,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
             }
           ],
           required: true,
-          response: "zxzx 4",
+          value: 4
         },
         {
           questionId: "456",
@@ -86,7 +86,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
           required: true,
           minValue: 0,
           maxValue: 5,
-          response: 5,
+          value: 5
         },
         {
           questionId: "852",

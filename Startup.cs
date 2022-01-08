@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
+using Hangfire;
+using Hangfire.SQLite;
 using patools.Models;
 using patools.Services.Authentication;
 using patools.Services.Courses;
@@ -36,6 +38,8 @@ namespace patools
         public void ConfigureServices(IServiceCollection services)
         {
             SetupJwtServices(services);
+            services.AddHangfire(h => h.UseSQLiteStorage(Configuration["ConnectionStrings:Hangfire"]));
+            services.AddHangfireServer();
             services.AddControllersWithViews();
             services.AddDbContext<PAToolsContext>();
             services.AddSpaStaticFiles(configuration =>
@@ -72,6 +76,8 @@ namespace patools
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseHangfireDashboard();
 
             app.UseEndpoints(endpoints =>
             {

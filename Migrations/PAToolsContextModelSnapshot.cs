@@ -28,7 +28,7 @@ namespace patools.Migrations
                     b.Property<Guid?>("QuestionID")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Review")
+                    b.Property<string>("Response")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("SubmissionID")
@@ -183,6 +183,9 @@ namespace patools.Migrations
                     b.Property<Guid?>("ExpertTaskID")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("PeersAssigned")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime?>("ReviewEndDateTime")
                         .HasColumnType("TEXT");
 
@@ -299,6 +302,27 @@ namespace patools.Migrations
                     b.HasIndex("PeeringTaskUserAssignmentID");
 
                     b.ToTable("Submissions");
+                });
+
+            modelBuilder.Entity("patools.Models.SubmissionPeer", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PeerID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("SubmissionID")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PeerID");
+
+                    b.HasIndex("SubmissionID");
+
+                    b.ToTable("SubmissionPeers");
                 });
 
             modelBuilder.Entity("patools.Models.User", b =>
@@ -473,6 +497,21 @@ namespace patools.Migrations
                         .HasForeignKey("PeeringTaskUserAssignmentID");
 
                     b.Navigation("PeeringTaskUserAssignment");
+                });
+
+            modelBuilder.Entity("patools.Models.SubmissionPeer", b =>
+                {
+                    b.HasOne("patools.Models.User", "Peer")
+                        .WithMany()
+                        .HasForeignKey("PeerID");
+
+                    b.HasOne("patools.Models.Submission", "Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionID");
+
+                    b.Navigation("Peer");
+
+                    b.Navigation("Submission");
                 });
 
             modelBuilder.Entity("patools.Models.Variant", b =>

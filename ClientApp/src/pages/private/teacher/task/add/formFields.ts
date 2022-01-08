@@ -1,6 +1,6 @@
 import { RegisterOptions, UseControllerProps } from "react-hook-form";
 import { InputRules } from "../../../../../const/inputRules";
-import { INewTaskMainInfo, IParentQuestionRubric, ITextQuestion, IShortTextQuestion, IMultipleQuiestion, ISelectRatingQuestion, INewTaskSettings } from "../../../../../store/types";
+import { INewTaskMainInfo, INewTextQuestion, INewShortTextQuestion, INewMultipleQuiestion, INewSelectRatingQuestion, INewTaskSettings } from "../../../../../store/types";
 
 export const titleProps: UseControllerProps<INewTaskMainInfo, "title"> = ({
   name: "title",
@@ -26,7 +26,7 @@ export const descriptionProps: UseControllerProps<INewTaskMainInfo, 'description
   },
 })
 
-export const titleAuthorProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "title"> = ({
+export const titleAuthorProps: UseControllerProps<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion, "title"> = ({
   name: "title",
   rules: {
     required: {
@@ -40,23 +40,23 @@ export const titleAuthorProps: UseControllerProps<ITextQuestion | IShortTextQues
   },
 })
 
-export const requiredProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "required"> = ({
+export const requiredProps: UseControllerProps<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion, "required"> = ({
   name: "required",
 })
 
-export const typeProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "type"> = ({
+export const typeProps: UseControllerProps<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion, "type"> = ({
   name: "type",
 })
 
-export const responsesProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "responses"> = ({
+export const responsesProps: UseControllerProps<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion, "responses"> = ({
   name: "responses",
 })
 
-export const descriptionRubricsProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "description"> = ({
+export const descriptionRubricsProps: UseControllerProps<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion, "description"> = ({
   name: "description",
 })
 
-export const minAuthorProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "minValue"> = ({
+export const minAuthorProps: UseControllerProps<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion, "minValue"> = ({
   name: "minValue",
   rules: {
     required: {
@@ -66,7 +66,7 @@ export const minAuthorProps: UseControllerProps<ITextQuestion | IShortTextQuesti
   },
 })
 
-export const maxAuthorProps: UseControllerProps<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion, "maxValue"> = ({
+export const maxAuthorProps: UseControllerProps<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion, "maxValue"> = ({
   name: "maxValue",
   rules: {
     required: {

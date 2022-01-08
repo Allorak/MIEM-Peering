@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using patools.Dtos.Variants;
 using patools.Enums;
@@ -7,6 +8,7 @@ namespace patools.Dtos.Question
 {
     public class GetQuestionDto
     {
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public bool Required { get; set; }

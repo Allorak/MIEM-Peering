@@ -61,5 +61,7 @@ namespace patools.Models
 
         public PeeringTask ExpertTask { get; set; }
 
+        public bool PeersAssigned { get; set; } = false;
+
     }
 }

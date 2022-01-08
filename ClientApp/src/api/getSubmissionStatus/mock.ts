@@ -9,6 +9,6 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
 
   return {
     success: true,
-    payload: ISubmissionStatus.COMPLETED
+    payload: ISubmissionStatus.NOT_COMPLETED
   }
 }

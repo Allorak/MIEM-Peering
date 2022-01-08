@@ -138,6 +138,19 @@ namespace patools.Services.CourseUsers
             };
 
             await _context.CourseUsers.AddAsync(newCourseUser);
+            
+            //TODO: Remove later
+            foreach (var task in tasks)
+            {
+                var taskUser = new PeeringTaskUser()
+                {
+                    ID = Guid.NewGuid(),
+                    PeeringTask = task,
+                    Student = student,
+                    States = PeeringTaskStates.Assigned
+                };
+                await _context.AddAsync(taskUser);
+            }
             await _context.SaveChangesAsync();
 
             return new SuccessfulResponse<string>("User joined successfully");
