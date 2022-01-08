@@ -19,7 +19,7 @@ export const Navbar: FC = () => {
 
     const { location, path: pathT } = usePrivatePathT()
     const { path: pathSt } = usePrivatePathSt()
-    const pathTaskAdd = matchPath('/t/course/:courseId/task/add', location.pathname
+    const pathTaskAdd = matchPath('/t/course/:courseId/task/add', location.pathname)
 
     const courses = useAppSelector(state => state.courses.payload)
 
