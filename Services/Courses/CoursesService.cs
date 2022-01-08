@@ -160,9 +160,9 @@ namespace patools.Services.Courses
 
             foreach (var courseExpert in expertRecords)
             {
-                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
-                if(course!= null)
-                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+                var courseForExperts = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
+                if(courseForExperts!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(courseForExperts));
             }
 
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
@@ -195,9 +195,9 @@ namespace patools.Services.Courses
 
             foreach (var courseExpert in expertRecords)
             {
-                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
-                if(course!= null)
-                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+                var courseForExperts = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
+                if(courseForExperts!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(courseForExperts));
             }
 
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
