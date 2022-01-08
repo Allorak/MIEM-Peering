@@ -1,30 +1,22 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
-import { PeerSteps } from '../../store/types'
 import { mock } from './mock'
 
 
-export const postTask = async ({
+export const getNewTaskStep = async ({
   accessToken,
-  courseId,
-  task
+  courseId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = false
-  console.log(task)
+  const isMock = true
 
   const requestConfig: AxiosRequestConfig = {
-    method: 'POST',
-    url: `/api/v1/tasks/add`,
+    method: 'GET',
+    url: `/api/v1/tasks/${courseId}/experts`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
-    },
-    data: {
-      ...task,
-      ...(task.settings.experts && task.settings.experts && { experts: task.settings.experts }),
-      courseId,
     }
   }
 

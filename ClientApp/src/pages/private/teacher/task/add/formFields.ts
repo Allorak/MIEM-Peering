@@ -97,16 +97,6 @@ export const maxSubmissionProps: UseControllerProps<INewTaskSettings, "submissio
   },
 })
 
-export const peerStepProps: UseControllerProps<INewTaskSettings, "stepParams.step"> = ({
-  name: "stepParams.step",
-  rules: {
-    required: {
-      value: true,
-      message: "Это обязательное поле"
-    }
-  },
-})
-
 export const taskTypeProps: UseControllerProps<INewTaskSettings, "type"> = ({
   name: "type",
   rules: {
