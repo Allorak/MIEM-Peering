@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Question;
+using patools.Dtos.SubmissionPeer;
 using patools.Dtos.Task;
 using patools.Dtos.Variants;
 using patools.Enums;
@@ -216,12 +218,61 @@ namespace patools.Services.PeeringTasks
                     newTask.ExpertTask = expertTask;
                     break;
             }
-
             await _context.SaveChangesAsync();
 
+
+            var delayNullable = newTask.SubmissionEndDateTime - DateTime.Now;
+            var delay = delayNullable ?? TimeSpan.FromDays(3);
+            BackgroundJob.Schedule(()=>AssignPeers(new AssignPeersDto()
+            {
+                TaskId = newTask.ID,
+                SubmissionsToCheck = newTask.SubmissionsToCheck
+            }), delay);
+            
             return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(_mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
         }
+    
+        public async Task<string> AssignPeers(AssignPeersDto peeringTask)
+        {
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == peeringTask.TaskId);
+            if (task.PeersAssigned)
+                return "Peers have been already assigned";
+            var submissions = await _context.Submissions
+                .Where(s => s.PeeringTaskUserAssignment.PeeringTask == task)
+                .Include(s => s.PeeringTaskUserAssignment)
+                .Include(s => s.PeeringTaskUserAssignment.Student)
+                .OrderBy(s => s.PeeringTaskUserAssignment.Student.ID)
+                .ToListAsync();
 
+            if (submissions.Count == 0)
+                return "No submissions for this task";
+
+            var peers = submissions
+                .Select(s => s.PeeringTaskUserAssignment.Student)
+                .OrderBy(u => u.ID)
+                .ToList();
+
+            var submissionsToCheck = Math.Min(peeringTask.SubmissionsToCheck, submissions.Count - 1);
+            var submissionPeerConnections = new List<SubmissionPeer>();
+            for (var i = 0; i < submissions.Count; i++)
+            {
+                for (var j = 0; j < submissionsToCheck; j++)
+                {
+                    var submissionPeer = new SubmissionPeer()
+                    {
+                        Peer = peers[i],
+                        Submission = submissions[(i+j+1)%peers.Count]
+                    };
+                    submissionPeerConnections.Add(submissionPeer);
+                }
+            }
+
+            await _context.SubmissionPeers.AddRangeAsync(submissionPeerConnections);
+            task.PeersAssigned = true;
+            await _context.SaveChangesAsync(); 
+            return $"Peers assigned successfully for the task with id {peeringTask.TaskId}";
+        }
+        
         public async Task<Response<GetCourseTasksDtoResponse>> GetTeacherCourseTasks(GetCourseTasksDtoRequest courseInfo)
         {
             
