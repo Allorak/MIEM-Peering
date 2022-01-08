@@ -153,6 +153,18 @@ namespace patools.Services.Courses
                 }))
                 .ToListAsync();
 
+            var expertRecords = await _context.Experts
+                .Include(x => x.PeeringTask.Course)
+                .Where(x => x.User == teacher)
+                .ToListAsync();
+
+            foreach (var courseExpert in expertRecords)
+            {
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
+                if(course!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+            }
+
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
@@ -172,6 +184,18 @@ namespace patools.Services.Courses
             foreach (var courseUser in courseUsers)
             {
                 var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseUser.Course.ID);
+                if(course!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+            }
+
+            var expertRecords = await _context.Experts
+                .Include(x => x.PeeringTask.Course)
+                .Where(x => x.User == student)
+                .ToListAsync();
+
+            foreach (var courseExpert in expertRecords)
+            {
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
                 if(course!= null)
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
