@@ -43,7 +43,6 @@ export function Private() {
   const registrationToken = useAppSelector(state => state.registration.googleToken)
   const userProfilePayload = useAppSelector(state => state.userProfile.payload)
   const dashboardProps = useAppSelector(state => state.dashboard.payload)
-  const courses = useAppSelector(state => state.courses.payload)
 
   const path = matchPath('/:role/task/:taskId/*', location.pathname)
   const role = path?.params?.role
