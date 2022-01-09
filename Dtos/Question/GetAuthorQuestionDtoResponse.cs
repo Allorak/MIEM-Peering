@@ -6,7 +6,7 @@ using patools.Models;
 
 namespace patools.Dtos.Question
 {
-    public class GetQuestionDto
+    public class GetAuthorQuestionDtoResponse
     {
         public Guid QuestionId { get; set; }
         public int Order { get; set; }

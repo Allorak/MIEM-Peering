@@ -415,10 +415,10 @@ namespace patools.Services.PeeringTasks
                 .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Author)
                 .OrderBy(q => q.Order);
 
-            var resultQuestions = new List<GetQuestionDto>();
+            var resultQuestions = new List<GetAuthorQuestionDtoResponse>();
             foreach (var question in questions)
             {
-                var resultQuestion = _mapper.Map<GetQuestionDto>(question);
+                var resultQuestion = _mapper.Map<GetAuthorQuestionDtoResponse>(question);
                 resultQuestion.QuestionId = question.ID;
                 if (question.Type == QuestionTypes.Multiple)
                 {
@@ -440,6 +440,20 @@ namespace patools.Services.PeeringTasks
             response.Error = null;
             response.Payload = new GetAuthorFormDtoResponse() {Rubrics = resultQuestions};
             return response;
+        }
+
+        public async Task<Response<GetPeerFromDtoResponse>> GetPeerForm(GetPeerFromDtoRequest taskInfo)
+        {
+            var task = await _context.Tasks
+                .Include(t=>t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetPeerFromDtoResponse>("Invalid task id provided");
+            
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetPeerFromDtoResponse>("Invalid user id provided");
+
         }
 
         public async Task<Response<GetTaskDeadlineDtoResponse>> GetTaskSubmissionDeadline(GetTaskDeadlineDtoRequest taskInfo)

@@ -5,6 +5,6 @@ namespace patools.Dtos.Task
 {
     public class GetAuthorFormDtoResponse
     {
-        public IEnumerable<GetQuestionDto> Rubrics { get; set; }
+        public IEnumerable<GetAuthorQuestionDtoResponse> Rubrics { get; set; }
     }
 }

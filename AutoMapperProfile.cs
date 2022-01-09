@@ -25,7 +25,7 @@ namespace patools
             CreateMap<AddAuthorQuestionDto,Question>();
             CreateMap<AddPeerQuestionDto,Question>();
             CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
-            CreateMap<Question,GetQuestionDto>();
+            CreateMap<Question,GetAuthorQuestionDtoResponse>();
             CreateMap<AddUserDTO,User>();
             CreateMap<Submission,GetNewSubmissionDtoResponse>();
             CreateMap<Course, GetCourseUserStudentDtoResponse>();
