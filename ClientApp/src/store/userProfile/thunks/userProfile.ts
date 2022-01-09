@@ -1,5 +1,5 @@
 import { actions } from "..";
-import { postUserProfile } from "../../../api/postUserProfile";
+import { getUserProfile } from "../../../api/getUserProfile";
 import { AppThunk } from "../../../app/store";
 
 
@@ -19,7 +19,7 @@ export const fetchUserProfile = (): AppThunk => async (dispatch, getState) => {
             return
         }
 
-        const response = await postUserProfile({ accessToken })
+        const response = await getUserProfile({ accessToken })
         if (!response) {
             dispatch(actions.userProfileFailed({
                 code: IErrorCode.RESPONSE,
