@@ -1,15 +1,15 @@
 import { actions } from "..";
+
+import { getNewTaskStep } from "../../../api/getNewTaskStep";
+
 import { AppThunk } from "../../../app/store";
-
 import { IErrorCode } from "../../types";
-import { getStudentWorkStatistics } from "../../../api/getStudentWorkStatistics";
 
 
-export const fetchStudentWorkStatistics = (taskId: string, workId: string): AppThunk => async (dispatch, getState) => {
-
-  dispatch(actions.fetchWorkStatisticsStarted())
-
+export const fetchTaskStep = (courseId: string): AppThunk => async (dispatch, getState) => {
+  dispatch(actions.fetchTaskStepStarted())
   const accessToken = getState().auth.accessToken
+
   if (!accessToken) {
     dispatch(actions.fetchFailed({
       code: IErrorCode.NO_ACCESS,
@@ -19,7 +19,8 @@ export const fetchStudentWorkStatistics = (taskId: string, workId: string): AppT
   }
 
   try {
-    const response = await getStudentWorkStatistics({ accessToken, taskId, workId })
+    const response = await getNewTaskStep({ accessToken, courseId })
+
     if (!response) {
       dispatch(actions.fetchFailed({
         code: IErrorCode.RESPONSE,
@@ -27,11 +28,8 @@ export const fetchStudentWorkStatistics = (taskId: string, workId: string): AppT
       }))
       return
     }
-    if (!response.success) {
-      dispatch(actions.fetchFailed(response.error))
-      return
-    }
-    dispatch(actions.fetchWorkStatisticsSuccess(response.payload))
+
+    dispatch(actions.fetchTaskStepSuccess(response.success))
     return
 
   } catch (error) {

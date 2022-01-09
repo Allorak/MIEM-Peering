@@ -133,7 +133,7 @@ namespace patools.Controllers.v1
 
             if(User.IsInRole(UserRoles.Student.ToString()))
                 return Ok(await _peeringTasksService.GetStudentCourseTasks(taskCourseInfo));
-            
+
             return Ok(new InvalidJwtTokenResponse());
         }
 

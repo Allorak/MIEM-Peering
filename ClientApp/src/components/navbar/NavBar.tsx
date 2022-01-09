@@ -1,21 +1,35 @@
-
 import { FC } from "react"
 import { Typography } from "@mui/material"
-import { Box, SxProps, Theme } from "@mui/system"
+import { SxProps, Theme } from "@mui/system"
 import { useNavigate, matchPath } from "react-router-dom"
 
 import { paths } from "../../app/constants/paths"
 import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
 import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
+import { useAppSelector } from "../../app/hooks"
 
 import { palette } from "../../theme/colors"
 
+import { ICourses } from "../../store/types";
 
 export const Navbar: FC = () => {
+    const history = useNavigate()
+
     const { location, path: pathT } = usePrivatePathT()
     const { path: pathSt } = usePrivatePathSt()
-    const history = useNavigate()
     const pathTaskAdd = matchPath('/t/course/:courseId/task/add', location.pathname)
+    const courses = useAppSelector(state => state.courses.payload)
+
+    const CurrentCourseTitle: FC<{ courseId: string, courses: Array<ICourses> }> = ({courses, courseId}) => {
+        return (
+        <>
+            {courses.map(item =>  
+                (item.id == courseId
+                    ? (<CourseTitle key={item.id} courseId={item.id} courseTitle={item.name} />)
+                    : null
+            ))}
+        </>
+    )}
 
     const CourseItem: FC = () => {
         return (
@@ -78,12 +92,11 @@ export const Navbar: FC = () => {
         return <CourseItem />
     }
 
-    if (pathT && pathT.courseId && !pathT.taskId && !pathTaskAdd) {
-        const courseItem = FakeData[0]
+    if (courses && pathT && pathT.courseId && !pathT.taskId && !pathTaskAdd) {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            <CourseTitle courseId={courseItem.id} courseTitle={courseItem.title} />
+            <CurrentCourseTitle courses={courses} courseId={pathT.courseId}/>
         </>)
     }
 
@@ -93,25 +106,22 @@ export const Navbar: FC = () => {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            <CourseTitle courseId={courseItem.id} courseTitle={courseItem.title} />
+            <CourseTitle courseId={pathT.courseId} courseTitle={courseItem.title} />
             <SpanDelimetr />
-            <TaskItem courseId={courseItem.id} />
+            <TaskItem courseId={pathT.courseId} />
             <SpanDelimetr />
-            <TaskTitle courseId={courseItem.id} taskTitle={taskItem.title} taskId={taskItem.id} />
+            <TaskTitle courseId={pathT.courseId} taskTitle={taskItem.title} taskId={taskItem.id} />
 
         </>)
     }
 
-    if (pathSt && pathSt.courseId && !pathSt.taskId) {
-        const courseItem = FakeData[0]
+    if (courses && pathSt && pathSt.courseId && !pathSt.taskId) {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            <CourseTitle courseId={courseItem.id} courseTitle={courseItem.title} />
+            <CurrentCourseTitle courses={courses} courseId={pathSt.courseId}/>
         </>)
     }
-
-
 
     if (pathSt && pathSt.courseId && pathSt.taskId) {
         const courseItem = FakeData[0]
@@ -119,11 +129,11 @@ export const Navbar: FC = () => {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            <CourseTitle courseId={courseItem.id} courseTitle={courseItem.title} />
+            <CourseTitle courseId={pathSt.courseId} courseTitle={courseItem.title} />
             <SpanDelimetr />
-            <TaskItem courseId={courseItem.id} />
+            <TaskItem courseId={pathSt.courseId} />
             <SpanDelimetr />
-            <TaskTitle courseId={courseItem.id} taskTitle={taskItem.title} taskId={taskItem.id} />
+            <TaskTitle courseId={pathSt.courseId} taskTitle={taskItem.title} taskId={taskItem.id} />
 
         </>)
     }

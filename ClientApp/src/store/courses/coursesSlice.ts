@@ -6,7 +6,7 @@ export interface ICoursesState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: Array<ICourses>
+  payload: Array<ICourses> | undefined
   updateStatus: boolean | undefined
 }
 
@@ -14,7 +14,7 @@ const initialState: ICoursesState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as Array<ICourses>,
+  payload: undefined,
   updateStatus: undefined
 };
 

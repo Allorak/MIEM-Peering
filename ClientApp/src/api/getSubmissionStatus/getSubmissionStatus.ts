@@ -9,11 +9,11 @@ export const getSubmissionStatus = async ({
   taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/authorform/task=${taskId}`,
+    url: `/api/v1/submissions/getstatus/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

@@ -153,6 +153,8 @@ namespace patools.Services.Courses
                 }))
                 .ToListAsync();
 
+            courses.AddRange(await GetExpertCourses(teacher));
+
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
@@ -176,7 +178,27 @@ namespace patools.Services.Courses
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
 
+            courses.AddRange(await GetExpertCourses(student));
+
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
+        }
+
+        public async Task<List<GetCourseDtoResponse>> GetExpertCourses(User user)
+        {
+            var expertRecords = await _context.Experts
+                .Include(x => x.PeeringTask.Course)
+                .Where(x => x.User == user)
+                .ToListAsync();
+
+            var courses = new List<GetCourseDtoResponse>();
+            foreach (var courseExpert in expertRecords)
+            {
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
+                if(course!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+            }
+
+            return courses;
         }
 
         public async Task<Response<string>> PutCourse(Guid teacherId, Guid courseId, PutCourseDto updateCourse)
@@ -219,6 +241,50 @@ namespace patools.Services.Courses
             await _context.SaveChangesAsync();
 
             return new SuccessfulResponse<string>("Course was updated successfully");
+        }
+
+        public async Task<Response<string>> CheckForSecondStep(CheckForSecondStepDto courseInfo)
+        {
+            var teacher = await _context.Users.FirstOrDefaultAsync(t => t.ID == courseInfo.TeacherId);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<string>("Invalid teacher id provided");
+
+            var course = await _context.Courses
+                .Include(c => c.Teacher)
+                .FirstOrDefaultAsync(c => c.ID == courseInfo.CourseId);
+            if (course == null)
+                return new InvalidGuidIdResponse<string>("Invalid course id provided");
+
+            if (course.Teacher != teacher)
+                return new NoAccessResponse<string>("This teacher has no access to this course");
+
+            var courseUsers = await _context.CourseUsers
+                .Where(cu => cu.Course == course)
+                .ToListAsync();
+
+            var noCoefficientCourseUsers = courseUsers
+                .Where(cu => cu.ConfidenceFactor == null)
+                .ToList();
+
+            var firstStepTask = await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Course == course && t.Step == PeeringSteps.FirstStep);
+            
+            if (firstStepTask == null)
+                return new OperationErrorResponse<string>("There was no first-step task");
+
+            if (firstStepTask.ReviewEndDateTime > DateTime.Now)
+                return new OperationErrorResponse<string>("The first-step task has not ended");
+
+            if (courseUsers.Count == noCoefficientCourseUsers.Count)
+                return new OperationErrorResponse<string>("There are no coefficients but the first-step task has ended");
+
+            foreach (var courseUser in noCoefficientCourseUsers)
+            {
+                courseUser.ConfidenceFactor = 0;
+            }
+
+            await _context.SaveChangesAsync();
+            return new SuccessfulResponse<string>("The first-step task can be created");
         }
     }
 }

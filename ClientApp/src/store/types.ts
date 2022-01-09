@@ -189,7 +189,7 @@ export interface INewTaskSettings {
   reviewStartDateTime: Date | undefined
   reviewEndDateTime: Date | undefined
   submissionsToCheck: number
-  stepParams: IFirstStepSettings | ISecondStepSettings,
+  experts?: Array<string>
   type: PeerTaskTypes
 }
 

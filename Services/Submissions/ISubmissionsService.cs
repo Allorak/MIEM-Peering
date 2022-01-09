@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using patools.Dtos.Submission;
 using patools.Dtos.SubmissionPeer;
+using patools.Enums;
 
 namespace patools.Services.Submissions
 {
@@ -17,6 +18,8 @@ namespace patools.Services.Submissions
             GetSubmissionIdDtoRequest taskInfo);
 
         Task<Response<GetSubmissionDtoResponse>> GetSubmission(GetSubmissionDtoRequest submissionInfo);
+
+        Task<Response<SubmissionStatus>> GetSubmissionStatus(CanSubmitDto submissionInfo);
 
     }
 }

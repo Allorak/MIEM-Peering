@@ -33,7 +33,7 @@ export const fetchStudentWork = (taskId: string, workId: string): AppThunk => as
       dispatch(actions.fetchFailed(response.error))
       return
     }
-    dispatch(actions.fetchStudentWorkSuccess(response.payload))
+    dispatch(actions.fetchStudentWorkSuccess({responses: response.payload.answers}))
     return
 
   } catch (error) {

@@ -6,6 +6,8 @@ import { Box, SxProps, Theme } from '@mui/system'
 import { PrivateHeader } from '../../components/header'
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
+import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
 import { paths } from '../../app/constants/paths'
 import { fetchUserProfile } from '../../store/userProfile'
 
@@ -21,13 +23,20 @@ import { Dashboard as StudentDashboard } from './student/dashboard/Dashboard'
 import { Dashboard as ExpertDashboard } from './expert/dashboard/Dashboard'
 import { STCourseList as StudentCourseList } from './student/course/list'
 import { fetchDashboard, actions as DashboardActions } from '../../store/dashboard'
+import { actions as authActions } from '../../store/auth'
 import { CircularProgress, Typography } from '@mui/material'
 
+import Cookies from 'universal-cookie';
+
+import { fetchCourses } from '../../store/courses/thunks/courses'
 
 export function Private() {
-
+  const cookies = new Cookies();  
   const location = useLocation()
   const dispatch = useAppDispatch()
+
+  const { path: pathT } = usePrivatePathT()
+  const { path: pathSt } = usePrivatePathSt()
 
   const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
   const accessToken = useAppSelector(state => state.auth.accessToken)
@@ -39,6 +48,20 @@ export function Private() {
   const role = path?.params?.role
   const taskId = path?.params?.taskId
 
+  if (!cookies.get('JWT')) { 
+    cookies.set('JWT', accessToken)
+  }
+
+  useEffect(() => {
+    const accessTokenFromCookies = cookies.get('JWT')
+    if (!accessToken && accessTokenFromCookies !== 'undefined' && !userProfilePayload) {
+      dispatch(authActions.authSuccess(accessTokenFromCookies))
+      if (pathT?.courseId || pathSt?.courseId) {
+        dispatch(fetchCourses())
+      }
+    }
+  }, [dispatch, accessToken])
+
   useEffect(() => {
     if (accessToken && !userProfilePayload) {
       dispatch(fetchUserProfile())
@@ -46,13 +69,13 @@ export function Private() {
   }, [dispatch, accessToken])
 
   useEffect(() => {
-    if (taskId && role) {
+    if (taskId && role && accessToken) {
       dispatch(DashboardActions.resetState())
       dispatch(fetchDashboard(taskId))
     }
-  }, [taskId])
+  }, [taskId, accessToken])
 
-  if ((!isAuthorized || !accessToken) && !registrationToken) {
+  if ((!isAuthorized || !accessToken) && !registrationToken && cookies.get('JWT') == 'undefined') {
     console.log('Navigate to login')
     return (
       <Navigate

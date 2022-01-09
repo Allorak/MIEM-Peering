@@ -20,15 +20,11 @@ import { ExpertUpdateForm } from "../components/ExpertUpdateForm";
 
 
 interface IProps {
-  onSubmit(questions: INewTaskSettings): void
+  onSubmit(questions: INewTaskSettings): void,
+  hasConfidenceFactor: boolean
 }
 
-interface IIterationCatalog {
-  id: PeerSteps,
-  name: string
-}
-
-export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
+export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) => {
   const [popupStatus, setPopupStatus] = useState(false)
   const [currentExpert, setCurrentExpert] = useState<string>()
 
@@ -36,30 +32,30 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
-      ...initialValue()
+      ...initialValue(),
+      experts: hasConfidenceFactor ? undefined : []
     }
   })
 
   const { field: maxSubmissionProps } = useController({ control, ...fields.maxSubmissionProps })
-  const { field: peerStepProps } = useController({ control, ...fields.peerStepProps })
   const { field: typeProps } = useController({ control, ...fields.taskTypeProps })
-  const experts = getValues('stepParams.experts')
+  const experts = getValues('experts')
 
-  const handleOnStepChange = useCallback((value: SelectChangeEvent<unknown>) => {
-    if (peerStepProps.value !== value.target.value) {
-      if (value.target.value === PeerSteps.FIRST_STEP) {
-        setValue('stepParams', {
-          step: PeerSteps.FIRST_STEP,
-          experts: []
-        })
-      } else {
-        setValue('stepParams', {
-          step: PeerSteps.SECOND_STEP,
-          taskId: "1" //TODO
-        })
-      }
-    }
-  }, [setValue, peerStepProps])
+  // const handleOnStepChange = useCallback((value: SelectChangeEvent<unknown>) => {
+  //   if (peerStepProps.value !== value.target.value) {
+  //     if (value.target.value === PeerSteps.FIRST_STEP) {
+  //       setValue('stepParams', {
+  //         step: PeerSteps.FIRST_STEP,
+  //         experts: []
+  //       })
+  //     } else {
+  //       setValue('stepParams', {
+  //         step: PeerSteps.SECOND_STEP,
+  //         taskId: "1" //TODO
+  //       })
+  //     }
+  //   }
+  // }, [setValue, peerStepProps])
 
   const handleAddOrEditExpert = useCallback((email?: string) => {
     setCurrentExpert(email)
@@ -67,15 +63,15 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
   }, [])
 
   const handleExpertSubmit = useCallback((email: string) => {
-    if (peerStepProps.value === PeerSteps.FIRST_STEP) {
-      if (currentExpert && experts.length > 0) {
+    if (!hasConfidenceFactor) {
+      if (currentExpert && experts && experts.length > 0) {
         if (currentExpert !== email) {
           const flag = experts.filter(expert => expert === email).length === 0
           if (flag) {
             const filteredExperts = experts.map(expert =>
               expert !== currentExpert ? expert : email
             )
-            setValue('stepParams.experts', JSON.parse(JSON.stringify(filteredExperts)))
+            setValue('experts', JSON.parse(JSON.stringify(filteredExperts)))
           }
           setPopupStatus(false)
           return
@@ -85,36 +81,36 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
         }
       }
 
-      if (!currentExpert) {
+      if (!currentExpert && experts) {
         const flag = experts.filter(expert => expert === email).length === 0
 
         if (flag) {
           const pushedExpert = [...JSON.parse(JSON.stringify(experts)), email]
-          setValue('stepParams.experts', JSON.parse(JSON.stringify(pushedExpert)))
+          setValue('experts', JSON.parse(JSON.stringify(pushedExpert)))
         }
 
         setPopupStatus(false)
         return
       }
     }
-  }, [currentExpert, experts, peerStepProps])
+  }, [currentExpert, experts, hasConfidenceFactor])
 
   const handleRemoveExpert = useCallback(() => {
-    if (peerStepProps.value === PeerSteps.FIRST_STEP && currentExpert && experts.length > 0) {
+    if (!hasConfidenceFactor && currentExpert && experts && experts.length > 0) {
       const filteredExperts = experts.filter(expert => expert !== currentExpert)
-      setValue('stepParams.experts', JSON.parse(JSON.stringify(filteredExperts)))
+      setValue('experts', JSON.parse(JSON.stringify(filteredExperts)))
       setPopupStatus(false)
     }
-  }, [peerStepProps, currentExpert, experts])
+  }, [currentExpert, experts, hasConfidenceFactor])
 
   const onSettingsFormSubmit = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
     const request = getValues()
-    if (request.stepParams.step === PeerSteps.FIRST_STEP && request.stepParams.experts.length > 0) {
+    if ((!hasConfidenceFactor && request.experts && request.experts.length > 0) || hasConfidenceFactor) {
       onSubmit(request)
     }
     // if (request.stepParams.step === PeerSteps.SECOND_STEP && request.stepParams.taskId) //TODO
-  }, [getValues])
+  }, [getValues, hasConfidenceFactor])
 
   return (
     <>
@@ -408,33 +404,18 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit }) => {
 
           <Box sx={styles.dateBox}>
             <Box>
-              <InputLabel
-                title={"Выберите итерацию:"}
-                required
-              />
+              <Typography variant={'h6'}>
+                {hasConfidenceFactor ? secondStepInfo.name : firsStepInfo.name}
+              </Typography>
 
-              <Select
-                sx={{ display: "block" }}
-                type={"text"}
-                required
-                disabled
-                inputProps={peerStepProps}
-                onChange={handleOnStepChange}
-              >
-                {stepsCatalog.map(step => (
-                  <MenuItem
-                    key={step.id}
-                    value={step.id}
-                  >
-                    {step.name}
-                  </MenuItem>
-                ))}
-              </Select>
+              <Typography variant={'body1'}>
+                {hasConfidenceFactor ? secondStepInfo.description : firsStepInfo.description}
+              </Typography>
             </Box>
           </Box>
         </Box>
 
-        {peerStepProps.value === PeerSteps.FIRST_STEP && experts && (
+        {!hasConfidenceFactor && experts && (
           <ExpertTable
             experts={experts}
             onAdd={handleAddOrEditExpert}
@@ -485,26 +466,22 @@ const initialValue = (): INewTaskSettings => {
     reviewStartDateTime: reviewStartDateTime,
     reviewEndDateTime: reviewEndDateTime,
     submissionsToCheck: 2,
-    stepParams: {
-      step: PeerSteps.FIRST_STEP,
-      experts: []
-    } as IFirstStepSettings,
     type: PeerTaskTypes.DOUBLE_BLIND
   }
 
   return taskSettings
 }
 
-const stepsCatalog: IIterationCatalog[] = [
-  {
-    id: PeerSteps.FIRST_STEP,
-    name: "Этап 1"
-  },
-  {
-    id: PeerSteps.SECOND_STEP,
-    name: "Этап 2"
-  }
-]
+const firsStepInfo = {
+  description: "В результате данного пирингового задания будут вычислены коэф. доверия. Необходимо участие экспертов",
+  name: "Этап 1"
+}
+
+const secondStepInfo = {
+  description: "Для вычисления итоговой оценки работ будут использованы коэф. доверия студентов",
+  name: "Этап 2"
+}
+
 
 const styles = {
   container: {

@@ -19,8 +19,8 @@ export const postAuthorForm = async ({
       'Accept-Language': 'ru',
     },
     data: {
-        ...(JSON.parse(JSON.stringify(responses))),
-        taskId
+      taskId,
+      answers: responses.responses
     }
   }
 

@@ -9,7 +9,7 @@ import { NewTaskMainInfo } from "./forms/NewTaskMainInfo"
 import { NewTaskAuthorForm } from "./forms/NewTaskAuthorForm"
 import { NewTaskSettings } from "./forms/NewTaskSettings"
 
-import { actions, createTasks } from "../../../../../store/tasks"
+import { actions, createTasks, fetchTaskStep } from "../../../../../store/tasks"
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
 import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
@@ -28,6 +28,7 @@ export const TaskAdd: FC = () => {
   const isLock = useAppSelector(state => state.tasks.isLock)
   const error = useAppSelector(state => state.tasks.error)
   const newTaskPayload = useAppSelector(state => state.tasks.newTaskPayload)
+  const hasConfidenceFactor = useAppSelector(state => state.tasks.hasConfidenceFactor)
 
   const [step, setStpep] = useState<INewTaskState>('main-info')
   const [newTaskItem, setNewTaskItem] = useState<INewTask>(initialTask)
@@ -65,7 +66,11 @@ export const TaskAdd: FC = () => {
 
   useEffect(() => {
     dispatch(actions.createReset())
-  }, [dispatch])
+
+    if (pathT && pathT.courseId) {
+      dispatch(fetchTaskStep(pathT.courseId))
+    }
+  }, [dispatch, pathT?.courseId])
 
   const setSettings = useCallback((response: INewTaskSettings) => {
     if (response.submissionStartDateTime && response.submissionEndDateTime && response.reviewEndDateTime && response.reviewStartDateTime) {
@@ -94,38 +99,43 @@ export const TaskAdd: FC = () => {
       isLock={isLock}
       error={error}
     >
-      <Subheader activeStep={step} />
+      {hasConfidenceFactor !== undefined && (
+        <>
+          <Subheader activeStep={step} />
 
-      <Box sx={styles.stepsContainer}>
-        <Box sx={styles.container}>
-          {step === 'main-info' && (
-            <NewTaskMainInfo
-              onSubmit={setMainInfo}
-            />
-          )}
+          <Box sx={styles.stepsContainer}>
+            <Box sx={styles.container}>
+              {step === 'main-info' && (
+                <NewTaskMainInfo
+                  onSubmit={setMainInfo}
+                />
+              )}
 
-          {step === 'author-form' && (
-            <NewTaskAuthorForm
-              onSubmit={setFormRubrics}
-              rubrics={newTaskItem.authorForm.rubrics}
-            />
-          )}
+              {step === 'author-form' && (
+                <NewTaskAuthorForm
+                  onSubmit={setFormRubrics}
+                  rubrics={newTaskItem.authorForm.rubrics}
+                />
+              )}
 
-          {step === 'peer-form' && (
-            <NewTaskAuthorForm
-              onSubmit={setFormRubrics}
-              rubrics={newTaskItem.peerForm.rubrics}
-              isPeerForm
-            />
-          )}
+              {step === 'peer-form' && (
+                <NewTaskAuthorForm
+                  onSubmit={setFormRubrics}
+                  rubrics={newTaskItem.peerForm.rubrics}
+                  isPeerForm
+                />
+              )}
 
-          {step === 'settings' && (
-            <NewTaskSettings
-              onSubmit={setSettings}
-            />
-          )}
-        </Box>
-      </Box>
+              {step === 'settings' && (
+                <NewTaskSettings
+                  onSubmit={setSettings}
+                  hasConfidenceFactor={hasConfidenceFactor}
+                />
+              )}
+            </Box>
+          </Box>
+        </>
+      )}
     </WorkBox>
   )
 }
@@ -157,10 +167,6 @@ const initialTask: INewTask = {
     reviewStartDateTime: new Date(),
     reviewEndDateTime: new Date(),
     submissionsToCheck: 2,
-    stepParams: {
-      step: PeerSteps.FIRST_STEP,
-      experts: ['ivan@ivanov.ru']
-    },
     type: PeerTaskTypes.DOUBLE_BLIND
   },
   authorForm: {
