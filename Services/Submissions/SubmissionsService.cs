@@ -126,6 +126,40 @@ namespace patools.Services.Submissions
                 });
         }
 
+        public async Task<Response<GetSubmissionIdDtoResponse>> GetSubmissionIdForStudents(GetSubmissionIdDtoRequest taskInfo)
+        {
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (student == null)
+                return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("Invalid user id");
+
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("Invalid task id");
+            
+            var courseUserConnection = await _context.CourseUsers
+                .FirstOrDefaultAsync(x => x.User == student && x.Course == task.Course);
+            if (courseUserConnection == null)
+                return new NoAccessResponse<GetSubmissionIdDtoResponse>("This student is not assigned to this course");
+            
+            var taskUser = await _context.TaskUsers
+                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
+            if (taskUser == null)
+                return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("The task isn't assigned to this user");
+
+            if (task.SubmissionStartDateTime > DateTime.Now)
+                return new OperationErrorResponse<GetSubmissionIdDtoResponse>("Submissioning hasn't started yet");
+
+            var submission = await _context.Submissions
+                .FirstOrDefaultAsync(x => x.PeeringTaskUserAssignment == taskUser);
+            if (submission == null)
+                return new OperationErrorResponse<GetSubmissionIdDtoResponse>("This student has no submission");
+                
+            return new SuccessfulResponse<GetSubmissionIdDtoResponse>(new GetSubmissionIdDtoResponse()
+            {
+                SubmissionId = submission.ID
+            });
+        }
+
         public async Task<Response<GetSubmissionDtoResponse>> GetSubmission(GetSubmissionDtoRequest submissionInfo)
         {
             var submission = await _context.Submissions
