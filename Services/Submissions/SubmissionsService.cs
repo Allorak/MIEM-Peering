@@ -136,6 +136,11 @@ namespace patools.Services.Submissions
             if (task == null)
                 return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("Invalid task id");
             
+            var courseUserConnection = await _context.CourseUsers
+                .FirstOrDefaultAsync(x => x.User == student && x.Course == task.Course);
+            if (courseUserConnection == null)
+                return new NoAccessResponse<GetSubmissionIdDtoResponse>("This student is not assigned to this course");
+            
             var taskUser = await _context.TaskUsers
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
@@ -144,19 +149,14 @@ namespace patools.Services.Submissions
             if (task.SubmissionStartDateTime > DateTime.Now)
                 return new OperationErrorResponse<GetSubmissionIdDtoResponse>("Submissioning hasn't started yet");
 
-            var courseUserConnection = await _context.CourseUsers
-                .FirstOrDefaultAsync(x => x.User == student && x.Course == task.Course);
-            if (courseUserConnection == null)
-                return new NoAccessResponse<GetSubmissionIdDtoResponse>("This student is not assigned to this course");
-
-            var submissions = await _context.Submissions
-                .FirstOrDefaultAsync(x => x.PeeringTaskUserAssignment.PeeringTask == task && x.PeeringTaskUserAssignment.Student == student);
-            if (submissions == null)
-                return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>();
+            var submission = await _context.Submissions
+                .FirstOrDefaultAsync(x => x.PeeringTaskUserAssignment == taskUser);
+            if (submission == null)
+                return new OperationErrorResponse<GetSubmissionIdDtoResponse>("This student has no submission");
                 
             return new SuccessfulResponse<GetSubmissionIdDtoResponse>(new GetSubmissionIdDtoResponse()
             {
-                SubmissionId = submissions.ID
+                SubmissionId = submission.ID
             });
         }
 
