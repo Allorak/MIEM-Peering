@@ -18,6 +18,17 @@ export const Navbar: FC = () => {
     const pathTaskAdd = matchPath('/t/course/:courseId/task/add', location.pathname)
     const courses = useAppSelector(state => state.courses.payload)
 
+    const CurrentCourseTitle: FC<{ courseId: string, courses: Array<ICourses> }> = ({courses, courseId}) => {
+        return (
+        <>
+            {courses.map(item =>  
+                (item.id == courseId
+                    ? (<CourseTitle key={item.id} courseId={item.id} courseTitle={item.name} />)
+                    : null
+            ))}
+        </>
+    )}
+
     const CourseItem: FC = () => {
         return (
             <Typography variant='h6'
@@ -83,11 +94,7 @@ export const Navbar: FC = () => {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            {courses.map(item =>  
-            (item.id == pathT.courseId
-                ? (<CourseTitle courseId={item.id} courseTitle={item.name} />)
-                : null
-            ))}
+            <CurrentCourseTitle courses={courses} courseId={pathT.courseId}/>
         </>)
     }
 
@@ -110,11 +117,7 @@ export const Navbar: FC = () => {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            {courses.map(item =>  
-            (item.id == pathSt.courseId
-                ? (<CourseTitle courseId={item.id} courseTitle={item.name} />)
-                : null
-            ))}
+            <CurrentCourseTitle courses={courses} courseId={pathSt.courseId}/>
         </>)
     }
 

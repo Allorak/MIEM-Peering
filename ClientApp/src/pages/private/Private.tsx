@@ -57,7 +57,6 @@ export function Private() {
     const accessTokenFromCookies = cookies.get('JWT')
     if (!accessToken && accessTokenFromCookies !== 'undefined' && !userProfilePayload) {
       dispatch(authActions.authSuccess(accessTokenFromCookies))
-      console.log(courses)
       if (pathT?.courseId || pathSt?.courseId) {
         dispatch(fetchCourses())
       }
