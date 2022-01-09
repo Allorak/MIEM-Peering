@@ -6,8 +6,10 @@ import { Box, SxProps, Theme } from '@mui/system'
 import { PrivateHeader } from '../../components/header'
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
+import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
 import { paths } from '../../app/constants/paths'
-import { fetchUserProfile, fetchUserProfileCookiesJWT } from '../../store/userProfile'
+import { fetchUserProfile } from '../../store/userProfile'
 
 import { IRole } from '../../store/types'
 
@@ -26,16 +28,22 @@ import { CircularProgress, Typography } from '@mui/material'
 
 import Cookies from 'universal-cookie';
 
+import { fetchCourses } from '../../store/courses/thunks/courses'
+
 export function Private() {
   const cookies = new Cookies();  
   const location = useLocation()
   const dispatch = useAppDispatch()
+
+  const { path: pathT } = usePrivatePathT()
+  const { path: pathSt } = usePrivatePathSt()
 
   const isAuthorized = useAppSelector(state => state.auth.isAuthorized)
   const accessToken = useAppSelector(state => state.auth.accessToken)
   const registrationToken = useAppSelector(state => state.registration.googleToken)
   const userProfilePayload = useAppSelector(state => state.userProfile.payload)
   const dashboardProps = useAppSelector(state => state.dashboard.payload)
+  const courses = useAppSelector(state => state.courses.payload)
 
   const path = matchPath('/:role/task/:taskId/*', location.pathname)
   const role = path?.params?.role
@@ -49,7 +57,10 @@ export function Private() {
     const accessTokenFromCookies = cookies.get('JWT')
     if (!accessToken && accessTokenFromCookies !== 'undefined' && !userProfilePayload) {
       dispatch(authActions.authSuccess(accessTokenFromCookies))
-      // dispatch(fetchUserProfileCookiesJWT())
+      console.log(courses)
+      if (pathT?.courseId || pathSt?.courseId) {
+        dispatch(fetchCourses())
+      }
     }
   }, [dispatch, accessToken])
 

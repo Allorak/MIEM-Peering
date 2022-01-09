@@ -4,4 +4,3 @@ export {
 } from './userProfileSlice'
 
 export { fetchUserProfile } from './thunks/userProfile'
-export { fetchUserProfileCookiesJWT } from './thunks/userProfileCookiesJWT'

@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react"
+import { FC } from "react"
 import { Typography } from "@mui/material"
 import { SxProps, Theme } from "@mui/system"
 import { useNavigate, matchPath } from "react-router-dom"
@@ -10,22 +10,13 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks"
 
 import { palette } from "../../theme/colors"
 
-import { fetchCourses } from "../../store/courses/thunks/courses"
-
-
 export const Navbar: FC = () => {
-    const dispatch = useAppDispatch()
     const history = useNavigate()
 
     const { location, path: pathT } = usePrivatePathT()
     const { path: pathSt } = usePrivatePathSt()
     const pathTaskAdd = matchPath('/t/course/:courseId/task/add', location.pathname)
-
     const courses = useAppSelector(state => state.courses.payload)
-
-    useEffect(() => {
-        dispatch(fetchCourses())
-    }, [])
 
     const CourseItem: FC = () => {
         return (
@@ -88,7 +79,7 @@ export const Navbar: FC = () => {
         return <CourseItem />
     }
 
-    if (pathT && pathT.courseId && !pathT.taskId && !pathTaskAdd) {
+    if (courses && pathT && pathT.courseId && !pathT.taskId && !pathTaskAdd) {
         return (<>
             <CourseItem />
             <SpanDelimetr />
@@ -115,7 +106,7 @@ export const Navbar: FC = () => {
         </>)
     }
 
-    if (pathSt && pathSt.courseId && !pathSt.taskId) {
+    if (courses && pathSt && pathSt.courseId && !pathSt.taskId) {
         return (<>
             <CourseItem />
             <SpanDelimetr />
