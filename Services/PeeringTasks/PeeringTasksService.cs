@@ -66,6 +66,19 @@ namespace patools.Services.PeeringTasks
             if (course.Teacher.ID != peeringTask.TeacherId)
                 return new NoAccessResponse<GetNewPeeringTaskDtoResponse>("This teacher has no access to this course");
 
+            if (peeringTask.Settings.SubmissionStartDateTime < DateTime.Now)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                    "Submission start time can't be less than current time");
+            if (peeringTask.Settings.SubmissionStartDateTime > peeringTask.Settings.SubmissionEndDateTime)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                    "Submission start time can't be greater than submission end time");
+            if (peeringTask.Settings.SubmissionEndDateTime > peeringTask.Settings.ReviewStartDateTime)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                    "Submission end time can't be greater than review start time");
+            if (peeringTask.Settings.ReviewStartDateTime > peeringTask.Settings.ReviewEndDateTime)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                    "Review start time can't be greater than review end time");
+            
             var newTask = new PeeringTask
             {
                 ID = Guid.NewGuid(),
@@ -406,6 +419,7 @@ namespace patools.Services.PeeringTasks
             foreach (var question in questions)
             {
                 var resultQuestion = _mapper.Map<GetQuestionDto>(question);
+                resultQuestion.QuestionId = question.ID;
                 if (question.Type == QuestionTypes.Multiple)
                 {
                     var variants = await _context.Variants
