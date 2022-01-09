@@ -1,8 +1,6 @@
 import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
-import { getStudentWork } from "../../../api/getStudentWork";
-
 import { IErrorCode } from "../../types";
 import { getStudentWorkStatistics } from "../../../api/getStudentWorkStatistics";
 

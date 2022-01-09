@@ -7,7 +7,8 @@ export interface ITaskState {
   isLock: boolean,
   error: IError | undefined,
   payload: ITasks | undefined,
-  newTaskPayload: INewTaskResponse | undefined
+  newTaskPayload: INewTaskResponse | undefined,
+  hasConfidenceFactor: boolean | undefined
 }
 
 const initialState: ITaskState = {
@@ -15,7 +16,8 @@ const initialState: ITaskState = {
   error: undefined,
   isLock: true,
   payload: undefined,
-  newTaskPayload: undefined
+  newTaskPayload: undefined,
+  hasConfidenceFactor: undefined
 };
 
 export const tasks = createSlice({
@@ -26,6 +28,19 @@ export const tasks = createSlice({
       state.isLoading = true
       state.isLock = true
       state.error = undefined
+    },
+
+    fetchTaskStepStarted: (state) => {
+      state.isLoading = true
+      state.isLock = true
+      state.error = undefined
+    },
+
+    fetchTaskStepSuccess: (state, { payload }: PayloadAction<boolean>) => {
+      state.isLoading = false
+      state.error = undefined
+      state.isLock = false
+      state.hasConfidenceFactor = payload
     },
 
     fetchSuccess: (state, { payload }: PayloadAction<ITasks>) => {
@@ -45,6 +60,7 @@ export const tasks = createSlice({
       state.isLock = false
       state.error = undefined
       state.newTaskPayload = undefined
+      state.hasConfidenceFactor = undefined
     },
     createStarted: (state) => {
       state.isLoading = true

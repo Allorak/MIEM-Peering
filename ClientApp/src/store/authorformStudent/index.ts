@@ -5,3 +5,4 @@ export {
 
 export { fetchAuthorformStudent } from "./thunks/fetchAuthorformStudent";
 export { postAuthorformStudent } from "./thunks/postAuthorformStudent";
+export { fetchWorkSubmissionStatus } from "./thunks/fetchWorkSubmissionStatus";

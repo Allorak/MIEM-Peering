@@ -6,15 +6,19 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathExDashboard } from "../../../../../app/hooks/usePrivatePathExDashboard";
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { AccessTime } from "../../../../../components/assessTime";
+import { NoData } from "../../../../../components/noData";
 
 import { actions, createReview, fetchStudentWork, fetchCheckingsWorkList, fetchPeerForm } from "../../../../../store/checkings";
+import { fetchReviewStatus } from "../../../../../store/deadlineStatus";
 
 import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
 import { CheckingsForm } from "./CheckingForm";
 
-import { IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
+import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
 
+import { palette } from "../../../../../theme/colors";
 import * as globalStyles from "../../../../../const/styles"
 
 export const Checkings: FC = () => {
@@ -23,8 +27,10 @@ export const Checkings: FC = () => {
 
   const { path } = usePrivatePathExDashboard()
 
+  const statusDeadline = useAppSelector(state => state.deadlineStatus.isLoading)
+  const reviewStatus = useAppSelector(state => state.deadlineStatus.reviewStatus)
+  const submissionError = useAppSelector(state => state.deadlineStatus.error)
   const statusList = useAppSelector(state => state.checkings.isListLoading)
-  const lockList = useAppSelector(state => state.checkings.isListLock)
   const statusReview = useAppSelector(state => state.checkings.isAddReviewLoading)
   const lockReview = useAppSelector(state => state.checkings.isAddReviewLock)
   const statusStudentWork = useAppSelector(state => state.checkings.isWorkLoading)
@@ -41,10 +47,18 @@ export const Checkings: FC = () => {
   const [responses, setResponses] = useState<IPeerForm>()
 
   useEffect(() => {
-    if (path && path.taskId) {
+    if (path && path.taskId && reviewStatus && reviewStatus !== DeadlineStatus.NOT_STARTED) {
+      console.log("Getting Works...")
       dispatch(actions.reset())
       dispatch(fetchCheckingsWorkList(path.taskId))
       dispatch(fetchPeerForm(path.taskId))
+    }
+  }, [reviewStatus])
+
+  useEffect(() => {
+    if (path && path.taskId) {
+      console.log("Getting Deadlines...")
+      dispatch(fetchReviewStatus(path.taskId))
     }
   }, [])
 
@@ -60,20 +74,21 @@ export const Checkings: FC = () => {
   }, [path])
 
   useEffect(() => {
-    if (studentList && studentList.length > 0) {
+    const flag = reviewStatus && reviewStatus !== DeadlineStatus.NOT_STARTED && studentList && studentList.length > 0
+    if (path && path.taskId && flag) {
+      console.log("Get Peer Form for review...")
+      dispatch(fetchPeerForm(path.taskId))
       setCurrentWorkIdStudent(studentList[0].submissionId)
       getStudentWork(studentList[0].submissionId)
     }
-  }, [studentList])
+  }, [studentList, reviewStatus])
 
   const handleStudentChange = useCallback((studentId: string) => {
-    if (currentWorkId !== studentId) {
-      setCurrentWorkIdStudent(studentId)
-      getStudentWork(studentId)
-      if (path && path.taskId) {
-        setResponses(undefined)
-        dispatch(fetchPeerForm(path.taskId))
-      }
+    setCurrentWorkIdStudent(studentId)
+    getStudentWork(studentId)
+    if (path && path.taskId) {
+      setResponses(undefined)
+      dispatch(fetchPeerForm(path.taskId))
     }
   }, [])
 
@@ -82,11 +97,23 @@ export const Checkings: FC = () => {
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
           rubrics: JSON.parse(JSON.stringify(prev.rubrics.map(item => {
-            if (item.id !== questionId) return item
-            if (item.type === IQuestionTypes.SELECT_RATE && (typeof value === 'number' || typeof value === 'undefined'))
-              return { ...item, response: value }
-            if (item.type !== IQuestionTypes.SELECT_RATE && (typeof value === 'string' || typeof value === 'undefined'))
-              return { ...item, response: value }
+            if (item.questionId !== questionId) return item
+
+            switch (item.type) {
+              case IQuestionTypes.SELECT_RATE:
+              case IQuestionTypes.MULTIPLE:
+                return {
+                  ...item,
+                  ...(typeof value !== 'string' && { value: value })
+                }
+
+              case IQuestionTypes.SHORT_TEXT:
+              case IQuestionTypes.TEXT:
+                return {
+                  ...item,
+                  ...(typeof value !== 'number' && { response: value?.trim() })
+                }
+            }
           })))
         }
       }
@@ -98,13 +125,19 @@ export const Checkings: FC = () => {
       dispatch(createReview(path.taskId, currentWorkId, formResponses))
   }, [currentWorkId, path])
 
+  const status = reviewStatus ? statusList : statusDeadline
+  const mainError = reviewStatus ? error : submissionError
+
   return (
     <DashboardWorkBox
-      isLoading={statusList}
-      isLock={lockList}
-      error={error}
+      isLoading={status}
+      error={mainError}
     >
-      {studentList && studentList.length > 0 && currentWorkId ? (
+      {reviewStatus && reviewStatus === DeadlineStatus.NOT_STARTED && (
+        <AccessTime label={"Доступ закрыт"} />
+      )}
+
+      {studentList && studentList.length > 0 && currentWorkId && (
         <Box sx={styles.container}>
           <StudentsListSelect
             selectedStudentId={currentWorkId}
@@ -131,7 +164,10 @@ export const Checkings: FC = () => {
                       >
                         {"Форма с ответами:"}
                       </Typography>
-                      <StudentWork studentWork={studentWork} />
+                      <StudentWork
+                        studentWork={studentWork}
+                        answerBoxColor={palette.fill.success}
+                      />
                     </>
                   )}
                 </DashboardWorkBox>
@@ -163,9 +199,10 @@ export const Checkings: FC = () => {
             </Box>
           </DashboardWorkBox>
         </Box>
+      )}
 
-      ) : (
-        <>{"Пусто"}</>
+      {studentList && studentList.length === 0 && reviewStatus && reviewStatus !== DeadlineStatus.NOT_STARTED && (
+        <NoData label={"Работы для проверки не найдены"} />
       )}
     </DashboardWorkBox>
   )
@@ -202,12 +239,16 @@ const styles = {
   } as SxProps<Theme>,
   subTitle: {
     color: "#5A7180",
-    margin: "15px 0px 7px 0px",
-    '@media (min-width: 900px)': {
-      display: "none",
-      opacity: 0,
-      width: "0px",
-      height: "0px"
-    }
+    margin: "15px 0px 7px 0px"
+  } as SxProps<Theme>,
+  errorDeadlineContainer: {
+    margin: "50px 0px 0px 0px",
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    gap: "10px",
+    flexDirection: "column",
+    color: "#A4ADC8",
+    fontSize: "58px"
   } as SxProps<Theme>,
 }

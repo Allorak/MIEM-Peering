@@ -1,10 +1,10 @@
-import { IExtpertItem } from "../../store/types";
+import { IExpertItem } from "../../store/types";
 
 export type IRequestData = {
     accessToken: string,
     taskId: string
 }
 
-export type IResponseData = Array<IExtpertItem>
+export type IResponseData = Array<IExpertItem>
 
 export { getExperts } from './getExperts';

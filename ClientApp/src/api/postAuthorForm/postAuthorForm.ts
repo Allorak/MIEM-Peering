@@ -1,4 +1,3 @@
-import { TrainRounded } from '@mui/icons-material'
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
@@ -10,7 +9,7 @@ export const postAuthorForm = async ({
   responses
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
@@ -20,8 +19,8 @@ export const postAuthorForm = async ({
       'Accept-Language': 'ru',
     },
     data: {
-        ...(JSON.parse(JSON.stringify(responses))),
-        taskId
+      taskId,
+      answers: responses.responses
     }
   }
 

@@ -4,28 +4,23 @@ import { api, IResponse } from '..'
 import { mock } from './mock'
 
 
-export const deleteExpert = async ({
+export const getSubmissionStatus = async ({
   accessToken,
-  taskId,
-  email
+  taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
-    method: 'DELETE',
-    url: `/api/v1/tasks/${taskId}/experts/${email}`,
+    method: 'GET',
+    url: `/api/v1/submissions/getstatus/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
     }
   }
 
-  if (isMock) {
-    const response = await mock(requestConfig)
-    return response
-  }
-
+  if (isMock) return await mock(requestConfig)
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data

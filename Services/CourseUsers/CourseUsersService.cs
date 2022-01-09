@@ -102,5 +102,58 @@ namespace patools.Services.CourseUsers
 
             return new SuccessfulResponse<string>("Student added successfully");
         }
+
+        public async Task<Response<string>> JoinByCourseCode(AddCourseUserByCourseCodeDto info)
+        {
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == info.StudentId);
+            if (student == null)
+                return new InvalidGuidIdResponse<string>("Invalid user id provided");
+
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseCode == info.CourseCode);
+            if (course == null)
+                return new BadRequestDataResponse<string>("Invalid course code provided");
+
+            var courseUser = await _context.CourseUsers
+                .FirstOrDefaultAsync(cu => cu.User == student && cu.Course == course);
+            if (courseUser != null)
+                return new OperationErrorResponse<string>("User is already assigned to this course");
+
+            var tasks = await _context.Tasks
+                .Where(t => t.Course == course)
+                .ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                var expert =await _context.Experts
+                    .FirstOrDefaultAsync(e => e.User == student && e.PeeringTask == task);
+                if (expert != null)
+                    return new NoAccessResponse<string>("User is an expert for this task");
+            }
+
+            var newCourseUser = new CourseUser()
+            {
+                ID = Guid.NewGuid(),
+                Course = course,
+                User = student
+            };
+
+            await _context.CourseUsers.AddAsync(newCourseUser);
+            
+            //TODO: Remove later
+            foreach (var task in tasks)
+            {
+                var taskUser = new PeeringTaskUser()
+                {
+                    ID = Guid.NewGuid(),
+                    PeeringTask = task,
+                    Student = student,
+                    States = PeeringTaskStates.Assigned
+                };
+                await _context.AddAsync(taskUser);
+            }
+            await _context.SaveChangesAsync();
+
+            return new SuccessfulResponse<string>("User joined successfully");
+        }
     }
 }

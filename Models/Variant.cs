@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace patools.Models
 {
@@ -9,9 +10,12 @@ namespace patools.Models
 
         [Required]
         [MaxLength(200)]
-        public string Content { get; set; }
+        public string Response { get; set; }
 
         [Required]
         public Question Question { get; set; }
+        
+        [Required]
+        public int ChoiceId { get; set; } 
     }
 }

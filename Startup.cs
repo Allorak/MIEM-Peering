@@ -13,10 +13,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
+using Hangfire;
+using Hangfire.SQLite;
 using patools.Models;
 using patools.Services.Authentication;
 using patools.Services.Courses;
 using patools.Services.CourseUsers;
+using patools.Services.Experts;
 using patools.Services.Submissions;
 using patools.Services.Users;
 using patools.Services.PeeringTasks;
@@ -35,6 +38,8 @@ namespace patools
         public void ConfigureServices(IServiceCollection services)
         {
             SetupJwtServices(services);
+            services.AddHangfire(h => h.UseSQLiteStorage(Configuration["ConnectionStrings:Hangfire"]));
+            services.AddHangfireServer();
             services.AddControllersWithViews();
             services.AddDbContext<PAToolsContext>();
             services.AddSpaStaticFiles(configuration =>
@@ -48,6 +53,7 @@ namespace patools
             services.AddScoped<IPeeringTasksService,PeeringTasksService>();
             services.AddScoped<ISubmissionsService, SubmissionsService>();
             services.AddScoped<ICourseUsersService, CourseUsersService>();
+            services.AddScoped<IExpertsService, ExpertsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -70,6 +76,8 @@ namespace patools
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseHangfireDashboard();
 
             app.UseEndpoints(endpoints =>
             {

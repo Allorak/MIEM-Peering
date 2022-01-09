@@ -6,6 +6,7 @@ import { SxProps, Theme } from "@mui/system"
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { palette } from "../../../theme/colors";
 
 
 interface IProps {
@@ -15,7 +16,8 @@ interface IProps {
   onRemove?(id: number): void,
   onClone?(id: number): void,
   required: boolean,
-  description?: string
+  description?: string,
+  borderColor?: string
 }
 
 const questionTx = 'В'
@@ -28,11 +30,14 @@ export const AnswerBox: FC<IProps> = ({
   onEdit,
   onRemove,
   onClone,
-  required
+  required,
+  borderColor = palette.fill.primary
 }) => {
 
+  const borderLeft = `3px solid ${borderColor}`
+
   return (
-    <Box sx={styles.wrapper}>
+    <Box sx={{ ...styles.wrapper, borderLeft: borderLeft }}>
       <Box sx={styles.topContainer}>
         <Box sx={styles.container}>
           <Typography variant='body1'>
@@ -115,7 +120,6 @@ const styles = {
     borderRadius: '4px',
     padding: '16px 0px 0px 0px',
     boxShadow: '0px 0px 3px 0px rgba(34, 60, 80, 0.2)',
-    borderLeft: theme => `3px solid ${theme.palette.primary.main}`,
     boxSizing: "border-box"
   } as SxProps<Theme>,
   container: {

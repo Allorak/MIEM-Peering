@@ -28,11 +28,14 @@ namespace patools.Migrations
                     b.Property<Guid?>("QuestionID")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Response")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid?>("SubmissionID")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Text")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Value")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
@@ -84,6 +87,9 @@ namespace patools.Migrations
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
+
+                    b.Property<float?>("ConfidenceFactor")
+                        .HasColumnType("REAL");
 
                     b.Property<Guid?>("CourseID")
                         .HasColumnType("TEXT");
@@ -179,6 +185,9 @@ namespace patools.Migrations
 
                     b.Property<Guid?>("ExpertTaskID")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("PeersAssigned")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("ReviewEndDateTime")
                         .HasColumnType("TEXT");
@@ -298,6 +307,27 @@ namespace patools.Migrations
                     b.ToTable("Submissions");
                 });
 
+            modelBuilder.Entity("patools.Models.SubmissionPeer", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PeerID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("SubmissionID")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PeerID");
+
+                    b.HasIndex("SubmissionID");
+
+                    b.ToTable("SubmissionPeers");
+                });
+
             modelBuilder.Entity("patools.Models.User", b =>
                 {
                     b.Property<Guid>("ID")
@@ -337,12 +367,15 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ChoiceId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("QuestionID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Response")
+                        .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
@@ -467,6 +500,21 @@ namespace patools.Migrations
                         .HasForeignKey("PeeringTaskUserAssignmentID");
 
                     b.Navigation("PeeringTaskUserAssignment");
+                });
+
+            modelBuilder.Entity("patools.Models.SubmissionPeer", b =>
+                {
+                    b.HasOne("patools.Models.User", "Peer")
+                        .WithMany()
+                        .HasForeignKey("PeerID");
+
+                    b.HasOne("patools.Models.Submission", "Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionID");
+
+                    b.Navigation("Peer");
+
+                    b.Navigation("Submission");
                 });
 
             modelBuilder.Entity("patools.Models.Variant", b =>

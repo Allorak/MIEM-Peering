@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { Box, Button, Theme } from "@mui/material";
+import { Box, Button, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import { AnswerBox } from "../../../../../components/rubrics/answerBox";
@@ -25,20 +25,37 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
     event.preventDefault()
     if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0) {
       for (const item of authorForm.rubrics) {
-        if (item.required && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
+        const isResponse = item.type === IQuestionTypes.SHORT_TEXT || item.type === IQuestionTypes.TEXT
+        const isValue = item.type === IQuestionTypes.MULTIPLE || item.type === IQuestionTypes.SELECT_RATE
+
+        if (item.required && isResponse && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
           console.log(item, "!", typeof item.response === 'undefined')
           return
         }
+
+        if (item.required && isValue && typeof item.value === 'undefined') {
+          console.log(item, "!", typeof item.value === 'undefined')
+          return
+        }
       }
+
       const formResponses: IAuthorFormResponses = {
         responses: authorForm.rubrics.map((response) => {
-          if (response.response !== undefined)
-            return {
-              questionId: response.id,
-              response: typeof response.response === 'string' ? response.response.trim() : response.response
-            }
-          console.log(response.response !== undefined)
-          return { questionId: response.id }
+          switch (response.type) {
+            case IQuestionTypes.TEXT:
+            case IQuestionTypes.SHORT_TEXT:
+              return {
+                questionId: response.questionId,
+                response: response.response?.trim()
+              }
+
+            case IQuestionTypes.SELECT_RATE:
+            case IQuestionTypes.MULTIPLE:
+              return {
+                questionId: response.questionId,
+                value: response.value
+              }
+          }
         })
       }
       onSubmit(formResponses)
@@ -53,8 +70,8 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
     >
       {authorForm.rubrics.map((item, index) => (
         <AnswerBox
-          id={index}
-          key={item.id}
+          id={item.order}
+          key={item.questionId}
           title={item.title}
           required={item.required}
           description={item.description}
@@ -62,7 +79,7 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
           <QuestionBox>
             {item.type === IQuestionTypes.SHORT_TEXT && (
               <ShortTextEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 onEdit={onEdit}
                 value={item.response}
@@ -71,7 +88,7 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
 
             {item.type === IQuestionTypes.TEXT && (
               <TextEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 onEdit={onEdit}
                 value={item.response}
@@ -80,20 +97,20 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
 
             {item.type === IQuestionTypes.MULTIPLE && (
               <MultipleEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 onEdit={onEdit}
-                value={item.response}
+                value={item.value}
                 responses={JSON.parse(JSON.stringify(item.responses))}
               />
             )}
 
             {item.type === IQuestionTypes.SELECT_RATE && (
               <RatingScaleEditable
-                id={item.id}
+                id={item.questionId}
                 required={item.required}
                 onEdit={onEdit}
-                value={item.response}
+                value={item.value}
                 maxValue={item.maxValue}
                 minValue={item.minValue}
               />
@@ -101,12 +118,17 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
           </QuestionBox>
         </AnswerBox>
       ))}
-      <Box sx={{ ...globalStyles.submitBtContainer, ...{ marginTop: "20px" } }}>
+      <Box sx={styles.footerContainer}>
+        <Typography
+          variant={"body1"}
+        >
+          {"* Работу можно сдать только один раз"}
+        </Typography>
         <Button
           type='submit'
           variant='contained'
         >
-          {"Отправить"}
+          {"Сдать работу"}
         </Button>
       </Box>
     </Box>
@@ -118,5 +140,11 @@ const styles = {
     display: "flex",
     gap: "5px",
     flexDirection: "column"
-  } as SxProps<Theme>
+  } as SxProps<Theme>,
+  footerContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: "center",
+    marginTop: "20px"
+  } as SxProps<Theme>,
 }

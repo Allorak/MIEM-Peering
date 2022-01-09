@@ -12,11 +12,13 @@ import { TextVisible } from "../../../../../components/rubrics/text";
 import { IQuestionTypes, IStudentWork } from "../../../../../store/types";
 
 interface IProps {
-  studentWork: IStudentWork
+  studentWork: IStudentWork,
+  answerBoxColor?: string
 }
 
 export const StudentWork: FC<IProps> = ({
-  studentWork
+  studentWork,
+  answerBoxColor
 }) => {
 
   const sorted = studentWork.responses
@@ -31,12 +33,13 @@ export const StudentWork: FC<IProps> = ({
             title={item.title}
             required={item.required}
             description={item.description}
+            borderColor={answerBoxColor}
           >
             <QuestionBox>
               {item.type === IQuestionTypes.MULTIPLE && (
                 <MultipleVisible
                   responses={item.responses}
-                  response={item.response}
+                  response={item.value}
                   isResponse
                 />
               )}
@@ -57,7 +60,7 @@ export const StudentWork: FC<IProps> = ({
 
               {item.type === IQuestionTypes.SELECT_RATE && (
                 <RatingScaleVisible
-                  response={item.response}
+                  response={item.value}
                   isResponse
                 />
               )}

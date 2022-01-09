@@ -138,6 +138,34 @@ namespace patools.Controllers.v1
 
             return Ok(await _coursesService.DeleteCourse(teacherId, id));
         }
+
+
+        [HttpGet("secondstepavailable/course={courseId}")]
+        public async Task<ActionResult<string>> CheckForSecondStep(Guid courseId)
+        {
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidGuidIdResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(_coursesService.CheckForSecondStep(new CheckForSecondStepDto()
+            {
+                CourseId = courseId,
+                TeacherId = teacherId
+            }));
+        }
         
         //Should be in CourseService.cs file, Remove after refactoring
         private bool CourseExists(Guid id)

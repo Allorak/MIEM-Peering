@@ -12,21 +12,46 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
     payload: {
       rubrics: [
         {
-          id: "123",
+          questionId: "123",
           order: 0,
           title: "Title 1",
           type: IQuestionTypes.TEXT,
           required: false
         },
         {
-          id: "234",
+          questionId: "234",
           order: 1,
           title: "Title 2",
           type: IQuestionTypes.TEXT,
           required: true
         },
         {
-          id: "345",
+          questionId: "345",
+          order: 3,
+          title: "Title 3",
+          type: IQuestionTypes.MULTIPLE,
+          responses: [
+            {
+              id: 1,
+              response: "Вариант 1",
+            },
+            {
+              id: 2,
+              response: "Вариант 2",
+            },
+            {
+              id: 3,
+              response: "Вариант 3",
+            },
+            {
+              id: 4,
+              response: "Вариант 4",
+            }
+          ],
+          required: false
+        },
+        {
+          questionId: "ashdjhsda",
           order: 3,
           title: "Title 3",
           type: IQuestionTypes.MULTIPLE,
@@ -52,7 +77,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         },
 
         {
-          id: "asydasd",
+          questionId: "asydasd",
           order: 5,
           title: "Title 33",
           type: IQuestionTypes.MULTIPLE,
@@ -77,7 +102,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
           required: true
         },
         {
-          id: "423456",
+          questionId: "423456",
           order: 4,
           title: "Title 4",
           type: IQuestionTypes.SELECT_RATE,
@@ -87,7 +112,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         },
 
         {
-          id: "852",
+          questionId: "852",
           order: 6,
           title: "Title 44",
           type: IQuestionTypes.SELECT_RATE,

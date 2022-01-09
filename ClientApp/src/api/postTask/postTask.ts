@@ -12,6 +12,7 @@ export const postTask = async ({
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
   const isMock = false
+  console.log(task)
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
@@ -22,12 +23,12 @@ export const postTask = async ({
     },
     data: {
       ...task,
+      // ...(task.settings.experts && task.settings.experts && {  experts: task.settings.experts }),
       stepParams: {
-        step: task.settings.stepParams.step,
-        ...(task.settings.stepParams.step === PeerSteps.FIRST_STEP && {experts: task.settings.stepParams.experts}),
-        ...(task.settings.stepParams.step === PeerSteps.SECOND_STEP && {taskId: task.settings.stepParams.taskId})
+        step: PeerSteps.FIRST_STEP,
+        experts: ['name.name.98gm@gmail.com']
       },
-      courseId
+      courseId,
     }
   }
 
