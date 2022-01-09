@@ -6,9 +6,11 @@ import { useNavigate, matchPath } from "react-router-dom"
 import { paths } from "../../app/constants/paths"
 import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
 import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 
 import { palette } from "../../theme/colors"
+
+import { ICourses } from "../../store/types";
 
 export const Navbar: FC = () => {
     const history = useNavigate()
