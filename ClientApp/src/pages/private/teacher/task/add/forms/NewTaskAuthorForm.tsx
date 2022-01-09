@@ -685,8 +685,9 @@ const styles = {
     margin: "0px 0px 15px 0px"
   } as SxProps<Theme>,
   rubricTypeBt: {
+    boxSizing: 'border-box',
     color: 'common.black',
-    height: '30px',
+    height: '50px',
     borderRadius: '4px',
     flex: '1 0 100%',
     padding: '10px',

@@ -145,7 +145,7 @@ export function Private() {
       <Box sx={styles.wrapper}>
         <PrivateHeader />
 
-        <Box sx={styles.body}>
+        <Box sx={styles.dashboardBody}>
           <Routes>
             <Route path={"*"} element={<TeacherDashboard />} />
           </Routes>
@@ -159,7 +159,7 @@ export function Private() {
       <Box sx={styles.wrapper}>
         <PrivateHeader />
 
-        <Box sx={styles.body}>
+        <Box sx={styles.dashboardBody}>
           <Routes>
             <Route path={"*"} element={<StudentDashboard />} />
           </Routes>
@@ -173,7 +173,7 @@ export function Private() {
       <Box sx={styles.wrapper}>
         <PrivateHeader />
 
-        <Box sx={styles.body}>
+        <Box sx={styles.dashboardBody}>
           <Routes>
             <Route path={"*"} element={<ExpertDashboard />} />
           </Routes>
@@ -238,7 +238,12 @@ const styles = {
     maxHeight: 'calc(100vh - 80px)',
     ...globalStyles.scrollStyles,
   } as SxProps<Theme>,
-
+  dashboardBody: {
+    overflowY: 'hidden',
+    overflowX: 'hidden',
+    maxHeight: 'calc(100vh - 80px)',
+    ...globalStyles.scrollStyles,
+  } as SxProps<Theme>,
   loadingRoot: {
     width: '100%',
     position: 'fixed',

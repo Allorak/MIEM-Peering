@@ -5,8 +5,8 @@ import { useLocation, matchPath } from 'react-router-dom'
 
 import { paths } from "../../app/constants/paths";
 
-import logo from "../../img/logo.svg"
 import { EStudieses } from "../icons/EStudieses";
+import { Logo as Logotype } from "../icons/Logo";
 
 
 export const Logo: FC = () => {
@@ -18,7 +18,9 @@ export const Logo: FC = () => {
 
     return (
         <Box sx={styles.root} >
-            <img src={logo} alt="Peer Assessment Tools" />
+            <Box sx={styles.logotype}>
+                <Logotype />
+            </Box>
             <Box sx={path ? styles.logoTextContainerHidden : styles.logoTextContainer}>
                 <EStudieses />
             </Box>
@@ -33,6 +35,9 @@ const styles = {
         'img': {
             marginRight: '18.66px'
         }
+    } as SxProps<Theme>,
+    logotype: {
+        marginRight: '12px'
     } as SxProps<Theme>,
     logoTextContainer: {
         display: 'flex',

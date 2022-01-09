@@ -1,11 +1,10 @@
 import { FC, useMemo } from "react"
 import { Box, TableCell as MuiTableCell, Theme, TableCellProps } from "@mui/material"
-
-import DefaultAvatar from '../../img/ico/avatar.svg'
 import type { SxProps } from "@mui/system"
 
 
 import * as styles from "./styles"
+import { Avatar as AvatarIcon } from "../icons/Avatar"
 
 type IProps = TableCellProps & {
   isCentered?: boolean,
@@ -36,8 +35,19 @@ export const TableBodyCellUser: FC<IProps> = ({
       {...props}
     >
       <Box sx={styles.bodyCellUser}>
-        <Box sx={{ ...styles.expertImgWrapper, background: `url(${img ?? DefaultAvatar})0 0/cover no-repeat` }} />
-
+        {img ? (
+          <Box sx={{ ...styles.expertImgWrapper }}>
+            <img
+              src={img}
+              style={{width: 25, height: 'auto'}}
+              alt="Avatar" />
+          </Box>
+        ) : (
+          <Box sx={{ ...styles.expertAvatarWrapper }}>
+            <AvatarIcon />
+          </Box>
+        )
+        }
         {name}
 
         {children}

@@ -137,9 +137,13 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
 
 const styles = {
   wrapper: {
+    maxHeight: "calc(100vh - 200px)",
+    paddingRight: "5px",
+    overflowY: "auto",
     display: "flex",
     gap: "5px",
-    flexDirection: "column"
+    flexDirection: "column",
+    ...globalStyles.scrollStyles
   } as SxProps<Theme>,
   footerContainer: {
     display: 'flex',

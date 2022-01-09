@@ -1,14 +1,16 @@
 import { FC } from "react";
 import { NavLink as RouterLink } from 'react-router-dom'
-import { Link, Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
-import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
-import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import { Link, Typography } from "@mui/material";
 
 import { Overview } from "../icons/Overview";
 import { Works } from "../icons/Works";
 import { Experts } from "../icons/Experts";
 import { Grades } from "../icons/Grades";
+import { Work } from "../icons/Work";
+import { Authorform } from "../icons/Authorform";
+import { Checkings } from "../icons/Checkings";
+import { Export } from "../icons/Export";
 
 import { IMenu, IMenuTitles } from "../../store/types";
 import { palette } from "../../theme/colors";
@@ -46,27 +48,19 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
       case IMenuTitles.OVERVIEW:
         return (<Overview svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.AUTHORFORM:
-        return (<Works svgColor={isActive ? "white" : "#A4ADC8"} />)        
+        return (<Authorform svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.WORKS:
         return (<Works svgColor={isActive ? "white" : "#A4ADC8"} />)
+      case IMenuTitles.WORK:
+        return (<Work svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.EXPERTS:
         return (<Experts svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.GRADES:
         return (<Grades svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.CHECKINGS:
-        return (
-          <AssignmentTurnedInOutlinedIcon
-            color={'inherit'}
-            fontSize={'inherit'}
-          />
-        )
+        return (<Checkings svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.EXPORT:
-        return (
-          <ArrowCircleUpIcon
-            color={'inherit'}
-            fontSize={'inherit'}
-          />
-        )
+        return (<Export svgColor={isActive ? "white" : "#A4ADC8"} />)
       default: return null
     }
   }
@@ -111,13 +105,16 @@ const styles = {
   generalMenu: {
     display: "flex",
     alignItems: "center",
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     width: 'auto',
     height: "54px",
-    padding: "0",
+    padding: "0 8px",
     gap: "19px",
     borderRadius: '4px',
     textDecoration: 'none',
+    '@media (min-width: 768px)': {
+      justifyContent: 'center',
+    },
     '@media (min-width: 1280px)': {
       justifyContent: 'flex-start',
       width: 'auto',

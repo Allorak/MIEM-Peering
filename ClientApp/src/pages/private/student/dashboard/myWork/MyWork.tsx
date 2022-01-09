@@ -218,7 +218,7 @@ const styles = {
   formContainer: {
     flex: "0 1 50%",
     maxHeight: "calc(100vh - 183px - 70px)",
-    overflowY: "auto",
+    overflowY: "hidden",
     ...globalStyles.scrollStyles,
     '@media (max-width: 900px)': {
       flex: "0 0 100%",
