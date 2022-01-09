@@ -10,11 +10,11 @@ export const getStudentWork = async ({
   workId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/${taskId}/works/${workId}/get`,
+    url: `/api/v1/submissions/get/submission=${workId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

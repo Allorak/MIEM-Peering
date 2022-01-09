@@ -10,7 +10,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
     return {
       success: true,
       payload: {
-        responses: [
+        answers: [
           {
             questionId: "123",
             description: "Описание 1",
@@ -72,7 +72,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
     return {
       success: true,
       payload: {
-        responses: [
+        answers: [
           {
             questionId: "123",
             order: 0,
@@ -131,7 +131,7 @@ export const mock = async (requestConfig: AxiosRequestConfig, workId: string): P
   return {
     success: true,
     payload: {
-      responses: [
+      answers: [
         {
           questionId: "123",
           order: 0,
