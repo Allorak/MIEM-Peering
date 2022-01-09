@@ -13,5 +13,7 @@ namespace patools.Models
 
         [Required]
         public User User { get; set; }
+
+        public float? ConfidenceFactor { get; set; }
     }
 }
