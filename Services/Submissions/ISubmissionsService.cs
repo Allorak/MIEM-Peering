@@ -13,6 +13,9 @@ namespace patools.Services.Submissions
         Task<Response<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissions(
             GetAllSubmissionsMainInfoDtoRequest taskInfo);
 
+        Task<Response<GetSubmissionIdDtoResponse>> GetSubmissionIdForStudents(
+            GetSubmissionIdDtoRequest taskInfo);
+
         Task<Response<GetSubmissionDtoResponse>> GetSubmission(GetSubmissionDtoRequest submissionInfo);
 
     }
