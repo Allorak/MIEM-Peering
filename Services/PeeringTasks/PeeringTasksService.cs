@@ -66,9 +66,9 @@ namespace patools.Services.PeeringTasks
             if (course.Teacher.ID != peeringTask.TeacherId)
                 return new NoAccessResponse<GetNewPeeringTaskDtoResponse>("This teacher has no access to this course");
 
-            if (peeringTask.Settings.SubmissionStartDateTime < DateTime.Now)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                    "Submission start time can't be less than current time");
+            // if (peeringTask.Settings.SubmissionStartDateTime < DateTime.Now)
+            //     return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+            //         "Submission start time can't be less than current time");
             if (peeringTask.Settings.SubmissionStartDateTime > peeringTask.Settings.SubmissionEndDateTime)
                 return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
                     "Submission start time can't be greater than submission end time");
