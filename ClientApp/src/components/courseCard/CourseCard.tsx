@@ -12,12 +12,14 @@ interface IProps {
     course: ICourses
     onCourseSelect(id: string): void
     onCourseSettings?: (course: ICourses) => void
+    setting?: boolean
 }
 
 export const CourseCard: FC<IProps> = ({
     course,
     onCourseSelect,
-    onCourseSettings
+    onCourseSettings,
+    setting
 }) => {
 
     const userProfile = useAppSelector(state => state.userProfile.payload)
@@ -42,7 +44,7 @@ export const CourseCard: FC<IProps> = ({
                     </Typography>
 
                     {
-                        userProfile && userProfile.role === IRole.teacher ? (
+                        userProfile && userProfile.role === IRole.teacher && setting === false ? (
                             <Box
                                 sx={styles.settingBt}
                                 onClick={onSettings}

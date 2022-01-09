@@ -82,6 +82,7 @@ export const TCourseList: FC = () => {
                                             key={course.id}
                                             course={course}
                                             onCourseSettings={onCourseSettings}
+                                            setting={course.settings === undefined || course.settings === null}
                                         />
                                 }
                             />
