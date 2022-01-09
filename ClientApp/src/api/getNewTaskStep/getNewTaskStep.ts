@@ -9,11 +9,11 @@ export const getNewTaskStep = async ({
   courseId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/${courseId}/experts`,
+    url: `/api/v1/courses/secondstepavailable/course=${courseId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
