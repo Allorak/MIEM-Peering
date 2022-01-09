@@ -26,7 +26,7 @@ export const postTask = async ({
       // ...(task.settings.experts && task.settings.experts && {  experts: task.settings.experts }),
       stepParams: {
         step: PeerSteps.FIRST_STEP,
-        experts: ['name.name.98gm@gmail.com']
+        experts: ['name.name.gm98@gmail.com']
       },
       courseId,
     }

@@ -4,26 +4,23 @@ import { api, IResponse } from '..'
 import { mock } from './mock'
 
 
-export const getMyWork = async ({
+export const getSubmissionIdForStrudent = async ({
   accessToken,
-  submissionId
+  taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = false
+  const isMock = true
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/submissions/get/submission=${submissionId}`,
+    url: `/api/v1/submissions/getsubmissionId/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
     }
   }
 
-  if (isMock) {
-    const response = await mock(requestConfig)
-    return response
-  }
+  if (isMock) return await mock(requestConfig)
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data
