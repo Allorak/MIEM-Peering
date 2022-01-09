@@ -153,17 +153,7 @@ namespace patools.Services.Courses
                 }))
                 .ToListAsync();
 
-            var expertRecords = await _context.Experts
-                .Include(x => x.PeeringTask.Course)
-                .Where(x => x.User == teacher)
-                .ToListAsync();
-
-            foreach (var courseExpert in expertRecords)
-            {
-                var courseForExperts = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
-                if(courseForExperts!= null)
-                    courses.Add(_mapper.Map<GetCourseDtoResponse>(courseForExperts));
-            }
+            courses.AddRange(await GetExpertCourses(teacher));
 
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
@@ -188,27 +178,13 @@ namespace patools.Services.Courses
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
 
-            var expertRecords = await _context.Experts
-                .Include(x => x.PeeringTask.Course)
-                .Where(x => x.User == student)
-                .ToListAsync();
-
-            foreach (var courseExpert in expertRecords)
-            {
-                var courseForExperts = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
-                if(courseForExperts!= null)
-                    courses.Add(_mapper.Map<GetCourseDtoResponse>(courseForExperts));
-            }
+            courses.AddRange(await GetExpertCourses(student));
 
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
-        public async Task<Response<List<GetCourseDtoResponse>>> GetExpertCourses(Guid userId)
+        public async Task<List<GetCourseDtoResponse>> GetExpertCourses(User user)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
-            if (user == null)
-                return new InvalidGuidIdResponse<List<GetCourseDtoResponse>>("Invalid user id");
-
             var expertRecords = await _context.Experts
                 .Include(x => x.PeeringTask.Course)
                 .Where(x => x.User == user)
@@ -222,7 +198,7 @@ namespace patools.Services.Courses
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
 
-            return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
+            return courses;
         }
 
         public async Task<Response<string>> PutCourse(Guid teacherId, Guid courseId, PutCourseDto updateCourse)

@@ -86,9 +86,6 @@ namespace patools.Controllers.v1
 
             if(User.IsInRole(UserRoles.Student.ToString()))
                 return Ok(await _coursesService.GetStudentCourses(userId));
-
-            if(User.IsInRole(UserRoles.Expert.ToString()))
-                return Ok(await _coursesService.GetExpertCourses(userId));
             
             return Ok(new InvalidJwtTokenResponse());
         }
