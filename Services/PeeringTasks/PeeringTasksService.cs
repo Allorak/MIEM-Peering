@@ -153,33 +153,24 @@ namespace patools.Services.PeeringTasks
                 return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid course id");
 
             var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == teacher && x.PeeringTask.Course == course);
-            if (expert == null)
-            {
-                if(course.Teacher != teacher)
-                    return new NoAccessResponse<GetCourseTasksDtoResponse>("This teacher has no access to the course");
-
-                var tasks = await _context.Tasks
-                        .Where(t => t.Course.ID == courseInfo.CourseId)
-                        .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
-                        .ToListAsync();
-            
+            if (expert != null)
                 return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
                 {
-                    Tasks = tasks
+                    Tasks = await GetExpertCourseTasks(expert, course)
                 });
-            }
-            else
-            {
-                var tasksExpert = await _context.Experts
-                    .Where(x => x == expert)
-                    .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x.PeeringTask))
-                    .ToListAsync();
+            if(course.Teacher != teacher)
+                return new NoAccessResponse<GetCourseTasksDtoResponse>("This teacher has no access to the course");
 
-                return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
-                {
-                    Tasks = tasksExpert
-                });
-            }
+            var tasks = await _context.Tasks
+                .Where(t => t.Course.ID == courseInfo.CourseId)
+                .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
+                .ToListAsync();
+        
+            return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
+            {
+                Tasks = tasks
+            });
+
         }
         
         public async Task<Response<GetCourseTasksDtoResponse>> GetStudentCourseTasks(GetCourseTasksDtoRequest courseInfo)
@@ -193,62 +184,39 @@ namespace patools.Services.PeeringTasks
                 return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid user id");
 
             var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == student && x.PeeringTask.Course == course);
-            if (expert == null)
-            {
-                var courseUserConnection = await _context.CourseUsers
-                    .FirstOrDefaultAsync(x => x.User == student && x.Course == course);
-            
-                if (courseUserConnection == null)
-                    return new NoAccessResponse<GetCourseTasksDtoResponse>("This user is not assigned to this course");
-                
-                var tasks = await _context.Tasks
-                    .Where(t => t.Course.ID == courseInfo.CourseId)
-                    .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
-                    .ToListAsync();
-
+            if (expert != null)
                 return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
                 {
-                    Tasks = tasks
+                    Tasks = await GetExpertCourseTasks(expert, course)
                 });
-            }
-            else
-            {
-                var tasksExpert = await _context.Experts
-                    .Where(x => x == expert)
-                    .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x.PeeringTask))
-                    .ToListAsync();
-
-                return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
-                {
-                    Tasks = tasksExpert
-                });
-            }
-        }
-
-        public async Task<Response<GetCourseTasksDtoResponse>> GetExpertCourseTasks(GetCourseTasksDtoRequest courseInfo)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == courseInfo.UserId);
-            if (user == null)
-                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid user id");
-
-            var course = await _context.Courses.FirstOrDefaultAsync(x => x.ID == courseInfo.CourseId);
-            if (course == null)
-                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("Invalid course id");
-
-            var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == user);
-            if (expert == null)
-                return new InvalidGuidIdResponse<GetCourseTasksDtoResponse>("The user is not an expert");
-           
-            var tasks = await _context.Experts
-                        .Where(x => x == expert && x.PeeringTask.Course == course)
-                        .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x.PeeringTask))
-                        .ToListAsync();
             
+            var courseUserConnection = await _context.CourseUsers
+                .FirstOrDefaultAsync(x => x.User == student && x.Course == course);
+        
+            if (courseUserConnection == null)
+                return new NoAccessResponse<GetCourseTasksDtoResponse>("This user is not assigned to this course");
+            
+            var tasks = await _context.Tasks
+                .Where(t => t.Course.ID == courseInfo.CourseId)
+                .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x))
+                .ToListAsync();
+
             return new SuccessfulResponse<GetCourseTasksDtoResponse>(new GetCourseTasksDtoResponse
             {
                 Tasks = tasks
             });
-                
+
+        }
+
+        public async Task<List<GetPeeringTaskMainInfoDtoResponse>> GetExpertCourseTasks(Expert expert, Course course)
+        {
+            var tasks = new List<GetPeeringTaskMainInfoDtoResponse>();
+            if(expert!=null)
+                tasks.AddRange(await _context.Experts
+                    .Where(x => x == expert && x.PeeringTask.Course == course)
+                    .Select(x => _mapper.Map<GetPeeringTaskMainInfoDtoResponse>(x.PeeringTask))
+                    .ToListAsync());
+            return tasks;
         }
 
         public async Task<Response<GetPeeringTaskTeacherOverviewDtoResponse>> GetTaskTeacherOverview(GetPeeringTaskTeacherOverviewDtoRequest taskInfo)

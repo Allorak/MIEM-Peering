@@ -13,7 +13,6 @@ namespace patools.Services.PeeringTasks
         Task<Response<GetNewPeeringTaskDtoResponse>> AddTask(AddPeeringTaskDto peeringTask);
         Task<Response<GetCourseTasksDtoResponse>> GetTeacherCourseTasks(GetCourseTasksDtoRequest courseInfo);
         Task<Response<GetCourseTasksDtoResponse>> GetStudentCourseTasks(GetCourseTasksDtoRequest courseInfo);
-        Task<Response<GetCourseTasksDtoResponse>> GetExpertCourseTasks(GetCourseTasksDtoRequest courseInfo);
         Task<Response<GetAuthorFormDtoResponse>> GetAuthorForm(GetAuthorFormDtoRequest taskInfo);
     }
 }
