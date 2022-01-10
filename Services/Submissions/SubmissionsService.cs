@@ -143,6 +143,11 @@ namespace patools.Services.Submissions
             if (courseUser == null)
                 return new NoAccessResponse<GetSubmissionIdDtoResponse>("This student has no access to this course");
             
+            var courseUserConnection = await _context.CourseUsers
+                .FirstOrDefaultAsync(x => x.User == student && x.Course == task.Course);
+            if (courseUserConnection == null)
+                return new NoAccessResponse<GetSubmissionIdDtoResponse>("This student is not assigned to this course");
+            
             var taskUser = await _context.TaskUsers
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
