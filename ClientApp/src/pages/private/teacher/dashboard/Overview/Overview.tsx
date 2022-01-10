@@ -37,8 +37,9 @@ export const Overview: FC = () => {
       dispatch(fetchOverview(path.taskId))
   }, [])
 
-  const graphData = payload.grades?.map((grade, index) => ({ x: index, y: grade }))
+  const graphData = payload?.grades?.map((grade, index) => ({ x: index, y: grade }))
 
+  
   return (
     <DashboardWorkBox
       isLoading={status}
