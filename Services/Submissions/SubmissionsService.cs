@@ -132,14 +132,21 @@ namespace patools.Services.Submissions
             if (student == null)
                 return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("Invalid user id");
 
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("Invalid task id");
+
+            var courseUser = await _context.CourseUsers
+                .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == student);
+            if (courseUser == null)
+                return new NoAccessResponse<GetSubmissionIdDtoResponse>("This student has no access to this course");
             
             var taskUser = await _context.TaskUsers
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
-                return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("The task isn't assigned to this user");
+                return new NoAccessResponse<GetSubmissionIdDtoResponse>("The task isn't assigned to this user");
 
             if (task.SubmissionStartDateTime > DateTime.Now)
                 return new OperationErrorResponse<GetSubmissionIdDtoResponse>("Submissioning hasn't started yet");
