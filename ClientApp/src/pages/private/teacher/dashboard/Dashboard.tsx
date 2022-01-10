@@ -147,7 +147,7 @@ const styles = {
     height: '100%',
     '@media (min-width: 768px)': {
       display: 'grid',
-      gridTemplateColumns: '100px auto',
+      gridTemplateColumns: '70px auto',
       gridTemplateAreas: ' "leftContainer rightContainer"',
       margin: "30px auto 15px",
       padding: '0 15px 0 8px',
