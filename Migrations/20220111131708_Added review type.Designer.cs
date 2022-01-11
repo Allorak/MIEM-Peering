@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220111131708_Added review type")]
+    partial class Addedreviewtype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -189,19 +191,19 @@ namespace patools.Migrations
                     b.Property<bool>("PeersAssigned")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("ReviewEndDateTime")
+                    b.Property<DateTime?>("ReviewEndDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ReviewStartDateTime")
+                    b.Property<DateTime?>("ReviewStartDateTime")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Step")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("SubmissionEndDateTime")
+                    b.Property<DateTime?>("SubmissionEndDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("SubmissionStartDateTime")
+                    b.Property<DateTime?>("SubmissionStartDateTime")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SubmissionsToCheck")
