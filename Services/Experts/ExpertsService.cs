@@ -40,10 +40,10 @@ namespace patools.Services.Experts
                 .Select(e => new GetExpertDtoResponse()
                 {
                     Email = e.Email,
-                    Name = e.User.Fullname ?? "Эксперт",
-                    ImageUrl = e.User.ImageUrl ?? "",
-                    TasksCompleted = 1,
-                    TasksAssigned = 1
+                    Name = e.User == null ? null : e.User.Fullname,
+                    ImageUrl = e.User == null ? null : e.User.ImageUrl,
+                    TasksCompleted = e.User == null ? null : 1,
+                    TasksAssigned = e.User == null ? null : 1
                 })
                 .ToArrayAsync();
 

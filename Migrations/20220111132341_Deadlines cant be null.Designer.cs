@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220111132341_Deadlines cant be null")]
+    partial class Deadlinescantbenull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,8 +185,8 @@ namespace patools.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool?>("ExpertsAssigned")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid?>("ExpertTaskID")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("PeersAssigned")
                         .HasColumnType("INTEGER");
@@ -218,6 +220,8 @@ namespace patools.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("CourseID");
+
+                    b.HasIndex("ExpertTaskID");
 
                     b.ToTable("Tasks");
                 });
@@ -461,7 +465,13 @@ namespace patools.Migrations
                         .WithMany()
                         .HasForeignKey("CourseID");
 
+                    b.HasOne("patools.Models.PeeringTask", "ExpertTask")
+                        .WithMany()
+                        .HasForeignKey("ExpertTaskID");
+
                     b.Navigation("Course");
+
+                    b.Navigation("ExpertTask");
                 });
 
             modelBuilder.Entity("patools.Models.PeeringTaskUser", b =>

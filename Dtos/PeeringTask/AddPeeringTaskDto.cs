@@ -11,6 +11,5 @@ namespace patools.Dtos.Task
         public AddPeeringTaskSettingsDto Settings { get; set;}
         public AddPeeringTaskAuthorFormDto AuthorForm { get; set;}
         public AddPeeringTaskPeerFormDto PeerForm { get; set;}
-        public AddExpertsDto StepParams { get; set; }
     }
 }

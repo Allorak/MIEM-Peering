@@ -3,6 +3,7 @@ import { AppThunk } from "../../../app/store";
 
 import { IErrorCode } from "../../types";
 import { getMyWork } from "../../../api/getMyWork";
+import { getSubmissionIdForStrudent } from "../../../api/getSubmissionIdForStrudent";
 
 
 export const fetchMyWork = (taskId: string): AppThunk => async (dispatch, getState) => {
@@ -18,7 +19,21 @@ export const fetchMyWork = (taskId: string): AppThunk => async (dispatch, getSta
     }
 
     try {
-        const response = await getMyWork({ accessToken, taskId })
+        const submissionId = await getSubmissionIdForStrudent({ accessToken, taskId })
+
+        if (!submissionId) {
+            dispatch(actions.fetchFailed({
+                code: IErrorCode.RESPONSE,
+                message: 'Некорректный ответ сервера',
+            }))
+            return
+        }
+        if (!submissionId.success) {
+            dispatch(actions.fetchFailed(submissionId.error))
+            return
+        }
+
+        const response = await getMyWork({ accessToken, submissionId: submissionId.payload.submissionId })
         if (!response) {
             dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,

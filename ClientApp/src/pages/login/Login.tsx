@@ -18,8 +18,10 @@ import { GoogleAuthStatus, IRole } from '../../store/types';
 
 import clientID from '../../secret/GoogleClientID';
 
+import Cookies from 'universal-cookie';
 
 export const Login: FC = () => {
+    const cookies = new Cookies(); 
     const dispatch = useAppDispatch()
 
     const isAuthorized = useAppSelector(state => state.gAuth.isAuthorized)
@@ -48,6 +50,7 @@ export const Login: FC = () => {
 
     const onGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ('accessToken' in response) {
+            cookies.remove('JWT')
             dispatch(fetchGAuth(response.tokenId))
         }
     }

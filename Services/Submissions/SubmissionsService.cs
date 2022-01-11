@@ -126,6 +126,42 @@ namespace patools.Services.Submissions
                 });
         }
 
+        public async Task<Response<GetSubmissionIdDtoResponse>> GetSubmissionIdForStudents(GetSubmissionIdDtoRequest taskInfo)
+        {
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (student == null)
+                return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("Invalid user id");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetSubmissionIdDtoResponse>("Invalid task id");
+
+            var courseUser = await _context.CourseUsers
+                .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == student);
+            if (courseUser == null)
+                return new NoAccessResponse<GetSubmissionIdDtoResponse>("This student has no access to this course");
+            
+            var taskUser = await _context.TaskUsers
+                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
+            if (taskUser == null)
+                return new NoAccessResponse<GetSubmissionIdDtoResponse>("The task isn't assigned to this user");
+
+            if (task.SubmissionStartDateTime > DateTime.Now)
+                return new OperationErrorResponse<GetSubmissionIdDtoResponse>("Submissioning hasn't started yet");
+
+            var submission = await _context.Submissions
+                .FirstOrDefaultAsync(x => x.PeeringTaskUserAssignment == taskUser);
+            if (submission == null)
+                return new OperationErrorResponse<GetSubmissionIdDtoResponse>("This student has no submission");
+                
+            return new SuccessfulResponse<GetSubmissionIdDtoResponse>(new GetSubmissionIdDtoResponse()
+            {
+                SubmissionId = submission.ID
+            });
+        }
+
         public async Task<Response<GetSubmissionDtoResponse>> GetSubmission(GetSubmissionDtoRequest submissionInfo)
         {
             var submission = await _context.Submissions
@@ -217,7 +253,33 @@ namespace patools.Services.Submissions
                 Answers = resultAnswers
             });
         }
-        
-        
+
+        public async Task<Response<SubmissionStatus>> GetSubmissionStatus(CanSubmitDto submissionInfo)
+        {
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == submissionInfo.StudentId && u.Role == UserRoles.Student);
+            if (student == null)
+                return new InvalidGuidIdResponse<SubmissionStatus>("Invalid student id provided");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == submissionInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<SubmissionStatus>("Invalid task id provided");
+
+            var courseUser = await _context.CourseUsers
+                .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == student);
+            if (courseUser == null)
+                return new NoAccessResponse<SubmissionStatus>("This student has no access to this course");
+            
+            var taskUser = await _context.TaskUsers
+                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
+            if (taskUser == null)
+                return new NoAccessResponse<SubmissionStatus>("This task is not assigned to this user");
+
+            var submission = await _context.Submissions
+                .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+
+            return submission == null ? new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.NotCompleted) : new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.Completed);
+        }
     }
 }

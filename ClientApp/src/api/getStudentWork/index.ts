@@ -1,4 +1,4 @@
-import { IStudentWork } from "../../store/types";
+import { IMyWorkForm } from "../../store/types";
 
 export type IRequestData = {
     accessToken: string,
@@ -6,6 +6,6 @@ export type IRequestData = {
     workId: string
 }
 
-export type IResponseData = IStudentWork
+export type IResponseData = IMyWorkForm
 
 export { getStudentWork } from './getStudentWork';

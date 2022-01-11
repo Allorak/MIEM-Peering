@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using patools.Dtos.Variants;
 using patools.Enums;
-using patools.Models;
 
 namespace patools.Dtos.Question
 {
-    public class GetQuestionDto
+    public class GetPeerQuestionDtoResponse
     {
         public Guid QuestionId { get; set; }
         public int Order { get; set; }
@@ -17,5 +16,6 @@ namespace patools.Dtos.Question
         public List<GetVariantDtoResponse> Responses { get; set; }
         public int? MinValue { get; set; }
         public int? MaxValue { get; set; }
+        public float? CoefficientPercentage { get; set; }
     }
 }
