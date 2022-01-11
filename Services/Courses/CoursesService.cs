@@ -153,6 +153,8 @@ namespace patools.Services.Courses
                 }))
                 .ToListAsync();
 
+            courses.AddRange(await GetExpertCourses(teacher));
+
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
         }
 
@@ -176,7 +178,27 @@ namespace patools.Services.Courses
                     courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
             }
 
+            courses.AddRange(await GetExpertCourses(student));
+
             return new SuccessfulResponse<List<GetCourseDtoResponse>>(courses);
+        }
+
+        public async Task<List<GetCourseDtoResponse>> GetExpertCourses(User user)
+        {
+            var expertRecords = await _context.Experts
+                .Include(x => x.PeeringTask.Course)
+                .Where(x => x.User == user)
+                .ToListAsync();
+
+            var courses = new List<GetCourseDtoResponse>();
+            foreach (var courseExpert in expertRecords)
+            {
+                var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(c => c.ID == courseExpert.PeeringTask.Course.ID);
+                if(course!= null)
+                    courses.Add(_mapper.Map<GetCourseDtoResponse>(course));
+            }
+
+            return courses;
         }
 
         public async Task<Response<string>> PutCourse(Guid teacherId, Guid courseId, PutCourseDto updateCourse)

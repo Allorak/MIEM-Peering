@@ -329,12 +329,31 @@ export type IStatusTask = {
 export type IOverview = {
   statistics: IStatusBar,
   deadlines: IDeadlines,
-  grades: number[]
+  grades?: number[],
+  type: PeerTaskTypes,
+  confidenceСoefficients?: number[],
+  currentConfidenceСoefficients?: number[],
+  step: PeerSteps
 }
 
 export type IOverviewStudent = {
   deadlines: IDeadlines,
-  status: IStatusTask
+  status: IStatusTask,
+  submissionStatus: boolean,
+  studentGrades?: IStudentSubmissionGrades,
+  step: PeerSteps,
+  studentConfidenceСoefficients?: {
+    until?: number,
+    after?: number
+  }
+}
+
+
+
+export type IStudentSubmissionGrades = {
+  coordinates: IWorkReviewСoordinates[],
+  minGrade: number,
+  maxGrade: number
 }
 
 export type IOverviewExpert = {

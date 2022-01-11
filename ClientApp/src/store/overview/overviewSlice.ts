@@ -6,14 +6,14 @@ export interface ICoursesState {
   isLoading: boolean,
   isLock: boolean,
   error: IError | undefined,
-  payload: IOverview,
+  payload: IOverview | undefined,
 }
 
 const initialState: ICoursesState = {
   isLoading: false,
   error: undefined,
   isLock: true,
-  payload: {} as IOverview,
+  payload: undefined,
 };
 
 export const overview = createSlice({
@@ -42,7 +42,7 @@ export const overview = createSlice({
       state.isLoading = false
       state.error = undefined
       state.isLock = true
-      state.payload = {} as IOverview
+      state.payload = undefined
     }
   },
 });

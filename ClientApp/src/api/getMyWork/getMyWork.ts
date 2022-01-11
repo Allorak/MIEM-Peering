@@ -6,14 +6,14 @@ import { mock } from './mock'
 
 export const getMyWork = async ({
   accessToken,
-  taskId
+  submissionId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/courses/get${taskId}`,
+    url: `/api/v1/submissions/get/submission=${submissionId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

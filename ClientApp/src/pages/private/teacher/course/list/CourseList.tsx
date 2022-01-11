@@ -27,7 +27,7 @@ export const TCourseList: FC = () => {
     useEffect(() => {
         dispatch(fetchCourses())
         setPopupCourseStatus(false)
-    }, [dispatch])
+    }, [])
 
     const onAddNewCourse = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.stopPropagation()
@@ -82,6 +82,7 @@ export const TCourseList: FC = () => {
                                             key={course.id}
                                             course={course}
                                             onCourseSettings={onCourseSettings}
+                                            setting={course.settings === undefined || course.settings === null}
                                         />
                                 }
                             />
