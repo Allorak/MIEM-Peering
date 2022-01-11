@@ -3,7 +3,7 @@ using patools.Dtos.Question;
 
 namespace patools.Dtos.Task
 {
-    public class GetPeerFromDtoResponse
+    public class GetPeerFormDtoResponse
     {
         public IEnumerable<GetPeerQuestionDtoResponse> Rubrics { get; set; }
     }

@@ -32,6 +32,7 @@ namespace patools
             CreateMap<PutCourseDto, Course>();
             CreateMap<GetCourseTeacherDtoResponse, GetCourseDtoResponse>();
             CreateMap<Variant, GetVariantDtoResponse>();
+            CreateMap<Question, GetPeerQuestionDtoResponse>();
         }
     }
 }

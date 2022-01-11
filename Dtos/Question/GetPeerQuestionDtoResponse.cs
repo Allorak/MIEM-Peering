@@ -16,6 +16,6 @@ namespace patools.Dtos.Question
         public List<GetVariantDtoResponse> Responses { get; set; }
         public int? MinValue { get; set; }
         public int? MaxValue { get; set; }
-        public float CoefficientPercentage { get; set; }
+        public float? CoefficientPercentage { get; set; }
     }
 }

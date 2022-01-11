@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Google.Apis.Util;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Question;
@@ -378,8 +379,6 @@ namespace patools.Services.PeeringTasks
         
         public async Task<Response<GetAuthorFormDtoResponse>> GetAuthorForm(GetAuthorFormDtoRequest taskInfo)
         {
-            var response = new Response<GetAuthorFormDtoResponse>();
-
             var task = await _context.Tasks
                 .Include(t=>t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
@@ -406,9 +405,6 @@ namespace patools.Services.PeeringTasks
                 }
                 case UserRoles.Teacher when task.Course.Teacher != user:
                     return new NoAccessResponse<GetAuthorFormDtoResponse>("This teacher has no access to the task");
-                default:
-                    return new OperationErrorResponse<GetAuthorFormDtoResponse>(
-                        "Incorrect user role stored in database");
             }
 
             var questions = _context.Questions
@@ -436,24 +432,71 @@ namespace patools.Services.PeeringTasks
                 resultQuestions.Add(resultQuestion);
             }
 
-            response.Success = true;
-            response.Error = null;
-            response.Payload = new GetAuthorFormDtoResponse() {Rubrics = resultQuestions};
-            return response;
+            return new SuccessfulResponse<GetAuthorFormDtoResponse>(new GetAuthorFormDtoResponse()
+            {
+                Rubrics = resultQuestions
+            });
         }
 
-        public async Task<Response<GetPeerFromDtoResponse>> GetPeerForm(GetPeerFromDtoRequest taskInfo)
+        public async Task<Response<GetPeerFormDtoResponse>> GetPeerForm(GetPeerFormDtoRequest taskInfo)
         {
             var task = await _context.Tasks
                 .Include(t=>t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
-                return new InvalidGuidIdResponse<GetPeerFromDtoResponse>("Invalid task id provided");
-            
+                return new InvalidGuidIdResponse<GetPeerFormDtoResponse>("Invalid task id provided");
             var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
             if (user == null)
-                return new InvalidGuidIdResponse<GetPeerFromDtoResponse>("Invalid user id provided");
+                return new InvalidGuidIdResponse<GetPeerFormDtoResponse>("Invalid user id provided");
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+            
+            switch (user.Role)
+            {
+                case {} when expert!= null:
+                    break;
+                case UserRoles.Teacher when task.Course.Teacher != user:
+                    return new NoAccessResponse<GetPeerFormDtoResponse>("This teacher has no access to this course");
+                case UserRoles.Student:
+                    var taskUser = await _context.TaskUsers
+                        .FirstOrDefaultAsync(tu => tu.PeeringTask == task && tu.Student == user);
+                    if (taskUser == null)
+                        return new NoAccessResponse<GetPeerFormDtoResponse>("This task is not assigned to this user");
+                    if (task.ReviewEndDateTime < DateTime.Now)
+                        return new OperationErrorResponse<GetPeerFormDtoResponse>("The deadline has already passed");
+                    if (task.ReviewStartDateTime > DateTime.Now)
+                        return new OperationErrorResponse<GetPeerFormDtoResponse>("Reviewing hasn't started yet");
+                    break;
+            }
+            
+            var questions = _context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Peer)
+                .OrderBy(q => q.Order);
+            
+            var resultQuestions = new List<GetPeerQuestionDtoResponse>();
+            foreach (var question in questions)
+            {
+                var resultQuestion = _mapper.Map<GetPeerQuestionDtoResponse>(question);
+                resultQuestion.QuestionId = question.ID;
+                if (question.Type == QuestionTypes.Multiple)
+                {
+                    var variants = await _context.Variants
+                        .Where(v => v.Question == question)
+                        .Select(v => new GetVariantDtoResponse()
+                        {
+                            Id = v.ChoiceId,
+                            Response = v.Response
+                        })
+                        .OrderBy(v => v.Id)
+                        .ToListAsync();
+                    resultQuestion.Responses = variants;
+                }
+                resultQuestions.Add(resultQuestion);
+            }
 
+            return new SuccessfulResponse<GetPeerFormDtoResponse>(new GetPeerFormDtoResponse()
+            {
+                Rubrics = resultQuestions
+            });
         }
 
         public async Task<Response<GetTaskDeadlineDtoResponse>> GetTaskSubmissionDeadline(GetTaskDeadlineDtoRequest taskInfo)

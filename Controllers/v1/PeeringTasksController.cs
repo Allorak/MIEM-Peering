@@ -99,7 +99,7 @@ namespace patools.Controllers.v1
             //The id stored in Claim is not Guid
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
-            var taskInfo = new GetPeerFromDtoRequest()
+            var taskInfo = new GetPeerFormDtoRequest()
             {
                 TaskId = taskId,
                 UserId = userId
