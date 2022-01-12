@@ -15,6 +15,7 @@ namespace patools.Models
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<Answer> Answers { get; set; }
         public DbSet<Expert> Experts { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         public DbSet<CourseUser> CourseUsers { get; set; }
         public DbSet<GroupUser> GroupUsers { get; set; }

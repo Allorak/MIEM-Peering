@@ -28,6 +28,9 @@ namespace patools.Services.CourseUsers
 
         public async Task<Response<string>> AddCourseUser(AddCourseUserDto newCourseUser)
         {
+            if (newCourseUser.Users == null)
+                return new BadRequestDataResponse<string>("Users are not provided");
+            
             var course = await _context.Courses.Include(x => x.Teacher).FirstOrDefaultAsync(u => u.ID == newCourseUser.CourseId);
             if(course == null)
                 return new BadRequestDataResponse<string>("Invalid course id");
@@ -85,7 +88,7 @@ namespace patools.Services.CourseUsers
                     ID = Guid.NewGuid(),
                     PeeringTask = task,
                     Student = student,
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 };
                 await _context.TaskUsers.AddAsync(newTaskUser);
             }
@@ -147,7 +150,7 @@ namespace patools.Services.CourseUsers
                     ID = Guid.NewGuid(),
                     PeeringTask = task,
                     Student = student,
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 };
                 await _context.AddAsync(taskUser);
             }

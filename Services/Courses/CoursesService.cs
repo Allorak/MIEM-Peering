@@ -203,6 +203,8 @@ namespace patools.Services.Courses
 
         public async Task<Response<string>> PutCourse(Guid teacherId, Guid courseId, PutCourseDto updateCourse)
         {
+            if (updateCourse.Settings == null)
+                return new BadRequestDataResponse<string>("Settings are not provided");
             var course = await _context.Courses.FindAsync(courseId);
             if (course == null)
                 return new InvalidGuidIdResponse<string>();
@@ -217,7 +219,7 @@ namespace patools.Services.Courses
 
             if (course.Teacher.ID != teacherId)
                 return new NoAccessResponse<string>("This teacher has no access to this task");
-
+            
             switch (courseNew.Settings.EnableCode)
             {
                 case true when !course.EnableCode:
