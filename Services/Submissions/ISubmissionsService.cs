@@ -21,6 +21,6 @@ namespace patools.Services.Submissions
 
         Task<Response<SubmissionStatus>> GetSubmissionStatus(CanSubmitDto submissionInfo);
 
-        Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetSubmissionsToCheck(GetSubmissionToCheckDtoRequest taskInfo);
+        Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog(GetSubmissionToCheckDtoRequest taskInfo);
     }
 }

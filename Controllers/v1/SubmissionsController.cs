@@ -143,8 +143,8 @@ namespace patools.Controllers.v1
             }));
         }
 
-        [HttpGet("get-submissions-to-check/task={taskId}")]
-        public async Task<ActionResult<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetSubmissionsToCheck([FromRoute] Guid taskId)
+        [HttpGet("get-checks-catalog/task={taskId}")]
+        public async Task<ActionResult<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog([FromRoute] Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -156,7 +156,7 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
 
-            return Ok(await _submissionsService.GetSubmissionsToCheck(new GetSubmissionToCheckDtoRequest()
+            return Ok(await _submissionsService.GetChecksCatalog(new GetSubmissionToCheckDtoRequest()
             {
                 TaskId = taskId,
                 UserId = userId

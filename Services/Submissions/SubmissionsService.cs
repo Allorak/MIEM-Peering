@@ -301,7 +301,7 @@ namespace patools.Services.Submissions
             return submission == null ? new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.NotCompleted) : new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.Completed);
         }
 
-        public async Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetSubmissionsToCheck(GetSubmissionToCheckDtoRequest taskInfo)
+        public async Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog(GetSubmissionToCheckDtoRequest taskInfo)
         {
             var task = await _context.Tasks
                 .Include(t => t.Course)
