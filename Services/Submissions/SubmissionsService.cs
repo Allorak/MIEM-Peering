@@ -249,6 +249,7 @@ namespace patools.Services.Submissions
                         break;
                     case QuestionTypes.Select:
                         resultAnswer.Value = answer.Value;
+                        resultAnswer.CoefficientPercentage = answer.Question.CoefficientPercentage;
                         break;
                     case QuestionTypes.Multiple:
                         resultAnswer.Value = answer.Value;

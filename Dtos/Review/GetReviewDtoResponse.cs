@@ -10,7 +10,7 @@ namespace patools.Dtos.Review
         public UserRoles Reviewer { get; set; }
         public string ReviewerName { get; set; }
         public Guid SubmissionId { get; set; }
-        public int FinalGrade { get; set; }
+        public float FinalGrade { get; set; }
         public IEnumerable<GetAnswerDtoResponse> Answers { get; set; }
     }
 }

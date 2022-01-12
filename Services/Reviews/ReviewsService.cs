@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using patools.Dtos.Answer;
 using patools.Dtos.Review;
+using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
@@ -99,11 +101,15 @@ namespace patools.Services.Reviews
                 if (question.Type == QuestionTypes.Select)
                 {
                     const int maxGrade = 10;
-                    var mappedValue = answer.Value / (question.MaxValue - question.MinValue) * maxGrade;
+                    var mappedValue = answer.Value * 1f / (question.MaxValue - question.MinValue) * maxGrade;
                     if (mappedValue == null)
                         return new OperationErrorResponse<GetNewReviewDtoResponse>(
                             "There is an error in database (Min or Max value for select-type question is null)");
-                    grades.Add(mappedValue.Value);
+                    var weightedValue = mappedValue.Value * question.CoefficientPercentage / 100;
+                    if (weightedValue == null)
+                        return new OperationErrorResponse<GetNewReviewDtoResponse>(
+                            "there is an error in database (Coefficient Percentage for required select question is null)");
+                    grades.Add(weightedValue.Value);
                 }
                 
                 answers.Add(new Answer()
@@ -126,7 +132,7 @@ namespace patools.Services.Reviews
 
             if (grades.Count == 0)
                 return new OperationErrorResponse<GetNewReviewDtoResponse>("There were no select-questions");
-            
+
             var resultGrade = grades.Sum()/grades.Count;
             newReview.Grade = resultGrade;
             
@@ -137,6 +143,133 @@ namespace patools.Services.Reviews
             {
                 ReviewId = newReview.ID
             });
+        }
+
+        public async Task<Response<IEnumerable<GetReviewDtoResponse>>> GetAllReviews(GetReviewDtoRequest taskInfo)
+        {
+            var student = await _context.Users.FirstOrDefaultAsync(
+                u => u.ID == taskInfo.StudentId && u.Role == UserRoles.Student);
+            if (student == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetReviewDtoResponse>>("Invalid user id provided");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetReviewDtoResponse>>("Invalid task id provided");
+
+            var courseUser = await _context.CourseUsers
+                .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == student);
+            if (courseUser == null)
+                return new NoAccessResponse<IEnumerable<GetReviewDtoResponse>>(
+                    "This user is not assigned to this course");
+
+            var taskUser = await _context.TaskUsers
+                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
+            if (taskUser == null)
+                return new NoAccessResponse<IEnumerable<GetReviewDtoResponse>>("This user has no access to this task");
+
+            //TODO: Change error
+            var submission = await _context.Submissions.FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+            if (submission == null)
+                return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
+                    "This user hasn't submissioned yet");
+
+            var reviews = await _context.Reviews
+                .Include(r => r.SubmissionPeerAssignment.Submission)
+                .Include(r => r.SubmissionPeerAssignment.Peer)
+                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student == student)
+                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+
+            var resultReviews = new List<GetReviewDtoResponse>();
+            var index = 0;
+            foreach (var review in reviews)
+            {
+                var peer = review.SubmissionPeerAssignment.Peer;
+
+                var expert = await _context.Experts.FirstOrDefaultAsync(
+                    e => e.User == peer &&
+                         e.PeeringTask == task);
+
+                var resultReview = new GetReviewDtoResponse();
+                switch (peer.Role)
+                {
+                    case { } when expert != null:
+                        resultReview.Reviewer = UserRoles.Expert;
+                        resultReview.ReviewerName = "Эксперт";
+                        break;
+                    case UserRoles.Student:
+                        resultReview.Reviewer = UserRoles.Student;
+                        if (task.Type != ReviewTypes.Open)
+                            resultReview.ReviewerName = $"Аноним #{index++}";
+                        break;
+                    case UserRoles.Teacher:
+                        resultReview.Reviewer = UserRoles.Teacher;
+                        break;
+                    default:
+                        return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
+                            "There is an error in database");
+                }
+
+                resultReview.SubmissionId = submission.ID;
+                resultReview.FinalGrade = review.Grade;
+
+                var answers = await _context.Answers
+                    .Include(a => a.Question)
+                    .Where(a => a.Review == review)
+                    .ToListAsync();
+
+                var resultAnswers = new List<GetAnswerDtoResponse>();
+                foreach (var answer in answers)
+                {
+                    var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
+                    if (question == null)
+                        return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
+                            "There is an error in stored data (Questions table)");
+
+                    var resultAnswer = new GetAnswerDtoResponse()
+                    {
+                        QuestionId = question.ID,
+                        Order = question.Order,
+                        Title = question.Title,
+                        Description = question.Description,
+                        MinValue = question.MinValue,
+                        MaxValue = question.MaxValue,
+                        Required = question.Required,
+                        Type = question.Type
+                    };
+                    switch (resultAnswer.Type)
+                    {
+                        case QuestionTypes.Text or QuestionTypes.ShortText:
+                            resultAnswer.Response = answer.Response;
+                            break;
+                        case QuestionTypes.Select:
+                            resultAnswer.Value = answer.Value;
+                            resultAnswer.CoefficientPercentage = answer.Question.CoefficientPercentage;
+                            break;
+                        case QuestionTypes.Multiple:
+                            resultAnswer.Value = answer.Value;
+                            var responses = await _context.Variants
+                                .Where(v => v.Question == question)
+                                .Select(v => new GetVariantDtoResponse()
+                                {
+                                    Id = v.ChoiceId,
+                                    Response = v.Response
+                                })
+                                .OrderBy(v => v.Id)
+                                .ToListAsync();
+                            resultAnswer.Responses = responses;
+                            break;
+                    }
+
+                    resultAnswers.Add(resultAnswer);
+                }
+                resultReview.Answers = resultAnswers;
+                resultReviews.Add(resultReview);
+            }
+
+            return new SuccessfulResponse<IEnumerable<GetReviewDtoResponse>>(resultReviews);
         }
     }
 }

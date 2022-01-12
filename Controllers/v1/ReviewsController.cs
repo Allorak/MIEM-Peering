@@ -46,7 +46,26 @@ namespace patools.Controllers.v1
         [HttpGet("get-all/task={taskId}")]
         public async Task<ActionResult<GetReviewDtoResponse>> GetAllReviews(Guid taskId)
         {
-            throw new NotImplementedException();
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            if (!User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+            
+            //The user has no id Claim
+            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(studentIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(studentIdClaim.Value, out var studentId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _reviewsService.GetAllReviews(new GetReviewDtoRequest()
+            {
+                StudentId = studentId,
+                TaskId = taskId
+            }));
         }
     }
 }
