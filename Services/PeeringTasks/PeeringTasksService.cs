@@ -147,9 +147,17 @@ namespace patools.Services.PeeringTasks
                     return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
                         "The task is first-step but no experts provided");
                 newTask.Step = PeeringSteps.FirstStep;
+                newTask.ExpertsAssigned = false;
                 foreach (var email in peeringTask.Settings.Experts)
                 {
                     var expertUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                    
+                    var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu =>
+                            cu.Course == course && cu.User == expertUser);
+                    if (courseUser != null)
+                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                            $"Expert {expertUser.Email} is a student of this course");
+                    
                     var expert = new Expert()
                     {
                         ID = Guid.NewGuid(),

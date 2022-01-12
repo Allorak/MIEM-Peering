@@ -303,7 +303,9 @@ namespace patools.Services.Submissions
 
         public async Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetSubmissionsToCheck(GetSubmissionToCheckDtoRequest taskInfo)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid task id provided");
 
@@ -312,17 +314,65 @@ namespace patools.Services.Submissions
                 return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid user id provided");
 
             var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
-            if (expert != null)
+            
+            var uncheckedSubmissions = await _context.SubmissionPeers
+                .Where(sp => sp.Peer == user &&
+                             sp.Submission.PeeringTaskUserAssignment.State == PeeringTaskStates.NotChecked)
+                .Select(sp => new GetSubmissionToCheckDtoResponse()
+                {
+                    SubmissionId = sp.Submission.ID,
+                    StudentName = sp.Submission.PeeringTaskUserAssignment.Student.Fullname
+                })
+                .ToListAsync();
+            
+            switch (user.Role)
             {
-                
+                case {} when expert != null:
+                    break;
+                case UserRoles.Student:
+                    var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu =>
+                        cu.User == user && cu.Course == task.Course);
+                    if (courseUser == null)
+                        return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "This user is not assigned to this course");
+                    
+                    var taskUser = await _context.TaskUsers.FirstOrDefaultAsync(tu =>
+                            tu.Student == user && tu.PeeringTask == task);
+                    if (taskUser == null)
+                        return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "this user is not assigned to this task");
+
+                    if (taskUser.State == PeeringTaskStates.Assigned)
+                        return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "This student hasn't submissioned yet");
+
+                    var submission =  await _context.Submissions
+                        .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+                    if (submission == null)
+                        return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "There is an error in database");
+
+                    if (task.Type == ReviewTypes.DoubleBlind)
+                    {
+                        var index = 1;
+                        foreach (var submissionToCheck in uncheckedSubmissions)
+                        {
+                            submissionToCheck.StudentName = $"Аноним #{index++}";
+                        }
+                    }
+                    break;
+                case UserRoles.Teacher:
+                    if (task.Course.Teacher != user)
+                        return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "This teacher has no access to this course");
+                    break;
+                default:
+                    return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                        "Incorrect user role in token");
             }
 
-            throw new NotImplementedException();
+            return new SuccessfulResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(uncheckedSubmissions);
         }
 
-        private async Task<IEnumerable<SubmissionPeer>> GetExpertSubmissionsToCheck(Expert expert)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
