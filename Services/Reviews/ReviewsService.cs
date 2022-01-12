@@ -73,6 +73,7 @@ namespace patools.Services.Reviews
                             q.RespondentType == RespondentTypes.Peer)
                 .ToListAsync();
             var answers = new List<Answer>();
+            var grades = new List<float>();
             foreach (var answer in review.Answers)
             {
                 var question = questions.FirstOrDefault(q => q.ID == answer.QuestionId);
@@ -94,6 +95,16 @@ namespace patools.Services.Reviews
                                 "Answer for a select question is out of range");
                     }
                 }
+
+                if (question.Type == QuestionTypes.Select)
+                {
+                    const int maxGrade = 10;
+                    var mappedValue = answer.Value / (question.MaxValue - question.MinValue) * maxGrade;
+                    if (mappedValue == null)
+                        return new OperationErrorResponse<GetNewReviewDtoResponse>(
+                            "There is an error in database (Min or Max value for select-type question is null)");
+                    grades.Add(mappedValue.Value);
+                }
                 
                 answers.Add(new Answer()
                 {
@@ -112,6 +123,12 @@ namespace patools.Services.Reviews
             if (unansweredRequiredQuestionsAmount > 0)
                 return new BadRequestDataResponse<GetNewReviewDtoResponse>(
                     "There is no answer for a required question");
+
+            if (grades.Count == 0)
+                return new OperationErrorResponse<GetNewReviewDtoResponse>("There were no select-questions");
+            
+            var resultGrade = grades.Sum()/grades.Count;
+            newReview.Grade = resultGrade;
             
             await _context.Answers.AddRangeAsync(answers);
             await _context.SaveChangesAsync();

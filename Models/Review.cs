@@ -9,5 +9,8 @@ namespace patools.Models
         
         [Required] 
         public SubmissionPeer SubmissionPeerAssignment { get; set; }
+
+        [Required]
+        public float Grade { get; set; }
     }
 }

@@ -20,5 +20,7 @@ namespace patools.Models
 
         [Required]
         public PeeringTaskStates State { get; set; }
+
+        public int FinalGrade { get; set; }
     }
 }

@@ -42,5 +42,11 @@ namespace patools.Controllers.v1
             review.UserId = userId;
             return Ok(await _reviewsService.AddReview(review));
         }
+
+        [HttpGet("get-all/task={taskId}")]
+        public async Task<ActionResult<GetReviewDtoResponse>> GetAllReviews(Guid taskId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
