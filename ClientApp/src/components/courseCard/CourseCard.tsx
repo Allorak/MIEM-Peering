@@ -82,7 +82,10 @@ export const CourseCard: FC<IProps> = ({
                             src={course.adminImageUrl}
                             alt="Admin" /
                         >
-                    ) : (<AvatarIcon />)
+                    ) : (
+                        <Box sx={styles.defaultAvatar}>
+                            <AvatarIcon />
+                        </Box>)
                     }
                     <Typography sx={styles.adminName}>
                         {course.adminName}
@@ -192,6 +195,17 @@ const styles = {
         borderRadius: '50%',
         margin: '0px 10px 0px 0px'
     },
+    defaultAvatar: {
+        overflow: 'hidden',
+        display: 'flex',
+        justifyContent: "center",
+        alignItems: "center",
+        flexShrink: 0,
+        width: "22px",
+        height: "22px",
+        marginRight: "8px",
+        borderRadius: "50%"
+    } as SxProps<Theme>,
     adminName: {
         fontSize: '12px',
         fontWeight: '500',

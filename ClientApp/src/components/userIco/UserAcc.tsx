@@ -3,6 +3,7 @@ import { matchPath } from "react-router-dom";
 
 import { Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
+import { palette } from "../../theme/colors";
 
 import { Avatar as AvatarIcon } from "../icons/Avatar"
 
@@ -16,12 +17,17 @@ export const UserAcc: FC = () => {
     const path = matchPath('/:role/task/:taskId/*', location.pathname)
     const role = path?.params?.role
     const taskId = path?.params?.taskId
+    
+    const colorUserRole = (userRole === 'Teacher' ? 
+    {...styles.roleTeacher, ...styles.role} : userRole === 'Student' ?
+    {...styles.roleStudent, ...styles.role} : userRole === 'Expert' ?
+    {...styles.roleExpert, ...styles.role} : styles.role)
 
     return (
         <Box sx={styles.profileBlock}>
             {role && taskId && userRole && (
                 <Box sx={styles.dashboardRoleBlock}>
-                    <Typography  variant='body1' sx={styles.role}>
+                    <Typography  variant='body1' sx={colorUserRole}>
                         {userRole}
                     </Typography>
                 </Box>
@@ -70,10 +76,20 @@ const styles = {
         overflow: 'hidden',
         display: 'block',
         whiteSpace: 'nowrap',
-        color: "primary.main",
-        backgroundColor: '#EBECFC',
         borderRadius: '4px',
         padding: '0 9px'
+    } as SxProps<Theme>,
+    roleTeacher: {
+        color: `${palette.fill.success}`,
+        backgroundColor: `${palette.transparent.success}`,
+    } as SxProps<Theme>,
+    roleExpert: {
+        color: `${palette.fill.info}`,
+        backgroundColor: `${palette.transparent.info}`,
+    } as SxProps<Theme>,
+    roleStudent: {
+        color: `${palette.fill.secondary}`,
+        backgroundColor: `${palette.transparent.secondary}`,
     } as SxProps<Theme>,
     dashboardRoleBlock: {
         display: 'flex',

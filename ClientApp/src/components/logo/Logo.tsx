@@ -40,8 +40,11 @@ const styles = {
         marginRight: '12px'
     } as SxProps<Theme>,
     logoTextContainer: {
-        display: 'flex',
+        display: 'none',
         maxWidth: '100px',
+        '@media (min-width: 375px)': {
+            display: 'flex'
+        },
         '@media (min-width: 700px)': {
             maxWidth: '120px'
         }

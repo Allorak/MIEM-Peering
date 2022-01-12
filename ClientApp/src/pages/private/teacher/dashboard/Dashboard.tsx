@@ -120,7 +120,7 @@ const styles = {
     top: '105px',
     right: '25px',
     padding: '8px',
-    background: 'white',
+    backgroundColor: 'white',
     width: '24px',
     height: '24px',
     borderRadius: '4px',
