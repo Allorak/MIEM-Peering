@@ -219,7 +219,7 @@ namespace patools.Services.Users
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = firstTasks[i],
-                    States = PeeringTaskStates.Assigned,
+                    State = PeeringTaskStates.Assigned,
                     Student = user
                 });
             }
@@ -230,7 +230,7 @@ namespace patools.Services.Users
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = secondTasks[i],
-                    States = PeeringTaskStates.Assigned,
+                    State = PeeringTaskStates.Assigned,
                     Student = user
                 });
             }

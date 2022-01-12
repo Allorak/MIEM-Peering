@@ -7,15 +7,14 @@ namespace patools.Models
     {
         public Guid ID { get; set; }
         
-        [Required]
         public Submission Submission { get; set; }
+        
+        public Review Review { get; set; }
         
         [Required]
         public Question Question { get; set; }
 
         public int? Value { get; set; }
         public string Response { get; set; }
-
-        public int Grade { get; set; }
     }
 }

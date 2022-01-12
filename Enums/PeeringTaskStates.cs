@@ -8,9 +8,9 @@ namespace patools.Enums
     {
         [EnumMember(Value = "assigned")]
         Assigned = 0,
-        [EnumMember(Value = "checking")]
-        Checking = 1,
-        [EnumMember(Value = "graded")]
-        Graded = 2
+        [EnumMember(Value = "notChecked")]
+        NotChecked = 1,
+        [EnumMember(Value = "checked")]
+        Checked = 2
     }
 }

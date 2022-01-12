@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220112174618_Added reviews")]
+    partial class Addedreviews
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -233,7 +235,7 @@ namespace patools.Migrations
                     b.Property<Guid?>("PeeringTaskID")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("State")
+                    b.Property<int>("States")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("StudentID")
@@ -307,7 +309,7 @@ namespace patools.Migrations
 
                     b.HasIndex("SubmissionPeerAssignmentID");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("patools.Models.Submission", b =>

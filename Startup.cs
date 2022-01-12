@@ -23,6 +23,7 @@ using patools.Services.Experts;
 using patools.Services.Submissions;
 using patools.Services.Users;
 using patools.Services.PeeringTasks;
+using patools.Services.Reviews;
 
 namespace patools
 {
@@ -54,6 +55,7 @@ namespace patools
             services.AddScoped<ISubmissionsService, SubmissionsService>();
             services.AddScoped<ICourseUsersService, CourseUsersService>();
             services.AddScoped<IExpertsService, ExpertsService>();
+            services.AddScoped<IReviewsService, ReviewsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -254,7 +254,7 @@ namespace patools.Controllers.v1
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = task,
-                    States = PeeringTaskStates.Assigned,
+                    State = PeeringTaskStates.Assigned,
                     Student = user
                 });
             }
