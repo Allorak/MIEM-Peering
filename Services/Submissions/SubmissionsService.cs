@@ -281,5 +281,29 @@ namespace patools.Services.Submissions
 
             return submission == null ? new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.NotCompleted) : new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.Completed);
         }
+
+        public async Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetSubmissionsToCheck(GetSubmissionToCheckDtoRequest taskInfo)
+        {
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid task id provided");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid user id provided");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+            if (expert != null)
+            {
+                
+            }
+
+            throw new NotImplementedException();
+        }
+
+        private async Task<IEnumerable<SubmissionPeer>> GetExpertSubmissionsToCheck(Expert expert)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
