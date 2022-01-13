@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -139,6 +140,26 @@ namespace patools.Controllers.v1
             {
                 StudentId = studentId,
                 TaskId = taskId
+            }));
+        }
+
+        [HttpGet("get-checks-catalog/task={taskId}")]
+        public async Task<ActionResult<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog([FromRoute] Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+            
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _submissionsService.GetChecksCatalog(new GetSubmissionToCheckDtoRequest()
+            {
+                TaskId = taskId,
+                UserId = userId
             }));
         }
     }

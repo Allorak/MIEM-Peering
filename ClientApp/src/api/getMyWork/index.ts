@@ -2,7 +2,7 @@ import { IMyWorkForm } from "../../store/types";
 
 export type IRequestData = {
     accessToken: string,
-    taskId: string
+    submissionId: string
 }
 
 export type IResponseData = IMyWorkForm

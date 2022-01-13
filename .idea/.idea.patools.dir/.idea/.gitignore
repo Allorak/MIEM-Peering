@@ -11,4 +11,9 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/*
 
+.idea/.idea.patools.dir/.idea/workspace.xml
+.idea.patools.dir/.idea/workspace.xml
+.idea/workspace.xml
+workspace.xml

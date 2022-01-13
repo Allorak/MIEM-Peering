@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using patools.Dtos.SubmissionPeer;
 using patools.Dtos.Task;
 using patools.Models;
 
@@ -14,7 +15,10 @@ namespace patools.Services.PeeringTasks
         Task<Response<GetCourseTasksDtoResponse>> GetTeacherCourseTasks(GetCourseTasksDtoRequest courseInfo);
         Task<Response<GetCourseTasksDtoResponse>> GetStudentCourseTasks(GetCourseTasksDtoRequest courseInfo);
         Task<Response<GetAuthorFormDtoResponse>> GetAuthorForm(GetAuthorFormDtoRequest taskInfo);
+        Task<Response<GetPeerFormDtoResponse>> GetPeerForm(GetPeerFormDtoRequest taskInfo);
         Task<Response<GetTaskDeadlineDtoResponse>> GetTaskSubmissionDeadline(GetTaskDeadlineDtoRequest taskInfo);
         Task<Response<GetTaskDeadlineDtoResponse>> GetTaskReviewDeadline(GetTaskDeadlineDtoRequest taskInfo);
+        Task<Response<string>> AssignPeers(AssignPeersDto peersInfo);
+        Task<Response<string>> AssignExperts(AssignExpertsDto expertsInfo);
     }
 }

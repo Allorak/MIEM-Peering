@@ -22,13 +22,13 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Grade")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Guid?>("QuestionID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Response")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ReviewID")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("SubmissionID")
@@ -40,6 +40,8 @@ namespace patools.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("QuestionID");
+
+                    b.HasIndex("ReviewID");
 
                     b.HasIndex("SubmissionID");
 
@@ -183,25 +185,25 @@ namespace patools.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ExpertTaskID")
-                        .HasColumnType("TEXT");
+                    b.Property<bool?>("ExpertsAssigned")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("PeersAssigned")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("ReviewEndDateTime")
+                    b.Property<DateTime>("ReviewEndDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("ReviewStartDateTime")
+                    b.Property<DateTime>("ReviewStartDateTime")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Step")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("SubmissionEndDateTime")
+                    b.Property<DateTime>("SubmissionEndDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("SubmissionStartDateTime")
+                    b.Property<DateTime>("SubmissionStartDateTime")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SubmissionsToCheck")
@@ -212,11 +214,12 @@ namespace patools.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ID");
 
                     b.HasIndex("CourseID");
-
-                    b.HasIndex("ExpertTaskID");
 
                     b.ToTable("Tasks");
                 });
@@ -227,10 +230,13 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("FinalGrade")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid?>("PeeringTaskID")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("States")
+                    b.Property<int>("State")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("StudentID")
@@ -258,10 +264,10 @@ namespace patools.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("MaxValue")
+                    b.Property<int?>("MaxValue")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("MinValue")
+                    b.Property<int?>("MinValue")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Order")
@@ -289,6 +295,25 @@ namespace patools.Migrations
                     b.HasIndex("PeeringTaskID");
 
                     b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("patools.Models.Review", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<float>("Grade")
+                        .HasColumnType("REAL");
+
+                    b.Property<Guid?>("SubmissionPeerAssignmentID")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("SubmissionPeerAssignmentID");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("patools.Models.Submission", b =>
@@ -391,11 +416,17 @@ namespace patools.Migrations
                         .WithMany()
                         .HasForeignKey("QuestionID");
 
+                    b.HasOne("patools.Models.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewID");
+
                     b.HasOne("patools.Models.Submission", "Submission")
                         .WithMany()
                         .HasForeignKey("SubmissionID");
 
                     b.Navigation("Question");
+
+                    b.Navigation("Review");
 
                     b.Navigation("Submission");
                 });
@@ -460,13 +491,7 @@ namespace patools.Migrations
                         .WithMany()
                         .HasForeignKey("CourseID");
 
-                    b.HasOne("patools.Models.PeeringTask", "ExpertTask")
-                        .WithMany()
-                        .HasForeignKey("ExpertTaskID");
-
                     b.Navigation("Course");
-
-                    b.Navigation("ExpertTask");
                 });
 
             modelBuilder.Entity("patools.Models.PeeringTaskUser", b =>
@@ -491,6 +516,15 @@ namespace patools.Migrations
                         .HasForeignKey("PeeringTaskID");
 
                     b.Navigation("PeeringTask");
+                });
+
+            modelBuilder.Entity("patools.Models.Review", b =>
+                {
+                    b.HasOne("patools.Models.SubmissionPeer", "SubmissionPeerAssignment")
+                        .WithMany()
+                        .HasForeignKey("SubmissionPeerAssignmentID");
+
+                    b.Navigation("SubmissionPeerAssignment");
                 });
 
             modelBuilder.Entity("patools.Models.Submission", b =>

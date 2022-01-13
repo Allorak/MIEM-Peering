@@ -35,8 +35,8 @@ namespace patools.Models
         public RespondentTypes RespondentType { get; set; }
 
         //for select-type questions
-        public int MinValue { get; set; }
-        public int MaxValue { get; set; }
+        public int? MinValue { get; set; }
+        public int? MaxValue { get; set; }
         
         public float? CoefficientPercentage { get; set; }
 

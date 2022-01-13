@@ -22,7 +22,8 @@ namespace patools.Models
             ApplyFormatInEditMode = true,
             NullDisplayText = "No start datetime set"
         )]
-        public DateTime? SubmissionStartDateTime { get; set; }
+        [Required]
+        public DateTime SubmissionStartDateTime { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat
@@ -31,7 +32,8 @@ namespace patools.Models
             ApplyFormatInEditMode = true,
             NullDisplayText = "No submission deadline set"
         )]
-        public DateTime? SubmissionEndDateTime { get; set; }
+        [Required]
+        public DateTime SubmissionEndDateTime { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat
@@ -40,7 +42,8 @@ namespace patools.Models
             ApplyFormatInEditMode = true,
             NullDisplayText = "No review start datetime set"
         )]
-        public DateTime? ReviewStartDateTime { get; set; }
+        [Required]
+        public DateTime ReviewStartDateTime { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat
@@ -49,7 +52,8 @@ namespace patools.Models
             ApplyFormatInEditMode = true,
             NullDisplayText = "No review deadline set"
         )]
-        public DateTime? ReviewEndDateTime { get; set; }
+        [Required]
+        public DateTime ReviewEndDateTime { get; set; }
 
         public int SubmissionsToCheck { get; set; }
 
@@ -59,9 +63,12 @@ namespace patools.Models
         [Required] 
         public PeeringSteps Step { get; set; }
 
-        public PeeringTask ExpertTask { get; set; }
+        public bool? ExpertsAssigned { get; set; } = null;
 
         public bool PeersAssigned { get; set; } = false;
+
+        [Required]
+        public ReviewTypes Type { get; set; }
 
     }
 }

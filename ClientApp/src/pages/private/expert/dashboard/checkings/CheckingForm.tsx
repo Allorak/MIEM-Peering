@@ -70,7 +70,10 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
         <AnswerBox
           id={item.order}
           key={item.questionId}
-          title={item.title}
+          title={item.type === IQuestionTypes.SELECT_RATE && item.coefficientPercentage ?
+            `${item.title} (коэф. ${item.coefficientPercentage}%)` :
+            item.title
+          }
           required={item.required}
           description={item.description}
         >
