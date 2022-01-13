@@ -383,10 +383,10 @@ namespace patools.Services.PeeringTasks
             
             if (submissions.Count == 0)
                 return new SuccessfulResponse<string>("No submissions for this task");
-            
+            var submissionPeers = new List<SubmissionPeer>();
+            /*
             var submissionsPerExpert = (int)Math.Ceiling(submissions.Count * 1f / registeredExperts.Count);
             var index = 0;
-            var submissionPeers = new List<SubmissionPeer>();
             foreach (var expert in registeredExperts)
             {
                 for (var i = 0; i < submissionsPerExpert && index<submissions.Count; i++)
@@ -398,6 +398,18 @@ namespace patools.Services.PeeringTasks
                         Submission = submissions[index++]
                     });
                 }
+            }*/
+            var submissionsPerExpert = 0;
+            for (var i = 0; i < submissions.Count; i++)
+            {
+                if (i % registeredExperts.Count == 0)
+                    submissionsPerExpert++;
+                submissionPeers.Add(new SubmissionPeer()
+                {
+                    ID = Guid.NewGuid(),
+                    Peer = registeredExperts[i % registeredExperts.Count].User,
+                    Submission = submissions[i]
+                });
             }
 
             submissionPeers.AddRange(submissions.Select(submission => 

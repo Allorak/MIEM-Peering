@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpGet("get/task={taskId}")]
-        public async Task<ActionResult<GetExpertDtoResponse[]>> GetExperts(Guid taskId)
+        public async Task<ActionResult<IEnumerable<GetExpertDtoResponse>>> GetExperts(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
