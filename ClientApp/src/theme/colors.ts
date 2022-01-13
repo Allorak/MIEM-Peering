@@ -35,6 +35,12 @@ export const palette = {
     greyLight: '#848B96',
     white: '#FFFFFF'
   },
+  transparent: {
+    default: 'transparent',
+    secondary: 'rgba(255, 167, 11, 0.2)',
+    success: 'rgba(0, 209, 109, 0.2)',
+    info: 'rgba(11, 190, 255, 0.2)',
+  },
   fillLight: {
     primary: '#525CE5',
     secondary: '#FFA70B',

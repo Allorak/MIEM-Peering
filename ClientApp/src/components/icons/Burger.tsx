@@ -4,7 +4,7 @@ type IProps = SVGProps<SVGSVGElement> & {
   svgColor?: string,
 }
 
-export const Burger: FC<IProps> = memo(({ svgColor = "#CBD5DE" }) => {
+export const Burger: FC<IProps> = memo(({ svgColor = "white" }) => {
   return (
     <svg
       width="24"

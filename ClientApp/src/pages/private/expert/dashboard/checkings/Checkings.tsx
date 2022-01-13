@@ -150,51 +150,54 @@ export const Checkings: FC = () => {
             error={error}
           >
             <Box sx={styles.formWrapper}>
-              <Box sx={styles.formContainer}>
-                <DashboardWorkBox
-                  isLoading={statusStudentWork}
-                  isLock={lockStudentWork}
-                  error={error}
+              <Box sx={styles.formBlock}>
+                <Typography
+                  variant={"h6"}
+                  sx={styles.subTitle}
                 >
-                  {studentWork && studentWork.responses && studentWork.responses.length > 0 && (
-                    <>
-                      <Typography
-                        variant={"h6"}
-                        sx={styles.subTitle}
-                      >
-                        {"Форма с ответами:"}
-                      </Typography>
-                      <StudentWork
-                        studentWork={studentWork}
-                        answerBoxColor={palette.fill.success}
-                      />
-                    </>
-                  )}
-                </DashboardWorkBox>
+                  {"Форма с ответами:"}
+                </Typography>
+                <Box sx={styles.formContainer}>
+                  <DashboardWorkBox
+                    isLoading={statusStudentWork}
+                    isLock={lockStudentWork}
+                    error={error}
+                  >
+                    {studentWork && studentWork.responses && studentWork.responses.length > 0 && (
+                      <>
+                        <StudentWork
+                          studentWork={studentWork}
+                          answerBoxColor={palette.fill.success}
+                        />
+                      </>
+                    )}
+                  </DashboardWorkBox>
+                </Box>
               </Box>
-
-              <Box sx={styles.formContainer}>
-                <DashboardWorkBox
-                  isLoading={statusPeerForm}
-                  isLock={lockPeerForm}
-                  error={error}
+              <Box sx={styles.formBlock}>
+                <Typography
+                  variant={"h6"}
+                  sx={styles.subTitle}
                 >
-                  {responses && responses.rubrics && responses.rubrics.length > 0 && (
-                    <>
-                      <Typography
-                        variant={"h6"}
-                        sx={styles.subTitle}
-                      >
-                        {"Форма для оценивания:"}
-                      </Typography>
-                      <CheckingsForm
-                        peerForm={responses}
-                        onSubmit={onRequest}
-                        onEdit={handleOnFormEdit}
-                      />
-                    </>
-                  )}
-                </DashboardWorkBox>
+                  {"Форма для оценивания:"}
+                </Typography>
+                <Box sx={styles.formContainer}>
+                  <DashboardWorkBox
+                    isLoading={statusPeerForm}
+                    isLock={lockPeerForm}
+                    error={error}
+                  >
+                    {responses && responses.rubrics && responses.rubrics.length > 0 && (
+                      <>
+                        <CheckingsForm
+                          peerForm={responses}
+                          onSubmit={onRequest}
+                          onEdit={handleOnFormEdit}
+                        />
+                      </>
+                    )}
+                  </DashboardWorkBox>
+                </Box>
               </Box>
             </Box>
           </DashboardWorkBox>
@@ -219,6 +222,11 @@ const styles = {
     display: "flex",
     gap: "5px"
   } as SxProps<Theme>,
+  formBlock: {
+    display: "flex",
+    flexDirection: 'column',
+    flex: "0 1 50%"
+  } as SxProps<Theme>,
   formWrapper: {
     display: "flex",
     gap: "10px",
@@ -228,8 +236,8 @@ const styles = {
     }
   } as SxProps<Theme>,
   formContainer: {
-    flex: "0 1 50%",
-    maxHeight: "calc(100vh - 183px - 70px)",
+    maxHeight: "calc(100vh - 183px - 125px)",
+    paddingRight: "5px",
     overflowY: "auto",
     ...globalStyles.scrollStyles,
     '@media (max-width: 900px)': {

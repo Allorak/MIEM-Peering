@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { fetchGAuth } from '../../store/googleAuth/thunks/googleAuth';
 
 import { Logo } from '../../components/logo';
-import GoogleLogo from '../../img/google-logo.svg'
+import { GoogleLogo as GoogleIcon } from '../../components/icons/GoogleLogo';
 
 import { palette } from '../../theme/colors';
 
@@ -78,7 +78,7 @@ export const Login: FC = () => {
                             onClick={renderProps.onClick}
                             disabled={renderProps.disabled}
                             startIcon={
-                                <img src={GoogleLogo} alt='' />
+                                <GoogleIcon />
                             }
                             variant='outlined'
                             sx={{ width: '100%' }}
