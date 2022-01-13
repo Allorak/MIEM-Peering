@@ -67,5 +67,27 @@ namespace patools.Controllers.v1
                 TaskId = taskId
             }));
         }
+
+        [HttpGet("get-all-my/task={taskId}")]
+        public async Task<ActionResult<GetMyReviewDtoResponse>> GetAllMyReviews(Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+            
+            //The user has no id Claim
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(userIdClaim.Value, out var userId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _reviewsService.GetAllMyReviews(new GetMyReviewDtoRequest()
+            {
+                UserId = userId,
+                TaskId = taskId
+            }));
+        }
     }
 }

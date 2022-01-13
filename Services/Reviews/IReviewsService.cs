@@ -8,5 +8,6 @@ namespace patools.Services.Reviews
     {
         Task<Response<GetNewReviewDtoResponse>> AddReview(AddReviewDto review);
         Task<Response<IEnumerable<GetReviewDtoResponse>>> GetAllReviews(GetReviewDtoRequest taskInfo);
+        Task<Response<IEnumerable<GetMyReviewDtoResponse>>> GetAllMyReviews(GetMyReviewDtoRequest taskInfo);
     }
 }
