@@ -2,11 +2,11 @@ import { Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
 import { FC, useCallback } from "react";
 import { useAppSelector } from "../../app/hooks";
-import SettingsIco from '../../img/ico/setting-hover.svg'
-import DefaultAvatar from '../../img/ico/avatar.svg'
 import { palette } from "../../theme/colors";
 import { ICourses, IRole } from "../../store/types";
 import { Delete as DeleteIcon } from "../icons/Delete";
+import { Setting as SettingIcon } from "../icons/Setting";
+import { Avatar as AvatarIcon } from "../icons/Avatar";
 
 interface IProps {
     course: ICourses
@@ -49,10 +49,7 @@ export const CourseCard: FC<IProps> = ({
                                 sx={styles.settingBt}
                                 onClick={onSettings}
                             >
-                                <img
-                                    src={SettingsIco}
-                                    alt="Settings"
-                                />
+                                <SettingIcon />
                             </Box>
                         ) :
                             (
@@ -79,11 +76,17 @@ export const CourseCard: FC<IProps> = ({
 
             <Box sx={styles.containerFooter}>
                 <Box sx={styles.containerFooterWrapper}>
-                    <img
-                        style={styles.avatar}
-                        src={course.adminImageUrl ? course.adminImageUrl : DefaultAvatar}
-                        alt="Admin" /
-                    >
+                    {course.adminImageUrl ? (
+                        <img
+                            style={styles.avatar}
+                            src={course.adminImageUrl}
+                            alt="Admin" /
+                        >
+                    ) : (
+                        <Box sx={styles.defaultAvatar}>
+                            <AvatarIcon />
+                        </Box>)
+                    }
                     <Typography sx={styles.adminName}>
                         {course.adminName}
                     </Typography>
@@ -192,6 +195,17 @@ const styles = {
         borderRadius: '50%',
         margin: '0px 10px 0px 0px'
     },
+    defaultAvatar: {
+        overflow: 'hidden',
+        display: 'flex',
+        justifyContent: "center",
+        alignItems: "center",
+        flexShrink: 0,
+        width: "22px",
+        height: "22px",
+        marginRight: "8px",
+        borderRadius: "50%"
+    } as SxProps<Theme>,
     adminName: {
         fontSize: '12px',
         fontWeight: '500',

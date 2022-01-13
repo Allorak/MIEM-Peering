@@ -146,8 +146,8 @@ const styles = {
     display: "grid",
     gridGap: "10px",
     gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr) )",
-    '@media (max-width: 1300px)': {
-      gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr) )"
+    '@media (max-width: 1324px)': {
+      gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr) )"
     },
     '@media (max-width: 600px)': {
       gridTemplateColumns: "repeat(auto-fill, minmax(100%, 1fr) )"
