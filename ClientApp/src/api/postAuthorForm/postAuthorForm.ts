@@ -20,7 +20,7 @@ export const postAuthorForm = async ({
     },
     data: {
       taskId,
-      answers: responses.responses
+      answers: responses.answers
     }
   }
 

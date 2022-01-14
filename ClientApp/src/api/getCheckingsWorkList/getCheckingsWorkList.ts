@@ -9,11 +9,11 @@ export const getCheckingsWorkList = async ({
   taskId
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/${taskId}/checkings/students/get`,
+    url: `/api/v1/submissions/get-checks-catalog/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

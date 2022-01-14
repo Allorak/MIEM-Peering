@@ -655,28 +655,28 @@ namespace patools
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "misha.mois@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "name.name.98gm@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "aosemenov_1@miem.hse.ru").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Польза ООП в промышленных предприятиях").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "alejandroleon0998@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 /*First Task (Second Course)*/
                 new PeeringTaskUser
@@ -684,28 +684,28 @@ namespace patools
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "misha.mois@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "name.name.98gm@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "aosemenov_1@miem.hse.ru").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "История изучения квантовой физики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "alejandroleon0998@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 /*First Task (Third Course)*/
                 new PeeringTaskUser
@@ -713,28 +713,28 @@ namespace patools
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Комплексные числа в линейной алгебре").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "misha.mois@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Комплексные числа в линейной алгебре").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "name.name.98gm@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Комплексные числа в линейной алгебре").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "aosemenov_1@miem.hse.ru").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Комплексные числа в линейной алгебре").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "alejandroleon0998@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 /*First Task (Fourth Course)*/
                 new PeeringTaskUser
@@ -742,28 +742,28 @@ namespace patools
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Изучение элементов математической логики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "misha.mois@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Изучение элементов математической логики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "name.name.98gm@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Изучение элементов математической логики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "aosemenov_1@miem.hse.ru").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 },
                 new PeeringTaskUser
                 {
                     ID = Guid.NewGuid(),
                     PeeringTask = db.Tasks.Where(task => task.Title == "Изучение элементов математической логики").FirstOrDefault(),
                     Student = db.Users.Where(user => user.Role == UserRoles.Student && user.Email == "alejandroleon0998@gmail.com").FirstOrDefault(),
-                    States = PeeringTaskStates.Assigned
+                    State = PeeringTaskStates.Assigned
                 }
             };
 

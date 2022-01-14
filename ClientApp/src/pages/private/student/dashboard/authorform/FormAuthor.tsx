@@ -40,7 +40,7 @@ export const FormAuthor: FC<IProps> = ({ authorForm, onSubmit, onEdit }) => {
       }
 
       const formResponses: IAuthorFormResponses = {
-        responses: authorForm.rubrics.map((response) => {
+        answers: authorForm.rubrics.map((response) => {
           switch (response.type) {
             case IQuestionTypes.TEXT:
             case IQuestionTypes.SHORT_TEXT:
