@@ -315,10 +315,16 @@ namespace patools.Services.Submissions
                 return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid user id provided");
 
             var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+
+            var reviewedSubmissionPeers = await _context.Reviews
+                .Select(r => r.SubmissionPeerAssignment)
+                .Where(sp => sp.Peer == user &&
+                            sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
             
             var uncheckedSubmissions = await _context.SubmissionPeers
                 .Where(sp => sp.Peer == user &&
-                             sp.Submission.PeeringTaskUserAssignment.State == PeeringTaskStates.NotChecked)
+                             !reviewedSubmissionPeers.Contains(sp))
                 .Select(sp => new GetSubmissionToCheckDtoResponse()
                 {
                     SubmissionId = sp.Submission.ID,
