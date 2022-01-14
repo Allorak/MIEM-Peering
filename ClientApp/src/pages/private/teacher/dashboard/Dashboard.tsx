@@ -62,10 +62,10 @@ export const Dashboard: FC = () => {
 
   return (
     <Box sx={styles.container}>
-      <Box sx={styles.menuItemBurger}
+      <Box sx={activeMenu ? styles.menuItemBurgerActive : styles.menuItemBurger}
         onClick={() => { setActiveMenu(!activeMenu) }}
       >
-        <Burger />
+        <Burger svgColor={activeMenu ? "white" : "#CBD5DE"}/>
       </Box>
       <Box sx={styles.gridWrapper}>
         <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : styles.leftContainer}>
@@ -88,7 +88,7 @@ export const Dashboard: FC = () => {
             {menuItemsP.find(item => item.title === path.activeMenuId)?.title}
           </Typography>
 
-          <Box sx={styles.rightContainerWrapper}>
+          <Box sx={activeMenu ? styles.rightContainerLock : styles.rightContainerWrapper}>
             <Box>
               <Routes>
                 <Route path={paths.teacher.dashboard.overview} element={<Overview />} />
@@ -117,8 +117,26 @@ const styles = {
   } as SxProps<Theme>,
   menuItemBurger: {
     position: 'absolute',
-    top: '28px',
-    right: '85px',
+    top: '105px',
+    right: '25px',
+    padding: '8px',
+    backgroundColor: 'white',
+    width: '24px',
+    height: '24px',
+    borderRadius: '4px',
+    '@media (min-width: 768px)': {
+      display: 'none'
+    }
+  } as SxProps<Theme>,
+  menuItemBurgerActive: {
+    position: 'absolute',
+    top: '105px',
+    right: '25px',
+    padding: '8px',
+    backgroundColor: 'primary.main',
+    width: '24px',
+    height: '24px',
+    borderRadius: '4px',
     '@media (min-width: 768px)': {
       display: 'none'
     }
@@ -129,7 +147,7 @@ const styles = {
     height: '100%',
     '@media (min-width: 768px)': {
       display: 'grid',
-      gridTemplateColumns: '10% 90%',
+      gridTemplateColumns: '70px auto',
       gridTemplateAreas: ' "leftContainer rightContainer"',
       margin: "30px auto 15px",
       padding: '0 15px 0 8px',
@@ -141,7 +159,7 @@ const styles = {
   leftContainer: {
     position: 'fixed',
     zIndex: '600',
-    width: '170px',
+    width: '180px',
     height: '100%',
     backgroundColor: 'white',
     display: 'flex',
@@ -157,10 +175,12 @@ const styles = {
       gridArea: 'leftContainer',
       width: '100%',
       height: 'auto',
+      minHeight: '100vh',
       overflowY: 'auto',
       transform: 'TranslateX(0)',
       transition: 'all 0.5s',
-      padding: '0',
+      padding: '0 8px 0 0',
+      boxShadow: '15px 0px 10px -15px rgba(34, 60, 80, 0.1)',
       backgroundColor: 'transparent'
     },
   } as SxProps<Theme>,
@@ -182,7 +202,15 @@ const styles = {
   } as SxProps<Theme>,
   rightContainerWrapper: {
     maxHeight: "calc(100vh - 183px)",
+    paddingRight: "8px",
     overflowY: "auto",
+    ...globalStyles.scrollStyles
+  } as SxProps<Theme>,
+  rightContainerLock: {
+    maxHeight: "calc(100vh - 183px)",
+    paddingRight: "8px",
+    overflowY: "auto",
+    touchAction: 'none',
     ...globalStyles.scrollStyles
   } as SxProps<Theme>,
 }

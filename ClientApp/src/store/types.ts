@@ -392,7 +392,7 @@ export type IWorks = {
 export interface IExpertItem {
   email: string,
   name?: string,
-  imgUrl?: string
+  imageUrl?: string
   taskComplete?: number,
   assignedTasks?: number
 }

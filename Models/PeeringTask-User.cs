@@ -19,6 +19,8 @@ namespace patools.Models
         public User Student { get; set; }
 
         [Required]
-        public PeeringTaskStates States { get; set; }
+        public PeeringTaskStates State { get; set; }
+
+        public int FinalGrade { get; set; }
     }
 }

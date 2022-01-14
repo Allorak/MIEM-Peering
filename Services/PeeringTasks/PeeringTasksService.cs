@@ -57,7 +57,15 @@ namespace patools.Services.PeeringTasks
 
         public async Task<Response<GetNewPeeringTaskDtoResponse>> AddTask(AddPeeringTaskDto peeringTask)
         {
-
+            if (peeringTask.MainInfo == null)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Main info is not provided");
+            if (peeringTask.AuthorForm == null)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Author form is not provided");
+            if (peeringTask.PeerForm == null)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Peer form is not provided");
+            if (peeringTask.Settings == null)
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Settings are not provided");
+            
             var course = await _context.Courses
                 .Include(c => c.Teacher)
                 .FirstOrDefaultAsync(c => c.ID == peeringTask.CourseId);
@@ -73,15 +81,6 @@ namespace patools.Services.PeeringTasks
             if (course.Teacher != teacher)
                 return new NoAccessResponse<GetNewPeeringTaskDtoResponse>("This teacher has no access to this course");
 
-            if (peeringTask.MainInfo == null)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Main info is not provided");
-            if (peeringTask.AuthorForm == null)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Author form is not provided");
-            if (peeringTask.PeerForm == null)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Peer form is not provided");
-            if (peeringTask.Settings == null)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Settings are not provided");
-            
             if (peeringTask.Settings.SubmissionStartDateTime == null ||
                 peeringTask.Settings.SubmissionEndDateTime == null ||
                 peeringTask.Settings.ReviewStartDateTime == null ||
@@ -119,7 +118,7 @@ namespace patools.Services.PeeringTasks
                 .FirstOrDefaultAsync(t => t.Course == course && t.Step == PeeringSteps.FirstStep);
             if (firstStepTask != null)
             {
-                if (firstStepTask.ReviewEndDateTime < DateTime.Now)
+                if (firstStepTask.ReviewEndDateTime > DateTime.Now)
                     return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>(
                         "The first-step task hasn't ended yet");
                 
@@ -148,9 +147,17 @@ namespace patools.Services.PeeringTasks
                     return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
                         "The task is first-step but no experts provided");
                 newTask.Step = PeeringSteps.FirstStep;
+                newTask.ExpertsAssigned = false;
                 foreach (var email in peeringTask.Settings.Experts)
                 {
                     var expertUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                    
+                    var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu =>
+                            cu.Course == course && cu.User == expertUser);
+                    if (courseUser != null)
+                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
+                            $"Expert {expertUser.Email} is a student of this course");
+                    
                     var expert = new Expert()
                     {
                         ID = Guid.NewGuid(),
@@ -176,7 +183,7 @@ namespace patools.Services.PeeringTasks
                 ID = Guid.NewGuid(),
                 PeeringTask = newTask,
                 Student = student,
-                States = PeeringTaskStates.Assigned
+                State = PeeringTaskStates.Assigned
             }))
             {
                 await _context.TaskUsers.AddAsync(taskUser);
@@ -269,22 +276,32 @@ namespace patools.Services.PeeringTasks
             
             await _context.SaveChangesAsync();
 
-
+            /*
             var delay = newTask.SubmissionEndDateTime - DateTime.Now;
-            BackgroundJob.Schedule(()=>AssignPeers(new AssignPeersDto()
-            {
-                TaskId = newTask.ID,
-                SubmissionsToCheck = newTask.SubmissionsToCheck
-            }), delay);
-            
+            if (newTask.Step == PeeringSteps.FirstStep)
+                BackgroundJob.Schedule(()=>AssignExperts(new AssignExpertsDto()
+                {
+                    TaskId = newTask.ID
+                }), delay);
+            else
+                BackgroundJob.Schedule(()=>AssignPeers(new AssignPeersDto()
+                {
+                    TaskId = newTask.ID
+                }), delay);
+            */
             return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(_mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
         }
     
-        public async Task<string> AssignPeers(AssignPeersDto peeringTask)
+        public async Task<Response<string>> AssignPeers(AssignPeersDto peersInfo)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == peeringTask.TaskId);
+            var startTime = DateTime.Now;
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == peersInfo.TaskId);
             if (task.PeersAssigned)
-                return "Peers have been already assigned";
+                return new SuccessfulResponse<string>("Peers have been already assigned");
+            task.PeersAssigned = true;
+            await _context.SaveChangesAsync();
             var submissions = await _context.Submissions
                 .Where(s => s.PeeringTaskUserAssignment.PeeringTask == task)
                 .Include(s => s.PeeringTaskUserAssignment)
@@ -293,16 +310,16 @@ namespace patools.Services.PeeringTasks
                 .ToListAsync();
 
             if (submissions.Count == 0)
-                return "No submissions for this task";
+                return new SuccessfulResponse<string>("No submissions for this task");
 
             var peers = submissions
                 .Select(s => s.PeeringTaskUserAssignment.Student)
                 .OrderBy(u => u.ID)
                 .ToList();
 
-            var submissionsToCheck = Math.Min(peeringTask.SubmissionsToCheck, submissions.Count - 1);
-            peeringTask.SubmissionsToCheck = submissionsToCheck;
-            var submissionPeerConnections = new List<SubmissionPeer>();
+            var submissionsToCheck = Math.Min(task.SubmissionsToCheck, submissions.Count - 1);
+            task.SubmissionsToCheck = submissionsToCheck;
+            var submissionPeers = new List<SubmissionPeer>();
             for (var i = 0; i < submissions.Count; i++)
             {
                 for (var j = 0; j < submissionsToCheck; j++)
@@ -312,16 +329,102 @@ namespace patools.Services.PeeringTasks
                         Peer = peers[i],
                         Submission = submissions[(i+j+1)%peers.Count]
                     };
-                    submissionPeerConnections.Add(submissionPeer);
+                    submissionPeers.Add(submissionPeer);
                 }
             }
 
-            await _context.SubmissionPeers.AddRangeAsync(submissionPeerConnections);
-            task.PeersAssigned = true;
-            await _context.SaveChangesAsync(); 
-            return $"Peers assigned successfully for the task with id {peeringTask.TaskId}";
+            submissionPeers.AddRange(submissions.Select(submission => 
+                new SubmissionPeer() {ID = Guid.NewGuid(), Peer = task.Course.Teacher, Submission = submission}));
+
+            await _context.SubmissionPeers.AddRangeAsync(submissionPeers);
+            await _context.SaveChangesAsync();
+            var endTime = DateTime.Now;
+            return new SuccessfulResponse<string>($"Result: Peers assigned successfully for the task with id {peersInfo.TaskId} " +
+                                                  $"| Time: {(endTime-startTime).TotalMilliseconds} ms"+
+                                                  $"| Peers: {peers.Count}"+
+                                                  $"| SubmissionsPerPeer: {submissionsToCheck}"+
+                                                  $"| TotalSubmissionPeers: {submissionPeers.Count}");
         }
-        
+
+        public async Task<Response<string>> AssignExperts(AssignExpertsDto expertsInfo)
+        {
+            var startTime = DateTime.Now;
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == expertsInfo.TaskId);
+            switch (task.ExpertsAssigned)
+            {
+                case null:
+                    return new SuccessfulResponse<string>("This is a second-step task");
+                case true:
+                    return new SuccessfulResponse<string>("Experts have been already assigned");
+            }
+            task.ExpertsAssigned = true;
+            await _context.SaveChangesAsync();
+            var experts = await _context.Experts
+                .Include(e => e.User)
+                .Where(e => e.PeeringTask == task)
+                .ToListAsync();
+            
+
+            var unregisteredExperts = experts.Where(e => e.User == null).ToList();
+            _context.Experts.RemoveRange(unregisteredExperts);
+            var registeredExperts = experts.Where(e => e.User != null).ToList();
+           
+            if (registeredExperts.Count == 0)
+                return new SuccessfulResponse<string>("No experts registered for this task");
+            
+            var submissions = await _context.Submissions
+                .Where(s => s.PeeringTaskUserAssignment.PeeringTask == task)
+                .Include(s => s.PeeringTaskUserAssignment)
+                .Include(s => s.PeeringTaskUserAssignment.Student)
+                .OrderBy(s => s.PeeringTaskUserAssignment.Student.ID)
+                .ToListAsync();
+            
+            if (submissions.Count == 0)
+                return new SuccessfulResponse<string>("No submissions for this task");
+            var submissionPeers = new List<SubmissionPeer>();
+            /*
+            var submissionsPerExpert = (int)Math.Ceiling(submissions.Count * 1f / registeredExperts.Count);
+            var index = 0;
+            foreach (var expert in registeredExperts)
+            {
+                for (var i = 0; i < submissionsPerExpert && index<submissions.Count; i++)
+                {
+                    submissionPeers.Add(new SubmissionPeer()
+                    {
+                        ID = Guid.NewGuid(),
+                        Peer = expert.User,
+                        Submission = submissions[index++]
+                    });
+                }
+            }*/
+            var submissionsPerExpert = 0;
+            for (var i = 0; i < submissions.Count; i++)
+            {
+                if (i % registeredExperts.Count == 0)
+                    submissionsPerExpert++;
+                submissionPeers.Add(new SubmissionPeer()
+                {
+                    ID = Guid.NewGuid(),
+                    Peer = registeredExperts[i % registeredExperts.Count].User,
+                    Submission = submissions[i]
+                });
+            }
+
+            submissionPeers.AddRange(submissions.Select(submission => 
+                new SubmissionPeer() {ID = Guid.NewGuid(), Peer = task.Course.Teacher, Submission = submission}));
+
+            await _context.SubmissionPeers.AddRangeAsync(submissionPeers);
+            await _context.SaveChangesAsync();
+            var endTime = DateTime.Now;
+            return new SuccessfulResponse<string>($"Result: Experts assigned successfully for the task with id {task.ID} " +
+                                                  $"| Time: {(endTime-startTime).TotalMilliseconds} ms"+
+                                                  $"| Experts: {registeredExperts.Count}"+
+                                                  $"| SubmissionsPerExpert: {submissionsPerExpert}"+
+                                                  $"| TotalSubmissionPeers: {submissionPeers.Count}");
+        }
+
         public async Task<Response<GetCourseTasksDtoResponse>> GetTeacherCourseTasks(GetCourseTasksDtoRequest courseInfo)
         {
             

@@ -135,6 +135,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
 const styles = {
   wrapper: {
     display: "flex",
+    overflowY: "auto",
     gap: "5px",
     flexDirection: "column"
   } as SxProps<Theme>

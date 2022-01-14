@@ -58,7 +58,7 @@ export const Navbar: FC = () => {
     const CourseTitle: FC<{ courseId: string, courseTitle: string }> = ({ courseId, courseTitle }) => {
         return (
             <Typography variant='h6'
-                sx={{ ...styles.item, ...styles.courseTitle, ...styles.itemHover, ...styles.blue }}
+                sx={{ ...styles.item, ...styles.courseTitle, ...styles.blue }}
                 onClick={() => console.log(courseId)}
             >
                 {courseTitle}
@@ -163,7 +163,6 @@ const styles = {
             textDecoration: 'underline'
         }
     } as SxProps<Theme>,
-
     blue: {
         color: palette.active.primary
     } as SxProps<Theme>

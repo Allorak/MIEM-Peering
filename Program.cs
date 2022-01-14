@@ -21,7 +21,6 @@ namespace patools
             PAToolsContext db = new PAToolsContext();
             //db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
-            InitializeDB(db);
             host.Run();
         }
 

@@ -40,7 +40,7 @@ const ExpertRow: FC<IPropsRow> = ({ expertItem }) => {
   return (
     <TableBodyRow>
       <TableBodyCell>{expertItem.email}</TableBodyCell>
-      <TableBodyCellUser name={expertItem.name ?? "No Name"} img={expertItem.imgUrl} />
+      <TableBodyCellUser name={expertItem.name ?? "No Name"} img={expertItem.imageUrl} />
       <TableBodyCell isCentered >
         {expertItem.taskComplete !== undefined && expertItem.assignedTasks !== undefined ? (
           <Tooltip

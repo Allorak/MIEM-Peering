@@ -63,7 +63,7 @@ namespace patools.Models
         [Required] 
         public PeeringSteps Step { get; set; }
 
-        public PeeringTask ExpertTask { get; set; }
+        public bool? ExpertsAssigned { get; set; } = null;
 
         public bool PeersAssigned { get; set; } = false;
 

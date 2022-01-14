@@ -27,6 +27,9 @@ namespace patools.Services.Submissions
         
         public async Task<Response<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission)
         {
+            if (submission.Answers == null)
+                return new BadRequestDataResponse<GetNewSubmissionDtoResponse>("Answers are not provided");
+            
             var student = await _context.Users.FirstOrDefaultAsync(u => u.ID == submission.UserId);
             if (student == null)
                 return new InvalidGuidIdResponse<GetNewSubmissionDtoResponse>("Invalid user id");
@@ -39,7 +42,7 @@ namespace patools.Services.Submissions
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
                 return new InvalidGuidIdResponse<GetNewSubmissionDtoResponse>("The task isn't assigned to this user");
-            if (taskUser.States != PeeringTaskStates.Assigned)
+            if (taskUser.State != PeeringTaskStates.Assigned)
                 return new OperationErrorResponse<GetNewSubmissionDtoResponse>("The submission for this task already exists");
             
             if (task.SubmissionEndDateTime < DateTime.Now)
@@ -53,14 +56,16 @@ namespace patools.Services.Submissions
                 ID = Guid.NewGuid(),
                 PeeringTaskUserAssignment = taskUser
             };
-            taskUser.States = PeeringTaskStates.Checking;
+            taskUser.State = PeeringTaskStates.NotChecked;
             await _context.Submissions.AddAsync(newSubmission);
 
+            var questions = await _context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Author)
+                .ToListAsync();
             var newAnswers = new List<Answer>();
             foreach (var answer in submission.Answers)
             {
-                var question = await _context.Questions
-                    .FirstOrDefaultAsync(q => q.PeeringTask == taskUser.PeeringTask && q.ID == answer.QuestionId);
+                var question = questions.FirstOrDefault(q => q.ID == answer.QuestionId);
                 
                 if (question == null)
                     return new BadRequestDataResponse<GetNewSubmissionDtoResponse>($"Incorrect QuestionId in answer");
@@ -74,6 +79,9 @@ namespace patools.Services.Submissions
                         case QuestionTypes.Text or QuestionTypes.ShortText when answer.Response == null:
                             return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
                                 "There is no answer for a required question");
+                        case QuestionTypes.Select when answer.Value<question.MinValue || answer.Value>question.MaxValue:
+                            return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                                "Answer for a select question is out of range");
                     }
                 }
                 newAnswers.Add(new Answer
@@ -82,9 +90,18 @@ namespace patools.Services.Submissions
                     Submission = newSubmission,
                     Question = question,
                     Response = answer.Response,
-                    Value = answer.Value
+                    Value = answer.Value,
+                    Review = null
                 });
+
+                questions.Remove(question);
             }
+
+            var unansweredRequiredQuestionsAmount = questions.Where(q => q.Required).ToList().Count;
+            if (unansweredRequiredQuestionsAmount > 0)
+                return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                    "There is no answer for a required question");
+            
             await _context.Answers.AddRangeAsync(newAnswers);
             await _context.SaveChangesAsync();
             var result = new GetNewSubmissionDtoResponse()
@@ -181,12 +198,15 @@ namespace patools.Services.Submissions
             
             switch (user.Role)
             {
-                case UserRoles.Student when submission.PeeringTaskUserAssignment.Student != user && expert == null:
-                    return new NoAccessResponse<GetSubmissionDtoResponse>("This submission doesn't belong to this user");
-                case UserRoles.Student when submission.PeeringTaskUserAssignment.States == PeeringTaskStates.Assigned:
-                    return new OperationErrorResponse<GetSubmissionDtoResponse>("There is an error in stored data (TaskUsers table)");
-                case UserRoles.Teacher when expert == null:
-                {
+                case {} when expert != null:
+                    break;
+                case UserRoles.Student:
+                    if(submission.PeeringTaskUserAssignment.Student != user)
+                        return new NoAccessResponse<GetSubmissionDtoResponse>("This submission doesn't belong to this user");
+                    if(submission.PeeringTaskUserAssignment.State == PeeringTaskStates.Assigned)
+                        return new OperationErrorResponse<GetSubmissionDtoResponse>("There is an error in stored data (TaskUsers table)");
+                    break;
+                case UserRoles.Teacher:
                     var task = await _context.Tasks
                         .Include(t => t.Course.Teacher)
                         .FirstOrDefaultAsync(t => t == submission.PeeringTaskUserAssignment.PeeringTask);
@@ -195,7 +215,6 @@ namespace patools.Services.Submissions
                         return new NoAccessResponse<GetSubmissionDtoResponse>(
                             "This teacher has no access to this submission");
                     break;
-                }
                 default:
                     return new OperationErrorResponse<GetSubmissionDtoResponse>("Incorrect user role in token");
             }
@@ -230,6 +249,7 @@ namespace patools.Services.Submissions
                         break;
                     case QuestionTypes.Select:
                         resultAnswer.Value = answer.Value;
+                        resultAnswer.CoefficientPercentage = answer.Question.CoefficientPercentage;
                         break;
                     case QuestionTypes.Multiple:
                         resultAnswer.Value = answer.Value;
@@ -281,5 +301,79 @@ namespace patools.Services.Submissions
 
             return submission == null ? new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.NotCompleted) : new SuccessfulResponse<SubmissionStatus>(SubmissionStatus.Completed);
         }
+
+        public async Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog(GetSubmissionToCheckDtoRequest taskInfo)
+        {
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid task id provided");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == taskInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid user id provided");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+            
+            var uncheckedSubmissions = await _context.SubmissionPeers
+                .Where(sp => sp.Peer == user &&
+                             sp.Submission.PeeringTaskUserAssignment.State == PeeringTaskStates.NotChecked)
+                .Select(sp => new GetSubmissionToCheckDtoResponse()
+                {
+                    SubmissionId = sp.Submission.ID,
+                    StudentName = sp.Submission.PeeringTaskUserAssignment.Student.Fullname
+                })
+                .ToListAsync();
+            
+            switch (user.Role)
+            {
+                case {} when expert != null:
+                    break;
+                case UserRoles.Student:
+                    var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu =>
+                        cu.User == user && cu.Course == task.Course);
+                    if (courseUser == null)
+                        return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "This user is not assigned to this course");
+                    
+                    var taskUser = await _context.TaskUsers.FirstOrDefaultAsync(tu =>
+                            tu.Student == user && tu.PeeringTask == task);
+                    if (taskUser == null)
+                        return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "this user is not assigned to this task");
+
+                    if (taskUser.State == PeeringTaskStates.Assigned)
+                        return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "This student hasn't submissioned yet");
+
+                    var submission =  await _context.Submissions
+                        .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+                    if (submission == null)
+                        return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "There is an error in database");
+
+                    if (task.Type == ReviewTypes.DoubleBlind)
+                    {
+                        var index = 1;
+                        foreach (var submissionToCheck in uncheckedSubmissions)
+                        {
+                            submissionToCheck.StudentName = $"Аноним #{index++}";
+                        }
+                    }
+                    break;
+                case UserRoles.Teacher:
+                    if (task.Course.Teacher != user)
+                        return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                            "This teacher has no access to this course");
+                    break;
+                default:
+                    return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
+                        "Incorrect user role in token");
+            }
+
+            return new SuccessfulResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(uncheckedSubmissions);
+        }
+
     }
 }

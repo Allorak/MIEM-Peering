@@ -22,7 +22,20 @@ export const headCell: SxProps<Theme> = {
   color: '#1E253C',
 }
 
+export const expertAvatarWrapper: SxProps<Theme> = {
+  overflow: 'hidden',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flexShrink: 0,
+  width: "25px",
+  height: "25px",
+  borderRadius: "50%"
+}
+
 export const expertImgWrapper: SxProps<Theme> = {
+  overflow: 'hidden',
+  flexShrink: 0,
   width: "25px",
   height: "25px",
   borderRadius: "50%"
