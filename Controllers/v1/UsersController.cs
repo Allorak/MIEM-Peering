@@ -29,7 +29,7 @@ namespace patools.Controllers.v1
             _configuration = configuration;
         }
 
-        [HttpPost("google/add")]
+        [HttpPost("add-google")]
         public async Task<ActionResult<GetNewUserDtoResponse>> AddGoogleUser(AddGoogleUserDTO newUser)
         {
             try
@@ -73,7 +73,7 @@ namespace patools.Controllers.v1
             return Ok(await _usersService.GetUserProfile(userId));
         }
 
-        [HttpGet("getrole/task={taskId}")]
+        [HttpGet("get-role/task={taskId}")]
         public async Task<ActionResult<GetUserRoleDtoResponse>> GetUserRole(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
