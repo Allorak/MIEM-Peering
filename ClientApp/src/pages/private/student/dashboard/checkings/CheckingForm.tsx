@@ -39,7 +39,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
       }
     }
     const formResponses: IPeerResponses = {
-      responses: peerForm.rubrics.map(response => {
+      answers: peerForm.rubrics.map(response => {
         switch (response.type) {
           case IQuestionTypes.TEXT:
           case IQuestionTypes.SHORT_TEXT:

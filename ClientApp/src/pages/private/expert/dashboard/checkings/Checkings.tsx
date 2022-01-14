@@ -121,7 +121,7 @@ export const Checkings: FC = () => {
   }, [responses])
 
   const onRequest = useCallback((formResponses: IPeerResponses) => {
-    if (path && path.taskId && currentWorkId && formResponses.responses)
+    if (path && path.taskId && currentWorkId && formResponses.answers)
       dispatch(createReview(path.taskId, currentWorkId, formResponses))
   }, [currentWorkId, path])
 

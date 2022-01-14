@@ -449,7 +449,7 @@ export type IQuestionAnswerItem = {
 export type IQuestionAnswers = Array<IQuestionAnswerItem>
 
 export type IPeerResponses = {
-  responses: IQuestionAnswers
+  answers: IQuestionAnswers
 }
 
 export enum Reviewers {

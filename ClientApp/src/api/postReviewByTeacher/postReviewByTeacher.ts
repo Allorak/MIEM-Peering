@@ -11,16 +11,20 @@ export const postReviewByTeacher = async ({
   responses
 }: IRequestData): Promise<IResponse<IResponseData>> => {
 
-  const isMock = true
+  const isMock = false
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/tasks/${taskId}/works/${workId}/post`,
+    url: `https://localhost:5001/api/v1/reviews/add`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
     },
-    data: JSON.parse(JSON.stringify(responses))
+    data: {
+      // taskId,
+      submissionId: workId,
+      answers: responses.answers
+    }
   }
 
   if (isMock) return await mock(requestConfig)
