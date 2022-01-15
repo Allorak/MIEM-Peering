@@ -15,6 +15,7 @@ export const Logo: FC = () => {
         ?? matchPath(paths.teacher.courses.course, location.pathname)
         ?? matchPath(paths.student.main, location.pathname)
         ?? matchPath(paths.student.courses.course, location.pathname)
+        ?? matchPath(paths.root, location.pathname)
 
     return (
         <Box sx={styles.root} >
