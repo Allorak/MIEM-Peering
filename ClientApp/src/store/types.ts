@@ -323,7 +323,8 @@ export type IStatusBar = {
 }
 
 export type IStatusTask = {
-  count: number
+  submissionsToCheck: number,
+  submissionsNumber: number
 }
 
 export type IOverview = {
@@ -343,12 +344,10 @@ export type IOverviewStudent = {
   studentGrades?: IStudentSubmissionGrades,
   step: PeerSteps,
   studentConfidenceСoefficients?: {
-    until?: number,
+    until: number,
     after?: number
   }
 }
-
-
 
 export type IStudentSubmissionGrades = {
   coordinates: IWorkReviewСoordinates[],
@@ -362,23 +361,9 @@ export type IOverviewExpert = {
   assignedWorksCount?: number
 }
 
-export type IOverviewResponse = IOverview & {
-  deadlines: {
-    submissionStartDateTime: string
-    submissionEndDateTime: string
-    reviewStartDateTime: string
-    reviewEndDateTime: string
-  }
-}
+export type IOverviewResponse = IOverview
 
-export type IOverviewStudentResponse = IOverviewStudent & {
-  deadlines: {
-    submissionStartDateTime: string
-    submissionEndDateTime: string
-    reviewStartDateTime: string
-    reviewEndDateTime: string
-  }
-}
+export type IOverviewStudentResponse = IOverviewStudent
 
 export type IWorkItem = {
   submissionId: string,
@@ -482,6 +467,8 @@ export interface IWorkReviewСoordinates {
   reviewer: Reviewers
   name: string
 }
+
+
 
 export type IWorkGraphPropsItem = {
   statisticType: WorkStatisticsTypes.GRAPH,
