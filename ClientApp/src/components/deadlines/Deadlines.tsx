@@ -16,7 +16,7 @@ export const Deadlines: FC<IDeadlines> = ({
   return (
     <Box sx={styles.wrapper}>
       <Box sx={styles.cardsWrapper}>
-        {sBegin && (
+        {sBegin && typeof sBegin !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.startBox }}>
             <Typography variant={'h6'}>
               {"Период сдачи работ начинается"}
@@ -38,7 +38,7 @@ export const Deadlines: FC<IDeadlines> = ({
           </Box>
         )}
 
-        {sEnd && (
+        {sEnd && typeof sEnd !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.endBox }}>
             <Typography variant={'h6'}>
               {"Период сдачи работ заканчивается"}
@@ -63,7 +63,7 @@ export const Deadlines: FC<IDeadlines> = ({
       </Box>
 
       <Box sx={styles.cardsWrapper}>
-        {rBegin && (
+        {rBegin && typeof rBegin !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.startBox }}>
             <Typography variant={'h6'}>
               {"Период проверки начинается"}
@@ -86,7 +86,7 @@ export const Deadlines: FC<IDeadlines> = ({
           </Box>
         )}
 
-        {rEnd && (
+        {rEnd && typeof rEnd !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.endBox }}>
             <Typography variant={'h6'}>
               {"Период проверки заканчивается"}

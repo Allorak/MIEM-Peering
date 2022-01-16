@@ -34,7 +34,16 @@ export const fetchOverviewExpert = (taskId: string): AppThunk => async (dispatch
             dispatch(actions.fetchFailed(response.error))
             return
         }
-        dispatch(actions.fetchSuccess(response.payload))
+
+        dispatch(actions.fetchSuccess({
+            ...response.payload,
+            deadlines: {
+                submissionEndDateTime: new Date(response.payload.deadlines.submissionEndDateTime),
+                submissionStartDateTime: new Date(response.payload.deadlines.submissionStartDateTime),
+                reviewEndDateTime: new Date(response.payload.deadlines.reviewEndDateTime),
+                reviewStartDateTime: new Date(response.payload.deadlines.reviewStartDateTime),
+            }
+        }))
 
     } catch (error) {
         dispatch(actions.fetchFailed({
