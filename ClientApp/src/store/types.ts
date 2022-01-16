@@ -393,8 +393,8 @@ export interface IExpertItem {
   email: string,
   name?: string,
   imageUrl?: string
-  taskComplete?: number,
-  assignedTasks?: number
+  tasksAssigned?: number,
+  tasksCompleted?: number
 }
 
 export enum PeerTaskTypes {

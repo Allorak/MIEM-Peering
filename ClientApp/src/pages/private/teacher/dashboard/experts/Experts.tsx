@@ -30,7 +30,9 @@ export const Experts: FC = () => {
       isLoading={status}
       error={error}
     >
-      <ExpertsTable experts={experts ?? []} />
+      {experts && experts.length > 0 && (
+        <ExpertsTable experts={experts} />
+      )}
     </DashboardWorkBox>
   )
 }
