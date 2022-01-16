@@ -398,9 +398,6 @@ namespace patools.Services.PeeringTasks
                 });
             }
 
-            submissionPeers.AddRange(submissions.Select(submission => 
-                new SubmissionPeer() {ID = Guid.NewGuid(), Peer = task.Course.Teacher, Submission = submission}));
-
             await _context.SubmissionPeers.AddRangeAsync(submissionPeers);
             await _context.SaveChangesAsync();
             var endTime = DateTime.Now;
