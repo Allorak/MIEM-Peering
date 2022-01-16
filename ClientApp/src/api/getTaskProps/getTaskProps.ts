@@ -13,7 +13,7 @@ export const getTaskProps = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/users/getrole/task=${taskId}`,
+    url: `/api/v1/users/get-role/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

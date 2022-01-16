@@ -7,7 +7,7 @@ export const postGUserCheck = async ({ googleToken }: IRequestData): Promise<IRe
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/googleauth`,
+    url: `/api/v1/authentication/google`,
     headers: {
       'Accept-Language': 'ru',
     },

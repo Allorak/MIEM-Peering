@@ -10,7 +10,7 @@ export const postRegistretion = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
-    url: `/api/v1/users/google/add`,
+    url: `/api/v1/users/add-google`,
     data: {
       googleToken,
       role
