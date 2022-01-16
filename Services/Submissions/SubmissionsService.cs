@@ -296,21 +296,26 @@ namespace patools.Services.Submissions
 
             var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
 
+            var submissionPeers = await _context.SubmissionPeers
+                .Include(sp => sp.Submission)
+                .Include(sp => sp.Submission.PeeringTaskUserAssignment.Student)
+                .Where(sp => sp.Peer == user && sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+            
             var reviewedSubmissionPeers = await _context.Reviews
                 .Select(r => r.SubmissionPeerAssignment)
                 .Where(sp => sp.Peer == user &&
                             sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
                 .ToListAsync();
             
-            var uncheckedSubmissions = await _context.SubmissionPeers
-                .Where(sp => sp.Peer == user &&
-                             !reviewedSubmissionPeers.Contains(sp))
+            var uncheckedSubmissions = submissionPeers
+                .Where(sp => !reviewedSubmissionPeers.Contains(sp))
                 .Select(sp => new GetSubmissionToCheckDtoResponse()
                 {
                     SubmissionId = sp.Submission.ID,
                     StudentName = sp.Submission.PeeringTaskUserAssignment.Student.Fullname
                 })
-                .ToListAsync();
+                .ToList();
             
             switch (user.Role)
             {
