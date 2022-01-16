@@ -369,6 +369,7 @@ namespace patools.Services.PeeringTasks
 
             var unregisteredExperts = experts.Where(e => e.User == null).ToList();
             _context.Experts.RemoveRange(unregisteredExperts);
+            await _context.SaveChangesAsync();
             var registeredExperts = experts.Where(e => e.User != null).ToList();
            
             if (registeredExperts.Count == 0)
