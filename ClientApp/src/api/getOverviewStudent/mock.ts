@@ -11,10 +11,10 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
     success: true,
     payload: {
       deadlines: {
-        submissionStartDateTime: new Date(),
-        submissionEndDateTime: new Date(),
-        reviewStartDateTime: new Date(),
-        reviewEndDateTime: new Date()
+        submissionStartDateTime: `${new Date()}`,
+        submissionEndDateTime: `${new Date()}`,
+        reviewStartDateTime: `${new Date()}`,
+        reviewEndDateTime: `${new Date()}`
       },
       status: {
         submissionsToCheck: 14,

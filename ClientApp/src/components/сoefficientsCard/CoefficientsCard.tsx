@@ -29,8 +29,6 @@ export const CoefficientsCard: FC<IProps> = ({
     }
   }
 
-  console.log(proportion)
-
   return (
     <Box>
       <Box sx={styles.wrapper}>

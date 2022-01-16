@@ -184,10 +184,10 @@ export interface INewTaskPeerForm {
 }
 
 export interface INewTaskSettings {
-  submissionStartDateTime: Date | undefined
-  submissionEndDateTime: Date | undefined
-  reviewStartDateTime: Date | undefined
-  reviewEndDateTime: Date | undefined
+  submissionStartDateTime: Date | string |undefined
+  submissionEndDateTime: Date | string | undefined
+  reviewStartDateTime: Date | string | undefined
+  reviewEndDateTime: Date | string | undefined
   submissionsToCheck: number
   experts?: Array<string>
   type: PeerTaskTypes
@@ -361,7 +361,14 @@ export type IOverviewExpert = {
   assignedWorksCount?: number
 }
 
-export type IOverviewResponse = IOverview
+export interface IOverviewResponse extends IOverview {
+  deadlines: {
+    submissionStartDateTime: string
+    submissionEndDateTime: string
+    reviewStartDateTime: string
+    reviewEndDateTime: string
+  }
+}
 
 export type IOverviewStudentResponse = IOverviewStudent
 

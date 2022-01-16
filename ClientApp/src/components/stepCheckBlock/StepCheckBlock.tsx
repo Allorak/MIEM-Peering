@@ -20,11 +20,11 @@ export const StepCheckBlock: FC<IProps> = ({
   switch (step) {
     case 'FirstStep':
       stepIcon = <StepFirst />
-      stepDescription = 'In this type of peer review the author does not know who the reviewers are. This is the most common form of peer review among science journals.'
+      stepDescription = 'Вы принимаете участие в первом этапе пиринговой проверки. Постарайтесь максимально внимательно и справедливо оценить работы участников.'
       break;
     case 'SecondStep':
       stepIcon = <StepSecond />
-      stepDescription = 'In this type of peer review the reviewers dont know the identity of authors, and vice versa. This is the most common form of peer review amongst social science and humanities journals.'
+      stepDescription = 'Вы принимаете участие во втором этапе пиринговой проверки. Постарайтесь максимально внимательно и справедливо оценить работы участников.'
       break;
   }
 

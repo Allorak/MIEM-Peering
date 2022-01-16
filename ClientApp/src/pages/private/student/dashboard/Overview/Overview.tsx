@@ -42,19 +42,25 @@ export const Overview: FC = () => {
         <>
           <Deadlines {...payload.deadlines} />
           <Box sx={styles.gridWrapper}>
-            <Box sx={styles.quarterColumn}>
-              <UncheckedFileCard
-                {...payload.status} />
-            </Box>
-            <Box sx={styles.quarterColumn}>
-              <CheckedFileCard
-                {...payload.status} />
-            </Box>
-            <Box sx={styles.quarterColumn}>
-              <CoefficientsCard {...payload.studentConfidenceСoefficients} />
-            </Box>
+            {payload.status && (
+              <>
+                <Box sx={styles.quarterColumn}>
+                  <UncheckedFileCard
+                    {...payload.status} />
+                </Box>
+                <Box sx={styles.quarterColumn}>
+                  <CheckedFileCard
+                    {...payload.status} />
+                </Box>
+              </>
+            )}
+            {payload.studentConfidenceСoefficients && (
+              <Box sx={styles.quarterColumn}>
+                <CoefficientsCard {...payload.studentConfidenceСoefficients} />
+              </Box>
+            )}
           </Box>
-          <Box sx={styles.gridWrapper}> 
+          <Box sx={styles.gridWrapper}>
             {(payload.step === 'FirstStep') && (
               <Box sx={styles.quarterColumn}>
                 <StepCheckBlock step={payload.step} />

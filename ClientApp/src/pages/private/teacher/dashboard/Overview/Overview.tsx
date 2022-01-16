@@ -128,12 +128,16 @@ export const Overview: FC = () => {
             )}
           </Box>
           <Box sx={styles.gridWrapper}>
-            <Box sx={styles.taskTypeBlock}>
-              <TaskTypeBlock type={payload.type} />
-            </Box>
-            <Box sx={styles.stepCheckBlock}>
-              <StepCheckBlock step={payload.step} />
-            </Box>
+            {payload.type && (
+              <Box sx={styles.taskTypeBlock}>
+                <TaskTypeBlock type={payload.type} />
+              </Box>
+            )}
+            {payload.step && (
+              <Box sx={styles.stepCheckBlock}>
+                <StepCheckBlock step={payload.step} />
+              </Box>
+            )}
             {(graphСoefficientsData !== undefined || graphCurrentСoefficientsData !== undefined) && (
               <Box sx={styles.graphBoxСoefficients}
                 onTouchMove={(e) => e.preventDefault()}
