@@ -271,5 +271,117 @@ namespace patools.Services.Reviews
 
             return new SuccessfulResponse<IEnumerable<GetReviewDtoResponse>>(resultReviews);
         }
+
+        public async Task<Response<IEnumerable<GetMyReviewDtoResponse>>> GetAllMyReviews(GetMyReviewDtoRequest taskInfo)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(
+                u => u.ID == taskInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetMyReviewDtoResponse>>("Invalid user id provided");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<IEnumerable<GetMyReviewDtoResponse>>("Invalid task id provided");
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+
+            switch (user.Role)
+            {
+                case {} when expert!=null:
+                    break;
+                case UserRoles.Student:
+                    var courseUser = await _context.CourseUsers
+                        .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == user);
+                    if (courseUser == null)
+                        return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("This user is not assigned to this course");
+
+                    var taskUser = await _context.TaskUsers
+                        .FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
+                    if (taskUser == null)
+                        return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("This user has no access to this task");
+                    break;
+                case UserRoles.Teacher:
+                    return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("Teacher can't make this request");
+                default:
+                    return new BadRequestDataResponse<IEnumerable<GetMyReviewDtoResponse>>("Incorrect role stored in token");
+            }
+
+            var resultReviews = new List<GetMyReviewDtoResponse>();
+            var reviews = await _context.Reviews
+                .Where(r => r.SubmissionPeerAssignment.Peer == user &&
+                            r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .Include(r => r.SubmissionPeerAssignment.Submission)
+                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student)
+                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask)
+                .ToListAsync();
+            var index = 0;
+            foreach (var review in reviews)
+            {
+                var submission = review.SubmissionPeerAssignment.Submission;
+                var student = submission.PeeringTaskUserAssignment.Student;
+                var resultReview = new GetMyReviewDtoResponse()
+                {
+                    SubmissionId = submission.ID,
+                    StudentName = task.Type==ReviewTypes.DoubleBlind?$"Аноним #{++index}":student.Fullname
+                };
+                
+                var answers = await _context.Answers
+                    .Include(a => a.Question)
+                    .Where(a => a.Review == review)
+                    .ToListAsync();
+
+                var resultAnswers = new List<GetAnswerDtoResponse>();
+                foreach (var answer in answers)
+                {
+                    var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
+                    if (question == null)
+                        return new OperationErrorResponse<IEnumerable<GetMyReviewDtoResponse>>(
+                            "There is an error in stored data (Questions table)");
+
+                    var resultAnswer = new GetAnswerDtoResponse()
+                    {
+                        QuestionId = question.ID,
+                        Order = question.Order,
+                        Title = question.Title,
+                        Description = question.Description,
+                        MinValue = question.MinValue,
+                        MaxValue = question.MaxValue,
+                        Required = question.Required,
+                        Type = question.Type
+                    };
+                    switch (resultAnswer.Type)
+                    {
+                        case QuestionTypes.Text or QuestionTypes.ShortText:
+                            resultAnswer.Response = answer.Response;
+                            break;
+                        case QuestionTypes.Select:
+                            resultAnswer.Value = answer.Value;
+                            resultAnswer.CoefficientPercentage = answer.Question.CoefficientPercentage;
+                            break;
+                        case QuestionTypes.Multiple:
+                            resultAnswer.Value = answer.Value;
+                            var responses = await _context.Variants
+                                .Where(v => v.Question == question)
+                                .Select(v => new GetVariantDtoResponse()
+                                {
+                                    Id = v.ChoiceId,
+                                    Response = v.Response
+                                })
+                                .OrderBy(v => v.Id)
+                                .ToListAsync();
+                            resultAnswer.Responses = responses;
+                            break;
+                    }
+
+                    resultAnswers.Add(resultAnswer);
+                }
+                resultReview.Answers = resultAnswers;
+                resultReviews.Add(resultReview);
+            }
+
+            return new SuccessfulResponse<IEnumerable<GetMyReviewDtoResponse>>(resultReviews);
+        }
     }
 }

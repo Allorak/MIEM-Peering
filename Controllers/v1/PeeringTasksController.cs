@@ -64,7 +64,7 @@ namespace patools.Controllers.v1
             return Ok(new InvalidJwtTokenResponse());
         }
 
-        [HttpGet("authorform/task={taskId}")]
+        [HttpGet("author-form/task={taskId}")]
         public async Task<ActionResult<GetAuthorFormDtoResponse>> GetAuthorForm(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -86,7 +86,7 @@ namespace patools.Controllers.v1
             return Ok(await _peeringTasksService.GetAuthorForm(taskInfo));
         }
         
-        [HttpGet("peerform/task={taskId}")]
+        [HttpGet("peer-form/task={taskId}")]
         public async Task<ActionResult<GetAuthorFormDtoResponse>> GetPeerForm(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -160,7 +160,7 @@ namespace patools.Controllers.v1
             return Ok(new InvalidJwtTokenResponse());
         }
 
-        [HttpGet("submissionDeadline/task={taskId}")]
+        [HttpGet("submission-deadline/task={taskId}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetSubmissionDeadline([FromRoute] Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -182,7 +182,7 @@ namespace patools.Controllers.v1
             }));
         }
         
-        [HttpGet("reviewDeadline/task={taskId}")]
+        [HttpGet("review-deadline/task={taskId}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetReviewDeadline([FromRoute] Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)

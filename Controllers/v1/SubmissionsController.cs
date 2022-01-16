@@ -71,7 +71,7 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.GetSubmissions(taskInfo));
         }
 
-        [HttpGet("getsubmissionId/task={taskId}")]
+        [HttpGet("get-id/task={taskId}")]
         public async Task<ActionResult<GetSubmissionIdDtoResponse>> GetSubmissionId(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -118,7 +118,7 @@ namespace patools.Controllers.v1
             }));
         }
 
-        [HttpGet("getstatus/task={taskId}")]
+        [HttpGet("get-status/task={taskId}")]
         public async Task<ActionResult<SubmissionStatus>> GetSubmissionStatus(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)

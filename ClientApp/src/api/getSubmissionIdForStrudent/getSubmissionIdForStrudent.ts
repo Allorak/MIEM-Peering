@@ -13,7 +13,7 @@ export const getSubmissionIdForStrudent = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/submissions/getsubmissionId/task=${taskId}`,
+    url: `/api/v1/submissions/get-id/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

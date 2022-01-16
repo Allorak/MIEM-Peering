@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -19,35 +20,53 @@ namespace patools.Services.Experts
             _context = context;
         }
         
-        public async Task<Response<GetExpertDtoResponse[]>> GetExperts(GetExpertDtoRequest info)
+        public async Task<Response<IEnumerable<GetExpertDtoResponse>>> GetExperts(GetExpertDtoRequest info)
         {
             var task = await _context.Tasks
                 .Include(t=>t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == info.TaskId);
             if (task == null)
-                return new InvalidGuidIdResponse<GetExpertDtoResponse[]>("Invalid task id provided");
+                return new InvalidGuidIdResponse<IEnumerable<GetExpertDtoResponse>>("Invalid task id provided");
 
             var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == info.TeacherId);
             if (teacher == null)
-                return new InvalidGuidIdResponse<GetExpertDtoResponse[]>("Invalid teacher id");
+                return new InvalidGuidIdResponse<IEnumerable<GetExpertDtoResponse>>("Invalid teacher id");
 
             if (task.Course.Teacher != teacher)
-                return new NoAccessResponse<GetExpertDtoResponse[]>("This teacher has no access to this task");
+                return new NoAccessResponse<IEnumerable<GetExpertDtoResponse>>("This teacher has no access to this task");
             
             var experts = await _context.Experts
                 .Include(e =>e.User)
                 .Where(e => e.PeeringTask == task)
-                .Select(e => new GetExpertDtoResponse()
-                {
-                    Email = e.Email,
-                    Name = e.User == null ? null : e.User.Fullname,
-                    ImageUrl = e.User == null ? null : e.User.ImageUrl,
-                    TasksCompleted = e.User == null ? null : 1,
-                    TasksAssigned = e.User == null ? null : 1
-                })
                 .ToArrayAsync();
 
-            return new SuccessfulResponse<GetExpertDtoResponse[]>(experts);
+            var resultExperts = new List<GetExpertDtoResponse>();
+            foreach (var expert in experts)
+            {
+                var resultExpert = new GetExpertDtoResponse()
+                {
+                    Email = expert.Email,
+                    Name = expert.User?.Fullname,
+                    ImageUrl = expert.User?.ImageUrl,
+                    TasksAssigned = null,
+                    TasksCompleted = null
+                };
+                if (expert.User != null)
+                {
+                    var assignedTasks = await _context.SubmissionPeers
+                        .Where(sp =>
+                            sp.Peer == expert.User && sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                        .ToListAsync();
+                    var completedTasks = await _context.Reviews
+                        .Where(r => assignedTasks.Contains(r.SubmissionPeerAssignment))
+                        .ToListAsync();
+
+                    resultExpert.TasksAssigned = assignedTasks.Count;
+                    resultExpert.TasksCompleted = completedTasks.Count;
+                }
+                resultExperts.Add(resultExpert);
+            }
+            return new SuccessfulResponse<IEnumerable<GetExpertDtoResponse>>(resultExperts);
         }
     }
 }

@@ -185,39 +185,19 @@ namespace patools.Services.Submissions
                 .Include(s => s.PeeringTaskUserAssignment)
                 .Include(s => s.PeeringTaskUserAssignment.Student)
                 .Include(s => s.PeeringTaskUserAssignment.PeeringTask)
+                .Include(s => s.PeeringTaskUserAssignment.PeeringTask.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == submissionInfo.SubmissionId);
             if (submission == null)
                 return new InvalidGuidIdResponse<GetSubmissionDtoResponse>("Invalid submission id provided");
-
+            
             var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == submissionInfo.StudentId);
             if (user == null)
                 return new InvalidGuidIdResponse<GetSubmissionDtoResponse>("Invalid student id provided");
 
-            var expert = await _context.Experts.FirstOrDefaultAsync(e =>
-                e.User == user && e.PeeringTask == submission.PeeringTaskUserAssignment.PeeringTask);
-            
-            switch (user.Role)
-            {
-                case {} when expert != null:
-                    break;
-                case UserRoles.Student:
-                    if(submission.PeeringTaskUserAssignment.Student != user)
-                        return new NoAccessResponse<GetSubmissionDtoResponse>("This submission doesn't belong to this user");
-                    if(submission.PeeringTaskUserAssignment.State == PeeringTaskStates.Assigned)
-                        return new OperationErrorResponse<GetSubmissionDtoResponse>("There is an error in stored data (TaskUsers table)");
-                    break;
-                case UserRoles.Teacher:
-                    var task = await _context.Tasks
-                        .Include(t => t.Course.Teacher)
-                        .FirstOrDefaultAsync(t => t == submission.PeeringTaskUserAssignment.PeeringTask);
-
-                    if (task.Course.Teacher != user)
-                        return new NoAccessResponse<GetSubmissionDtoResponse>(
-                            "This teacher has no access to this submission");
-                    break;
-                default:
-                    return new OperationErrorResponse<GetSubmissionDtoResponse>("Incorrect user role in token");
-            }
+            var submissionPeer = await _context.SubmissionPeers
+                .FirstOrDefaultAsync(sp => sp.Submission == submission && sp.Peer == user);
+            if (submissionPeer == null && submission.PeeringTaskUserAssignment.Student != user)
+                return new NoAccessResponse<GetSubmissionDtoResponse>("This user can't access this submission");
 
             var answers = await _context.Answers
                 .Include(a => a.Question)
@@ -315,10 +295,16 @@ namespace patools.Services.Submissions
                 return new InvalidGuidIdResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>("Invalid user id provided");
 
             var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+
+            var reviewedSubmissionPeers = await _context.Reviews
+                .Select(r => r.SubmissionPeerAssignment)
+                .Where(sp => sp.Peer == user &&
+                            sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
             
             var uncheckedSubmissions = await _context.SubmissionPeers
                 .Where(sp => sp.Peer == user &&
-                             sp.Submission.PeeringTaskUserAssignment.State == PeeringTaskStates.NotChecked)
+                             !reviewedSubmissionPeers.Contains(sp))
                 .Select(sp => new GetSubmissionToCheckDtoResponse()
                 {
                     SubmissionId = sp.Submission.ID,

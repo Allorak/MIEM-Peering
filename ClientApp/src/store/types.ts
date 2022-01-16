@@ -377,9 +377,9 @@ export type IWorks = {
 export interface IExpertItem {
   email: string,
   name?: string,
-  imgUrl?: string
-  taskComplete?: number,
-  assignedTasks?: number
+  imageUrl?: string
+  tasksAssigned?: number,
+  tasksCompleted?: number
 }
 
 export enum PeerTaskTypes {
@@ -434,7 +434,7 @@ export type IQuestionAnswerItem = {
 export type IQuestionAnswers = Array<IQuestionAnswerItem>
 
 export type IPeerResponses = {
-  responses: IQuestionAnswers
+  answers: IQuestionAnswers
 }
 
 export enum Reviewers {

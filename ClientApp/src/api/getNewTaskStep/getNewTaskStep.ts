@@ -13,7 +13,7 @@ export const getNewTaskStep = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/courses/secondstepavailable/course=${courseId}`,
+    url: `/api/v1/courses/second-step-available/course=${courseId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

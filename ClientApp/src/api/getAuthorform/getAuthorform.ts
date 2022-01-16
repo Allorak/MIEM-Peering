@@ -13,7 +13,7 @@ export const getAuthorform = async ({
 
   const requestConfig: AxiosRequestConfig = { 
     method: 'GET',
-    url: `/api/v1/tasks/authorform/task=${taskId}`,
+    url: `/api/v1/tasks/author-form/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

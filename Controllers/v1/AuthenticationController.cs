@@ -12,7 +12,7 @@ using patools.Errors;
 namespace patools.Controllers.v1
 {
     [ApiController]
-    [Route("api/v1")]
+    [Route("api/v1/[controller]")]
     public class AuthenticationController : ControllerBase
     {
         private readonly patools.Services.Authentication.IAuthenticationService _authenticationService;
@@ -24,7 +24,7 @@ namespace patools.Controllers.v1
             _authenticationService = authenticationService;
         }
 
-        [HttpGet("getjwttoken")]
+        [HttpGet("get-jwt-token")]
         public async Task<ActionResult<Response<GetJwtTokenDtoResponse>>> GetJwtToken([FromBody]GetJwtByGoogleDtoRequest userInfo)
         {
             try
@@ -42,7 +42,7 @@ namespace patools.Controllers.v1
             }
         }
 
-        [HttpPost("googleauth")]
+        [HttpPost("google")]
         public async Task<ActionResult<Response<GetGoogleRegisteredUserDtoResponse>>> GoogleAuth([FromBody]GetJwtByGoogleDtoRequest tokenInfo)
         {
             try

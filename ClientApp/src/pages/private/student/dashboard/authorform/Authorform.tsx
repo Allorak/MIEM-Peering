@@ -30,7 +30,7 @@ export const Authorform: FC = () => {
 
   const onRequest = useCallback((formResponses: IAuthorFormResponses) => {
     console.log("formResponses:", formResponses)
-    if (path && path.taskId && formResponses.responses)
+    if (path && path.taskId && formResponses.answers)
       dispatch(postAuthorformStudent(path.taskId, formResponses))
   }, [path])
 

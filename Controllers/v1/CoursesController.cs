@@ -67,7 +67,7 @@ namespace patools.Controllers.v1
 
         // GET: api/v1/Courses/get
         [HttpGet("get")]
-        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCoursess()
+        public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCourses()
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -140,7 +140,7 @@ namespace patools.Controllers.v1
         }
 
 
-        [HttpGet("secondstepavailable/course={courseId}")]
+        [HttpGet("second-step-available/course={courseId}")]
         public async Task<ActionResult<string>> CheckForSecondStep(Guid courseId)
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)

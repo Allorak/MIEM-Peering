@@ -13,7 +13,7 @@ export const getSubmissionDeadlineStatus = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/submissionDeadline/task=${taskId}`,
+    url: `/api/v1/tasks/submission-deadline/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',

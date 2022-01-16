@@ -13,7 +13,7 @@ export const getSubmissionStatus = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/submissions/getstatus/task=${taskId}`,
+    url: `/api/v1/submissions/get-status/task=${taskId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept-Language': 'ru',
