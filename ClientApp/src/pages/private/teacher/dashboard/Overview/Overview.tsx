@@ -5,7 +5,8 @@ import {
   XAxis,
   YAxis,
   VerticalGridLines,
-  LineMarkSeries
+  LineMarkSeries,
+  DiscreteColorLegend
 } from 'react-vis';
 import { Box, SxProps, Theme } from "@mui/system"
 
@@ -14,6 +15,8 @@ import { StatusBar } from "../../../../../components/statusBar"
 
 import { Typography } from "@mui/material";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { TaskTypeBlock } from "../../../../../components/taskTypeBlock";
+import { StepCheckBlock } from "../../../../../components/stepCheckBlock";
 
 import { palette } from "../../../../../theme/colors";
 
@@ -21,6 +24,10 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
 
 import { fetchOverview } from "../../../../../store/overview";
+
+import * as globalStyles from "../../../../../const/styles"
+
+
 
 
 export const Overview: FC = () => {
@@ -38,8 +45,27 @@ export const Overview: FC = () => {
   }, [])
 
   const graphData = payload?.grades?.map((grade, index) => ({ x: index, y: grade }))
+  const graphСoefficientsData = payload?.confidenceСoefficients?.map((coefficient, index) => ({ x: index, y: coefficient }))
+  const graphCurrentСoefficientsData = payload?.currentConfidenceСoefficients?.map((coefficient, index) => ({ x: index, y: coefficient }))
 
-  
+  const legendItems = []
+
+  if (graphCurrentСoefficientsData) {
+    legendItems.push({
+      title: 'Текущий коэффициент',
+      color: palette.fill.success,
+      strokeWidth: 3,
+    })
+  }
+
+  if (graphСoefficientsData) {
+    legendItems.push({
+      title: 'Вычисленный коэффициент',
+      color: palette.fill.secondary,
+      strokeWidth: 3,
+    })
+  }
+
   return (
     <DashboardWorkBox
       isLoading={status}
@@ -48,62 +74,137 @@ export const Overview: FC = () => {
       {payload && (
         <>
           <Deadlines {...payload.deadlines} />
-
           <Box sx={styles.gridWrapper}>
             <Box sx={styles.statusbarBox}>
               <StatusBar {...payload.statistics} />
             </Box>
+            {graphData && (
+              <Box sx={styles.graphBox}
+                onTouchMove={(e) => e.preventDefault()}
+              >
+                <Box m={"15px"}>
+                  <Typography
+                    variant={"h6"}
+                    margin={"0px 0px 10px 0px"}
+                  >
+                    {"График успеваемости"}
+                  </Typography>
 
-            <Box sx={styles.graphBox}
-              onTouchMove={(e) => e.preventDefault()}
-            >
-              <Box m={"15px"}>
-                <Typography
-                  variant={"h6"}
-                  margin={"0px 0px 10px 0px"}
-                >
-                  {"График успеваемости"}
-                </Typography>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center"
-                  }}
-                >
                   <Box
                     sx={{
-                      overflowY: "auto"
+                      display: "flex",
+                      justifyContent: "center"
                     }}
                   >
-                    <XYPlot
-                      height={300}
-                      width={970}
-                      xType="linear"
-                      onTouchMove={(e) => e.preventDefault()}
+                    <Box
+                      sx={{
+                        overflowY: "auto"
+                      }}
                     >
-                      <HorizontalGridLines />
-                      <VerticalGridLines />
-                      <YAxis title="- оценки" />
-                      <XAxis title="- № работы" />
-                      <LineMarkSeries
-                        style={{
-                          strokeWidth: '1px'
-                        }}
-                        lineStyle={{ stroke: palette.fill.secondary }}
-                        markStyle={{ fill: palette.fill.primary, strokeWidth: "0px" }}
-                        data={graphData}
-                      />
+                      <XYPlot
+                        height={300}
+                        width={970}
+                        xType="linear"
+                        onTouchMove={(e) => e.preventDefault()}
+                      >
+                        <HorizontalGridLines />
+                        <VerticalGridLines />
+                        <YAxis title="- оценки" />
+                        <XAxis title="- № работы" />
+                        <LineMarkSeries
+                          style={{
+                            strokeWidth: '1px'
+                          }}
+                          lineStyle={{ stroke: palette.fill.secondary }}
+                          markStyle={{ fill: palette.fill.primary, strokeWidth: "0px" }}
+                          data={graphData}
+                        />
 
-                    </XYPlot>
+                      </XYPlot>
+                    </Box>
                   </Box>
                 </Box>
               </Box>
-            </Box>
+            )}
+          </Box>
+          <Box sx={styles.gridWrapper}>
+            {payload.type && (
+              <Box sx={styles.taskTypeBlock}>
+                <TaskTypeBlock type={payload.type} />
+              </Box>
+            )}
+            {payload.step && (
+              <Box sx={styles.stepCheckBlock}>
+                <StepCheckBlock step={payload.step} />
+              </Box>
+            )}
+            {(graphСoefficientsData !== undefined || graphCurrentСoefficientsData !== undefined) && (
+              <Box sx={styles.graphBoxСoefficients}
+                onTouchMove={(e) => e.preventDefault()}
+              >
+                <Box m={"15px"}>
+                  <Typography
+                    variant={"h6"}
+                    margin={"0px 0px 10px 0px"}
+                  >
+                    {"График коэффициентов"}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center"
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        height: "355px",
+                        overflowY: "auto",
+                        ...globalStyles.scrollStyles
+                      }}
+                    >
+                      <XYPlot
+                        height={300}
+                        width={970}
+                        xType="linear"
+                        onTouchMove={(e) => e.preventDefault()}
+                      >
+                        <HorizontalGridLines />
+                        <VerticalGridLines />
+                        <YAxis title="- коэффициент" />
+                        <XAxis title="- № участника" />
+                        <DiscreteColorLegend items={legendItems} orientation="horizontal" />
+                        {graphСoefficientsData && (
+                          <LineMarkSeries
+                            style={{
+                              strokeWidth: '1px'
+                            }}
+                            lineStyle={{ stroke: palette.fill.secondary }}
+                            markStyle={{ fill: palette.fill.primary, strokeWidth: "0px" }}
+                            data={graphСoefficientsData}
+                          />
+                        )}
+                        {graphCurrentСoefficientsData && (
+                          <LineMarkSeries
+                            style={{
+                              strokeWidth: '1px'
+                            }}
+                            lineStyle={{ stroke: palette.fill.success }}
+                            markStyle={{ fill: palette.fill.info, strokeWidth: "0px" }}
+                            data={graphCurrentСoefficientsData}
+                          />
+                        )}
+                      </XYPlot>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            )}
+          </Box>
+          <Box sx={styles.gridWrapper}>
           </Box>
         </>
       )}
-
     </DashboardWorkBox>
   )
 }
@@ -117,6 +218,26 @@ const styles = {
       flexWrap: "wrap"
     },
   } as SxProps<Theme>,
+  taskTypeBlock: {
+    flexBasis: "calc(25% - 7px)",
+    flexGrow: 0,
+    flexShrink: 0,
+    '@media (max-width: 1321px)': {
+      flexBasis: "100%",
+      flexGrow: 0,
+      flexShrink: 0,
+    }
+  } as SxProps<Theme>,
+  stepCheckBlock: {
+    flexBasis: "calc(25% - 7px)",
+    flexGrow: 0,
+    flexShrink: 0,
+    '@media (max-width: 1321px)': {
+      flexBasis: "100%",
+      flexGrow: 0,
+      flexShrink: 0,
+    }
+  } as SxProps<Theme>,
   statusbarBox: {
     flexBasis: "calc(25% - 7px)",
     flexGrow: 0,
@@ -128,8 +249,24 @@ const styles = {
     }
   } as SxProps<Theme>,
   graphBox: {
-    height: "365px",
+    height: "360px",
     flexBasis: "calc(75% - 3px)",
+    flexGrow: 0,
+    flexShrink: 0,
+    boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
+    backgroundColor: 'common.white',
+    borderRadius: '4px',
+    overflowX: "auto",
+    overflowY: "hidden",
+    '@media (max-width: 1321px)': {
+      flexBasis: "100%",
+      flexGrow: 0,
+      flexShrink: 0,
+    }
+  } as SxProps<Theme>,
+  graphBoxСoefficients: {
+    height: "410px",
+    flexBasis: "calc(50% - 6px)",
     flexGrow: 0,
     flexShrink: 0,
     boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',

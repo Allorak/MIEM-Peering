@@ -194,6 +194,7 @@ export function Private() {
             <Route path={paths.teacher.main} element={<TeacherCourseList />} />
             <Route path={paths.teacher.courses.course} element={<TeacherCourseMain />} />
             <Route path={paths.teacher.task.add} element={<TaskAdd />} />
+            <Route path={paths.root} element={<TeacherCourseList />} />
           </Routes>
         </Box>
       </Box>
@@ -209,9 +210,10 @@ export function Private() {
           <Routes>
             <Route path={paths.student.main} element={<StudentCourseList />} />
             <Route path={paths.student.courses.course} element={<StudentCourseMain />} />
+            <Route path={paths.root} element={<StudentCourseList />} />
             <Route path={"*"} element={<StudentDashboard />} />
           </Routes>
-        </Box>
+        </Box>  
       </Box>
     )
   }

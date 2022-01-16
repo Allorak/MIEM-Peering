@@ -1,14 +1,22 @@
 import { FC, useEffect } from "react"
 import { SxProps, Theme } from "@mui/system"
+import { Box } from "@mui/material";
 
 import { Deadlines } from "../../../../../components/deadlines"
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { StepCheckBlock } from "../../../../../components/stepCheckBlock";
+import { UncheckedFileCard } from "../../../../../components/uncheckedFileCard";
+import { CheckedFileCard } from "../../../../../components/checkedFileCard";
+import { CoefficientsCard } from "../../../../../components/сoefficientsCard";
+import { TaskLineGraphStudent } from "../../../../../components/taskLineGraphStudent";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
 import { fetchOverviewStudent } from "../../../../../store/overviewStudent";
+
+
 
 
 export const Overview: FC = () => {
@@ -33,6 +41,35 @@ export const Overview: FC = () => {
       {payload && (
         <>
           <Deadlines {...payload.deadlines} />
+          <Box sx={styles.gridWrapper}>
+            {payload.status && (
+              <>
+                <Box sx={styles.quarterColumn}>
+                  <UncheckedFileCard
+                    {...payload.status} />
+                </Box>
+                <Box sx={styles.quarterColumn}>
+                  <CheckedFileCard
+                    {...payload.status} />
+                </Box>
+              </>
+            )}
+            {payload.studentConfidenceСoefficients && (
+              <Box sx={styles.quarterColumn}>
+                <CoefficientsCard {...payload.studentConfidenceСoefficients} />
+              </Box>
+            )}
+          </Box>
+          <Box sx={styles.gridWrapper}>
+            {(payload.step === 'FirstStep') && (
+              <Box sx={styles.quarterColumn}>
+                <StepCheckBlock step={payload.step} />
+              </Box>
+            )}
+            {payload.studentGrades && (
+              <TaskLineGraphStudent graphProps={payload.studentGrades} />
+            )}
+          </Box>
         </>
       )}
 
@@ -49,7 +86,7 @@ const styles = {
       flexWrap: "wrap"
     },
   } as SxProps<Theme>,
-  statusbarBox: {
+  quarterColumn: {
     flexBasis: "calc(25% - 7px)",
     flexGrow: 0,
     flexShrink: 0,
@@ -74,5 +111,8 @@ const styles = {
       flexGrow: 0,
       flexShrink: 0,
     }
+  } as SxProps<Theme>,
+  quarterColumnItem: {
+    mb: '10px'
   } as SxProps<Theme>,
 }

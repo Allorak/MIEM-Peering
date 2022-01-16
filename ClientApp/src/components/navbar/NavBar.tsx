@@ -92,6 +92,10 @@ export const Navbar: FC = () => {
         return <CourseItem />
     }
 
+    if (location.pathname === paths.root || location.pathname === paths.root) {
+        return <CourseItem />
+    }
+
     if (courses && pathT && pathT.courseId && !pathT.taskId && !pathTaskAdd) {
         return (<>
             <CourseItem />

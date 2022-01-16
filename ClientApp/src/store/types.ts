@@ -184,10 +184,10 @@ export interface INewTaskPeerForm {
 }
 
 export interface INewTaskSettings {
-  submissionStartDateTime: Date | undefined
-  submissionEndDateTime: Date | undefined
-  reviewStartDateTime: Date | undefined
-  reviewEndDateTime: Date | undefined
+  submissionStartDateTime: Date | string |undefined
+  submissionEndDateTime: Date | string | undefined
+  reviewStartDateTime: Date | string | undefined
+  reviewEndDateTime: Date | string | undefined
   submissionsToCheck: number
   experts?: Array<string>
   type: PeerTaskTypes
@@ -323,7 +323,8 @@ export type IStatusBar = {
 }
 
 export type IStatusTask = {
-  count: number
+  submissionsToCheck: number,
+  submissionsNumber: number
 }
 
 export type IOverview = {
@@ -343,12 +344,10 @@ export type IOverviewStudent = {
   studentGrades?: IStudentSubmissionGrades,
   step: PeerSteps,
   studentConfidenceСoefficients?: {
-    until?: number,
+    until: number,
     after?: number
   }
 }
-
-
 
 export type IStudentSubmissionGrades = {
   coordinates: IWorkReviewСoordinates[],
@@ -362,7 +361,7 @@ export type IOverviewExpert = {
   assignedWorksCount?: number
 }
 
-export type IOverviewResponse = IOverview & {
+export interface IOverviewResponse extends IOverview {
   deadlines: {
     submissionStartDateTime: string
     submissionEndDateTime: string
@@ -371,14 +370,7 @@ export type IOverviewResponse = IOverview & {
   }
 }
 
-export type IOverviewStudentResponse = IOverviewStudent & {
-  deadlines: {
-    submissionStartDateTime: string
-    submissionEndDateTime: string
-    reviewStartDateTime: string
-    reviewEndDateTime: string
-  }
-}
+export type IOverviewStudentResponse = IOverviewStudent
 
 export type IWorkItem = {
   submissionId: string,
@@ -482,6 +474,8 @@ export interface IWorkReviewСoordinates {
   reviewer: Reviewers
   name: string
 }
+
+
 
 export type IWorkGraphPropsItem = {
   statisticType: WorkStatisticsTypes.GRAPH,
