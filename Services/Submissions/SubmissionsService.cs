@@ -194,9 +194,14 @@ namespace patools.Services.Submissions
             if (user == null)
                 return new InvalidGuidIdResponse<GetSubmissionDtoResponse>("Invalid student id provided");
 
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t == submission.PeeringTaskUserAssignment.PeeringTask);
+            
             var submissionPeer = await _context.SubmissionPeers
                 .FirstOrDefaultAsync(sp => sp.Submission == submission && sp.Peer == user);
-            if (submissionPeer == null && submission.PeeringTaskUserAssignment.Student != user)
+            
+            if (submissionPeer == null && submission.PeeringTaskUserAssignment.Student != user && task.Course.Teacher != user)
                 return new NoAccessResponse<GetSubmissionDtoResponse>("This user can't access this submission");
 
             var answers = await _context.Answers
