@@ -43,15 +43,30 @@ namespace patools.Services.PeeringTasks
                 return new NoAccessResponse<GetPeeringTaskStudentOverviewDtoResponse>("This student has no access to this task");
             
             var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
-            
-            var reviewed = 0;
+
+            int submissions = 1;
+
+            var status = new GetPeeringTaskStatusDtoResponse
+            {
+                submissionsToCheck = task.SubmissionsToCheck,
+                submissionsNumber = submissions
+            };
+
+            var studentConfidenceСoefficients = new GetPeeringTaskСoefficientsDtoResponse
+            {
+                until =
+                after =
+            };
             
             return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
             (new GetPeeringTaskStudentOverviewDtoResponse
             {
                 Deadlines = deadlines,
-                SubmissionsToCheck = task.SubmissionsToCheck,
-                Reviewed = reviewed
+                Status = status,
+                SubmissionStatus = taskUserConnection.State,
+                StudentGrades = 
+                Step = task.Step,
+                StudentConfidenceСoefficients = studentConfidenceСoefficients
             });
         }
 
