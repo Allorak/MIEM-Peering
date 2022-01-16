@@ -537,6 +537,8 @@ namespace patools.Services.PeeringTasks
                 {
                     Statistics = statistics,
                     Deadlines = deadlines,
+                    Type = task.Type,
+                    Step = task.Step,
                     Grades = grades
                 });
         }
