@@ -134,6 +134,7 @@ namespace patools.Services.Submissions
                     SubmissionId = s.ID,
                     StudentName = s.PeeringTaskUserAssignment.Student.Fullname
                 })
+                .OrderBy(s => s.StudentName)
                 .ToListAsync();
 
             return new SuccessfulResponse<GetAllSubmissionsMainInfoDtoResponse>(
