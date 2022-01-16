@@ -335,7 +335,14 @@ namespace patools.Services.Reviews
                 };
 
 
-                if (task.Step == PeeringSteps.FirstStep)
+                
+
+                var teacherReview = await _context.Reviews
+                    .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == task.Course.Teacher);
+
+                if (teacherReview != null)
+                    resultReview.TeacherAnswers = await GetAnswersForReview(teacherReview);
+                else if (task.Step == PeeringSteps.FirstStep)
                 {
                     var experts = await _context.Experts
                         .Where(e => e.PeeringTask == task)
@@ -349,13 +356,7 @@ namespace patools.Services.Reviews
                     if (expertReview != null)
                         resultReview.ExpertAnswers = await GetAnswersForReview(expertReview);
                 }
-
-                var teacherReview = await _context.Reviews
-                    .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == task.Course.Teacher);
-
-                if (teacherReview != null)
-                    resultReview.TeacherAnswers = await GetAnswersForReview(teacherReview);
-
+                
                 resultReview.Answers = await GetAnswersForReview(review);
                 resultReviews.Add(resultReview);
             }
