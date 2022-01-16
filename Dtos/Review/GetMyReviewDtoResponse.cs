@@ -9,5 +9,7 @@ namespace patools.Dtos.Review
         public string StudentName { get; set; }
         public Guid SubmissionId { get; set; }
         public IEnumerable<GetAnswerDtoResponse> Answers { get; set; }
+        public IEnumerable<GetAnswerDtoResponse> ExpertAnswers { get; set; }
+        public IEnumerable<GetAnswerDtoResponse> TeacherAnswers { get; set; }
     }
 }

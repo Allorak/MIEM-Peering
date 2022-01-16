@@ -332,7 +332,7 @@ namespace patools.Services.Submissions
                             tu.Student == user && tu.PeeringTask == task);
                     if (taskUser == null)
                         return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
-                            "this user is not assigned to this task");
+                            " This user is not assigned to this task");
 
                     if (taskUser.State == PeeringTaskStates.Assigned)
                         return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
