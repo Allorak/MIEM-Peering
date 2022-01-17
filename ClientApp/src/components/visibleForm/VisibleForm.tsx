@@ -30,7 +30,10 @@ export const VisibleForm: FC<IProps> = ({
           <AnswerBox
             id={item.order}
             key={item.questionId}
-            title={item.title}
+            title={item.type === IQuestionTypes.SELECT_RATE && typeof item.coefficientPercentage === 'number' ?
+              `${item.title} (коэф. ${item.coefficientPercentage}%)` :
+              item.title
+            }
             required={item.required}
             description={item.description}
             borderColor={answerBoxColor}

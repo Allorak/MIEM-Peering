@@ -18,13 +18,13 @@ export const MultipleVisible: FC<IProps> = ({
 
   return (
     <Tooltip
-      title={isResponse ? (response ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
+      title={isResponse ? (typeof response === 'number' ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
       placement={"top"}
     >
       <Box>
         <RadioGroup
           name="radio-buttons-group"
-          {...(response !== undefined && {value: response})}
+          {...(response !== undefined && { value: response })}
         >
           {responses.map((item, index) => (
             <FormControlLabel
@@ -33,7 +33,7 @@ export const MultipleVisible: FC<IProps> = ({
               id={item.id.toString()}
               value={item.id}
               control={
-                <Radio value={item.id} readOnly/>
+                <Radio value={item.id} readOnly />
               }
               label={
                 <Typography variant={'h6'}>

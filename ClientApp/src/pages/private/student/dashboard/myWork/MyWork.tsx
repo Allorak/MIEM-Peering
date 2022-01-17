@@ -8,13 +8,13 @@ import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePa
 import { AccessTime } from "../../../../../components/assessTime";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { NoData } from "../../../../../components/noData";
+import { VisibleForm } from "../../../../../components/visibleForm";
 
 import { fetchWorkSubmissionStatus } from "../../../../../store/authorformStudent";
 import { fetchReviewStatus, fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
 import { fetchMyWork, fetchReviews } from "../../../../../store/myWork";
 import { DeadlineStatus, IMyWorkReviewsItem, IRole, ISubmissionStatus } from "../../../../../store/types";
 
-import { MyWorkForm } from "./MyWorkForm";
 import { ReviewsList } from "./ReviewsList";
 
 import { palette } from "../../../../../theme/colors";
@@ -131,12 +131,10 @@ export const MyWork: FC = () => {
       error={mainError}
     >
       {myWorkPayload && myWorkPayload.answers && myWorkPayload.answers.length > 0 && workFound && (reviewDeadlineInvalid || reviewsNotFound) && (
-        <>
-          <MyWorkForm
-            myWork={myWorkPayload}
-            answerBoxColor={palette.fill.success}
-          />
-        </>
+        <VisibleForm
+          form={{ responses: myWorkPayload.answers }}
+          answerBoxColor={palette.fill.success}
+        />
       )}
 
       {myWorkPayload && myWorkPayload.answers && myWorkPayload.answers.length > 0 && workFound &&
@@ -159,8 +157,8 @@ export const MyWork: FC = () => {
                   {"Мои ответы:"}
                 </Typography>
 
-                <MyWorkForm
-                  myWork={myWorkPayload}
+                <VisibleForm
+                  form={{ responses: myWorkPayload.answers }}
                   answerBoxColor={palette.fill.success} /
                 >
               </Box>
@@ -170,11 +168,11 @@ export const MyWork: FC = () => {
                   variant={"h6"}
                   sx={styles.subTitle}
                 >
-                  {`Результаты проверок (${currentReview.reviewerName}, оценка - ${currentReview.finalGrade}):`}
+                  {`Результаты проверок (${currentReview.reviewerName}, оценка ${currentReview.finalGrade}):`}
                 </Typography>
 
-                <MyWorkForm
-                  myWork={currentReview}
+                <VisibleForm
+                  form={{ responses: currentReview.answers }}
                   answerBoxColor={palette.fill.info}
                 />
               </Box>
