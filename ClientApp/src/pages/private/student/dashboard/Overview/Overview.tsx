@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
 import { fetchOverviewStudent } from "../../../../../store/overviewStudent";
+import { StatusWorkDashboard } from ".";
 
 
 
@@ -45,6 +46,9 @@ export const Overview: FC = () => {
             {payload.status && (
               <>
                 <Box sx={styles.quarterColumn}>
+                  <StatusWorkDashboard submissionStatus={payload.submissionStatus}/>
+                </Box>
+                <Box sx={styles.quarterColumn}>
                   <UncheckedFileCard
                     {...payload.status} />
                 </Box>
@@ -62,7 +66,7 @@ export const Overview: FC = () => {
           </Box>
           <Box sx={styles.gridWrapper}>
             {(payload.step === 'FirstStep') && (
-              <Box sx={styles.quarterColumn}>
+              <Box sx={{ ...styles.quarterColumn, ...styles.tabletMaxWidth }}>
                 <StepCheckBlock step={payload.step} />
               </Box>
             )}
@@ -86,11 +90,23 @@ const styles = {
       flexWrap: "wrap"
     },
   } as SxProps<Theme>,
+  tabletMaxWidth: {
+    '@media (max-width: 1321px)': {
+      flexBasis: "100%",
+      flexGrow: 0,
+      flexShrink: 0,
+    }
+  } as SxProps<Theme>,
   quarterColumn: {
     flexBasis: "calc(25% - 7px)",
     flexGrow: 0,
     flexShrink: 0,
     '@media (max-width: 1321px)': {
+      flexBasis: "calc(50% - 5px)",
+      flexGrow: 0,
+      flexShrink: 0,
+    },
+    '@media (max-width: 768px)': {
       flexBasis: "100%",
       flexGrow: 0,
       flexShrink: 0,

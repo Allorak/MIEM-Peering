@@ -2,3 +2,13 @@
 @import "~react-vis/dist/style";
 
 /* @import "~react-vis/dist/styles/legends"; */
+
+.rv-discrete-color-legend-item.horizontal .rv-discrete-color-legend-item__title {
+        display: inline-block;
+        padding-left: 15px;
+}
+
+.rv-discrete-color-legend.horizontal {
+    display: flex;
+    justify-content: center;
+}

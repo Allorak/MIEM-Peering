@@ -316,6 +316,11 @@ export enum IMenuTitles {
   MENU_3 = 'Меню 3'
 }
 
+export type IDonutChart = {
+  total: number,
+  proportion: number
+}
+
 export type IStatusBar = {
   total: number,
   submissions: number,

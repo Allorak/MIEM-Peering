@@ -1,15 +1,16 @@
 import { FC, useEffect } from "react"
 import { Box, SxProps, Theme } from "@mui/system"
+import { Typography } from "@mui/material";
+import { palette } from "../../../../../theme/colors";
 
 import { Deadlines } from "../../../../../components/deadlines"
-
+import { DonutChart } from "../../../../../components/donutChart";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { usePrivatePathExDashboard } from "../../../../../app/hooks/usePrivatePathExDashboard";
 
 import { fetchOverviewExpert } from "../../../../../store/overviewExpert";
-import { StatusBarExpert } from "../../../../../components/statusBarExpert";
-import { usePrivatePathExDashboard } from "../../../../../app/hooks/usePrivatePathExDashboard";
 
 
 export const Overview: FC = () => {
@@ -28,7 +29,7 @@ export const Overview: FC = () => {
 
   useEffect(() => {
     console.log(payload)
-  },[])
+  }, [])
 
   return (
     <DashboardWorkBox
@@ -39,15 +40,23 @@ export const Overview: FC = () => {
         payload && (
           <>
             <Deadlines {...payload.deadlines} />
-
-            <Box sx={styles.gridWrapper}>
-              <Box sx={styles.statusbarBox}>
-                <StatusBarExpert
-                  checkedWorksCount={payload.checkedWorksCount}
-                  assignedWorksCount={payload.assignedWorksCount}
-                />
+            {payload.assignedWorksCount && payload.checkedWorksCount && (
+              <Box sx={styles.gridWrapper}>
+                <Box sx={styles.quarterColumn}>
+                  <Box sx={styles.wrapper}>
+                    <Typography variant={'h6'} sx={styles.statisticsBlockTitle}>
+                      {"Статистика проверенных работ"}
+                    </Typography>
+                    <DonutChart
+                      total={payload.assignedWorksCount}
+                      proportion={payload.checkedWorksCount}
+                      color={palette.fill.info}
+                      bgColor={palette.transparent.info}
+                    />
+                  </Box>
+                </Box>
               </Box>
-            </Box>
+            )}
           </>
         )
       }
@@ -64,7 +73,7 @@ const styles = {
       flexWrap: "wrap"
     },
   } as SxProps<Theme>,
-  statusbarBox: {
+  quarterColumn: {
     flexBasis: "calc(25% - 7px)",
     flexGrow: 0,
     flexShrink: 0,
@@ -73,5 +82,19 @@ const styles = {
       flexGrow: 0,
       flexShrink: 0,
     }
-  } as SxProps<Theme>
+  } as SxProps<Theme>,
+  wrapper: {
+    backgroundColor: 'common.white',
+    borderRadius: '4px',
+    padding: '15px',
+    height: '100%',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
+    gap: "10px"
+  } as SxProps<Theme>,
+  statisticsBlockTitle: {
+    mb: "12px"
+  } as SxProps<Theme>,
 }

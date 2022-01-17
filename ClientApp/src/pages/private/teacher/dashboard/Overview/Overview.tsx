@@ -26,6 +26,7 @@ import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePat
 import { fetchOverview } from "../../../../../store/overview";
 
 import * as globalStyles from "../../../../../const/styles"
+import { DonutChart } from "../../../../../components/donutChart";
 
 
 
@@ -51,19 +52,17 @@ export const Overview: FC = () => {
   const legendItems = []
 
   if (graphCurrentСoefficientsData) {
-    legendItems.push({
-      title: 'Текущий коэффициент',
-      color: palette.fill.success,
-      strokeWidth: 3,
-    })
+    legendItems.push(
+      <Typography variant={"body1"}>
+        {'Текущий коэффициент'}
+      </Typography>)
   }
 
   if (graphСoefficientsData) {
-    legendItems.push({
-      title: 'Вычисленный коэффициент',
-      color: palette.fill.secondary,
-      strokeWidth: 3,
-    })
+    legendItems.push(
+      <Typography variant={"body1"}>
+        {'Вычисленный коэффициент'}
+      </Typography>)
   }
 
   return (
@@ -75,8 +74,31 @@ export const Overview: FC = () => {
         <>
           <Deadlines {...payload.deadlines} />
           <Box sx={styles.gridWrapper}>
-            <Box sx={styles.statusbarBox}>
-              <StatusBar {...payload.statistics} />
+            <Box sx={{ ...styles.quarterColumn, ...styles.tabletMaxWidth }}>
+              <Box sx={styles.statisticsBlockWrapper}>
+                <Box sx={styles.statisticsBlock}>
+                  <Typography variant={'h6'} sx={styles.statisticsBlockTitle}>
+                    {"Сдали работу"}
+                  </Typography>
+                  <DonutChart
+                    total={payload.statistics.total}
+                    proportion={payload.statistics.submissions}
+                    color={palette.fill.info}
+                    bgColor={palette.transparent.info}
+                  />
+                </Box>
+                <Box>
+                  <Typography variant={'h6'} sx={styles.statisticsBlockTitle}>
+                    {"Проверили работу"}
+                  </Typography>
+                  <DonutChart
+                    total={payload.statistics.total}
+                    proportion={payload.statistics.review}
+                    color={palette.fill.success}
+                    bgColor={palette.transparent.success}
+                  />
+                </Box>
+              </Box>
             </Box>
             {graphData && (
               <Box sx={styles.graphBox}
@@ -110,7 +132,7 @@ export const Overview: FC = () => {
                         <HorizontalGridLines />
                         <VerticalGridLines />
                         <YAxis title="- оценки" />
-                        <XAxis title="- № работы" />
+                        <XAxis title="- № работы" tickFormat={val => Math.round(val) === val ? val : ""} />
                         <LineMarkSeries
                           style={{
                             strokeWidth: '1px'
@@ -128,16 +150,6 @@ export const Overview: FC = () => {
             )}
           </Box>
           <Box sx={styles.gridWrapper}>
-            {payload.type && (
-              <Box sx={styles.taskTypeBlock}>
-                <TaskTypeBlock type={payload.type} />
-              </Box>
-            )}
-            {payload.step && (
-              <Box sx={styles.stepCheckBlock}>
-                <StepCheckBlock step={payload.step} />
-              </Box>
-            )}
             {(graphСoefficientsData !== undefined || graphCurrentСoefficientsData !== undefined) && (
               <Box sx={styles.graphBoxСoefficients}
                 onTouchMove={(e) => e.preventDefault()}
@@ -147,7 +159,7 @@ export const Overview: FC = () => {
                     variant={"h6"}
                     margin={"0px 0px 10px 0px"}
                   >
-                    {"График коэффициентов"}
+                    {"График коэффициентов доверия"}
                   </Typography>
 
                   <Box
@@ -169,18 +181,17 @@ export const Overview: FC = () => {
                         xType="linear"
                         onTouchMove={(e) => e.preventDefault()}
                       >
-                        <HorizontalGridLines />
                         <VerticalGridLines />
                         <YAxis title="- коэффициент" />
-                        <XAxis title="- № участника" />
+                        <XAxis title="- № участника" tickFormat={val => Math.round(val) === val ? val : ""} />
                         <DiscreteColorLegend items={legendItems} orientation="horizontal" />
                         {graphСoefficientsData && (
                           <LineMarkSeries
                             style={{
                               strokeWidth: '1px'
                             }}
-                            lineStyle={{ stroke: palette.fill.secondary }}
-                            markStyle={{ fill: palette.fill.primary, strokeWidth: "0px" }}
+                            lineStyle={{ stroke: palette.fill.warning }}
+                            markStyle={{ fill: palette.fill.danger, strokeWidth: "0px" }}
                             data={graphСoefficientsData}
                           />
                         )}
@@ -189,6 +200,7 @@ export const Overview: FC = () => {
                             style={{
                               strokeWidth: '1px'
                             }}
+                            className="linemark-series-example-2"
                             lineStyle={{ stroke: palette.fill.success }}
                             markStyle={{ fill: palette.fill.info, strokeWidth: "0px" }}
                             data={graphCurrentСoefficientsData}
@@ -200,8 +212,16 @@ export const Overview: FC = () => {
                 </Box>
               </Box>
             )}
-          </Box>
-          <Box sx={styles.gridWrapper}>
+            {payload.type && (
+              <Box sx={styles.quarterColumn}>
+                <TaskTypeBlock type={payload.type} />
+              </Box>
+            )}
+            {payload.step && (
+              <Box sx={styles.quarterColumn}>
+                <StepCheckBlock step={payload.step} />
+              </Box>
+            )}
           </Box>
         </>
       )}
@@ -214,34 +234,24 @@ const styles = {
     display: "flex",
     padding: "0px 0px 10px 0px",
     gap: "10px",
+    flexWrap: "wrap"
+  } as SxProps<Theme>,
+  quarterColumn: {
+    flexBasis: "calc(25% - 7px)",
+    flexGrow: 0,
+    flexShrink: 0,
     '@media (max-width: 1321px)': {
-      flexWrap: "wrap"
+      flexBasis: "calc(50% - 5px)",
+      flexGrow: 0,
+      flexShrink: 0,
     },
-  } as SxProps<Theme>,
-  taskTypeBlock: {
-    flexBasis: "calc(25% - 7px)",
-    flexGrow: 0,
-    flexShrink: 0,
-    '@media (max-width: 1321px)': {
+    '@media (max-width: 768px)': {
       flexBasis: "100%",
       flexGrow: 0,
       flexShrink: 0,
     }
   } as SxProps<Theme>,
-  stepCheckBlock: {
-    flexBasis: "calc(25% - 7px)",
-    flexGrow: 0,
-    flexShrink: 0,
-    '@media (max-width: 1321px)': {
-      flexBasis: "100%",
-      flexGrow: 0,
-      flexShrink: 0,
-    }
-  } as SxProps<Theme>,
-  statusbarBox: {
-    flexBasis: "calc(25% - 7px)",
-    flexGrow: 0,
-    flexShrink: 0,
+  tabletMaxWidth: {
     '@media (max-width: 1321px)': {
       flexBasis: "100%",
       flexGrow: 0,
@@ -266,7 +276,7 @@ const styles = {
   } as SxProps<Theme>,
   graphBoxСoefficients: {
     height: "410px",
-    flexBasis: "calc(50% - 6px)",
+    flexBasis: "calc(75% - 6px)",
     flexGrow: 0,
     flexShrink: 0,
     boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
@@ -279,5 +289,29 @@ const styles = {
       flexGrow: 0,
       flexShrink: 0,
     }
+  } as SxProps<Theme>,
+  statisticsBlockWrapper: {
+    backgroundColor: 'common.white',
+    borderRadius: '4px',
+    padding: '15px',
+    height: '100%',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
+    gap: "10px",
+    '@media (max-width: 1321px)': {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+    },
+    '@media (max-width: 425px)': {
+      flexDirection: 'column',
+    }
+  } as SxProps<Theme>,
+  statisticsBlock: {
+    flexDirection: 'column',
+  } as SxProps<Theme>,
+  statisticsBlockTitle: {
+    mb: "12px"
   } as SxProps<Theme>,
 }

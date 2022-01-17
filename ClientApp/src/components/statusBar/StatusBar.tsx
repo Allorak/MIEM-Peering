@@ -72,7 +72,6 @@ const styles = {
     boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
     gap: "10px"
   } as SxProps<Theme>,
-
   linearProgress: {
     height: "30px",
     borderRadius: "4px",

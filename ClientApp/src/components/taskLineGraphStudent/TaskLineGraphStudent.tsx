@@ -67,7 +67,7 @@ export const TaskLineGraphStudent: FC<IProps> = ({ graphProps }) => {
         >
           <XYPlot
             height={300}
-            width={860}
+            width={980}
             xType="linear"
             onTouchMove={(e) => e.preventDefault()}
             yDomain={[graphProps.minGrade, graphProps.maxGrade]}
@@ -195,7 +195,6 @@ const styles = {
   } as SxProps<Theme>,
   graphContainer: {
     margin: "0px auto",
-    maxWidth: "860px",
     overflow: "auto",
     ...globalStyles.scrollStyles
   } as SxProps<Theme>,

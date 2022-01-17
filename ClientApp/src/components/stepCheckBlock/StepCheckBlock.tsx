@@ -69,7 +69,7 @@ const styles = {
   cardHeader: {
     display: 'flex',
     justifyContent: 'center',
-    margin: '15px 0 0'
+    margin: '10px 0 20px 0'
   } as SxProps<Theme>,
   cardBody: {
   } as SxProps<Theme>,
@@ -86,8 +86,8 @@ const styles = {
   } as SxProps<Theme>,
   typeIcon: {
     display: 'flex',
+    justifyContent: 'center',
     width: '100px',
-    marginBottom: '8px',
     flexShrink: 0
   } as SxProps<Theme>,
   hrBlock: {

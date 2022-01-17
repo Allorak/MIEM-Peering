@@ -116,7 +116,7 @@ const styles = {
   wrapper: {
     display: "grid",
     gridGap: "10px",
-    gridTemplateColumns: "repeat(auto-fill, minmax(500px, 1fr) )",
+    gridTemplateColumns: "repeat(auto-fill, minmax(495px, 1fr) )",
     '@media (max-width: 670px)': {
       gridTemplateColumns: "repeat(auto-fill, minmax(100%, 1fr) )"
     }
