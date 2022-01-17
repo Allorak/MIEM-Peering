@@ -64,7 +64,7 @@ export const Authorform: FC = () => {
   }, [responses])
 
   useEffect(() => {
-    if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0 && !responses) {
+    if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0) {
       setResponses(JSON.parse(JSON.stringify(authorForm)))
     }
   }, [authorForm])

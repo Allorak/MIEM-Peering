@@ -12,13 +12,13 @@ import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePa
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { AccessTime } from "../../../../../components/assessTime";
 import { Popup } from "../../../../../components/popup";
+import { EditableForm } from "../../../../../components/editableForm";
+import { VisibleForm } from "../../../../../components/visibleForm";
 
 import { actions, createReview, fetchStudentWork, fetchCheckingsWorkList, fetchPeerForm, fetchReviews } from "../../../../../store/checkings";
 import { fetchReviewStatus } from "../../../../../store/deadlineStatus";
 
-import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
-import { CheckingsForm } from "./CheckingForm";
 
 import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
 
@@ -160,10 +160,8 @@ export const Checkings: FC = () => {
   }, [responses])
 
   const handleOnViewClick = useCallback(() => {
-    console.log(path && path.taskId && currentReviewId)
     if (path && path.taskId && currentReviewId) {
       setPopupStatus(true)
-      console.log("currentReviewId:", currentReviewId)
       getStudentWork(currentReviewId)
     }
   }, [currentReviewId])
@@ -228,8 +226,8 @@ export const Checkings: FC = () => {
                   >
                     {studentWork && studentWork.responses && studentWork.responses.length > 0 && (
                       <>
-                        <StudentWork
-                          studentWork={studentWork}
+                        <VisibleForm
+                          form={studentWork}
                           answerBoxColor={palette.fill.secondary}
                         />
                       </>
@@ -251,8 +249,8 @@ export const Checkings: FC = () => {
                   >
                     {responses && responses.rubrics && responses.rubrics.length > 0 && (
                       <>
-                        <CheckingsForm
-                          peerForm={responses}
+                        <EditableForm
+                          form={responses}
                           onSubmit={onRequest}
                           onEdit={handleOnFormEdit}
                         />
@@ -295,14 +293,14 @@ export const Checkings: FC = () => {
 
             <Box sx={styles.formWrapper}>
               <Typography
-                  variant={"h6"}
-                  sx={styles.subTitle}
-                >
-                  {"Результаты Вашей проверки:"}
+                variant={"h6"}
+                sx={styles.subTitle}
+              >
+                {"Результаты Вашей проверки:"}
               </Typography>
               <Box sx={currentExpertAnswers ? styles.formContainer : { ...styles.formContainer, flex: "0 1 100%" }}>
-                <StudentWork
-                  studentWork={currentAnswers}
+                <VisibleForm
+                  form={currentAnswers}
                   answerBoxColor={palette.fill.success}
                 />
               </Box>
@@ -316,8 +314,8 @@ export const Checkings: FC = () => {
                     {"Результаты экспертной проверки:"}
                   </Typography>
 
-                  <StudentWork
-                    studentWork={currentExpertAnswers}
+                  <VisibleForm
+                    form={currentExpertAnswers}
                     answerBoxColor={palette.fill.info}
                   />
                 </Box>
@@ -348,8 +346,8 @@ export const Checkings: FC = () => {
                 {"Ответы:"}
               </Typography>
 
-              <StudentWork
-                studentWork={studentWork}
+              <VisibleForm
+                form={studentWork}
                 answerBoxColor={palette.fill.secondary}
               />
             </Box>

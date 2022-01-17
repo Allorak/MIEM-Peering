@@ -4,10 +4,10 @@ import { SxProps } from "@mui/system";
 
 import { InputLabel } from "../../../../../../components/inputLabel";
 import { TextSelect } from "../../../../../../components/textSelect";
-
-import { StudentWork } from "../../checkings/StudentForm";
+import { VisibleForm } from "../../../../../../components/visibleForm";
 
 import { IWorkReviewerForm, Reviewers } from "../../../../../../store/types";
+import { palette } from "../../../../../../theme/colors";
 
 
 interface IProps {
@@ -67,8 +67,9 @@ export const WorkForms: FC<IProps> = ({ workResponseForm }) => {
           />
 
           <Box sx={{ margin: "20px 0px 0px 0px" }}>
-            <StudentWork
-              studentWork={{ ...activeReviewForm }}
+            <VisibleForm
+              answerBoxColor={palette.fill.success}
+              form={{ responses: activeReviewForm.responses }}
             />
           </Box>
         </>

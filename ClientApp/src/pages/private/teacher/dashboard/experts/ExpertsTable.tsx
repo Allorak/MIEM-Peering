@@ -42,13 +42,13 @@ const ExpertRow: FC<IPropsRow> = ({ expertItem }) => {
       <TableBodyCell>{expertItem.email}</TableBodyCell>
       <TableBodyCellUser name={expertItem.name ?? "No Name"} img={expertItem.imageUrl} />
       <TableBodyCell isCentered >
-        {expertItem.tasksAssigned !== undefined && expertItem.tasksCompleted !== undefined ? (
+        {typeof expertItem.tasksAssigned === 'number' && typeof expertItem.tasksCompleted === 'number' && expertItem.tasksAssigned !== 0 ? (
           <Tooltip
-            title={`Назначено: ${expertItem.tasksCompleted}; Проверено: ${expertItem.tasksAssigned}`}
+            title={`Назначено: ${expertItem.tasksAssigned}; Проверено: ${expertItem.tasksCompleted}`}
             placement={"top"}
           >
             <Box>
-              <Progress progress={expertItem.tasksAssigned / expertItem.tasksCompleted * 100} />
+              <Progress progress={expertItem.tasksCompleted / expertItem.tasksAssigned * 100} />
             </Box>
           </Tooltip>
         ) : (

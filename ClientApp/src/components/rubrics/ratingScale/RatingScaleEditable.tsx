@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect } from "react";
 import { FormControl, FormHelperText, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import { RegisterOptions, useController, useForm } from "react-hook-form";
@@ -28,43 +28,22 @@ export const RatingScaleEditable: FC<IProps> = ({
     rates.push(i)
   }
 
-  const { control, formState } = useForm<{ response: number }>({
-    mode: FormValidateMode,
-    reValidateMode: FormReValidateMode,
-    defaultValues: {
-      response: value !== undefined ? value : required ? (rates.length > 0 ? rates[0] : 999) : undefined
-    }
-  })
-
-  const valueRules: RegisterOptions = {
-    required: {
-      value: required,
-      message: "Это обязательное поле"
-    }
-  }
-
-  const { field: valueProps } = useController({
-    name: "response",
-    control,
-    rules: valueRules
-  })
-
   const handleOnChange = useCallback((e: SelectChangeEvent<unknown>) => {
     if (!required && typeof e.target.value === 'undefined') onEdit(undefined, id)
-    if (!isNaN(Number(e.target.value)) && valueProps.value !== Number(e.target.value)) {
+    if (!isNaN(Number(e.target.value)) && value !== Number(e.target.value)) {
       const filtered = rates.filter(rate => (rate === Number(e.target.value)))
       if (filtered && filtered.length > 0) onEdit(Number(e.target.value), id)
     }
-  }, [rates])
+  }, [rates, value])
 
   return (
     <FormControl>
       <Select
-        inputProps={valueProps}
         variant={"outlined"}
         sx={styles.textField}
         required={required}
         onChange={handleOnChange}
+        value={value}
       >
         {!required && (
           <MenuItem>{"-"}</MenuItem>
@@ -73,7 +52,12 @@ export const RatingScaleEditable: FC<IProps> = ({
           <MenuItem value={rate}>{rate}</MenuItem>
         ))}
       </Select>
-      <FormHelperText>{formState.errors.response !== undefined ? formState.errors.response.message : ""}</FormHelperText>
+
+      {required && value === undefined && (
+        <FormHelperText>
+          {"Это обязательное поле"}
+        </FormHelperText>
+      )}
     </FormControl>
   )
 }
