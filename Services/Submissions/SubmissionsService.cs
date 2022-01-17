@@ -134,6 +134,7 @@ namespace patools.Services.Submissions
                     SubmissionId = s.ID,
                     StudentName = s.PeeringTaskUserAssignment.Student.Fullname
                 })
+                .OrderBy(s => s.StudentName)
                 .ToListAsync();
 
             return new SuccessfulResponse<GetAllSubmissionsMainInfoDtoResponse>(
@@ -194,9 +195,14 @@ namespace patools.Services.Submissions
             if (user == null)
                 return new InvalidGuidIdResponse<GetSubmissionDtoResponse>("Invalid student id provided");
 
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t == submission.PeeringTaskUserAssignment.PeeringTask);
+            
             var submissionPeer = await _context.SubmissionPeers
                 .FirstOrDefaultAsync(sp => sp.Submission == submission && sp.Peer == user);
-            if (submissionPeer == null && submission.PeeringTaskUserAssignment.Student != user)
+            
+            if (submissionPeer == null && submission.PeeringTaskUserAssignment.Student != user && task.Course.Teacher != user)
                 return new NoAccessResponse<GetSubmissionDtoResponse>("This user can't access this submission");
 
             var answers = await _context.Answers
@@ -296,21 +302,26 @@ namespace patools.Services.Submissions
 
             var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
 
+            var submissionPeers = await _context.SubmissionPeers
+                .Include(sp => sp.Submission)
+                .Include(sp => sp.Submission.PeeringTaskUserAssignment.Student)
+                .Where(sp => sp.Peer == user && sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+            
             var reviewedSubmissionPeers = await _context.Reviews
                 .Select(r => r.SubmissionPeerAssignment)
                 .Where(sp => sp.Peer == user &&
                             sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
                 .ToListAsync();
             
-            var uncheckedSubmissions = await _context.SubmissionPeers
-                .Where(sp => sp.Peer == user &&
-                             !reviewedSubmissionPeers.Contains(sp))
+            var uncheckedSubmissions = submissionPeers
+                .Where(sp => !reviewedSubmissionPeers.Contains(sp))
                 .Select(sp => new GetSubmissionToCheckDtoResponse()
                 {
                     SubmissionId = sp.Submission.ID,
                     StudentName = sp.Submission.PeeringTaskUserAssignment.Student.Fullname
                 })
-                .ToListAsync();
+                .ToList();
             
             switch (user.Role)
             {
@@ -327,7 +338,7 @@ namespace patools.Services.Submissions
                             tu.Student == user && tu.PeeringTask == task);
                     if (taskUser == null)
                         return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
-                            "this user is not assigned to this task");
+                            " This user is not assigned to this task");
 
                     if (taskUser.State == PeeringTaskStates.Assigned)
                         return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(

@@ -8,18 +8,18 @@ import { usePrivatePathExDashboard } from "../../../../../app/hooks/usePrivatePa
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { AccessTime } from "../../../../../components/assessTime";
 import { NoData } from "../../../../../components/noData";
+import { EditableForm } from "../../../../../components/editableForm";
+import { VisibleForm } from "../../../../../components/visibleForm";
 
 import { actions, createReview, fetchStudentWork, fetchCheckingsWorkList, fetchPeerForm } from "../../../../../store/checkings";
 import { fetchReviewStatus } from "../../../../../store/deadlineStatus";
 
-import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
-import { CheckingsForm } from "./CheckingForm";
 
 import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
 
 import { palette } from "../../../../../theme/colors";
-import * as globalStyles from "../../../../../const/styles"
+import * as globalStyles from "../../../../../const/styles";
 
 export const Checkings: FC = () => {
 
@@ -165,8 +165,8 @@ export const Checkings: FC = () => {
                   >
                     {studentWork && studentWork.responses && studentWork.responses.length > 0 && (
                       <>
-                        <StudentWork
-                          studentWork={studentWork}
+                        <VisibleForm
+                          form={studentWork}
                           answerBoxColor={palette.fill.success}
                         />
                       </>
@@ -189,8 +189,8 @@ export const Checkings: FC = () => {
                   >
                     {responses && responses.rubrics && responses.rubrics.length > 0 && (
                       <>
-                        <CheckingsForm
-                          peerForm={responses}
+                        <EditableForm
+                          form={responses}
                           onSubmit={onRequest}
                           onEdit={handleOnFormEdit}
                         />

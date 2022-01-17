@@ -102,24 +102,24 @@ export const MyWork: FC = () => {
 
   const reviewsList = myWorkReview?.map(item => {
     if (item.reviewer === IRole.teacher) return {
-      submissionId: item.submissionId,
+      submissionId: item.reviewId,
       studentName: `${item.reviewerName} - Преподаватель`
     }
 
     if (item.reviewer === IRole.student) return {
-      submissionId: item.submissionId,
+      submissionId: item.reviewId,
       studentName: `${item.reviewerName} - Пир`
     }
 
     return {
-      submissionId: item.submissionId,
+      submissionId: item.reviewId,
       studentName: item.reviewerName,
     }
   })
 
   const handleReviewerChange = useCallback((submissionId: string) => {
     console.log(currentReview)
-    const sortArray = myWorkReview?.filter(item => item.submissionId === submissionId)
+    const sortArray = myWorkReview?.filter(item => item.reviewId === submissionId)
     if (sortArray && sortArray.length > 0) {
       setCurrentReview(JSON.parse(JSON.stringify(sortArray[0])))
     }
@@ -145,7 +145,7 @@ export const MyWork: FC = () => {
         (
           <Box sx={styles.container}>
             <ReviewsList
-              selectedReviewId={currentReview.submissionId}
+              selectedReviewId={currentReview.reviewId}
               reviewsList={reviewsList}
               onReviewerChange={handleReviewerChange}
             />
@@ -218,7 +218,7 @@ const styles = {
   formContainer: {
     flex: "0 1 50%",
     maxHeight: "calc(100vh - 183px - 70px)",
-    overflowY: "hidden",
+    overflowY: "auto",
     ...globalStyles.scrollStyles,
     '@media (max-width: 900px)': {
       flex: "0 0 100%",

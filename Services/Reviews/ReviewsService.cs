@@ -23,12 +23,12 @@ namespace patools.Services.Reviews
             _mapper = mapper;
             _context = context;
         }
-        
+
         public async Task<Response<GetNewReviewDtoResponse>> AddReview(AddReviewDto review)
         {
             if (review.Answers == null)
                 return new BadRequestDataResponse<GetNewReviewDtoResponse>("No answers provided");
-            
+
             var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == review.UserId);
             if (user == null)
                 return new InvalidGuidIdResponse<GetNewReviewDtoResponse>("Invalid user id provided");
@@ -44,13 +44,13 @@ namespace patools.Services.Reviews
                 .FirstOrDefaultAsync(sp => sp.Peer == user && sp.Submission == submission);
             if (submissionPeerConnection == null)
                 return new NoAccessResponse<GetNewReviewDtoResponse>("This user can't review this submission");
-            
+
             var firstReview = await _context.Reviews.FirstOrDefaultAsync(r =>
                 r.SubmissionPeerAssignment.Peer == user && r.SubmissionPeerAssignment.Submission == submission);
             if (firstReview != null)
                 return new OperationErrorResponse<GetNewReviewDtoResponse>(
                     "This user has already reviewed this submission");
-            
+
             var expert = await _context.Experts.FirstOrDefaultAsync(e =>
                 e.User == user && e.PeeringTask == submission.PeeringTaskUserAssignment.PeeringTask);
 
@@ -79,7 +79,7 @@ namespace patools.Services.Reviews
             foreach (var answer in review.Answers)
             {
                 var question = questions.FirstOrDefault(q => q.ID == answer.QuestionId);
-                
+
                 if (question == null)
                     return new BadRequestDataResponse<GetNewReviewDtoResponse>($"Incorrect QuestionId in answer");
                 if (question.Required)
@@ -92,7 +92,8 @@ namespace patools.Services.Reviews
                         case QuestionTypes.Text or QuestionTypes.ShortText when answer.Response == null:
                             return new BadRequestDataResponse<GetNewReviewDtoResponse>(
                                 "There is no answer for a required question");
-                        case QuestionTypes.Select when answer.Value<question.MinValue || answer.Value>question.MaxValue:
+                        case QuestionTypes.Select
+                            when answer.Value < question.MinValue || answer.Value > question.MaxValue:
                             return new BadRequestDataResponse<GetNewReviewDtoResponse>(
                                 "Answer for a select question is out of range");
                     }
@@ -111,7 +112,7 @@ namespace patools.Services.Reviews
                             "there is an error in database (Coefficient Percentage for required select question is null)");
                     grades.Add(weightedValue.Value);
                 }
-                
+
                 answers.Add(new Answer()
                 {
                     ID = Guid.NewGuid(),
@@ -133,9 +134,9 @@ namespace patools.Services.Reviews
             if (grades.Count == 0)
                 return new OperationErrorResponse<GetNewReviewDtoResponse>("There were no select-questions");
 
-            var resultGrade = grades.Sum()/grades.Count;
+            var resultGrade = grades.Sum() / grades.Count;
             newReview.Grade = resultGrade;
-            
+
             await _context.Answers.AddRangeAsync(answers);
             await _context.SaveChangesAsync();
 
@@ -170,7 +171,8 @@ namespace patools.Services.Reviews
                 return new NoAccessResponse<IEnumerable<GetReviewDtoResponse>>("This user has no access to this task");
 
             //TODO: Change error
-            var submission = await _context.Submissions.FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+            var submission =
+                await _context.Submissions.FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
             if (submission == null)
                 return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
                     "This user hasn't submissioned yet");
@@ -212,7 +214,7 @@ namespace patools.Services.Reviews
                             "There is an error in database");
                 }
 
-                resultReview.SubmissionId = submission.ID;
+                resultReview.ReviewId = review.ID;
                 resultReview.FinalGrade = review.Grade;
 
                 var answers = await _context.Answers
@@ -265,6 +267,7 @@ namespace patools.Services.Reviews
 
                     resultAnswers.Add(resultAnswer);
                 }
+
                 resultReview.Answers = resultAnswers;
                 resultReviews.Add(resultReview);
             }
@@ -281,6 +284,7 @@ namespace patools.Services.Reviews
 
             var task = await _context.Tasks
                 .Include(t => t.Course)
+                .Include(t => t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<IEnumerable<GetMyReviewDtoResponse>>("Invalid task id provided");
@@ -289,23 +293,26 @@ namespace patools.Services.Reviews
 
             switch (user.Role)
             {
-                case {} when expert!=null:
-                    break;
+                case { } when expert != null:
+                    return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("Expert can't make this request");
                 case UserRoles.Student:
                     var courseUser = await _context.CourseUsers
                         .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == user);
                     if (courseUser == null)
-                        return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("This user is not assigned to this course");
+                        return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>(
+                            "This user is not assigned to this course");
 
                     var taskUser = await _context.TaskUsers
                         .FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
                     if (taskUser == null)
-                        return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("This user has no access to this task");
+                        return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>(
+                            "This user has no access to this task");
                     break;
                 case UserRoles.Teacher:
                     return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("Teacher can't make this request");
                 default:
-                    return new BadRequestDataResponse<IEnumerable<GetMyReviewDtoResponse>>("Incorrect role stored in token");
+                    return new BadRequestDataResponse<IEnumerable<GetMyReviewDtoResponse>>(
+                        "Incorrect role stored in token");
             }
 
             var resultReviews = new List<GetMyReviewDtoResponse>();
@@ -324,9 +331,42 @@ namespace patools.Services.Reviews
                 var resultReview = new GetMyReviewDtoResponse()
                 {
                     SubmissionId = submission.ID,
-                    StudentName = task.Type==ReviewTypes.DoubleBlind?$"Аноним #{++index}":student.Fullname
+                    StudentName = task.Type == ReviewTypes.DoubleBlind ? $"Аноним #{++index}" : student.Fullname
                 };
+
+
                 
+
+                var teacherReview = await _context.Reviews
+                    .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == task.Course.Teacher);
+
+                if (teacherReview != null)
+                    resultReview.TeacherAnswers = await GetAnswersForReview(teacherReview);
+                else if (task.Step == PeeringSteps.FirstStep)
+                {
+                    var experts = await _context.Experts
+                        .Where(e => e.PeeringTask == task)
+                        .Select(e => e.User)
+                        .ToListAsync();
+                    var expertReview = await _context.Reviews
+                        .FirstOrDefaultAsync(r =>
+                            r.SubmissionPeerAssignment.Submission == review.SubmissionPeerAssignment.Submission
+                            && experts.Contains(r.SubmissionPeerAssignment.Peer));
+
+                    if (expertReview != null)
+                        resultReview.ExpertAnswers = await GetAnswersForReview(expertReview);
+                }
+                
+                resultReview.Answers = await GetAnswersForReview(review);
+                resultReviews.Add(resultReview);
+            }
+
+            return new SuccessfulResponse<IEnumerable<GetMyReviewDtoResponse>>(resultReviews);
+        }
+
+        private async Task<IEnumerable<GetAnswerDtoResponse>> GetAnswersForReview(Review review)
+        {
+            
                 var answers = await _context.Answers
                     .Include(a => a.Question)
                     .Where(a => a.Review == review)
@@ -336,9 +376,6 @@ namespace patools.Services.Reviews
                 foreach (var answer in answers)
                 {
                     var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
-                    if (question == null)
-                        return new OperationErrorResponse<IEnumerable<GetMyReviewDtoResponse>>(
-                            "There is an error in stored data (Questions table)");
 
                     var resultAnswer = new GetAnswerDtoResponse()
                     {
@@ -377,11 +414,7 @@ namespace patools.Services.Reviews
 
                     resultAnswers.Add(resultAnswer);
                 }
-                resultReview.Answers = resultAnswers;
-                resultReviews.Add(resultReview);
-            }
-
-            return new SuccessfulResponse<IEnumerable<GetMyReviewDtoResponse>>(resultReviews);
+                return resultAnswers;
         }
     }
 }

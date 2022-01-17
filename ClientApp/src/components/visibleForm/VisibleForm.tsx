@@ -2,26 +2,26 @@ import { FC } from "react";
 import { Box, Theme } from "@mui/material";
 import { SxProps } from "@mui/system";
 
-import { AnswerBox } from "../../../../../components/rubrics/answerBox";
-import { MultipleVisible } from "../../../../../components/rubrics/multiple";
-import { QuestionBox } from "../../../../../components/rubrics/questionBox";
-import { RatingScaleVisible } from "../../../../../components/rubrics/ratingScale";
-import { ShortTextVisible } from "../../../../../components/rubrics/shortText";
-import { TextVisible } from "../../../../../components/rubrics/text";
+import { AnswerBox } from "../rubrics/answerBox";
+import { MultipleVisible } from "../rubrics/multiple";
+import { QuestionBox } from "../rubrics/questionBox";
+import { RatingScaleVisible } from "../rubrics/ratingScale";
+import { ShortTextVisible } from "../rubrics/shortText";
+import { TextVisible } from "../rubrics/text";
 
-import { IQuestionTypes, IStudentWork } from "../../../../../store/types";
+import { IQuestionTypes, IStudentWork } from "../../store/types";
 
 interface IProps {
-  studentWork: IStudentWork,
+  form: IStudentWork,
   answerBoxColor?: string
 }
 
-export const StudentWork: FC<IProps> = ({
-  studentWork,
+export const VisibleForm: FC<IProps> = ({
+  form,
   answerBoxColor
 }) => {
 
-  const sorted = studentWork.responses
+  const sorted = form.responses
 
   return (
     <Box sx={styles.wrapper}>

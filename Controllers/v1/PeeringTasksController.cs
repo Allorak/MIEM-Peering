@@ -87,7 +87,7 @@ namespace patools.Controllers.v1
         }
         
         [HttpGet("peer-form/task={taskId}")]
-        public async Task<ActionResult<GetAuthorFormDtoResponse>> GetPeerForm(Guid taskId)
+        public async Task<ActionResult<GetPeerFormDtoResponse>> GetPeerForm(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());

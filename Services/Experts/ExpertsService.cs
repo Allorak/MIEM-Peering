@@ -51,7 +51,7 @@ namespace patools.Services.Experts
                     TasksAssigned = null,
                     TasksCompleted = null
                 };
-                if (expert.User != null)
+                if (expert.User != null && task.ExpertsAssigned == true)
                 {
                     var assignedTasks = await _context.SubmissionPeers
                         .Where(sp =>
