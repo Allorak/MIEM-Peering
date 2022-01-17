@@ -1,21 +1,23 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import { generatePath, NavLink as RouterLink } from 'react-router-dom'
+import { Link, Theme, Typography } from "@mui/material";
+import { SxProps } from "@mui/system";
+
+import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
+import { EditableForm } from "../../../../../components/editableForm";
+import { AccessTime } from "../../../../../components/assessTime";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
 import { fetchAuthorformStudent, fetchWorkSubmissionStatus, postAuthorformStudent } from "../../../../../store/authorformStudent";
 import { DeadlineStatus, IAuthorForm, IAuthorFormResponses, IQuestionTypes, ISubmissionStatus } from "../../../../../store/types";
-import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
-import { FormAuthor } from "./FormAuthor";
 import { fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
-import { AccessTime } from "../../../../../components/assessTime";
-import { Link, Theme, Typography } from "@mui/material";
-import { SxProps } from "@mui/system";
+
 import { paths } from "../../../../../app/constants/paths";
 
-export const Authorform: FC = () => {
 
+export const Authorform: FC = () => {
   const dispatch = useAppDispatch()
   const { path } = usePrivatePathStDashboard()
 
@@ -99,8 +101,8 @@ export const Authorform: FC = () => {
     >
       {responses && responses.rubrics && responses.rubrics.length > 0 && submissionStatus === DeadlineStatus.START && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED && (
         <>
-          <FormAuthor
-            authorForm={responses}
+          <EditableForm
+            form={responses}
             onSubmit={onRequest}
             onEdit={handleOnFormEdit}
           />

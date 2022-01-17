@@ -418,6 +418,7 @@ export type IMyReviewsItem = {
   submissionId: string,
   answers: IQuestionRubrics,
   expertAnswers?: IQuestionRubrics,
+  teacherAnswers?: IQuestionRubrics
 }
 
 export type IMyReviews = Array<IMyReviewsItem>
@@ -433,7 +434,7 @@ export type IMyWorkForm = {
 export type IMyWorkReviewsItem = {
   reviewer: IRole,
   reviewerName: string,
-  submissionId: string,
+  reviewId: string,
   finalGrade: number,
   answers: IQuestionRubrics
 }
