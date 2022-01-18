@@ -16,7 +16,7 @@ export const RatingScaleVisible: FC<IProps> = ({
 
   return (
     <Tooltip
-      title={isResponse ? (response ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
+      title={isResponse ? (typeof response === 'number' ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
       placement={"top"}
     >
       <Select

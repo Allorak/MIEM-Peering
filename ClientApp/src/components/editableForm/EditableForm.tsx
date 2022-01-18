@@ -70,7 +70,7 @@ export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
         <AnswerBox
           id={index}
           key={item.questionId}
-          title={item.type === IQuestionTypes.SELECT_RATE && item.coefficientPercentage ?
+          title={item.type === IQuestionTypes.SELECT_RATE && typeof item.coefficientPercentage === 'number' ?
             `${item.title} (коэф. ${item.coefficientPercentage}%)` :
             item.title
           }

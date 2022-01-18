@@ -158,8 +158,12 @@ export const Works: FC = () => {
           TransitionComponent={Transition}
           transitionDuration={100}
         >
-          {workStatistics && (
+          {workStatistics && workStatistics.length > 0 && (
             <WorkStatistics workStatistics={workStatistics} />
+          )}
+
+          {workStatistics && workStatistics.length === 0 && (
+            <NoData label={"Данную работу еще не оценили"} />
           )}
         </Popup>
       )}

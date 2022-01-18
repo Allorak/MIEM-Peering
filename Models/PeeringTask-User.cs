@@ -23,7 +23,7 @@ namespace patools.Models
 
         public int FinalGrade { get; set; }
 
-        public float ConfidenceFactorBeforeTask { get; set; }
-        public float ConfidenceFactorAfterTask { get; set; }
+        public float? ConfidenceFactorBeforeTask { get; set; }
+        public float? ConfidenceFactorAfterTask { get; set; }
     }
 }
