@@ -1,30 +1,30 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback } from "react";
 import { Box, Button, Theme } from "@mui/material";
 import { SxProps } from "@mui/system";
 
-import { AnswerBox } from "../../../../../components/rubrics/answerBox";
-import { MultipleEditable } from "../../../../../components/rubrics/multiple";
-import { QuestionBox } from "../../../../../components/rubrics/questionBox";
-import { RatingScaleEditable } from "../../../../../components/rubrics/ratingScale";
-import { ShortTextEditable } from "../../../../../components/rubrics/shortText";
-import { TextEditable } from "../../../../../components/rubrics/text";
+import { AnswerBox } from "../rubrics/answerBox";
+import { MultipleEditable } from "../rubrics/multiple";
+import { QuestionBox } from "../rubrics/questionBox";
+import { RatingScaleEditable } from "../rubrics/ratingScale";
+import { ShortTextEditable } from "../rubrics/shortText";
+import { TextEditable } from "../rubrics/text";
 
-import { IPeerForm, IQuestionTypes, IPeerResponses } from "../../../../../store/types";
+import { IPeerForm, IQuestionTypes, IPeerResponses } from "../../store/types";
 
-
-import * as globalStyles from "../../../../../const/styles";
+import * as globalStyles from "../../const/styles";
 
 interface IProps {
-  peerForm: IPeerForm,
+  form: IPeerForm,
   onSubmit: (formResponses: IPeerResponses) => void
   onEdit: (value: string | number | undefined, questionId: string) => void
 }
 
-export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
+
+export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
 
   const submitForm = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
-    for (const item of peerForm.rubrics) {
+    for (const item of form.rubrics) {
       const isResponse = item.type === IQuestionTypes.SHORT_TEXT || item.type === IQuestionTypes.TEXT
       const isValue = item.type === IQuestionTypes.MULTIPLE || item.type === IQuestionTypes.SELECT_RATE
 
@@ -39,7 +39,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
       }
     }
     const formResponses: IPeerResponses = {
-      answers: peerForm.rubrics.map(response => {
+      answers: form.rubrics.map((response) => {
         switch (response.type) {
           case IQuestionTypes.TEXT:
           case IQuestionTypes.SHORT_TEXT:
@@ -58,7 +58,7 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
       })
     }
     onSubmit(formResponses)
-  }, [peerForm])
+  }, [form])
 
   return (
     <Box
@@ -66,11 +66,11 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
       component={'form'}
       onSubmit={submitForm}
     >
-      {peerForm.rubrics.map((item, index) => (
+      {form.rubrics.map((item, index) => (
         <AnswerBox
-          id={item.order}
+          id={index}
           key={item.questionId}
-          title={item.type === IQuestionTypes.SELECT_RATE && item.coefficientPercentage ?
+          title={item.type === IQuestionTypes.SELECT_RATE && typeof item.coefficientPercentage === 'number' ?
             `${item.title} (коэф. ${item.coefficientPercentage}%)` :
             item.title
           }
@@ -135,7 +135,6 @@ export const CheckingsForm: FC<IProps> = ({ peerForm, onSubmit, onEdit }) => {
 const styles = {
   wrapper: {
     display: "flex",
-    overflowY: "auto",
     gap: "5px",
     flexDirection: "column"
   } as SxProps<Theme>

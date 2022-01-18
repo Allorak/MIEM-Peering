@@ -12,15 +12,15 @@ import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePa
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { AccessTime } from "../../../../../components/assessTime";
 import { Popup } from "../../../../../components/popup";
+import { EditableForm } from "../../../../../components/editableForm";
+import { VisibleForm } from "../../../../../components/visibleForm";
 
 import { actions, createReview, fetchStudentWork, fetchCheckingsWorkList, fetchPeerForm, fetchReviews } from "../../../../../store/checkings";
 import { fetchReviewStatus } from "../../../../../store/deadlineStatus";
 
-import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
-import { CheckingsForm } from "./CheckingForm";
 
-import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
+import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes, IRole } from "../../../../../store/types";
 
 import { palette } from "../../../../../theme/colors";
 import * as globalStyles from "../../../../../const/styles"
@@ -160,10 +160,8 @@ export const Checkings: FC = () => {
   }, [responses])
 
   const handleOnViewClick = useCallback(() => {
-    console.log(path && path.taskId && currentReviewId)
     if (path && path.taskId && currentReviewId) {
       setPopupStatus(true)
-      console.log("currentReviewId:", currentReviewId)
       getStudentWork(currentReviewId)
     }
   }, [currentReviewId])
@@ -186,10 +184,15 @@ export const Checkings: FC = () => {
   const currentMyReview = myReviews && myReviews.length > 0 && currentReviewId ? myReviews.filter(item => item.submissionId === currentReviewId) : undefined
 
   const currentAnswers = currentMyReview && currentMyReview.length > 0 ? { responses: currentMyReview[0].answers } : undefined
-  const currentExpertAnswers = currentMyReview && currentMyReview.length > 0 && currentMyReview[0].expertAnswers && currentMyReview[0].expertAnswers.length > 0 ?
+  const currentExpertAnswers = currentMyReview && currentMyReview.length > 0 && currentMyReview[0].teacherAnswers && currentMyReview[0].teacherAnswers.length > 0 ?
     {
-      responses: currentMyReview[0].expertAnswers
-    } : undefined
+      responses: currentMyReview[0].teacherAnswers,
+      reviewer: IRole.teacher
+    } : currentMyReview && currentMyReview.length > 0 && currentMyReview[0].expertAnswers && currentMyReview[0].expertAnswers.length > 0 ?
+      {
+        responses: currentMyReview[0].expertAnswers,
+        reviewer: IRole.expert
+      } : undefined
 
   const currentReviewAuthor = currentMyReview && currentMyReview.length > 0 ? currentMyReview[0].studentName : undefined
 
@@ -228,8 +231,8 @@ export const Checkings: FC = () => {
                   >
                     {studentWork && studentWork.responses && studentWork.responses.length > 0 && (
                       <>
-                        <StudentWork
-                          studentWork={studentWork}
+                        <VisibleForm
+                          form={studentWork}
                           answerBoxColor={palette.fill.secondary}
                         />
                       </>
@@ -251,8 +254,8 @@ export const Checkings: FC = () => {
                   >
                     {responses && responses.rubrics && responses.rubrics.length > 0 && (
                       <>
-                        <CheckingsForm
-                          peerForm={responses}
+                        <EditableForm
+                          form={responses}
                           onSubmit={onRequest}
                           onEdit={handleOnFormEdit}
                         />
@@ -293,36 +296,56 @@ export const Checkings: FC = () => {
               </Tooltip>
             </Box>
 
-            <Box sx={styles.formWrapper}>
-              <Typography
-                  variant={"h6"}
-                  sx={styles.subTitle}
-                >
-                  {"Результаты Вашей проверки:"}
-              </Typography>
-              <Box sx={currentExpertAnswers ? styles.formContainer : { ...styles.formContainer, flex: "0 1 100%" }}>
-                <StudentWork
-                  studentWork={currentAnswers}
-                  answerBoxColor={palette.fill.success}
-                />
-              </Box>
-
-              {currentExpertAnswers && (
-                <Box sx={styles.formContainer}>
+            {currentExpertAnswers !== undefined ? (
+              <Box sx={styles.formWrapper}>
+                <Box sx={styles.formBlock}>
                   <Typography
                     variant={"h6"}
                     sx={styles.subTitle}
                   >
-                    {"Результаты экспертной проверки:"}
+                    {"Результаты Вашей проверки:"}
                   </Typography>
 
-                  <StudentWork
-                    studentWork={currentExpertAnswers}
-                    answerBoxColor={palette.fill.info}
+                  <Box sx={styles.formContainer}>
+                    <VisibleForm
+                      form={currentAnswers}
+                      answerBoxColor={palette.fill.success}
+                    />
+                  </Box>
+                </Box>
+
+                <Box sx={styles.formBlock}>
+                  <Typography
+                    variant={"h6"}
+                    sx={styles.subTitle}
+                  >
+                    {currentExpertAnswers.reviewer === IRole.teacher ? "Результаты проверки преподавателя" : "Результаты экспертной проверки:"}
+                  </Typography>
+                  <Box sx={styles.formContainer}>
+                    <VisibleForm
+                      form={currentExpertAnswers}
+                      answerBoxColor={palette.fill.info}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{ display: "flex", gap: "10px", flexDirection: "column" }}>
+                <Typography
+                  variant={"h6"}
+                  sx={styles.subTitle}
+                >
+                  {"Результаты Вашей проверки:"}
+                </Typography>
+
+                <Box sx={styles.formContainer}>
+                  <VisibleForm
+                    form={currentAnswers}
+                    answerBoxColor={palette.fill.success}
                   />
                 </Box>
-              )}
-            </Box>
+              </Box>
+            )}
           </Box>
         )}
 
@@ -348,8 +371,8 @@ export const Checkings: FC = () => {
                 {"Ответы:"}
               </Typography>
 
-              <StudentWork
-                studentWork={studentWork}
+              <VisibleForm
+                form={studentWork}
                 answerBoxColor={palette.fill.secondary}
               />
             </Box>
@@ -365,7 +388,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    gap: "10px"
   } as SxProps<Theme>,
   listContainer: {
     display: "flex",

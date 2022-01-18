@@ -41,22 +41,6 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
   const { field: typeProps } = useController({ control, ...fields.taskTypeProps })
   const experts = getValues('experts')
 
-  // const handleOnStepChange = useCallback((value: SelectChangeEvent<unknown>) => {
-  //   if (peerStepProps.value !== value.target.value) {
-  //     if (value.target.value === PeerSteps.FIRST_STEP) {
-  //       setValue('stepParams', {
-  //         step: PeerSteps.FIRST_STEP,
-  //         experts: []
-  //       })
-  //     } else {
-  //       setValue('stepParams', {
-  //         step: PeerSteps.SECOND_STEP,
-  //         taskId: "1" //TODO
-  //       })
-  //     }
-  //   }
-  // }, [setValue, peerStepProps])
-
   const handleAddOrEditExpert = useCallback((email?: string) => {
     setCurrentExpert(email)
     setPopupStatus(true)
@@ -105,11 +89,11 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
 
   const onSettingsFormSubmit = useCallback((event: React.FormEvent<HTMLElement>) => {
     event.preventDefault()
+
     const request = getValues()
     if ((!hasConfidenceFactor && request.experts && request.experts.length > 0) || hasConfidenceFactor) {
       onSubmit(request)
     }
-    // if (request.stepParams.step === PeerSteps.SECOND_STEP && request.stepParams.taskId) //TODO
   }, [getValues, hasConfidenceFactor])
 
   return (
@@ -427,6 +411,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
           <Button
             type='submit'
             variant='contained'
+            disabled={!hasConfidenceFactor && (!experts || experts.length === 0)}
           >
             {"Создать задание"}
           </Button>

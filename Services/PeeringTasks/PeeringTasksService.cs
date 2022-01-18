@@ -412,6 +412,7 @@ namespace patools.Services.PeeringTasks
 
             var unregisteredExperts = experts.Where(e => e.User == null).ToList();
             _context.Experts.RemoveRange(unregisteredExperts);
+            await _context.SaveChangesAsync();
             var registeredExperts = experts.Where(e => e.User != null).ToList();
            
             if (registeredExperts.Count == 0)
@@ -439,9 +440,6 @@ namespace patools.Services.PeeringTasks
                     Submission = submissions[i]
                 });
             }
-
-            submissionPeers.AddRange(submissions.Select(submission => 
-                new SubmissionPeer() {ID = Guid.NewGuid(), Peer = task.Course.Teacher, Submission = submission}));
 
             await _context.SubmissionPeers.AddRangeAsync(submissionPeers);
             await _context.SaveChangesAsync();

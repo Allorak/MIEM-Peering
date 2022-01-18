@@ -13,7 +13,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
       {
         reviewer: IRole.expert,
         reviewerName: "Эксперт",
-        submissionId: "123",
+        reviewId: "123",
         finalGrade: 7.1,
         answers: [
           {
@@ -109,7 +109,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
       {
         reviewer: IRole.teacher,
         reviewerName: "Виктор Петров",
-        submissionId: "234",
+        reviewId: "234",
         finalGrade: 8.2,
         answers: [
           {

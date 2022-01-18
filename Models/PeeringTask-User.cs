@@ -23,10 +23,7 @@ namespace patools.Models
 
         public int FinalGrade { get; set; }
 
-        //wheretaskuser.perirntak = taskselect final grade
-
         public float? ConfidenceFactorBeforeTask { get; set; }
-
         public float? ConfidenceFactorAfterTask { get; set; }
     }
 }

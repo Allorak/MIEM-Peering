@@ -8,13 +8,13 @@ import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePa
 import { AccessTime } from "../../../../../components/assessTime";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { NoData } from "../../../../../components/noData";
+import { VisibleForm } from "../../../../../components/visibleForm";
 
 import { fetchWorkSubmissionStatus } from "../../../../../store/authorformStudent";
 import { fetchReviewStatus, fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
 import { fetchMyWork, fetchReviews } from "../../../../../store/myWork";
 import { DeadlineStatus, IMyWorkReviewsItem, IRole, ISubmissionStatus } from "../../../../../store/types";
 
-import { MyWorkForm } from "./MyWorkForm";
 import { ReviewsList } from "./ReviewsList";
 
 import { palette } from "../../../../../theme/colors";
@@ -102,24 +102,24 @@ export const MyWork: FC = () => {
 
   const reviewsList = myWorkReview?.map(item => {
     if (item.reviewer === IRole.teacher) return {
-      submissionId: item.submissionId,
+      submissionId: item.reviewId,
       studentName: `${item.reviewerName} - Преподаватель`
     }
 
     if (item.reviewer === IRole.student) return {
-      submissionId: item.submissionId,
+      submissionId: item.reviewId,
       studentName: `${item.reviewerName} - Пир`
     }
 
     return {
-      submissionId: item.submissionId,
+      submissionId: item.reviewId,
       studentName: item.reviewerName,
     }
   })
 
   const handleReviewerChange = useCallback((submissionId: string) => {
     console.log(currentReview)
-    const sortArray = myWorkReview?.filter(item => item.submissionId === submissionId)
+    const sortArray = myWorkReview?.filter(item => item.reviewId === submissionId)
     if (sortArray && sortArray.length > 0) {
       setCurrentReview(JSON.parse(JSON.stringify(sortArray[0])))
     }
@@ -131,12 +131,10 @@ export const MyWork: FC = () => {
       error={mainError}
     >
       {myWorkPayload && myWorkPayload.answers && myWorkPayload.answers.length > 0 && workFound && (reviewDeadlineInvalid || reviewsNotFound) && (
-        <>
-          <MyWorkForm
-            myWork={myWorkPayload}
-            answerBoxColor={palette.fill.success}
-          />
-        </>
+        <VisibleForm
+          form={{ responses: myWorkPayload.answers }}
+          answerBoxColor={palette.fill.success}
+        />
       )}
 
       {myWorkPayload && myWorkPayload.answers && myWorkPayload.answers.length > 0 && workFound &&
@@ -145,7 +143,7 @@ export const MyWork: FC = () => {
         (
           <Box sx={styles.container}>
             <ReviewsList
-              selectedReviewId={currentReview.submissionId}
+              selectedReviewId={currentReview.reviewId}
               reviewsList={reviewsList}
               onReviewerChange={handleReviewerChange}
             />
@@ -159,8 +157,8 @@ export const MyWork: FC = () => {
                   {"Мои ответы:"}
                 </Typography>
 
-                <MyWorkForm
-                  myWork={myWorkPayload}
+                <VisibleForm
+                  form={{ responses: myWorkPayload.answers }}
                   answerBoxColor={palette.fill.success} /
                 >
               </Box>
@@ -170,11 +168,11 @@ export const MyWork: FC = () => {
                   variant={"h6"}
                   sx={styles.subTitle}
                 >
-                  {`Результаты проверок (${currentReview.reviewerName}, оценка - ${currentReview.finalGrade}):`}
+                  {`Результаты проверок (${currentReview.reviewerName}, оценка ${currentReview.finalGrade}):`}
                 </Typography>
 
-                <MyWorkForm
-                  myWork={currentReview}
+                <VisibleForm
+                  form={{ responses: currentReview.answers }}
                   answerBoxColor={palette.fill.info}
                 />
               </Box>
@@ -218,7 +216,7 @@ const styles = {
   formContainer: {
     flex: "0 1 50%",
     maxHeight: "calc(100vh - 183px - 70px)",
-    overflowY: "hidden",
+    overflowY: "auto",
     ...globalStyles.scrollStyles,
     '@media (max-width: 900px)': {
       flex: "0 0 100%",

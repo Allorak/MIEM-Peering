@@ -8,13 +8,13 @@ import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePat
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { AccessTime } from "../../../../../components/assessTime";
 import { NoData } from "../../../../../components/noData";
+import { EditableForm } from "../../../../../components/editableForm";
+import { VisibleForm } from "../../../../../components/visibleForm";
 
 import { actions, createReview, fetchStudentWork, fetchCheckingsWorkList, fetchPeerForm } from "../../../../../store/checkings";
 import { fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
 
-import { StudentWork } from "./StudentForm";
 import { StudentsListSelect } from "./StudentsList";
-import { CheckingsForm } from "./CheckingForm";
 
 import { DeadlineStatus, IPeerForm, IPeerResponses, IQuestionTypes } from "../../../../../store/types";
 
@@ -26,7 +26,6 @@ export const Checkings: FC = () => {
   const dispatch = useAppDispatch()
 
   const { path } = usePrivatePathTDashboard()
-
 
   const statusDeadline = useAppSelector(state => state.deadlineStatus.isLoading)
   const submissionStatus = useAppSelector(state => state.deadlineStatus.submissionStatus)
@@ -51,7 +50,6 @@ export const Checkings: FC = () => {
     if (path && path.taskId && submissionStatus === DeadlineStatus.END) {
       dispatch(actions.reset())
       dispatch(fetchCheckingsWorkList(path.taskId))
-      dispatch(fetchPeerForm(path.taskId))
     }
   }, [submissionStatus])
 
@@ -73,7 +71,8 @@ export const Checkings: FC = () => {
   }, [path])
 
   useEffect(() => {
-    if (studentList && studentList.length > 0) {
+    if (studentList && studentList.length > 0 && path && path.taskId) {
+      dispatch(fetchPeerForm(path.taskId))
       setCurrentWorkIdStudent(studentList[0].submissionId)
       getStudentWork(studentList[0].submissionId)
     }
@@ -161,8 +160,8 @@ export const Checkings: FC = () => {
                   >
                     {studentWork && studentWork.responses && studentWork.responses.length > 0 && (
                       <>
-                        <StudentWork
-                          studentWork={studentWork}
+                        <VisibleForm
+                          form={studentWork}
                           answerBoxColor={palette.fill.success}
                         />
                       </>
@@ -185,8 +184,8 @@ export const Checkings: FC = () => {
                   >
                     {responses && responses.rubrics && responses.rubrics.length > 0 && (
                       <>
-                        <CheckingsForm
-                          peerForm={responses}
+                        <EditableForm
+                          form={responses}
                           onSubmit={onRequest}
                           onEdit={handleOnFormEdit}
                         />

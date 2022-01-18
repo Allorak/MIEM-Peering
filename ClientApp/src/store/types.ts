@@ -418,6 +418,7 @@ export type IMyReviewsItem = {
   submissionId: string,
   answers: IQuestionRubrics,
   expertAnswers?: IQuestionRubrics,
+  teacherAnswers?: IQuestionRubrics
 }
 
 export type IMyReviews = Array<IMyReviewsItem>
@@ -433,7 +434,7 @@ export type IMyWorkForm = {
 export type IMyWorkReviewsItem = {
   reviewer: IRole,
   reviewerName: string,
-  submissionId: string,
+  reviewId: string,
   finalGrade: number,
   answers: IQuestionRubrics
 }
@@ -453,19 +454,19 @@ export type IPeerResponses = {
 }
 
 export enum Reviewers {
-  TEACHER = 'teacher',
-  PEER = 'peer',
-  EXPERT = 'expert'
+  TEACHER = 'Teacher',
+  PEER = 'Peer',
+  EXPERT = 'Expert'
 }
 
 export enum WorkGraphTypes {
-  FINAL = "finalRates",
-  CRITERIA = "criteria"
+  FINAL = "FinalGrades",
+  CRITERIA = "Criteria"
 }
 
 export enum WorkStatisticsTypes {
-  GRAPH = "graph",
-  RESPONSE = "response"
+  GRAPH = "Graph",
+  RESPONSE = "Response"
 }
 
 export interface IWorkGraphByCriteriaItem {

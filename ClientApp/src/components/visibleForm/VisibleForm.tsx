@@ -2,26 +2,26 @@ import { FC } from "react";
 import { Box, Theme } from "@mui/material";
 import { SxProps } from "@mui/system";
 
-import { AnswerBox } from "../../../../../components/rubrics/answerBox";
-import { MultipleVisible } from "../../../../../components/rubrics/multiple";
-import { QuestionBox } from "../../../../../components/rubrics/questionBox";
-import { RatingScaleVisible } from "../../../../../components/rubrics/ratingScale";
-import { ShortTextVisible } from "../../../../../components/rubrics/shortText";
-import { TextVisible } from "../../../../../components/rubrics/text";
+import { AnswerBox } from "../rubrics/answerBox";
+import { MultipleVisible } from "../rubrics/multiple";
+import { QuestionBox } from "../rubrics/questionBox";
+import { RatingScaleVisible } from "../rubrics/ratingScale";
+import { ShortTextVisible } from "../rubrics/shortText";
+import { TextVisible } from "../rubrics/text";
 
-import { IQuestionTypes, IMyWorkForm } from "../../../../../store/types";
+import { IQuestionTypes, IStudentWork } from "../../store/types";
 
 interface IProps {
-  myWork: IMyWorkForm,
+  form: IStudentWork,
   answerBoxColor?: string
 }
 
-export const MyWorkForm: FC<IProps> = ({
-  myWork,
+export const VisibleForm: FC<IProps> = ({
+  form,
   answerBoxColor
 }) => {
 
-  const sorted = myWork.answers
+  const sorted = form.responses
 
   return (
     <Box sx={styles.wrapper}>
@@ -30,7 +30,7 @@ export const MyWorkForm: FC<IProps> = ({
           <AnswerBox
             id={item.order}
             key={item.questionId}
-            title={item.type === IQuestionTypes.SELECT_RATE && item.coefficientPercentage !== undefined ?
+            title={item.type === IQuestionTypes.SELECT_RATE && typeof item.coefficientPercentage === 'number' ?
               `${item.title} (коэф. ${item.coefficientPercentage}%)` :
               item.title
             }
