@@ -40,6 +40,7 @@ export const palette = {
     secondary: 'rgba(255, 167, 11, 0.2)',
     success: 'rgba(0, 209, 109, 0.2)',
     info: 'rgba(11, 190, 255, 0.2)',
+    warning: 'rgba(249, 127, 5, 0.2)'
   },
   fillLight: {
     primary: '#525CE5',

@@ -11,29 +11,27 @@ export const CheckedFileCard: FC<IStatusTask> = ({
 }) => {
 
     return (
-        <Box>
-            <Box sx={styles.wrapper}>
-                <Box>
-                    {submissionsNumber && (
-                        <Box sx={styles.cardContent}>
-                            <Box sx={styles.cardHeader}>
-                                <Box sx={styles.typeIcon}>
-                                    <CheckedFile />
-                                </Box>
-                            </Box>
-                            <Box sx={styles.cardBody}>
-                                <Typography variant={'h5'}>
-                                    {submissionsNumber}
-                                </Typography>
-                                <Typography variant={'body1'}>
-                                    {"Проверено"}
-                                </Typography>
+        <Box sx={styles.wrapper}>
+            <Box>
+                {submissionsNumber && (
+                    <Box sx={styles.cardContent}>
+                        <Box sx={styles.cardHeader}>
+                            <Box sx={styles.typeIcon}>
+                                <CheckedFile />
                             </Box>
                         </Box>
-                    )}
-                </Box>
+                        <Box sx={styles.cardBody}>
+                            <Typography variant={'h5'}>
+                                {submissionsNumber}
+                            </Typography>
+                            <Typography variant={'body1'}>
+                                {"Проверено"}
+                            </Typography>
+                        </Box>
+                    </Box>
+                )}
             </Box>
-        </Box >
+        </Box>
     )
 }
 
@@ -42,7 +40,8 @@ const styles = {
         backgroundColor: 'common.white',
         borderRadius: '8px',
         padding: '20px 15px',
-        height: '100px',
+        height: '100%',
+        boxSizing: 'border-box',
         display: 'flex',
         alignItems: "center",
         boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
@@ -59,7 +58,7 @@ const styles = {
         display: 'flex',
         width: '60px',
         flexShrink: 0
-    } as SxProps<Theme>,    
+    } as SxProps<Theme>,
     cardContent: {
         display: "flex",
     } as SxProps<Theme>,

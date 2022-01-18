@@ -30,55 +30,53 @@ export const CoefficientsCard: FC<IProps> = ({
   }
 
   return (
-    <Box>
-      <Box sx={styles.wrapper}>
-        <Box>
-          <Box sx={styles.cardContent}>
-            <Box sx={styles.cardHeader}>
-              <Box sx={styles.typeIcon}>
-                <CoefficientIcon />
-              </Box>
+    <Box sx={styles.wrapper}>
+      <Box>
+        <Box sx={styles.cardContent}>
+          <Box sx={styles.cardHeader}>
+            <Box sx={styles.typeIcon}>
+              <CoefficientIcon />
             </Box>
-            <Box sx={styles.cardBody}>
-              <Box sx={styles.coefficientBlock}>
-                {proportion ? (
-                  <>
-                    <Typography variant={'h5'} sx={{ textDecoration: 'line-through', opacity: '0.4' }}>
-                      {until}
-                    </Typography>
-                    <Box sx={styles.arrowRightBlock}>
-                      <ArrowRight />
-                    </Box>
-                    <Typography variant={'h5'}>
-                      {after}
-                    </Typography>
-                  </>
-                ) : (
-                  <Typography variant={'h5'}>
+          </Box>
+          <Box sx={styles.cardBody}>
+            <Box sx={styles.coefficientBlock}>
+              {proportion ? (
+                <>
+                  <Typography variant={'h5'} sx={{ textDecoration: 'line-through', opacity: '0.4' }}>
                     {until}
                   </Typography>
-                )
-                }
-              </Box>
-              <Typography variant={'body1'}>
-                {"Коэффициент доверия"}
-              </Typography>
-              {proportion && (
-                <Box sx={styles.proportionBlock}>
-                  <Box sx={flag === true ? styles.arrowBlock : {...styles.arrowBlock, ...styles.rotate180}}>
-                    <Arrow svgColor={flag === true ? '#42BDA1' : '#F04461'} />
+                  <Box sx={styles.arrowRightBlock}>
+                    <ArrowRight />
                   </Box>
-                  <Box sx={styles.proportionTextBlock}>
-                    <Typography variant={'body1'} sx={flag === true ? { color: '#42BDA1' } : { color: '#F04461' }}>
-                      {`${proportion}` + ' %'}
-                    </Typography>
-                  </Box>
-                </Box>)}
+                  <Typography variant={'h5'}>
+                    {after}
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant={'h5'}>
+                  {until}
+                </Typography>
+              )
+              }
             </Box>
+            <Typography variant={'body1'}>
+              {"Коэффициент доверия"}
+            </Typography>
+            {proportion && (
+              <Box sx={styles.proportionBlock}>
+                <Box sx={flag === true ? styles.arrowBlock : { ...styles.arrowBlock, ...styles.rotate180 }}>
+                  <Arrow svgColor={flag === true ? '#42BDA1' : '#F04461'} />
+                </Box>
+                <Box sx={styles.proportionTextBlock}>
+                  <Typography variant={'body1'} sx={flag === true ? { color: '#42BDA1' } : { color: '#F04461' }}>
+                    {`${proportion}` + ' %'}
+                  </Typography>
+                </Box>
+              </Box>)}
           </Box>
         </Box>
       </Box>
-    </Box >
+    </Box>
   )
 }
 
@@ -87,7 +85,8 @@ const styles = {
     backgroundColor: 'common.white',
     borderRadius: '8px',
     padding: '20px 15px',
-    height: '100px',
+    height: '100%',
+    boxSizing: 'border-box',
     display: 'flex',
     alignItems: "center",
     boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
@@ -130,5 +129,5 @@ const styles = {
   } as SxProps<Theme>,
   rotate180: {
     transform: 'rotate(180deg)'
-  }as SxProps<Theme>,
+  } as SxProps<Theme>,
 }
