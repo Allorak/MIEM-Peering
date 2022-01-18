@@ -14,5 +14,7 @@ namespace patools.Dtos.Task
         public GetPeeringTaskStudentGradesDtoResponse StudentGrades { get; set; }
         public PeeringSteps Step { get; set; }
         public GetPeeringTaskСoefficientsDtoResponse StudentConfidenceСoefficients { get; set; }
+        public int? CheckedWorksCount { get; set; }
+        public int? AssignedWorksCount { get; set; }
     }
 }
