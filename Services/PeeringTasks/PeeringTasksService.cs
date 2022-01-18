@@ -41,6 +41,24 @@ namespace patools.Services.PeeringTasks
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUserConnection == null)
                 return new NoAccessResponse<GetPeeringTaskStudentOverviewDtoResponse>("This student has no access to this task");
+            
+            var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
+
+            var expertUser = await _context.Experts.FirstOrDefaultAsync(x => x.User == student && x.PeeringTask == task);
+            if (expertUser != null)
+            {
+                int checkedWorksCount = 1;
+                int assignedWorksCount = 3;
+
+                var expertOverview =_mapper.Map<GetPeeringTaskStudentOverviewDtoResponse>(new GetPeeringTaskExpertOverviewDtoResponse()
+                {
+                    Deadlines = deadlines,
+                    CheckedWorksCount = checkedWorksCount,
+                    AssignedWorksCount = assignedWorksCount
+                });
+
+                return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>(expertOverview);
+            };
 
             var reviews = await _context.Reviews
                 .Include(r => r.SubmissionPeerAssignment.Submission)
@@ -75,7 +93,7 @@ namespace patools.Services.PeeringTasks
                         resultReview.Reviewer = UserRoles.Teacher;
                         break;
                     default:
-                        return new OperationErrorResponse<IEnumerable<GetPeeringTaskCoordinatesDtoResponse>>(
+                        return new OperationErrorResponse<GetPeeringTaskStudentOverviewDtoResponse>(
                             "There is an error in database");
                 }
 
@@ -83,36 +101,6 @@ namespace patools.Services.PeeringTasks
 
                 coordinates.Add(resultReview);
             }
-
-            var coordinates = new List<GetPeeringTaskCoordinatesDtoResponse>();
-            var reviews = await _context.Reviews
-                .Where(r => r.SubmissionPeerAssignment.Peer == student &&
-                            r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
-                .Include(r => r.SubmissionPeerAssignment.Submission)
-                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student)
-                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask)
-                .ToListAsync();
-            var index = 0;
-            foreach (var review in reviews)
-            {
-                var submission = review.SubmissionPeerAssignment.Submission;
-                var student = submission.PeeringTaskUserAssignment.Student;
-                var resultReview = new GetPeeringTaskCoordinatesDtoResponse()
-                {
-                    Value = review.Grade,
-                    Reviewer = student.Role,
-                    Name = task.Type == ReviewTypes.DoubleBlind ? $"Аноним #{++index}" : student1.Fullname
-                };
-
-                coordinates.Add(resultReview);
-            }
-
-            var resultTeacher = new GetPeeringTaskCoordinatesDtoResponse()
-            {
-                Value = 
-            }
-            
-            var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
 
             int submissions = 1;
 
@@ -611,21 +599,23 @@ namespace patools.Services.PeeringTasks
             if (task == null)
                 return new InvalidGuidIdResponse<GetPeeringTaskTeacherOverviewDtoResponse>("Invalid task id");
 
-            /*var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == teacher && x.PeeringTask == task);
+            var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
+
+            var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == teacher && x.PeeringTask == task);
             if (expert != null)
             {
-                var deadlines2 = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
                 int checkedWorksCount = 1;
-                int assignedWorksCount =3;
+                int assignedWorksCount = 3;
 
-                expertDTO = <GetPeeringTaskTeacherOverviewDtoResponse>
-                (new GetPeeringTaskExpertOverviewDtoResponse
+                var expertOverview =_mapper.Map<GetPeeringTaskTeacherOverviewDtoResponse>(new GetPeeringTaskExpertOverviewDtoResponse()
                 {
-                    Deadlines = deadlines2,
+                    Deadlines = deadlines,
                     CheckedWorksCount = checkedWorksCount,
                     AssignedWorksCount = assignedWorksCount
                 });
-            }*/
+
+                return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>(expertOverview);
+            };
                 
             if (task.Course.Teacher.ID != teacher.ID)
                 return new NoAccessResponse<GetPeeringTaskTeacherOverviewDtoResponse>("This teacher has no access to this task");
@@ -679,8 +669,6 @@ namespace patools.Services.PeeringTasks
                 Review = reviewsNumber,
                 Total = totalAssignments
             };
-
-            var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
 
             return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>
                 (new GetPeeringTaskTeacherOverviewDtoResponse
