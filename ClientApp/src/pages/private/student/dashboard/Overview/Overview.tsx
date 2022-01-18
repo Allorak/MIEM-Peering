@@ -46,7 +46,7 @@ export const Overview: FC = () => {
             {payload.status && (
               <>
                 <Box sx={styles.quarterColumn}>
-                  <StatusWorkDashboard submissionStatus={payload.submissionStatus}/>
+                  <StatusWorkDashboard submissionStatus={payload.submissionStatus} />
                 </Box>
                 <Box sx={styles.quarterColumn}>
                   <UncheckedFileCard
@@ -58,7 +58,7 @@ export const Overview: FC = () => {
                 </Box>
               </>
             )}
-            {payload.studentConfidenceСoefficients && (
+            {payload.studentConfidenceСoefficients && (typeof payload.studentConfidenceСoefficients.after === 'number' || typeof payload.studentConfidenceСoefficients.until === 'number') && (
               <Box sx={styles.quarterColumn}>
                 <CoefficientsCard {...payload.studentConfidenceСoefficients} />
               </Box>
@@ -70,7 +70,7 @@ export const Overview: FC = () => {
                 <StepCheckBlock step={payload.step} />
               </Box>
             )}
-            {payload.studentGrades && (
+            {payload.studentGrades && payload.studentGrades.coordinates && payload.studentGrades.coordinates.length > 0 && (
               <TaskLineGraphStudent graphProps={payload.studentGrades} />
             )}
           </Box>

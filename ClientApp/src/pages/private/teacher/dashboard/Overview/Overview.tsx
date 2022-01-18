@@ -11,7 +11,6 @@ import {
 import { Box, SxProps, Theme } from "@mui/system"
 
 import { Deadlines } from "../../../../../components/deadlines"
-import { StatusBar } from "../../../../../components/statusBar"
 
 import { Typography } from "@mui/material";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
@@ -51,14 +50,14 @@ export const Overview: FC = () => {
 
   const legendItems = []
 
-  if (graphCurrentСoefficientsData) {
+  if (graphCurrentСoefficientsData && graphCurrentСoefficientsData.length > 0) {
     legendItems.push(
       <Typography variant={"body1"}>
         {'Текущий коэффициент'}
       </Typography>)
   }
 
-  if (graphСoefficientsData) {
+  if (graphСoefficientsData && graphСoefficientsData.length > 0) {
     legendItems.push(
       <Typography variant={"body1"}>
         {'Вычисленный коэффициент'}
@@ -100,7 +99,7 @@ export const Overview: FC = () => {
                 </Box>
               </Box>
             </Box>
-            {graphData && (
+            {graphData && graphData.length > 0 && (
               <Box sx={styles.graphBox}
                 onTouchMove={(e) => e.preventDefault()}
               >
@@ -150,7 +149,7 @@ export const Overview: FC = () => {
             )}
           </Box>
           <Box sx={styles.gridWrapper}>
-            {(graphСoefficientsData !== undefined || graphCurrentСoefficientsData !== undefined) && (
+            {((graphСoefficientsData && graphСoefficientsData.length > 0) || (graphCurrentСoefficientsData && graphCurrentСoefficientsData.length > 0)) && (
               <Box sx={styles.graphBoxСoefficients}
                 onTouchMove={(e) => e.preventDefault()}
               >
@@ -185,7 +184,7 @@ export const Overview: FC = () => {
                         <YAxis title="- коэффициент" />
                         <XAxis title="- № участника" tickFormat={val => Math.round(val) === val ? val : ""} />
                         <DiscreteColorLegend items={legendItems} orientation="horizontal" />
-                        {graphСoefficientsData && (
+                        {graphСoefficientsData && graphСoefficientsData.length > 0 && (
                           <LineMarkSeries
                             style={{
                               strokeWidth: '1px'
@@ -195,7 +194,7 @@ export const Overview: FC = () => {
                             data={graphСoefficientsData}
                           />
                         )}
-                        {graphCurrentСoefficientsData && (
+                        {graphCurrentСoefficientsData && graphCurrentСoefficientsData.length > 0 && (
                           <LineMarkSeries
                             style={{
                               strokeWidth: '1px'

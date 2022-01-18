@@ -21,17 +21,17 @@ export const TaskTypeBlock: FC<IProps> = ({
   let typeIcon: JSX.Element | undefined
 
   switch (type) {
-    case 'singleBlind':
+    case PeerTaskTypes.SINGLE_BLIND:
       typeIcon = <SingleBlind />
       typeDescription = 'Имена рецензентов скрыты от автора. Анонимность рецензента позволяет принимать решения, справедливость которых не зависит от влияния автора.'
       typeName = 'Одностороннее «слепое»'
       break;
-    case 'doubleBlind':
+    case PeerTaskTypes.DOUBLE_BLIND:
       typeIcon = <DoubleBlind />
       typeDescription = 'Анонимными остаются и автор, и рецензент. Анонимность автора позволяет избежать предвзятости со стороны рецензента.'
       typeName = 'Двойное «слепое»'
       break;
-    case 'open':
+    case PeerTaskTypes.OPEN:
       typeIcon = <OpenPeer />
       typeDescription = 'Личности автора и рецензентов известны всем участникам. Некоторые ученые считают, что такое рецензирование – лучший способ избежать жестких комментариев, предотвратить плагиат, пресечь желание рецензента быстрее выполнить свой план работы и получить открытую, честную рецензию.'
       typeName = 'Открытое'

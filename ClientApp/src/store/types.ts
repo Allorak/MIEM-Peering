@@ -349,7 +349,7 @@ export type IOverviewStudent = {
   studentGrades?: IStudentSubmissionGrades,
   step: PeerSteps,
   studentConfidenceСoefficients?: {
-    until: number,
+    until?: number,
     after?: number
   }
 }
@@ -412,9 +412,9 @@ export interface IExpertItem {
 }
 
 export enum PeerTaskTypes {
-  SINGLE_BLIND = 'singleBlind',
-  DOUBLE_BLIND = 'doubleBlind',
-  OPEN = 'open'
+  SINGLE_BLIND = 'SingleBlind',
+  DOUBLE_BLIND = 'DoubleBlind',
+  OPEN = 'Open'
 }
 export interface ICatalog {
   id: string,
