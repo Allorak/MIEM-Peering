@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220116185910_Added task confidence factors")]
+    partial class Addedtaskconfidencefactors
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,10 +232,10 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<float?>("ConfidenceFactorAfterTask")
+                    b.Property<float>("ConfidenceFactorAfterTask")
                         .HasColumnType("REAL");
 
-                    b.Property<float?>("ConfidenceFactorBeforeTask")
+                    b.Property<float>("ConfidenceFactorBeforeTask")
                         .HasColumnType("REAL");
 
                     b.Property<int>("FinalGrade")

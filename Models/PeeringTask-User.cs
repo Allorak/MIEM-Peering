@@ -22,5 +22,11 @@ namespace patools.Models
         public PeeringTaskStates State { get; set; }
 
         public int FinalGrade { get; set; }
+
+        //wheretaskuser.perirntak = taskselect final grade
+
+        public float? ConfidenceFactorBeforeTask { get; set; }
+
+        public float? ConfidenceFactorAfterTask { get; set; }
     }
 }

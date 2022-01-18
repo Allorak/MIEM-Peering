@@ -52,21 +52,47 @@ namespace patools.Services.PeeringTasks
                 submissionsNumber = submissions
             };
 
+            /*
             var studentConfidenceСoefficients = new GetPeeringTaskСoefficientsDtoResponse
             {
-                until =
-                after =
+                until =  taskUserConnection.ConfidenceFactorBeforeTask,
+                after = taskUserConnection.ConfidenceFactorAfterTask
             };
+            */
+
+            int minimunGrade = 0;
+            int reviewed = 1;
+            int submissionsToCheckExample = 2;
+
+            /*var submission = await _context.Submissions
+                .Include(s => s.PeeringTaskUserAssignment.Student)
+                .Include(s => s.PeeringTaskUserAssignment.PeeringTask)
+                .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment.PeeringTask == task && s.PeeringTaskUserAssignment.Student == student);*/
+
+            /*var coordinatesData = new GetPeeringTaskStudentCoordinatesDtoResponse
+            {
+                value = 
+            }*/
+
+            /*var studentGrades = new GetPeeringTaskStudentGradesDtoResponse
+            {
+                minGrade = minimunGrade,
+                maxGrade = 
+                coordinates =
+            }*/
             
             return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
             (new GetPeeringTaskStudentOverviewDtoResponse
             {
                 Deadlines = deadlines,
                 Status = status,
-                SubmissionStatus = taskUserConnection.State,
-                StudentGrades = 
-                Step = task.Step,
-                StudentConfidenceСoefficients = studentConfidenceСoefficients
+                SubmissionsToCheck = submissionsToCheckExample,
+                //SubmissionStatus = taskUserConnection.State,
+                Reviewed = reviewed
+
+                //StudentGrades = 
+                //Step = task.Step
+                //StudentConfidenceСoefficients = studentConfidenceСoefficients
             });
         }
 
@@ -188,16 +214,18 @@ namespace patools.Services.PeeringTasks
             await _context.Tasks.AddAsync(newTask);
             //TODO: Feature should be changed later
 
-            var students = await _context.CourseUsers
+            var courseStudents = await _context.CourseUsers
                 .Where(cu => cu.Course == course)
-                .Select(cu => cu.User)
+                .Include(cu => cu.User)
                 .ToListAsync();
 
-            foreach (var taskUser in students.Select(student => new PeeringTaskUser()
+
+            foreach (var taskUser in courseStudents.Select(student => new PeeringTaskUser()
             {
                 ID = Guid.NewGuid(),
                 PeeringTask = newTask,
-                Student = student,
+                Student = student.User,
+                ConfidenceFactorBeforeTask = student.ConfidenceFactor,
                 State = PeeringTaskStates.Assigned
             }))
             {
@@ -522,7 +550,43 @@ namespace patools.Services.PeeringTasks
             var totalAssignments = await _context.TaskUsers.CountAsync(tu => tu.PeeringTask == task);
             int submissionsNumber = 1;
             int reviewsNumber = 1;
-            float[] grades = {10,10,10,10,10,10};
+            //float[] grades = {10,10,10,10,10,10};
+
+            var grades = _context.TaskUsers
+                .Where(s => s.PeeringTask == task)
+                .OrderBy(q => q.ID);
+            
+            var resultGrades = new List<GetGradesTeacherOverviewDtoResponse>();
+            foreach (var grade in grades)
+            {
+                var resultGrade = _mapper.Map<GetGradesTeacherOverviewDtoResponse>(grade);
+                resultGrade.FinalGradeDTO = grade.FinalGrade;
+                resultGrades.Add(resultGrade);
+            }
+
+            var currentConfidenceСoefficients = _context.TaskUsers
+                .Where(s => s.PeeringTask == task)
+                .OrderBy(q => q.ID);
+
+            var resultCurrentConfidenceСoefficients = new List<GetCurrentConfidenceСoefficientsDtoResponse>();
+            foreach (var currentConfidenceСoefficient in currentConfidenceСoefficients)
+            {
+                var resultcurrentConfidenceСoefficient = _mapper.Map<GetCurrentConfidenceСoefficientsDtoResponse>(currentConfidenceСoefficient);
+                resultcurrentConfidenceСoefficient.ConfidenceFactorBeforeTaskDTO = currentConfidenceСoefficient.ConfidenceFactorBeforeTask;
+                resultCurrentConfidenceСoefficients.Add(resultcurrentConfidenceСoefficient);
+            }
+
+            var confidenceСoefficients = _context.TaskUsers
+                .Where(s => s.PeeringTask == task)
+                .OrderBy(q => q.ID);
+            
+            var resultConfidenceСoefficients = new List<GetConfidenceСoefficientsDtoResponse>();
+            foreach (var confidenceСoefficient in confidenceСoefficients)
+            {
+                var resultconfidenceСoefficient = _mapper.Map<GetConfidenceСoefficientsDtoResponse>(confidenceСoefficient);
+                resultconfidenceСoefficient.ConfidenceFactorAfterTaskDTO= confidenceСoefficient.ConfidenceFactorAfterTask;
+                resultConfidenceСoefficients.Add(resultconfidenceСoefficient);
+            }
 
             var statistics = new GetPeeringTaskStatisticsDtoResponse
             {
@@ -530,6 +594,7 @@ namespace patools.Services.PeeringTasks
                 Review = reviewsNumber,
                 Total = totalAssignments
             };
+
             var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
 
             return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>
@@ -537,9 +602,13 @@ namespace patools.Services.PeeringTasks
                 {
                     Statistics = statistics,
                     Deadlines = deadlines,
-                    Type = task.Type,
-                    Step = task.Step,
-                    Grades = grades
+                    Grades = resultGrades,
+                    CurrentConfidenceСoefficients = resultCurrentConfidenceСoefficients,
+                    ConfidenceСoefficients = resultConfidenceСoefficients
+                    //CurrentConfidenceСoefficients = confidenceСoefficients,
+                    //ConfidenceСoefficients = confidenceСoefficients,
+                    //Type = task.Type,
+                    //Step = task.Step
                 });
         }
         
