@@ -1,10 +1,18 @@
+using System;
+using System.Collections.Generic;
+using patools.Enums;
+using System.Collections;
+using patools.Models;
+
 namespace patools.Dtos.Task
 {
     public class GetPeeringTaskStudentOverviewDtoResponse
     {
         public GetPeeringTaskDeadlinesDtoResponse Deadlines { get; set; }
         public GetPeeringTaskStatusDtoResponse Status { get; set; }
-        public int SubmissionsToCheck { get; set; }
-        public int Reviewed { get; set; }
+        public bool SubmissionStatus { get; set; }
+        public GetPeeringTaskStudentGradesDtoResponse StudentGrades { get; set; }
+        public PeeringSteps Step { get; set; }
+        public GetPeeringTaskСoefficientsDtoResponse StudentConfidenceСoefficients { get; set; }
     }
 }

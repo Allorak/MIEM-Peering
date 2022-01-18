@@ -230,17 +230,10 @@ namespace patools.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-<<<<<<< HEAD
                     b.Property<float?>("ConfidenceFactorAfterTask")
                         .HasColumnType("REAL");
 
                     b.Property<float?>("ConfidenceFactorBeforeTask")
-=======
-                    b.Property<float>("ConfidenceFactorAfterTask")
-                        .HasColumnType("REAL");
-
-                    b.Property<float>("ConfidenceFactorBeforeTask")
->>>>>>> 8c0ef9e8f4d3b3c7a3fb80cc11600d05dd51410f
                         .HasColumnType("REAL");
 
                     b.Property<int>("FinalGrade")
