@@ -468,19 +468,19 @@ export type IPeerResponses = {
 }
 
 export enum Reviewers {
-  TEACHER = 'teacher',
-  PEER = 'peer',
-  EXPERT = 'expert'
+  TEACHER = 'Teacher',
+  PEER = 'Peer',
+  EXPERT = 'Expert'
 }
 
 export enum WorkGraphTypes {
-  FINAL = "finalRates",
-  CRITERIA = "criteria"
+  FINAL = "FinalGrades",
+  CRITERIA = "Criteria"
 }
 
 export enum WorkStatisticsTypes {
-  GRAPH = "graph",
-  RESPONSE = "response"
+  GRAPH = "Graph",
+  RESPONSE = "Response"
 }
 
 export interface IWorkGraphByCriteriaItem {
