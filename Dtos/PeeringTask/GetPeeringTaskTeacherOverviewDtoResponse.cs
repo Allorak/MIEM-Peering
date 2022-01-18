@@ -15,5 +15,7 @@ namespace patools.Dtos.Task
         public List<float?> ConfidenceСoefficients { get; set; }
         public ReviewTypes Type { get; set; }
         public PeeringSteps Step { get; set; }
+        public int? CheckedWorksCount { get; set; }
+        public int? AssignedWorksCount { get; set; }
     }
 }

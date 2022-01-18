@@ -37,28 +37,27 @@ namespace patools.Services.PeeringTasks
             if (task == null)
                 return new InvalidGuidIdResponse<GetPeeringTaskStudentOverviewDtoResponse>("Invalid task id");
 
-            var taskUserConnection = await _context.TaskUsers
-                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
-            if (taskUserConnection == null)
-                return new NoAccessResponse<GetPeeringTaskStudentOverviewDtoResponse>("This student has no access to this task");
-            
             var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
 
             var expertUser = await _context.Experts.FirstOrDefaultAsync(x => x.User == student && x.PeeringTask == task);
             if (expertUser != null)
             {
-                int checkedWorksCount = 1;
-                int assignedWorksCount = 3;
+                int? checkedWorksCount = 2;
+                int? assignedWorksCount = 4;
 
-                var expertOverview =_mapper.Map<GetPeeringTaskStudentOverviewDtoResponse>(new GetPeeringTaskExpertOverviewDtoResponse()
+                return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
+                (new GetPeeringTaskStudentOverviewDtoResponse
                 {
                     Deadlines = deadlines,
                     CheckedWorksCount = checkedWorksCount,
                     AssignedWorksCount = assignedWorksCount
                 });
-
-                return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>(expertOverview);
             };
+
+            var taskUserConnection = await _context.TaskUsers
+                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
+            if (taskUserConnection == null)
+                return new NoAccessResponse<GetPeeringTaskStudentOverviewDtoResponse>("This student has no access to this task");
 
             var reviews = await _context.Reviews
                 .Include(r => r.SubmissionPeerAssignment.Submission)
@@ -604,17 +603,16 @@ namespace patools.Services.PeeringTasks
             var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == teacher && x.PeeringTask == task);
             if (expert != null)
             {
-                int checkedWorksCount = 1;
-                int assignedWorksCount = 3;
+                int? checkedWorksCount = 1;
+                int? assignedWorksCount = 3;
 
-                var expertOverview =_mapper.Map<GetPeeringTaskTeacherOverviewDtoResponse>(new GetPeeringTaskExpertOverviewDtoResponse()
+                return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>
+                (new GetPeeringTaskTeacherOverviewDtoResponse
                 {
                     Deadlines = deadlines,
                     CheckedWorksCount = checkedWorksCount,
                     AssignedWorksCount = assignedWorksCount
                 });
-
-                return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>(expertOverview);
             };
                 
             if (task.Course.Teacher.ID != teacher.ID)
