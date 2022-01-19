@@ -33,6 +33,8 @@ namespace patools.Services.PeeringTasks
                 return new InvalidGuidIdResponse<GetPeeringTaskStudentOverviewDtoResponse>("Invalid student id");
 
             var task = await _context.Tasks
+                .Include(t => t.Course)
+                .Include(t => t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<GetPeeringTaskStudentOverviewDtoResponse>("Invalid task id");
@@ -42,8 +44,8 @@ namespace patools.Services.PeeringTasks
             var expertUser = await _context.Experts.FirstOrDefaultAsync(x => x.User == student && x.PeeringTask == task);
             if (expertUser != null)
             {
-                int? checkedWorksCount = 2;
-                int? assignedWorksCount = 4;
+                int? checkedWorksCount = 2; //need to add to the database
+                int? assignedWorksCount = 4; //need to add to the database
 
                 return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
                 (new GetPeeringTaskStudentOverviewDtoResponse
@@ -58,6 +60,39 @@ namespace patools.Services.PeeringTasks
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUserConnection == null)
                 return new NoAccessResponse<GetPeeringTaskStudentOverviewDtoResponse>("This student has no access to this task");
+
+            int submissions = 0; //need to add to the database
+
+            var status = new GetPeeringTaskStatusDtoResponse
+            {
+                submissionsToCheck = task.SubmissionsToCheck,
+                submissionsNumber = submissions
+            };
+
+            bool submissionStatus = true; //need to add to the database
+
+            var questionsMinValues = await _context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Peer)
+                .Select(q => q.MinValue)
+                .ToListAsync();
+
+            int? minGrade = questionsMinValues.AsQueryable().Min();
+
+            var questionsMaxValues = await _context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Peer)
+                .Select(q => q.MaxValue)
+                .ToListAsync();
+
+            var questionsCoefficients = await _context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Peer)
+                .Select(q => q.CoefficientPercentage)
+                .ToListAsync();
+
+            var newQuestionsCoefficients = questionsCoefficients.Select(x => x/100).ToList();
+
+            var multiplicationList = new List<float?>(questionsMaxValues.Zip(newQuestionsCoefficients,(a,b)=>a*b));
+
+            float? sum = multiplicationList.Sum();
 
             var reviews = await _context.Reviews
                 .Include(r => r.SubmissionPeerAssignment.Submission)
@@ -90,6 +125,7 @@ namespace patools.Services.PeeringTasks
                         break;
                     case UserRoles.Teacher:
                         resultReview.Reviewer = UserRoles.Teacher;
+                        resultReview.Name = task.Course.Teacher.Fullname;
                         break;
                     default:
                         return new OperationErrorResponse<GetPeeringTaskStudentOverviewDtoResponse>(
@@ -101,44 +137,18 @@ namespace patools.Services.PeeringTasks
                 coordinates.Add(resultReview);
             }
 
-            int submissions = 1;
-
-            var status = new GetPeeringTaskStatusDtoResponse
-            {
-                submissionsToCheck = task.SubmissionsToCheck,
-                submissionsNumber = submissions
-            };
-
-            bool submissionStatus = true;
-
-            var studentConfidenceСoefficients = new GetPeeringTaskСoefficientsDtoResponse
-            {
-                Until =  taskUserConnection.ConfidenceFactorBeforeTask,
-                After = taskUserConnection.ConfidenceFactorAfterTask
-            };
-
-            int minGrade = 0;
-
-            var questionsValues = await _context.Questions
-                .Where(q => q.PeeringTask == task)
-                .Select(q => q.MaxValue)
-                .ToListAsync();
-
-            var questionsCoeffcients = await _context.Questions
-                .Where(q => q.PeeringTask == task)
-                .Select(q => q.CoefficientPercentage)
-                .ToListAsync();
-
-            List<float?> listC = questionsValues.Select((dValue, index) => dValue * questionsCoeffcients[index]).ToList();
-
-            float? sum = listC.Sum(); 
-
             var studentGrades = new GetPeeringTaskStudentGradesDtoResponse
             {
                 MinGrade = minGrade,
                 MaxGrade = sum,
                 Coordinates = coordinates
             };
+
+            var studentConfidenceСoefficients = new GetPeeringTaskСoefficientsDtoResponse
+            {
+                Until =  taskUserConnection.ConfidenceFactorBeforeTask,
+                After = taskUserConnection.ConfidenceFactorAfterTask
+            }; 
 
             return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
             (new GetPeeringTaskStudentOverviewDtoResponse
@@ -622,51 +632,27 @@ namespace patools.Services.PeeringTasks
             int submissionsNumber = 1;
             int reviewsNumber = 1;
 
-            var grades = await _context.TaskUsers
-                .Where(g => g.PeeringTask == task)
-                .Select(g => g.FinalGrade)
-                .ToListAsync();
-            
-            /*var resultGrades = new List<GetGradesTeacherOverviewDtoResponse>();
-            foreach (var grade in grades)
-            {
-                var resultGrade = _mapper.Map<GetGradesTeacherOverviewDtoResponse>(grade);
-                resultGrade.FinalGradeDTO = grade.FinalGrade;
-                resultGrades.Add(resultGrade);
-            }*/
-
-            var currentConfidenceСoefficients = await _context.TaskUsers
-                .Where(c => c.PeeringTask == task)
-                .Select(c => c.ConfidenceFactorBeforeTask)
-                .ToListAsync();
-
-            /*var resultCurrentConfidenceСoefficients = new List<GetCurrentConfidenceСoefficientsDtoResponse>();
-            foreach (var currentConfidenceСoefficient in currentConfidenceСoefficients)
-            {
-                var resultcurrentConfidenceСoefficient = _mapper.Map<GetCurrentConfidenceСoefficientsDtoResponse>(currentConfidenceСoefficient);
-                resultcurrentConfidenceСoefficient.ConfidenceFactorBeforeTaskDTO = currentConfidenceСoefficient.ConfidenceFactorBeforeTask;
-                resultCurrentConfidenceСoefficients.Add(resultcurrentConfidenceСoefficient);
-            }*/
-
-            var confidenceСoefficients = await _context.TaskUsers
-                .Where(c => c.PeeringTask == task)
-                .Select(c => c.ConfidenceFactorAfterTask)
-                .ToListAsync();
-            
-            /*var resultConfidenceСoefficients = new List<GetConfidenceСoefficientsDtoResponse>();
-            foreach (var confidenceСoefficient in confidenceСoefficients)
-            {
-                var resultconfidenceСoefficient = _mapper.Map<GetConfidenceСoefficientsDtoResponse>(confidenceСoefficient);
-                resultconfidenceСoefficient.ConfidenceFactorAfterTaskDTO= confidenceСoefficient.ConfidenceFactorAfterTask;
-                resultConfidenceСoefficients.Add(resultconfidenceСoefficient);
-            }*/
-
             var statistics = new GetPeeringTaskStatisticsDtoResponse
             {
                 Submissions = submissionsNumber,
                 Review = reviewsNumber,
                 Total = totalAssignments
             };
+
+            var grades = await _context.TaskUsers
+                .Where(g => g.PeeringTask == task)
+                .Select(g => g.FinalGrade)
+                .ToListAsync();
+
+            var currentConfidenceСoefficients = await _context.TaskUsers
+                .Where(c => c.PeeringTask == task)
+                .Select(c => c.ConfidenceFactorBeforeTask)
+                .ToListAsync();
+
+            var confidenceСoefficients = await _context.TaskUsers
+                .Where(c => c.PeeringTask == task)
+                .Select(c => c.ConfidenceFactorAfterTask)
+                .ToListAsync();
 
             return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>
                 (new GetPeeringTaskTeacherOverviewDtoResponse
