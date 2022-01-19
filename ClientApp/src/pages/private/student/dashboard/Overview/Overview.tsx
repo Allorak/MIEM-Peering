@@ -86,9 +86,7 @@ const styles = {
     display: "flex",
     padding: "0px 0px 10px 0px",
     gap: "10px",
-    '@media (max-width: 1321px)': {
-      flexWrap: "wrap"
-    },
+    flexWrap: "wrap"
   } as SxProps<Theme>,
   tabletMaxWidth: {
     '@media (max-width: 1321px)': {
@@ -98,13 +96,14 @@ const styles = {
     }
   } as SxProps<Theme>,
   quarterColumn: {
-    flexBasis: "calc(25% - 7px)",
+    flexBasis: "calc(25% - 8px)",
     flexGrow: 0,
     flexShrink: 0,
     '@media (max-width: 1321px)': {
       flexBasis: "calc(50% - 5px)",
       flexGrow: 0,
       flexShrink: 0,
+      minHeight: '142px'
     },
     '@media (max-width: 768px)': {
       flexBasis: "100%",

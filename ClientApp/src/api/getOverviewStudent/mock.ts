@@ -20,7 +20,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         submissionsToCheck: 14,
         submissionsNumber: 6
       },
-      submissionStatus: false,
+      submissionStatus: true,
       studentGrades: {
         coordinates: [
           {
@@ -53,10 +53,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         maxGrade: 10
       },
       step: PeerSteps.FIRST_STEP,
-      studentConfidenceСoefficients: {
-        until: 0.86,
-        after: 0.46
-      }
+      studentConfidenceСoefficients: undefined
     }
   }
 }

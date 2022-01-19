@@ -23,7 +23,8 @@ export const StatusWorkDashboard: FC<IProps> = ({
 
     const taskId = path?.params?.taskId
 
-    const onRedirect = useCallback(() => {
+    const onRedirect = useCallback((e) => {
+        e.preventDefault();
         const authorformPath = generatePath(paths.student.dashboard.authorform, { taskId })
         const workPath = generatePath(paths.student.dashboard.work, { taskId })
         history(submissionStatus === true ? workPath : authorformPath)

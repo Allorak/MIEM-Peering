@@ -24,17 +24,17 @@ export const TaskTypeBlock: FC<IProps> = ({
     case PeerTaskTypes.SINGLE_BLIND:
       typeIcon = <SingleBlind />
       typeDescription = 'Имена рецензентов скрыты от автора. Анонимность рецензента позволяет принимать решения, справедливость которых не зависит от влияния автора.'
-      typeName = 'Одностороннее «слепое»'
+      typeName = 'Односторонняя «слепая»'
       break;
     case PeerTaskTypes.DOUBLE_BLIND:
       typeIcon = <DoubleBlind />
       typeDescription = 'Анонимными остаются и автор, и рецензент. Анонимность автора позволяет избежать предвзятости со стороны рецензента.'
-      typeName = 'Двойное «слепое»'
+      typeName = 'Двойная «слепая»'
       break;
     case PeerTaskTypes.OPEN:
       typeIcon = <OpenPeer />
       typeDescription = 'Личности автора и рецензентов известны всем участникам. Некоторые ученые считают, что такое рецензирование – лучший способ избежать жестких комментариев, предотвратить плагиат, пресечь желание рецензента быстрее выполнить свой план работы и получить открытую, честную рецензию.'
-      typeName = 'Открытое'
+      typeName = 'Открытая'
       break;
   }
 
@@ -56,7 +56,7 @@ export const TaskTypeBlock: FC<IProps> = ({
                 </Typography>
               </Box>
             </Box>
-            <Box sx={styles.cardBody}>
+            <Box>
               <Box sx={styles.hrBlock}></Box>
               <Typography variant={'body1'}>
                 {typeDescription}
@@ -86,9 +86,6 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     marginBottom: '12px'
-  } as SxProps<Theme>,
-  cardBody: {
-
   } as SxProps<Theme>,
   typeName: {
     overflow: 'hidden',

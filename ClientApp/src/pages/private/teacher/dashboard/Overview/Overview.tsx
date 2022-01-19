@@ -147,8 +147,6 @@ export const Overview: FC = () => {
                 </Box>
               </Box>
             )}
-          </Box>
-          <Box sx={styles.gridWrapper}>
             {((graphСoefficientsData && graphСoefficientsData.length > 0) || (graphCurrentСoefficientsData && graphCurrentСoefficientsData.length > 0)) && (
               <Box sx={styles.graphBoxСoefficients}
                 onTouchMove={(e) => e.preventDefault()}
