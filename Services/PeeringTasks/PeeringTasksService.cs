@@ -179,14 +179,18 @@ namespace patools.Services.PeeringTasks
                 .Select(cu => cu.User)
                 .ToListAsync();
 
-            foreach (var taskUser in students.Select(student => new PeeringTaskUser()
+            foreach (var student in students)
             {
-                ID = Guid.NewGuid(),
-                PeeringTask = newTask,
-                Student = student,
-                State = PeeringTaskStates.Assigned
-            }))
-            {
+                var courseUser = await _context.CourseUsers
+                    .FirstOrDefaultAsync(cu => cu.User == student && cu.Course == course);
+                var taskUser = new PeeringTaskUser()
+                {
+                    ID = Guid.NewGuid(),
+                    PeeringTask = newTask,
+                    Student = student,
+                    State = PeeringTaskStates.Assigned,
+                    ConfidenceFactorBeforeTask = courseUser.ConfidenceFactor ?? 0
+                };
                 await _context.TaskUsers.AddAsync(taskUser);
             }
 
