@@ -656,8 +656,8 @@ namespace patools.Services.PeeringTasks
                     Statistics = statistics,
                     Deadlines = deadlines,
                     Grades = task.ReviewEndDateTime < DateTime.Now ? grades : null,
-                    CurrentConfidenceСoefficients = task.Step == PeeringSteps.SecondStep ? currentConfidenceCoefficients : null,
-                    ConfidenceСoefficients = task.ReviewEndDateTime < DateTime.Now ? confidenceCoefficients : null,
+                    CurrentConfidenceCoefficients = task.Step == PeeringSteps.SecondStep ? currentConfidenceCoefficients : null,
+                    ConfidenceCoefficients = task.ReviewEndDateTime < DateTime.Now ? confidenceCoefficients : null,
                     Type = task.Type,
                     Step = task.Step
                 });
