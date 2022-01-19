@@ -138,8 +138,8 @@ namespace patools.Services.PeeringTasks
 
             var studentConfidenceCoefficients = new GetPeeringTaskСoefficientsDtoResponse
             {
-                Until =  taskUserConnection.ConfidenceFactorBeforeTask,
-                After = taskUserConnection.ConfidenceFactorAfterTask
+                Until =  task.Step == PeeringSteps.FirstStep ? taskUserConnection.ConfidenceFactorBeforeTask : null,
+                After = task.ReviewEndDateTime < DateTime.Now ? taskUserConnection.ConfidenceFactorAfterTask : null
             }; 
 
             return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
