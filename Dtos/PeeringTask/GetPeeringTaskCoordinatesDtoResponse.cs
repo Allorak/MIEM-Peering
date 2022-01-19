@@ -9,7 +9,7 @@ namespace patools.Dtos.Task
     public class GetPeeringTaskCoordinatesDtoResponse
     {
         public float Value { get; set; }
-        public UserRoles Reviewer { get; set; }
+        public ReviewerTypes Reviewer { get; set; }
         public string Name { get; set; }
     }
 }

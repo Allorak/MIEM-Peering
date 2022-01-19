@@ -33,37 +33,65 @@ namespace patools.Services.PeeringTasks
                 return new InvalidGuidIdResponse<GetPeeringTaskStudentOverviewDtoResponse>("Invalid student id");
 
             var task = await _context.Tasks
+                .Include(t => t.Course)
+                .Include(t => t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<GetPeeringTaskStudentOverviewDtoResponse>("Invalid task id");
 
             var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
 
+            var submissionPeers = await _context.SubmissionPeers
+                .Where(sp => sp.Peer == student && sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+            var checkedWorksCount = await _context.Reviews
+                .CountAsync(r => submissionPeers.Contains(r.SubmissionPeerAssignment));
+            var assignedWorksCount = submissionPeers.Count;
+            
             var expertUser = await _context.Experts.FirstOrDefaultAsync(x => x.User == student && x.PeeringTask == task);
             if (expertUser != null)
-            {
-                int? checkedWorksCount = 2;
-                int? assignedWorksCount = 4;
-
                 return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
                 (new GetPeeringTaskStudentOverviewDtoResponse
                 {
                     Deadlines = deadlines,
-                    CheckedWorksCount = checkedWorksCount,
-                    AssignedWorksCount = assignedWorksCount
+                    CheckedWorksCount = task.ReviewStartDateTime < DateTime.Now ? checkedWorksCount : null,
+                    AssignedWorksCount = task.ReviewStartDateTime < DateTime.Now ? assignedWorksCount : null
                 });
-            };
 
             var taskUserConnection = await _context.TaskUsers
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUserConnection == null)
                 return new NoAccessResponse<GetPeeringTaskStudentOverviewDtoResponse>("This student has no access to this task");
 
+            var status = new GetPeeringTaskStatusDtoResponse
+            {
+                submissionsToCheck = task.SubmissionsToCheck,
+                submissionsNumber = checkedWorksCount
+            };
+
+            var submissionStatus = await _context.Submissions
+                .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUserConnection) != null;
+
+            var questions = await _context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Peer && q.Type == QuestionTypes.Select && q.Required)
+                .ToListAsync();
+
+            float minGrade = 0;
+            float maxGrade = 0;
+            foreach (var question in questions)
+            {
+                if (question.MinValue == null || question.MaxValue == null || question.CoefficientPercentage == null)
+                    return new OperationErrorResponse<GetPeeringTaskStudentOverviewDtoResponse>(
+                        "There is an error in database");
+                
+                minGrade += question.MinValue.Value * question.CoefficientPercentage.Value / 100;
+                maxGrade += question.MaxValue.Value * question.CoefficientPercentage.Value / 100;
+            }
+
             var reviews = await _context.Reviews
                 .Include(r => r.SubmissionPeerAssignment.Submission)
                 .Include(r => r.SubmissionPeerAssignment.Peer)
-                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student == student)
-                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUserConnection)
                 .ToListAsync();
 
             var coordinates = new List<GetPeeringTaskCoordinatesDtoResponse>();
@@ -72,24 +100,24 @@ namespace patools.Services.PeeringTasks
             {
                 var peer = review.SubmissionPeerAssignment.Peer;
 
-                var expert = await _context.Experts.FirstOrDefaultAsync(
-                    e => e.User == peer &&
-                         e.PeeringTask == task);
+                var expert = await _context.Experts
+                    .FirstOrDefaultAsync(e => e.User == peer && e.PeeringTask == task);
 
                 var resultReview = new GetPeeringTaskCoordinatesDtoResponse();
                 switch (peer.Role)
                 {
                     case { } when expert != null:
-                        resultReview.Reviewer = UserRoles.Expert;
+                        resultReview.Reviewer = ReviewerTypes.Expert;
                         resultReview.Name = "Эксперт";
                         break;
                     case UserRoles.Student:
-                        resultReview.Reviewer = UserRoles.Student;
+                        resultReview.Reviewer = ReviewerTypes.Peer;
                         if (task.Type != ReviewTypes.Open)
                             resultReview.Name = $"Аноним #{index++}";
                         break;
                     case UserRoles.Teacher:
-                        resultReview.Reviewer = UserRoles.Teacher;
+                        resultReview.Reviewer = ReviewerTypes.Teacher;
+                        resultReview.Name = task.Course.Teacher.Fullname;
                         break;
                     default:
                         return new OperationErrorResponse<GetPeeringTaskStudentOverviewDtoResponse>(
@@ -101,44 +129,18 @@ namespace patools.Services.PeeringTasks
                 coordinates.Add(resultReview);
             }
 
-            int submissions = 1;
-
-            var status = new GetPeeringTaskStatusDtoResponse
-            {
-                submissionsToCheck = task.SubmissionsToCheck,
-                submissionsNumber = submissions
-            };
-
-            bool submissionStatus = true;
-
-            var studentConfidenceСoefficients = new GetPeeringTaskСoefficientsDtoResponse
-            {
-                Until =  taskUserConnection.ConfidenceFactorBeforeTask,
-                After = taskUserConnection.ConfidenceFactorAfterTask
-            };
-
-            int minGrade = 0;
-
-            var questionsValues = await _context.Questions
-                .Where(q => q.PeeringTask == task)
-                .Select(q => q.MaxValue)
-                .ToListAsync();
-
-            var questionsCoeffcients = await _context.Questions
-                .Where(q => q.PeeringTask == task)
-                .Select(q => q.CoefficientPercentage)
-                .ToListAsync();
-
-            List<float?> listC = questionsValues.Select((dValue, index) => dValue * questionsCoeffcients[index]).ToList();
-
-            float? sum = listC.Sum(); 
-
             var studentGrades = new GetPeeringTaskStudentGradesDtoResponse
             {
                 MinGrade = minGrade,
-                MaxGrade = sum,
+                MaxGrade = maxGrade,
                 Coordinates = coordinates
             };
+
+            var studentConfidenceCoefficients = new GetPeeringTaskСoefficientsDtoResponse
+            {
+                Until =  task.Step == PeeringSteps.FirstStep ? taskUserConnection.ConfidenceFactorBeforeTask : null,
+                After = task.ReviewEndDateTime < DateTime.Now ? taskUserConnection.ConfidenceFactorAfterTask : null
+            }; 
 
             return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
             (new GetPeeringTaskStudentOverviewDtoResponse
@@ -148,7 +150,7 @@ namespace patools.Services.PeeringTasks
                 SubmissionStatus = submissionStatus,
                 StudentGrades = studentGrades,
                 Step = task.Step,
-                StudentConfidenceСoefficients = studentConfidenceСoefficients
+                StudentConfidenceСoefficients = studentConfidenceCoefficients
             });
         }
 
@@ -600,66 +602,31 @@ namespace patools.Services.PeeringTasks
 
             var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
 
-            var expert = await _context.Experts.FirstOrDefaultAsync(x => x.User == teacher && x.PeeringTask == task);
-            if (expert != null)
-            {
-                int? checkedWorksCount = 1;
-                int? assignedWorksCount = 3;
-
+            var submissionPeers = await _context.SubmissionPeers
+                .Where(sp => sp.Peer == teacher && sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+            var checkedWorksCount = _context.Reviews
+                .Count(r => submissionPeers.Contains(r.SubmissionPeerAssignment));
+            var assignedWorksCount = submissionPeers.Count;
+            
+            var expertUser = await _context.Experts.FirstOrDefaultAsync(x => x.User == teacher && x.PeeringTask == task);
+            if (expertUser != null)
                 return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>
                 (new GetPeeringTaskTeacherOverviewDtoResponse
                 {
                     Deadlines = deadlines,
-                    CheckedWorksCount = checkedWorksCount,
-                    AssignedWorksCount = assignedWorksCount
+                    CheckedWorksCount = task.ReviewStartDateTime < DateTime.Now ? checkedWorksCount : null,
+                    AssignedWorksCount = task.ReviewStartDateTime < DateTime.Now ? assignedWorksCount : null
                 });
-            };
                 
-            if (task.Course.Teacher.ID != teacher.ID)
+            if (task.Course.Teacher != teacher)
                 return new NoAccessResponse<GetPeeringTaskTeacherOverviewDtoResponse>("This teacher has no access to this task");
             
             var totalAssignments = await _context.TaskUsers.CountAsync(tu => tu.PeeringTask == task);
-            int submissionsNumber = 1;
-            int reviewsNumber = 1;
-
-            var grades = await _context.TaskUsers
-                .Where(g => g.PeeringTask == task)
-                .Select(g => g.FinalGrade)
-                .ToListAsync();
-            
-            /*var resultGrades = new List<GetGradesTeacherOverviewDtoResponse>();
-            foreach (var grade in grades)
-            {
-                var resultGrade = _mapper.Map<GetGradesTeacherOverviewDtoResponse>(grade);
-                resultGrade.FinalGradeDTO = grade.FinalGrade;
-                resultGrades.Add(resultGrade);
-            }*/
-
-            var currentConfidenceСoefficients = await _context.TaskUsers
-                .Where(c => c.PeeringTask == task)
-                .Select(c => c.ConfidenceFactorBeforeTask)
-                .ToListAsync();
-
-            /*var resultCurrentConfidenceСoefficients = new List<GetCurrentConfidenceСoefficientsDtoResponse>();
-            foreach (var currentConfidenceСoefficient in currentConfidenceСoefficients)
-            {
-                var resultcurrentConfidenceСoefficient = _mapper.Map<GetCurrentConfidenceСoefficientsDtoResponse>(currentConfidenceСoefficient);
-                resultcurrentConfidenceСoefficient.ConfidenceFactorBeforeTaskDTO = currentConfidenceСoefficient.ConfidenceFactorBeforeTask;
-                resultCurrentConfidenceСoefficients.Add(resultcurrentConfidenceСoefficient);
-            }*/
-
-            var confidenceСoefficients = await _context.TaskUsers
-                .Where(c => c.PeeringTask == task)
-                .Select(c => c.ConfidenceFactorAfterTask)
-                .ToListAsync();
-            
-            /*var resultConfidenceСoefficients = new List<GetConfidenceСoefficientsDtoResponse>();
-            foreach (var confidenceСoefficient in confidenceСoefficients)
-            {
-                var resultconfidenceСoefficient = _mapper.Map<GetConfidenceСoefficientsDtoResponse>(confidenceСoefficient);
-                resultconfidenceСoefficient.ConfidenceFactorAfterTaskDTO= confidenceСoefficient.ConfidenceFactorAfterTask;
-                resultConfidenceСoefficients.Add(resultconfidenceСoefficient);
-            }*/
+            var submissionsNumber = await _context.Submissions
+                .CountAsync(s => s.PeeringTaskUserAssignment.PeeringTask == task);
+            var reviewsNumber = await _context.Reviews
+                .CountAsync(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task);
 
             var statistics = new GetPeeringTaskStatisticsDtoResponse
             {
@@ -668,14 +635,29 @@ namespace patools.Services.PeeringTasks
                 Total = totalAssignments
             };
 
+            var grades = await _context.TaskUsers
+                .Where(g => g.PeeringTask == task)
+                .Select(g => g.FinalGrade)
+                .ToListAsync();
+
+            var currentConfidenceCoefficients = await _context.TaskUsers
+                .Where(c => c.PeeringTask == task)
+                .Select(c => c.ConfidenceFactorBeforeTask)
+                .ToListAsync();
+
+            var confidenceCoefficients = await _context.TaskUsers
+                .Where(c => c.PeeringTask == task)
+                .Select(c => c.ConfidenceFactorAfterTask)
+                .ToListAsync();
+
             return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>
                 (new GetPeeringTaskTeacherOverviewDtoResponse
                 {
                     Statistics = statistics,
                     Deadlines = deadlines,
-                    Grades = grades,
-                    CurrentConfidenceСoefficients = currentConfidenceСoefficients,
-                    ConfidenceСoefficients = confidenceСoefficients,
+                    Grades = task.ReviewEndDateTime < DateTime.Now ? grades : null,
+                    CurrentConfidenceCoefficients = task.Step == PeeringSteps.SecondStep ? currentConfidenceCoefficients : null,
+                    ConfidenceCoefficients = task.ReviewEndDateTime < DateTime.Now ? confidenceCoefficients : null,
                     Type = task.Type,
                     Step = task.Step
                 });
