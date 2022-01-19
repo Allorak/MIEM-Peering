@@ -19,6 +19,7 @@ namespace patools.Services.PeeringTasks
     {
         private readonly PAToolsContext _context;
         private readonly IMapper _mapper;
+        private const int MaxPossibleGrade = 10;
 
         public PeeringTasksService(PAToolsContext context, IMapper mapper)
         {
@@ -114,13 +115,13 @@ namespace patools.Services.PeeringTasks
                 Type = peeringTask.Settings.Type
             };
             
-            var firstStepTask = await _context.Tasks
-                .FirstOrDefaultAsync(t => t.Course == course && t.Step == PeeringSteps.FirstStep);
-            if (firstStepTask != null)
+            var initialTask = await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Course == course && t.TaskType == TaskTypes.Initial);
+            if (initialTask != null)
             {
-                if (firstStepTask.ReviewEndDateTime > DateTime.Now)
+                if (initialTask.ReviewEndDateTime > DateTime.Now)
                     return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>(
-                        "The first-step task hasn't ended yet");
+                        "The initial task hasn't ended yet");
                 
                 var courseStudentConnections = await _context.CourseUsers
                     .Where(cu => cu.Course == course)
@@ -132,21 +133,21 @@ namespace patools.Services.PeeringTasks
 
                 if (courseStudentConnections.Count == noConfidenceFactorStudents.Count)
                     return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>(
-                        "First-step task has ended but no students have confidence factor");
+                        "Initial task has ended but no students have confidence factor");
                 
                 foreach (var courseStudent in noConfidenceFactorStudents)
                 {
                     courseStudent.ConfidenceFactor = 0;
                 }
 
-                newTask.Step = PeeringSteps.SecondStep;
+                newTask.TaskType = TaskTypes.Common;
             }
             else
             {
                 if (peeringTask.Settings.Experts == null)
                     return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                        "The task is first-step but no experts provided");
-                newTask.Step = PeeringSteps.FirstStep;
+                        "The task is initial but no experts provided");
+                newTask.TaskType = TaskTypes.Initial;
                 newTask.ExpertsAssigned = false;
                 foreach (var email in peeringTask.Settings.Experts)
                 {
@@ -750,6 +751,213 @@ namespace patools.Services.PeeringTasks
                 return TaskDeadlineStates.NotStarted;
 
             return task.ReviewEndDateTime > DateTime.Now ? TaskDeadlineStates.Start : TaskDeadlineStates.End;
+        }
+
+        public async Task<Response<string>> ChangeConfidenceFactors(ChangeConfidenceFactorDto taskInfo)
+        {
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<string>("Invalid task id provided");
+
+            var taskUsers = await _context.TaskUsers
+                .Include(tu => tu.Student)
+                .Include(tu => tu.PeeringTask.Course)
+                .Where(tu => tu.PeeringTask == task)
+                .ToListAsync();
+            foreach (var taskUser in taskUsers)
+            {
+                var student = taskUser.Student;
+                Console.WriteLine($"Student Name: {student.Fullname}");
+                
+                var courseUser = await _context.CourseUsers
+                    .FirstOrDefaultAsync(cu => cu.User == student && cu.Course == task.Course);
+
+                if (task.TaskType == TaskTypes.Initial)
+                {
+                    var expertReview = await GetExpertReview(task,student);
+                    var confidenceFactor = await CountInitialConfidenceFactor(task, student, expertReview.Grade);
+                    if (confidenceFactor == null)
+                        return new OperationErrorResponse<string>("There is an error in counting initial confidence factors");
+                    courseUser.ConfidenceFactor = confidenceFactor.Value;
+                    taskUser.ConfidenceFactorAfterTask = confidenceFactor.Value;
+                    taskUser.FinalGrade = (int)Math.Round(expertReview.Grade);
+                }
+                else
+                {
+                    var confidenceFactor = await CountNewConfidenceFactor(taskUser) ?? taskUser.ConfidenceFactorBeforeTask;
+                    courseUser.ConfidenceFactor = confidenceFactor;
+                    taskUser.ConfidenceFactorAfterTask = confidenceFactor;
+                    Console.WriteLine($"Confidence factor before task: {taskUser.ConfidenceFactorBeforeTask}");
+                    Console.WriteLine($"Confidence factor after task: {taskUser.ConfidenceFactorAfterTask}");
+                }
+
+            }
+
+            await _context.SaveChangesAsync();
+            return new SuccessfulResponse<string>("Factors recalculated successfully. All grades are set");
+        }
+
+        private async Task<Review> GetExpertReview(PeeringTask task, User student)
+        {
+            var peers = await _context.Reviews
+                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .Select(r => r.SubmissionPeerAssignment.Peer)
+                .ToListAsync();
+                
+            var expert = await _context.Experts
+                .Include(e => e.User)
+                .FirstOrDefaultAsync(e => e.PeeringTask == task && peers.Contains(e.User));
+                
+            var expertReview = await _context.Reviews
+                .FirstOrDefaultAsync(r => 
+                    r.SubmissionPeerAssignment.Peer == expert.User
+                    && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task
+                    && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student == student);
+
+            return expertReview;
+        }
+
+        private async Task<float?> CountInitialConfidenceFactor(PeeringTask task, User student, float grade)
+        {
+            var expertUsers = await _context.Experts
+                    .Where(e => e.PeeringTask == task)
+                    .Select(e => e.User)
+                    .ToListAsync();
+            
+            var peerReviews = await _context.Reviews
+                .Include(r => r.SubmissionPeerAssignment)
+                .Include(r => r.SubmissionPeerAssignment.Submission)
+                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment)
+                .Where(r => r.SubmissionPeerAssignment.Peer == student 
+                            && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+
+            var expertReviews = await _context.Reviews
+                .Include(r => r.SubmissionPeerAssignment)
+                .Include(r => r.SubmissionPeerAssignment.Submission)
+                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment)
+                .Where(r => expertUsers.Contains(r.SubmissionPeerAssignment.Peer)
+                            && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+
+            var peerExpertReviewsDictionary = new Dictionary<Review, Review>();
+            foreach (var peerReview in peerReviews)
+            {
+                var expertReview = expertReviews.Find(er =>
+                    er.SubmissionPeerAssignment.Submission == peerReview.SubmissionPeerAssignment.Submission);
+                if (expertReview == null)
+                {
+                    Console.WriteLine("Expert hasn't reviewed this submission yet");
+                    return null;
+                }
+
+                peerExpertReviewsDictionary[peerReview] = expertReview;
+            }
+
+            var normalizedErrors = new List<float>();
+            
+            foreach (var peerReview in peerReviews)
+            {
+                var peerAnswers = await _context.Answers
+                    .Where(a => a.Review == peerReview && a.Question.Type == QuestionTypes.Select)
+                    .OrderBy(a => a.Question)
+                    .Include(a => a.Question)
+                    .ToListAsync();
+
+                var expertAnswers = await _context.Answers
+                    .Where(a => a.Review == peerExpertReviewsDictionary[peerReview] &&
+                                a.Question.Type == QuestionTypes.Select)
+                    .OrderBy(a => a.Question)
+                    .Include(a => a.Question)
+                    .ToListAsync();
+
+                var error = 0f;
+                var maxError = 0f;
+                for (var i = 0; i < peerAnswers.Count; i++)
+                {
+                    var question = peerAnswers[i].Question;
+                    
+                    if (peerAnswers[i].Value == null || expertAnswers[i].Value == null)
+                    {
+                        Console.WriteLine("There is an error in database");
+                        return null;
+                    }
+                    if (peerAnswers[i].Question != expertAnswers[i].Question)
+                    {
+                        Console.WriteLine("There is an error in database");
+                        return null;
+                    }
+                    if (question.CoefficientPercentage == null)
+                    {
+                        Console.WriteLine("There is an error in database");
+                        return null;
+                    }
+                    if (question.MinValue == null)
+                    {
+                        Console.WriteLine("There is an error in database");
+                        return null;
+                    }
+                    if (question.MaxValue == null)
+                    {
+                        Console.WriteLine("There is an error in database");
+                        return null;
+                    }
+                    
+                    var normalizingFactor = (question.CoefficientPercentage.Value / 100);
+                    var answerValuesDifference = Math.Abs(peerAnswers[i].Value.Value - expertAnswers[i].Value.Value);
+                    Console.WriteLine($"Answers difference: {answerValuesDifference}");
+                    Console.WriteLine($"Normalizing factor: {normalizingFactor}");
+                    error += answerValuesDifference * normalizingFactor;
+                    maxError += (question.MaxValue.Value - question.MinValue.Value) * normalizingFactor;
+                }
+                Console.WriteLine($"Error: {error}");
+                Console.WriteLine($"Max Error: {maxError}");
+                
+                normalizedErrors.Add(error/maxError);
+                Console.WriteLine($"Normalized error: {normalizedErrors[^1]}");
+            }
+            
+            var resultError = normalizedErrors.Sum() / normalizedErrors.Count;
+            Console.WriteLine($"Result error: {resultError}");
+            var resultConfidenceFactor = ((1 - resultError)*MaxPossibleGrade + grade)/(2*MaxPossibleGrade);
+            Console.WriteLine($"Result confidence factor: {resultConfidenceFactor}");
+            return resultConfidenceFactor;
+        }
+
+        private async Task<float?> CountNewConfidenceFactor(PeeringTaskUser taskUser)
+        {
+            var reviews = await _context.Reviews
+                .Include(r => r.SubmissionPeerAssignment.Peer)
+                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser)
+                .ToListAsync();
+            
+            if (reviews.Count == 0)
+                return null;
+
+            var confidenceFactorsSum = 0f;
+            var resultGrade = 0f;
+            foreach (var review in reviews)
+            {
+                var peerConfidenceFactor = await _context.CourseUsers
+                    .Where(cu => 
+                        cu.Course == taskUser.PeeringTask.Course && cu.User == review.SubmissionPeerAssignment.Peer)
+                    .Select(cu => cu.ConfidenceFactor)
+                    .FirstOrDefaultAsync();
+                if (peerConfidenceFactor == null)
+                    return null;
+                resultGrade += review.Grade * peerConfidenceFactor.Value;
+                confidenceFactorsSum += peerConfidenceFactor.Value;
+            }
+            resultGrade /= confidenceFactorsSum;
+            Console.WriteLine($"Mid-calculated grade: {resultGrade}");
+            var newConfidenceFactor = taskUser.ConfidenceFactorBeforeTask * MaxPossibleGrade;
+            newConfidenceFactor += resultGrade;
+            newConfidenceFactor /= (2*MaxPossibleGrade);
+            taskUser.FinalGrade = (int) Math.Round(resultGrade);
+            Console.WriteLine($"Final grade: {taskUser.FinalGrade}");
+            return newConfidenceFactor;
         }
     }
 }

@@ -269,7 +269,7 @@ namespace patools.Services.Courses
                 .ToList();
 
             var firstStepTask = await _context.Tasks
-                .FirstOrDefaultAsync(t => t.Course == course && t.Step == PeeringSteps.FirstStep);
+                .FirstOrDefaultAsync(t => t.Course == course && t.TaskType == TaskTypes.Initial);
             
             if (firstStepTask == null)
                 return new OperationErrorResponse<string>("There was no first-step task");
