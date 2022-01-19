@@ -13,7 +13,7 @@ export const CheckedFileCard: FC<IStatusTask> = ({
     return (
         <Box sx={styles.wrapper}>
             <Box>
-                {submissionsNumber && (
+                {typeof submissionsNumber === 'number' && (
                     <Box sx={styles.cardContent}>
                         <Box sx={styles.cardHeader}>
                             <Box sx={styles.typeIcon}>
