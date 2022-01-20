@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 namespace patools.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum PeeringSteps
+    public enum TaskTypes
     {
-        [EnumMember(Value = "firstStep")]
-        FirstStep = 1,
-        [EnumMember(Value = "secondStep")]
-        SecondStep = 2
+        [EnumMember(Value = "initial")]
+        Initial = 1,
+        [EnumMember(Value = "common")]
+        Common = 2
     }
 }

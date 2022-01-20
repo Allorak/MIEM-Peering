@@ -296,7 +296,7 @@ namespace patools
                     ReviewEndDateTime = DateTime.Now.AddMinutes(35),
                     /*SubmissionsToCheck = 3,*/
                     Course = db.Courses.Where(course => course.Title == "Объектноориентрованное программирование на языке C++").FirstOrDefault(),
-                    Step = PeeringSteps.FirstStep,
+                    TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
                     Type = ReviewTypes.DoubleBlind
@@ -312,7 +312,7 @@ namespace patools
                     ReviewEndDateTime = DateTime.Now.AddMinutes(35),
                     /*SubmissionsToCheck = 5,*/
                     Course = db.Courses.Where(course => course.Title == "Квантовая физика").FirstOrDefault(),
-                    Step = PeeringSteps.FirstStep,
+                    TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
                     Type = ReviewTypes.DoubleBlind
@@ -328,7 +328,7 @@ namespace patools
                     ReviewEndDateTime = DateTime.Now.AddMinutes(35),
                     /*SubmissionsToCheck = 2,*/
                     Course = db.Courses.Where(course => course.Title == "Изучение основ линейной алгебры").FirstOrDefault(),
-                    Step = PeeringSteps.FirstStep,
+                    TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
                     Type = ReviewTypes.DoubleBlind
@@ -344,7 +344,7 @@ namespace patools
                     ReviewEndDateTime = DateTime.Now.AddMinutes(35),
                     /*SubmissionsToCheck = 4,*/
                     Course = db.Courses.Where(course => course.Title == "Элементы математической логики").FirstOrDefault(),
-                    Step = PeeringSteps.FirstStep,
+                    TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
                     Type = ReviewTypes.DoubleBlind

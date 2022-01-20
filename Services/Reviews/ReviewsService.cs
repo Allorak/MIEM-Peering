@@ -6,10 +6,12 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Answer;
 using patools.Dtos.Review;
+using patools.Dtos.Task;
 using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
+using patools.Services.PeeringTasks;
 
 namespace patools.Services.Reviews
 {
@@ -17,11 +19,13 @@ namespace patools.Services.Reviews
     {
         private readonly PAToolsContext _context;
         private readonly IMapper _mapper;
+        private readonly IPeeringTasksService _peeringTasksService;
 
-        public ReviewsService(PAToolsContext context, IMapper mapper)
+        public ReviewsService(PAToolsContext context, IMapper mapper, IPeeringTasksService peeringTasksService)
         {
             _mapper = mapper;
             _context = context;
+            _peeringTasksService = peeringTasksService;
         }
 
         public async Task<Response<GetNewReviewDtoResponse>> AddReview(AddReviewDto review)
@@ -134,10 +138,43 @@ namespace patools.Services.Reviews
             if (grades.Count == 0)
                 return new OperationErrorResponse<GetNewReviewDtoResponse>("There were no select-questions");
 
-            var resultGrade = grades.Sum() / grades.Count;
+            var resultGrade = grades.Sum();
             newReview.Grade = resultGrade;
 
             await _context.Answers.AddRangeAsync(answers);
+
+            var task = submission.PeeringTaskUserAssignment.PeeringTask;
+            if (task.TaskType == TaskTypes.Initial && expert != null)
+            {
+                var expertUsers = await _context.Experts
+                    .Where(e => e.PeeringTask == task)
+                    .Select(e => e.User)
+                    .ToListAsync();
+                
+                var assignedReviews = await _context.SubmissionPeers
+                    .Where(sp => sp.Submission.PeeringTaskUserAssignment.PeeringTask == task &&
+                                 expertUsers.Contains(sp.Peer))
+                    .Include(sp => sp.Submission.PeeringTaskUserAssignment.Student)
+                    .ToListAsync();
+
+                var currentReviewsAmount = await _context.Reviews
+                    .CountAsync(r => assignedReviews.Contains(r.SubmissionPeerAssignment));
+
+                if (currentReviewsAmount == assignedReviews.Count)
+                {
+                    if(task.ReviewEndDateTime < DateTime.Now)
+                        await _peeringTasksService.ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
+                        {
+                            TaskId = task.ID
+                        });
+                    else
+                    {
+                        //TODO
+                        //Schedule
+                    }
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return new SuccessfulResponse<GetNewReviewDtoResponse>(new GetNewReviewDtoResponse()
@@ -334,15 +371,12 @@ namespace patools.Services.Reviews
                     StudentName = task.Type == ReviewTypes.DoubleBlind ? $"Аноним #{++index}" : student.Fullname
                 };
 
-
-                
-
                 var teacherReview = await _context.Reviews
                     .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == task.Course.Teacher);
 
                 if (teacherReview != null)
                     resultReview.TeacherAnswers = await GetAnswersForReview(teacherReview);
-                else if (task.Step == PeeringSteps.FirstStep)
+                else if (task.TaskType == TaskTypes.Initial)
                 {
                     var experts = await _context.Experts
                         .Where(e => e.PeeringTask == task)

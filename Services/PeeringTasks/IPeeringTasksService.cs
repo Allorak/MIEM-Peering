@@ -20,5 +20,6 @@ namespace patools.Services.PeeringTasks
         Task<Response<GetTaskDeadlineDtoResponse>> GetTaskReviewDeadline(GetTaskDeadlineDtoRequest taskInfo);
         Task<Response<string>> AssignPeers(AssignPeersDto peersInfo);
         Task<Response<string>> AssignExperts(AssignExpertsDto expertsInfo);
+        Task<Response<string>> ChangeConfidenceFactors(ChangeConfidenceFactorDto taskInfo);
     }
 }

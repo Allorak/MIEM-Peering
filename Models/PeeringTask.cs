@@ -61,7 +61,7 @@ namespace patools.Models
         public Course Course { get; set; }
         
         [Required] 
-        public PeeringSteps Step { get; set; }
+        public TaskTypes TaskType { get; set; }
 
         public bool? ExpertsAssigned { get; set; } = null;
 

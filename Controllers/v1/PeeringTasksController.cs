@@ -322,5 +322,15 @@ namespace patools.Controllers.v1
 
             return Ok($"Test experts created for task {taskId}");
         }
+
+        [HttpPost("confidence-factors/task={taskId}")]
+        public async Task<ActionResult<string>> ConfidenceFactors(Guid taskId)
+        {
+            return Ok(await _peeringTasksService.ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
+            {
+                TaskId = taskId
+            }));
+        }
+        
     }
 }
