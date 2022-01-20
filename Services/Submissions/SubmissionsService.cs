@@ -206,49 +206,10 @@ namespace patools.Services.Submissions
             if (submissionPeer == null && submission.PeeringTaskUserAssignment.Student != user && task.Course.Teacher != user)
                 return new NoAccessResponse<GetSubmissionDtoResponse>("This user can't access this submission");
 
-            var answers = await _context.Answers
-                .Include(a => a.Question)
-                .Where(a => a.Submission == submission)
-                .ToListAsync();
-
-            var resultAnswers = new List<GetAnswerDtoResponse>();
-            foreach (var answer in answers)
-            {
-                var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
-                if(question==null)
-                    return new OperationErrorResponse<GetSubmissionDtoResponse>("There is an error in stored data (Questions table)");
-
-                var resultAnswer = _mapper.Map<GetAnswerDtoResponse>(question);
-                resultAnswer.QuestionId = question.ID;
-                switch (resultAnswer.Type)
-                {
-                    case QuestionTypes.Text or QuestionTypes.ShortText:
-                        resultAnswer.Response = answer.Response;
-                        break;
-                    case QuestionTypes.Select:
-                        resultAnswer.Value = answer.Value;
-                        resultAnswer.CoefficientPercentage = answer.Question.CoefficientPercentage;
-                        break;
-                    case QuestionTypes.Multiple:
-                        resultAnswer.Value = answer.Value;
-                        var responses = await _context.Variants
-                            .Where(v => v.Question == question)
-                            .Select(v => new GetVariantDtoResponse()
-                            {
-                                Id=v.ChoiceId,
-                                Response = v.Response
-                            })
-                            .OrderBy(v=>v.Id)
-                            .ToListAsync();
-                        resultAnswer.Responses = responses;
-                        break;
-                }
-                resultAnswers.Add(resultAnswer);
-            }
 
             return new SuccessfulResponse<GetSubmissionDtoResponse>(new GetSubmissionDtoResponse()
             {
-                Answers = resultAnswers
+                Answers = await GetResponses(review:null,submission:submission)
             });
         }
 
@@ -482,14 +443,15 @@ namespace patools.Services.Submissions
                 StatisticType = StatisticTypes.Response,
                 Name = review.SubmissionPeerAssignment.Peer.Fullname,
                 Reviewer = await GetReviewerType(review),
-                Responses = await GetResponsesByReview(review)
+                Responses = await GetResponses(review:review, submission:null)
             };
         }
-        private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponsesByReview(Review review)
+        private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponses(Review review, Submission submission)
         {
             var answers = await _context.Answers
                 .Include(a => a.Question)
-                .Where(a => a.Review == review && a.Question.RespondentType == RespondentTypes.Peer)
+                .Where(a => 
+                    a.Review == review && a.Submission == submission && a.Question.RespondentType == RespondentTypes.Peer)
                 .ToListAsync();
 
             var resultAnswers = new List<GetAnswerDtoResponse>();
