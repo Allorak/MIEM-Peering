@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220120134442_Renamed confidence factors to previous and next")]
+    partial class Renamedconfidencefactorstopreviousandnext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -239,7 +241,7 @@ namespace patools.Migrations
                     b.Property<Guid?>("PeeringTaskID")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("PreviousConfidenceFactor")
+                    b.Property<float?>("PreviousConfidenceFactor")
                         .HasColumnType("REAL");
 
                     b.Property<int>("State")

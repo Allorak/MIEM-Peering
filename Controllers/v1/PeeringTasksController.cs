@@ -26,7 +26,7 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
-        [HttpGet("overview/task={taskId}")]
+        [HttpGet("overview/task={taskId:guid}")]
         public async Task<ActionResult<GetPeeringTaskTeacherOverviewDtoResponse>> GetTaskOverview(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -64,7 +64,7 @@ namespace patools.Controllers.v1
             return Ok(new InvalidJwtTokenResponse());
         }
 
-        [HttpGet("author-form/task={taskId}")]
+        [HttpGet("author-form/task={taskId:guid}")]
         public async Task<ActionResult<GetAuthorFormDtoResponse>> GetAuthorForm(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -86,7 +86,7 @@ namespace patools.Controllers.v1
             return Ok(await _peeringTasksService.GetAuthorForm(taskInfo));
         }
         
-        [HttpGet("peer-form/task={taskId}")]
+        [HttpGet("peer-form/task={taskId:guid}")]
         public async Task<ActionResult<GetPeerFormDtoResponse>> GetPeerForm(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -130,7 +130,7 @@ namespace patools.Controllers.v1
             return Ok(await _peeringTasksService.AddTask(peeringTask));
         }
         
-        [HttpGet("get/course={courseId}")]
+        [HttpGet("get/course={courseId:guid}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetCourseTasks([FromRoute]Guid courseId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -160,7 +160,7 @@ namespace patools.Controllers.v1
             return Ok(new InvalidJwtTokenResponse());
         }
 
-        [HttpGet("submission-deadline/task={taskId}")]
+        [HttpGet("submission-deadline/task={taskId:guid}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetSubmissionDeadline([FromRoute] Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -182,7 +182,7 @@ namespace patools.Controllers.v1
             }));
         }
         
-        [HttpGet("review-deadline/task={taskId}")]
+        [HttpGet("review-deadline/task={taskId:guid}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetReviewDeadline([FromRoute] Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -204,7 +204,7 @@ namespace patools.Controllers.v1
             }));
         }
 
-        [HttpPost("assign-peers/task={taskId}")]
+        [HttpPost("assign-peers/task={taskId:guid}")]
         public async Task<ActionResult<string>> AssignPeers([FromRoute] Guid taskId)
         {
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskId);
@@ -216,7 +216,7 @@ namespace patools.Controllers.v1
             }));
         }
         
-        [HttpPost("assign-experts/task={taskId}")]
+        [HttpPost("assign-experts/task={taskId:guid}")]
         public async Task<ActionResult<string>> AssignExperts([FromRoute] Guid taskId)
         {
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskId);
@@ -228,7 +228,7 @@ namespace patools.Controllers.v1
             }));
         }
         
-        [HttpPost("create-test-peers/task={taskId}")]
+        [HttpPost("create-test-peers/task={taskId:guid}")]
         public async Task<ActionResult<string>> CreateTestPeers([FromRoute] Guid taskId)
         {
             var task = await _context.Tasks.FirstOrDefaultAsync(t => t.ID == taskId);
@@ -276,7 +276,7 @@ namespace patools.Controllers.v1
             return Ok($"Test peers with submissions created for task {task.ID}");
         }
 
-        [HttpPost("create-test-experts/task={taskId}")]
+        [HttpPost("create-test-experts/task={taskId:guid}")]
         public async Task<ActionResult<string>> CreateTestExperts([FromRoute] Guid taskId)
         {
             await CreateTestPeers(taskId);
@@ -323,12 +323,37 @@ namespace patools.Controllers.v1
             return Ok($"Test experts created for task {taskId}");
         }
 
-        [HttpPost("confidence-factors/task={taskId}")]
+        [HttpPost("confidence-factors/task={taskId:guid}")]
         public async Task<ActionResult<string>> ConfidenceFactors(Guid taskId)
         {
             return Ok(await _peeringTasksService.ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
             {
                 TaskId = taskId
+            }));
+        }
+
+        [HttpPost("get-performance-table/task={taskId:guid}")]
+        public async Task<ActionResult<GetPerformanceTableDtoResponse>> GetPerformanceTable(Guid taskId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            if (!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+            
+            //The user has no id Claim
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            return Ok(await _peeringTasksService.GetPerformanceTable(new GetPerformanceTableDtoRequest()
+            {
+                TaskId = taskId,
+                TeacherId = teacherId
             }));
         }
         

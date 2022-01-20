@@ -11,8 +11,8 @@ namespace patools.Dtos.Task
         public GetPeeringTaskStatisticsDtoResponse Statistics { get; set; }
         public GetPeeringTaskDeadlinesDtoResponse Deadlines { get; set; }
         public List<int> Grades { get; set; }
-        public List<float?> CurrentConfidenceCoefficients { get; set; }
-        public List<float?> ConfidenceCoefficients { get; set; }
+        public List<float> CurrentConfidenceFactors { get; set; }
+        public List<float?> ConfidenceFactors { get; set; }
         public ReviewTypes? ReviewType { get; set; }
         public TaskTypes? TaskType { get; set; }
         public int? CheckedWorksCount { get; set; }

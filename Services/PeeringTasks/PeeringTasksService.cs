@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Question;
 using patools.Dtos.SubmissionPeer;
 using patools.Dtos.Task;
+using patools.Dtos.User;
 using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Models;
@@ -20,6 +21,8 @@ namespace patools.Services.PeeringTasks
         private readonly PAToolsContext _context;
         private readonly IMapper _mapper;
         private const int MaxPossibleGrade = 10;
+        private const float BadAverageConfidenceFactor = 1f/3;
+        private const float DecentAverageConfidenceFactor = 2f/3;
 
         public PeeringTasksService(PAToolsContext context, IMapper mapper)
         {
@@ -139,8 +142,8 @@ namespace patools.Services.PeeringTasks
 
             var studentConfidenceCoefficients = new GetPeeringTaskCoefficientsDtoResponse
             {
-                Before =  task.TaskType == TaskTypes.Initial ? taskUserConnection.ConfidenceFactorBeforeTask : null,
-                After = task.ReviewEndDateTime < DateTime.Now ? taskUserConnection.ConfidenceFactorAfterTask : null
+                Before =  task.TaskType == TaskTypes.Initial ? taskUserConnection.PreviousConfidenceFactor : null,
+                After = task.ReviewEndDateTime < DateTime.Now ? taskUserConnection.NextConfidenceFactor : null
             }; 
 
             return new SuccessfulResponse<GetPeeringTaskStudentOverviewDtoResponse>
@@ -288,7 +291,7 @@ namespace patools.Services.PeeringTasks
                     PeeringTask = newTask,
                     Student = student,
                     State = PeeringTaskStates.Assigned,
-                    ConfidenceFactorBeforeTask = courseUser.ConfidenceFactor ?? 0
+                    PreviousConfidenceFactor = courseUser.ConfidenceFactor ?? 0
                 };
                 await _context.TaskUsers.AddAsync(taskUser);
             }
@@ -645,12 +648,12 @@ namespace patools.Services.PeeringTasks
 
             var currentConfidenceCoefficients = await _context.TaskUsers
                 .Where(c => c.PeeringTask == task)
-                .Select(c => c.ConfidenceFactorBeforeTask)
+                .Select(c => c.PreviousConfidenceFactor)
                 .ToListAsync();
 
             var confidenceCoefficients = await _context.TaskUsers
                 .Where(c => c.PeeringTask == task)
-                .Select(c => c.ConfidenceFactorAfterTask)
+                .Select(c => c.NextConfidenceFactor)
                 .ToListAsync();
 
             return new SuccessfulResponse<GetPeeringTaskTeacherOverviewDtoResponse>
@@ -659,8 +662,8 @@ namespace patools.Services.PeeringTasks
                     Statistics = statistics,
                     Deadlines = deadlines,
                     Grades = task.ReviewEndDateTime < DateTime.Now ? grades : null,
-                    CurrentConfidenceCoefficients = task.TaskType == TaskTypes.Common ? currentConfidenceCoefficients : null,
-                    ConfidenceCoefficients = task.ReviewEndDateTime < DateTime.Now ? confidenceCoefficients : null,
+                    CurrentConfidenceFactors = task.TaskType == TaskTypes.Common ? currentConfidenceCoefficients : null,
+                    ConfidenceFactors = task.ReviewEndDateTime < DateTime.Now ? confidenceCoefficients : null,
                     ReviewType = task.ReviewType,
                     TaskType = task.TaskType
                 });
@@ -922,22 +925,129 @@ namespace patools.Services.PeeringTasks
                     if (confidenceFactor == null)
                         return new OperationErrorResponse<string>("There is an error in counting initial confidence factors");
                     courseUser.ConfidenceFactor = confidenceFactor.Value;
-                    taskUser.ConfidenceFactorAfterTask = confidenceFactor.Value;
+                    taskUser.NextConfidenceFactor = confidenceFactor.Value;
                     taskUser.FinalGrade = (int)Math.Round(expertReview.Grade);
                 }
                 else
                 {
-                    var confidenceFactor = await CountNewConfidenceFactor(taskUser) ?? taskUser.ConfidenceFactorBeforeTask;
+                    var confidenceFactor = await CountNewConfidenceFactor(taskUser) ?? taskUser.PreviousConfidenceFactor;
                     courseUser.ConfidenceFactor = confidenceFactor;
-                    taskUser.ConfidenceFactorAfterTask = confidenceFactor;
-                    Console.WriteLine($"Confidence factor before task: {taskUser.ConfidenceFactorBeforeTask}");
-                    Console.WriteLine($"Confidence factor after task: {taskUser.ConfidenceFactorAfterTask}");
+                    taskUser.NextConfidenceFactor = confidenceFactor;
+                    Console.WriteLine($"Confidence factor before task: {taskUser.PreviousConfidenceFactor}");
+                    Console.WriteLine($"Confidence factor after task: {taskUser.NextConfidenceFactor}");
                 }
 
             }
 
             await _context.SaveChangesAsync();
             return new SuccessfulResponse<string>("Factors recalculated successfully. All grades are set");
+        }
+
+        public async Task<Response<GetPerformanceTableDtoResponse>> GetPerformanceTable(GetPerformanceTableDtoRequest taskInfo)
+        {
+            var teacher = await _context.Users
+                .FirstOrDefaultAsync(u => u.ID == taskInfo.TeacherId && u.Role == UserRoles.Teacher);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<GetPerformanceTableDtoResponse>("Invalid teacher id provided");
+
+            var task = await _context.Tasks
+                .Include(t => t.Course.Teacher)
+                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<GetPerformanceTableDtoResponse>("Invalid task id provided");
+
+            if (teacher != task.Course.Teacher)
+                return new NoAccessResponse<GetPerformanceTableDtoResponse>(
+                    "This teacher isn't the teacher of this course");
+            
+            var taskStudents = await _context.TaskUsers
+                .Include(tu => tu.Student)
+                .Where(tu => tu.PeeringTask == task)
+                .OrderBy(tu => tu.Student)
+                .ToListAsync();
+
+            var resultStudents = new List<GetStudentPerformanceDtoResponse>();
+            foreach (var taskUser in taskStudents)
+            {
+                resultStudents.Add(await GetStudentPerformance(taskUser,teacher));
+            }
+
+            return new SuccessfulResponse<GetPerformanceTableDtoResponse>(new GetPerformanceTableDtoResponse()
+            {
+                Students = resultStudents
+            });
+        }
+
+        private async Task<GetStudentPerformanceDtoResponse> GetStudentPerformance(PeeringTaskUser taskUser, User teacher)
+        {
+            var studentInfo = new GetStudentPerformanceDtoResponse()
+            {
+                Fullname = taskUser.Student.Fullname,
+                ImageUrl = taskUser.Student.ImageUrl,
+                PreviousConfidenceFactor = taskUser.PreviousConfidenceFactor
+            };
+
+            var submission = await _context.Submissions
+                .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+            studentInfo.Submitted = submission != null;
+            if (!studentInfo.Submitted)
+                return studentInfo;
+
+            if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
+            {
+                studentInfo.NextConfidenceFactor = taskUser.NextConfidenceFactor;
+                studentInfo.FinalGrade = taskUser.FinalGrade;
+            }
+
+            
+            var submissionPeers = await _context.SubmissionPeers
+                .Where(sp => sp.Submission == submission && sp.Peer != teacher)
+                .ToListAsync();
+
+            var reviews = await _context.Reviews
+                .Where(r => submissionPeers.Contains(r.SubmissionPeerAssignment))
+                .Include(r => r.SubmissionPeerAssignment.Peer)
+                .ToListAsync();
+
+            var teacherReview = await _context.Reviews.FirstOrDefaultAsync(r => 
+                r.SubmissionPeerAssignment.Peer == teacher
+                && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser);
+            studentInfo.TeacherReviewed = teacherReview != null;
+
+            if (taskUser.PeeringTask.TaskType != TaskTypes.Common) 
+                return studentInfo;
+            
+            studentInfo.AssignedPeers = submissionPeers.Count;
+            studentInfo.ReviewedPeers = reviews.Count;
+            studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask.Course, reviews);
+            return studentInfo;
+        }
+
+        private async Task<ReviewQualities?> GetReviewQuality(Course course, IEnumerable<Review> reviews)
+        {
+            var confidenceFactorsSum = 0f;
+            var reviewersAmount = 0;
+            foreach (var review in reviews)
+            {
+                var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu =>
+                    cu.Course == course && cu.User == review.SubmissionPeerAssignment.Peer);
+                if (courseUser.ConfidenceFactor != null)
+                {
+                    reviewersAmount++;
+                    confidenceFactorsSum += courseUser.ConfidenceFactor.Value;
+                }
+            }
+
+            if (reviewersAmount == 0)
+                return null;
+            
+            var averageConfidenceFactor = confidenceFactorsSum/reviewersAmount;
+            return averageConfidenceFactor switch
+            {
+                < BadAverageConfidenceFactor => ReviewQualities.Bad,
+                < DecentAverageConfidenceFactor => ReviewQualities.Decent,
+                _ => ReviewQualities.Good
+            };
         }
 
         private async Task<Review> GetExpertReview(PeeringTask task, User student)
@@ -1093,7 +1203,7 @@ namespace patools.Services.PeeringTasks
             }
             resultGrade /= confidenceFactorsSum;
             Console.WriteLine($"Mid-calculated grade: {resultGrade}");
-            var newConfidenceFactor = taskUser.ConfidenceFactorBeforeTask * MaxPossibleGrade;
+            var newConfidenceFactor = taskUser.PreviousConfidenceFactor * MaxPossibleGrade;
             newConfidenceFactor += resultGrade;
             newConfidenceFactor /= (2*MaxPossibleGrade);
             taskUser.FinalGrade = (int) Math.Round(resultGrade);
