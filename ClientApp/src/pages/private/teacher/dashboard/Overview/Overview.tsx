@@ -45,8 +45,8 @@ export const Overview: FC = () => {
   }, [])
 
   const graphData = payload?.grades?.map((grade, index) => ({ x: index, y: grade }))
-  const graphСoefficientsData = payload?.confidenceСoefficients?.map((coefficient, index) => ({ x: index, y: coefficient }))
-  const graphCurrentСoefficientsData = payload?.currentConfidenceСoefficients?.map((coefficient, index) => ({ x: index, y: coefficient }))
+  const graphСoefficientsData = payload?.confidenceFactors?.map((coefficient, index) => ({ x: index, y: coefficient }))
+  const graphCurrentСoefficientsData = payload?.currentConfidenceFactors?.map((coefficient, index) => ({ x: index, y: coefficient }))
 
   const legendItems = []
 

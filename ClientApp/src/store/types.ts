@@ -327,8 +327,8 @@ export type IOverview = {
   deadlines: IDeadlines,
   grades?: number[],
   reviewType: PeerTaskTypes,
-  confidenceСoefficients?: number[],
-  currentConfidenceСoefficients?: number[],
+  confidenceFactors?: number[],
+  currentConfidenceFactors?: number[],
   taskType: PeerSteps
 }
 
@@ -526,4 +526,23 @@ export enum DeadlineStatus {
   START = 'Start',
   END = 'End',
   NOT_STARTED = 'NotStarted'
+}
+
+export enum ReviewQualities {
+  BAD = "Bad",
+  DECENT = "Decent",
+  GOOD = "Good"
+}
+
+export interface IGrades {
+  fullname: string
+  imageUrl?: string
+  previousConfidenceFactor: number
+  nextConfidenceFactor?: number
+  submitted: boolean,
+  assignedSubmissions?: number,
+  reviewedSubmissions?: number
+  teacherReviewed: boolean
+  finalGrade?: number
+  reviewQuality?: ReviewQualities
 }

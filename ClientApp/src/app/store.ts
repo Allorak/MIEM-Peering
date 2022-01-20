@@ -17,6 +17,7 @@ import { reducer as authorForm } from '../store/authorformStudent'
 import { reducer as dashboard } from '../store/dashboard'
 import { reducer as deadlineStatus } from '../store/deadlineStatus'
 import { reducer as myWork } from '../store/myWork'
+import { reducer as grades } from '../store/grades'
 
 
 export const store = configureStore({
@@ -38,7 +39,8 @@ export const store = configureStore({
     experts,
     checkings,
     authorForm,
-    myWork
+    myWork,
+    grades
   }
 })
 
