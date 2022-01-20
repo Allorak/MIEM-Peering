@@ -139,7 +139,7 @@ namespace patools.Services.PeeringTasks
 
             var studentConfidenceCoefficients = new GetPeeringTaskСoefficientsDtoResponse
             {
-                Until =  task.Step == PeeringSteps.FirstStep ? taskUserConnection.ConfidenceFactorBeforeTask : null,
+                Until =  task.TaskType == TaskTypes.Initial ? taskUserConnection.ConfidenceFactorBeforeTask : null,
                 After = task.ReviewEndDateTime < DateTime.Now ? taskUserConnection.ConfidenceFactorAfterTask : null
             }; 
 
@@ -150,7 +150,7 @@ namespace patools.Services.PeeringTasks
                 Status = status,
                 SubmissionStatus = submissionStatus,
                 StudentGrades = studentGrades,
-                Step = task.Step,
+                Step = task.TaskType,
                 StudentConfidenceСoefficients = studentConfidenceCoefficients
             });
         }
@@ -659,10 +659,10 @@ namespace patools.Services.PeeringTasks
                     Statistics = statistics,
                     Deadlines = deadlines,
                     Grades = task.ReviewEndDateTime < DateTime.Now ? grades : null,
-                    CurrentConfidenceCoefficients = task.Step == PeeringSteps.SecondStep ? currentConfidenceCoefficients : null,
+                    CurrentConfidenceCoefficients = task.TaskType == TaskTypes.Common ? currentConfidenceCoefficients : null,
                     ConfidenceCoefficients = task.ReviewEndDateTime < DateTime.Now ? confidenceCoefficients : null,
                     Type = task.Type,
-                    Step = task.Step
+                    Step = task.TaskType
                 });
         }
         

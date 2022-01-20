@@ -14,7 +14,7 @@ namespace patools.Dtos.Task
         public List<float?> CurrentConfidenceCoefficients { get; set; }
         public List<float?> ConfidenceCoefficients { get; set; }
         public ReviewTypes? Type { get; set; }
-        public PeeringSteps? Step { get; set; }
+        public TaskTypes? Step { get; set; }
         public int? CheckedWorksCount { get; set; }
         public int? AssignedWorksCount { get; set; }
     }
