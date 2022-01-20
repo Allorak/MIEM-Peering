@@ -448,11 +448,23 @@ namespace patools.Services.Submissions
         }
         private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponses(Review review, Submission submission)
         {
-            var answers = await _context.Answers
-                .Include(a => a.Question)
-                .Where(a => 
-                    a.Review == review && a.Submission == submission && a.Question.RespondentType == RespondentTypes.Peer)
-                .ToListAsync();
+            List<Answer> answers;
+            if (review == null)
+            {
+                answers = await _context.Answers
+                    .Include(a => a.Question)
+                    .Where(a =>
+                        a.Submission == submission && a.Question.RespondentType == RespondentTypes.Author)
+                    .ToListAsync();
+            }
+            else
+            {
+                answers = await _context.Answers
+                    .Include(a => a.Question)
+                    .Where(a => 
+                        a.Review == review && a.Question.RespondentType == RespondentTypes.Peer)
+                    .ToListAsync();
+            }
 
             var resultAnswers = new List<GetAnswerDtoResponse>();
             foreach (var answer in answers)
