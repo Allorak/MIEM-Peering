@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Answer;
 using patools.Dtos.Submission;
 using patools.Dtos.SubmissionPeer;
+using patools.Dtos.Task;
 using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Errors;
@@ -372,9 +373,76 @@ namespace patools.Services.Submissions
             return new SuccessfulResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(uncheckedSubmissions);
         }
 
-        public Task<Response<GetSubmissionMetadataDtoResponse>> GetSubmissionMetadata(GetSubmissionMetadataDtoRequest submissionInfo)
+        public async Task<Response<GetSubmissionMetadataDtoResponse>> GetSubmissionMetadata(GetSubmissionMetadataDtoRequest submissionInfo)
         {
+            var submission = await _context.Submissions
+                .Include(s =>s.PeeringTaskUserAssignment.PeeringTask.Course.Teacher)
+                .Include(s =>s.PeeringTaskUserAssignment.PeeringTask.Course)
+                .Include(s =>s.PeeringTaskUserAssignment.PeeringTask)
+                .FirstOrDefaultAsync(s => s.ID == submissionInfo.SubmissionId);
+            if (submission == null)
+                return new InvalidGuidIdResponse<GetSubmissionMetadataDtoResponse>("Invalid submission id provided");
+
+            var teacher = await _context.Users.FirstOrDefaultAsync(u =>
+                    u.ID == submissionInfo.StudentId && u.Role == UserRoles.Teacher);
+            if (teacher == null)
+                return new InvalidGuidIdResponse<GetSubmissionMetadataDtoResponse>("Invalid student id provided");
+
+            if (submission.PeeringTaskUserAssignment.PeeringTask.Course.Teacher != teacher)
+                return new NoAccessResponse<GetSubmissionMetadataDtoResponse>("This teacher has no access to this task ");
+
             throw new NotImplementedException();
+        }
+
+        private async Task<GetStatisticDtoResponse> GetFinalGradesStatistic(Submission submission)
+        {
+            var task = submission.PeeringTaskUserAssignment.PeeringTask;
+            var resultStatistic = new GetStatisticDtoResponse()
+            {
+                StatisticType = StatisticTypes.Graph,
+                GraphType = GraphTypes.FinalGrades,
+                MinGrade = 0,
+                MaxGrade = 10
+            };
+
+            var submissionPeers = await _context.SubmissionPeers
+                .Where(sp => sp.Submission == submission)
+                .ToListAsync();
+
+            var reviews = await _context.Reviews
+                .Include(r => r.SubmissionPeerAssignment.Peer)
+                .Where(r => submissionPeers.Contains(r.SubmissionPeerAssignment))
+                .ToListAsync();
+
+            var experts = await _context.Experts
+                    .Where(e => e.PeeringTask == task)
+                    .ToListAsync();
+
+            var coordinates = new List<GetPeeringTaskCoordinatesDtoResponse>();
+            foreach (var review in reviews)
+            {
+                var resultCoordinate = new GetPeeringTaskCoordinatesDtoResponse()
+                {
+                    Name = review.SubmissionPeerAssignment.Peer.Fullname,
+                    Value = review.Grade
+                };
+                Expert expert = null;
+                if(experts!=null)
+                    expert = experts.FirstOrDefault(e => review.SubmissionPeerAssignment.Peer == e.User);
+                resultCoordinate.Reviewer = review.SubmissionPeerAssignment.Peer.Role switch
+                {
+                    { } when expert != null => ReviewerTypes.Expert,
+                    UserRoles.Student => ReviewerTypes.Peer,
+                    UserRoles.Teacher => review.SubmissionPeerAssignment.Peer == task.Course.Teacher
+                        ? ReviewerTypes.Teacher
+                        : ReviewerTypes.Peer,
+                    _ => resultCoordinate.Reviewer
+                };
+                coordinates.Add(resultCoordinate);
+            }
+
+            resultStatistic.Coordinates = coordinates;
+            return resultStatistic;
         }
     }
 }
