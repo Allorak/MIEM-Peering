@@ -332,7 +332,7 @@ namespace patools.Controllers.v1
             }));
         }
 
-        [HttpPost("get-performance-table/task={taskId:guid}")]
+        [HttpGet("get-performance-table/task={taskId:guid}")]
         public async Task<ActionResult<GetPerformanceTableDtoResponse>> GetPerformanceTable(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)

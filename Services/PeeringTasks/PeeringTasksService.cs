@@ -993,11 +993,7 @@ namespace patools.Services.PeeringTasks
             if (!studentInfo.Submitted)
                 return studentInfo;
 
-            if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
-            {
-                studentInfo.NextConfidenceFactor = taskUser.NextConfidenceFactor;
-                studentInfo.FinalGrade = taskUser.FinalGrade;
-            }
+            
 
             
             var submissionPeers = await _context.SubmissionPeers
@@ -1013,13 +1009,20 @@ namespace patools.Services.PeeringTasks
                 r.SubmissionPeerAssignment.Peer == teacher
                 && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser);
             studentInfo.TeacherReviewed = teacherReview != null;
-
+            
+            if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
+            {
+                studentInfo.NextConfidenceFactor = taskUser.NextConfidenceFactor;
+                studentInfo.FinalGrade = taskUser.FinalGrade;
+            }
+            
             if (taskUser.PeeringTask.TaskType != TaskTypes.Common) 
                 return studentInfo;
             
             studentInfo.AssignedPeers = submissionPeers.Count;
             studentInfo.ReviewedPeers = reviews.Count;
-            studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask.Course, reviews);
+            if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
+                studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask.Course, reviews);
             return studentInfo;
         }
 
