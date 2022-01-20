@@ -89,6 +89,11 @@ export const bodyCenteredCell: SxProps<Theme> = {
   textAlign: "center",
 }
 
+export const bodyRightCell: SxProps<Theme> = {
+  ...bodyCell,
+  textAlign: "end",
+}
+
 export const headRow: SxProps<Theme> = {
   "> th:first-child": {
     padding: '15px 8px 15px 18px',

@@ -7,18 +7,20 @@ import * as styles from "./styles"
 
 type IProps = TableCellProps & {
   isCentered?: boolean,
+  isRight?: boolean,
   text?: boolean
 }
 
 export const TableBodyCell: FC<IProps> = ({
   children,
   isCentered,
+  isRight,
   sx,
   text,
   ...props
 }) => {
   const mergedSx = useMemo<SxProps<Theme> | undefined>(() => {
-    const cellStyle = isCentered ? styles.bodyCenteredCell : styles.bodyCell
+    const cellStyle = isCentered ? styles.bodyCenteredCell : isRight ? styles.bodyRightCell : styles.bodyCell
     return {
       ...cellStyle,
       ...sx
