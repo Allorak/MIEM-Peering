@@ -8,6 +8,7 @@ namespace patools.Dtos.Submission
     public class GetStatisticDtoResponse
     {
         public StatisticTypes StatisticType { get; set; }
+        public string Name { get; set; }
         public GraphTypes? GraphType { get; set; }
         public string Title { get; set; }
         public int? MinGrade { get; set; }

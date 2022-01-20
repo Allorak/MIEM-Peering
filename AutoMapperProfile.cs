@@ -1,4 +1,5 @@
 using AutoMapper;
+using patools.Dtos.Answer;
 using patools.Models;
 using patools.Dtos.User;
 using patools.Dtos.Course;
@@ -35,6 +36,7 @@ namespace patools
             CreateMap<GetCourseTeacherDtoResponse, GetCourseDtoResponse>();
             CreateMap<Variant, GetVariantDtoResponse>();
             CreateMap<Question, GetPeerQuestionDtoResponse>();
+            CreateMap<Question, GetAnswerDtoResponse>();
         }
     }
 }

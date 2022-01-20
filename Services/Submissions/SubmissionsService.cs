@@ -217,18 +217,9 @@ namespace patools.Services.Submissions
                 var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
                 if(question==null)
                     return new OperationErrorResponse<GetSubmissionDtoResponse>("There is an error in stored data (Questions table)");
-                
-                var resultAnswer = new GetAnswerDtoResponse()
-                {
-                    QuestionId = question.ID,
-                    Order = question.Order,
-                    Title = question.Title,
-                    Description = question.Description,
-                    MinValue = question.MinValue,
-                    MaxValue = question.MaxValue,
-                    Required = question.Required,
-                    Type = question.Type
-                };
+
+                var resultAnswer = _mapper.Map<GetAnswerDtoResponse>(question);
+                resultAnswer.QuestionId = question.ID;
                 switch (resultAnswer.Type)
                 {
                     case QuestionTypes.Text or QuestionTypes.ShortText:
@@ -384,26 +375,12 @@ namespace patools.Services.Submissions
                 return new InvalidGuidIdResponse<GetSubmissionMetadataDtoResponse>("Invalid submission id provided");
 
             var teacher = await _context.Users.FirstOrDefaultAsync(u =>
-                    u.ID == submissionInfo.StudentId && u.Role == UserRoles.Teacher);
+                    u.ID == submissionInfo.TeacherId && u.Role == UserRoles.Teacher);
             if (teacher == null)
                 return new InvalidGuidIdResponse<GetSubmissionMetadataDtoResponse>("Invalid student id provided");
 
             if (submission.PeeringTaskUserAssignment.PeeringTask.Course.Teacher != teacher)
                 return new NoAccessResponse<GetSubmissionMetadataDtoResponse>("This teacher has no access to this task ");
-
-            throw new NotImplementedException();
-        }
-
-        private async Task<GetStatisticDtoResponse> GetFinalGradesStatistic(Submission submission)
-        {
-            var task = submission.PeeringTaskUserAssignment.PeeringTask;
-            var resultStatistic = new GetStatisticDtoResponse()
-            {
-                StatisticType = StatisticTypes.Graph,
-                GraphType = GraphTypes.FinalGrades,
-                MinGrade = 0,
-                MaxGrade = 10
-            };
 
             var submissionPeers = await _context.SubmissionPeers
                 .Where(sp => sp.Submission == submission)
@@ -414,35 +391,131 @@ namespace patools.Services.Submissions
                 .Where(r => submissionPeers.Contains(r.SubmissionPeerAssignment))
                 .ToListAsync();
 
-            var experts = await _context.Experts
-                    .Where(e => e.PeeringTask == task)
-                    .ToListAsync();
+            var resultStatistics = new List<GetStatisticDtoResponse>();
+            
+            var questions = await _context.Questions
+                .Where(q => q.PeeringTask == submission.PeeringTaskUserAssignment.PeeringTask
+                            && q.Type == QuestionTypes.Select && q.RespondentType == RespondentTypes.Peer)
+                .ToListAsync();
 
+            resultStatistics.Add(await GetFinalGradesStatistic(reviews));
+            
+            foreach (var question in questions)
+                resultStatistics.Add(await GetCriteriaStatistic(question,reviews));
+
+            foreach (var review in reviews)
+                resultStatistics.Add(await GetReviewerStatistic(review));
+            
+            return new SuccessfulResponse<GetSubmissionMetadataDtoResponse>(new GetSubmissionMetadataDtoResponse()
+            {
+                Statistics = resultStatistics
+            });
+        }
+
+        private async Task<GetStatisticDtoResponse> GetFinalGradesStatistic(IEnumerable<Review> reviews)
+        { 
+            return new GetStatisticDtoResponse()
+            {
+                StatisticType = StatisticTypes.Graph,
+                GraphType = GraphTypes.FinalGrades,
+                MinGrade = 0,
+                MaxGrade = 10,
+                Coordinates = await GetGraphCoordinates(reviews)
+            };
+        }
+        private async Task<IEnumerable<GetPeeringTaskCoordinatesDtoResponse>> GetGraphCoordinates(IEnumerable<Review> reviews,Question question = null)
+        {
             var coordinates = new List<GetPeeringTaskCoordinatesDtoResponse>();
+            
             foreach (var review in reviews)
             {
-                var resultCoordinate = new GetPeeringTaskCoordinatesDtoResponse()
+                var coordinate = new GetPeeringTaskCoordinatesDtoResponse
                 {
                     Name = review.SubmissionPeerAssignment.Peer.Fullname,
-                    Value = review.Grade
+                    Reviewer = await GetReviewerType(review)
                 };
-                Expert expert = null;
-                if(experts!=null)
-                    expert = experts.FirstOrDefault(e => review.SubmissionPeerAssignment.Peer == e.User);
-                resultCoordinate.Reviewer = review.SubmissionPeerAssignment.Peer.Role switch
+                if (question != null)
                 {
-                    { } when expert != null => ReviewerTypes.Expert,
-                    UserRoles.Student => ReviewerTypes.Peer,
-                    UserRoles.Teacher => review.SubmissionPeerAssignment.Peer == task.Course.Teacher
-                        ? ReviewerTypes.Teacher
-                        : ReviewerTypes.Peer,
-                    _ => resultCoordinate.Reviewer
-                };
-                coordinates.Add(resultCoordinate);
+                    var answer = await _context.Answers
+                        .FirstOrDefaultAsync(a=>a.Question == question && a.Review == review);
+                    if(answer.Value!=null)
+                        coordinate.Value = answer.Value.Value;
+                }
+                else
+                {
+                    coordinate.Value = review.Grade;
+                }
+                coordinates.Add(coordinate);
             }
 
-            resultStatistic.Coordinates = coordinates;
-            return resultStatistic;
+            return coordinates;
+        }
+        private async Task<ReviewerTypes> GetReviewerType(Review review)
+        {
+            var submission = review.SubmissionPeerAssignment.Submission;
+            var task = submission.PeeringTaskUserAssignment.PeeringTask;
+            var peer = review.SubmissionPeerAssignment.Peer;
+            var teacher = task.Course.Teacher;
+            
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == peer && e.PeeringTask == task);
+            
+            if (expert != null) return ReviewerTypes.Expert;
+            return teacher == peer ? ReviewerTypes.Teacher : ReviewerTypes.Peer;
+        }
+        private async Task<GetStatisticDtoResponse> GetCriteriaStatistic(Question question, IEnumerable<Review> reviews)
+        {
+            return new GetStatisticDtoResponse()
+            {
+                StatisticType = StatisticTypes.Graph,
+                GraphType = GraphTypes.Criteria,
+                Title = question.Title,
+                MinGrade = question.MinValue,
+                MaxGrade = question.MaxValue,
+                Coordinates = await GetGraphCoordinates(reviews,question),
+                Responses = null
+            };
+        }
+        private async Task<GetStatisticDtoResponse> GetReviewerStatistic(Review review)
+        {
+            return new GetStatisticDtoResponse()
+            {
+                StatisticType = StatisticTypes.Response,
+                Name = review.SubmissionPeerAssignment.Peer.Fullname,
+                Reviewer = await GetReviewerType(review),
+                Responses = await GetResponsesByReview(review)
+            };
+        }
+        private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponsesByReview(Review review)
+        {
+            var answers = await _context.Answers
+                .Include(a => a.Question)
+                .Where(a => a.Review == review && a.Question.RespondentType == RespondentTypes.Peer)
+                .ToListAsync();
+
+            var resultAnswers = new List<GetAnswerDtoResponse>();
+            foreach (var answer in answers)
+            {
+                var resultAnswer = _mapper.Map<GetAnswerDtoResponse>(answer.Question);
+                resultAnswer.QuestionId = answer.Question.ID;
+                resultAnswer.Value = answer.Value;
+                resultAnswer.Response = answer.Response;
+                resultAnswer.Responses = await GetVariants(answer.Question);
+                resultAnswers.Add(resultAnswer);
+            }
+
+            return resultAnswers;
+        }
+        private async Task<IEnumerable<GetVariantDtoResponse>> GetVariants(Question question)
+        {
+            return await _context.Variants
+                .Where(v => v.Question == question)
+                .Select(v => new GetVariantDtoResponse()
+                {
+                    Id=v.ChoiceId,
+                    Response = v.Response
+                })
+                .OrderBy(v=>v.Id)
+                .ToListAsync();
         }
     }
 }

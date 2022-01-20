@@ -17,7 +17,7 @@ namespace patools.Dtos.Answer
         public int? Value { get; set; }
         public int? MinValue { get; set; }
         public int? MaxValue { get; set; }
-        public List<GetVariantDtoResponse> Responses { get; set; }
+        public IEnumerable<GetVariantDtoResponse> Responses { get; set; }
         public float? CoefficientPercentage { get; set; }
     }
 }

@@ -49,7 +49,7 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.AddSubmission(submission));
         }
 
-        [HttpGet("get/task={taskId}")]
+        [HttpGet("get/task={taskId:guid}")]
         public async Task<ActionResult<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissionsInfo(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -71,7 +71,7 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.GetSubmissions(taskInfo));
         }
 
-        [HttpGet("get-id/task={taskId}")]
+        [HttpGet("get-id/task={taskId:guid}")]
         public async Task<ActionResult<GetSubmissionIdDtoResponse>> GetSubmissionId(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -97,7 +97,7 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.GetSubmissionIdForStudents(taskInfo));
         }
 
-        [HttpGet("get/submission={submissionId}")]
+        [HttpGet("get/submission={submissionId:guid}")]
         public async Task<ActionResult<GetSubmissionDtoResponse>> GetSubmission([FromRoute] Guid submissionId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -118,7 +118,7 @@ namespace patools.Controllers.v1
             }));
         }
 
-        [HttpGet("get-status/task={taskId}")]
+        [HttpGet("get-status/task={taskId:guid}")]
         public async Task<ActionResult<SubmissionStatus>> GetSubmissionStatus(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -143,7 +143,7 @@ namespace patools.Controllers.v1
             }));
         }
 
-        [HttpGet("get-checks-catalog/task={taskId}")]
+        [HttpGet("get-checks-catalog/task={taskId:guid}")]
         public async Task<ActionResult<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog([FromRoute] Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
@@ -160,6 +160,29 @@ namespace patools.Controllers.v1
             {
                 TaskId = taskId,
                 UserId = userId
+            }));
+        }
+
+        [HttpGet("get-metadata/submission={submissionId:guid}")]
+        public async Task<ActionResult<GetSubmissionMetadataDtoResponse>> GetSubmissionMetadata(Guid submissionId)
+        {
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            if (!User.IsInRole(UserRoles.Teacher.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+            
+            var teacherIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(teacherIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
+                return Ok(new InvalidGuidIdResponse());
+
+            return Ok(await _submissionsService.GetSubmissionMetadata(new GetSubmissionMetadataDtoRequest()
+            {
+                SubmissionId = submissionId,
+                TeacherId = teacherId
             }));
         }
     }
