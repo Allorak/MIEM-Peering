@@ -209,7 +209,7 @@ namespace patools.Services.Submissions
 
             return new SuccessfulResponse<GetSubmissionDtoResponse>(new GetSubmissionDtoResponse()
             {
-                Answers = await GetResponses(review:null,submission:submission)
+                Answers = await GetResponsesBySubmission(submission)
             });
         }
 
@@ -443,29 +443,33 @@ namespace patools.Services.Submissions
                 StatisticType = StatisticTypes.Response,
                 Name = review.SubmissionPeerAssignment.Peer.Fullname,
                 Reviewer = await GetReviewerType(review),
-                Responses = await GetResponses(review:review, submission:null)
+                Responses = await GetResponsesByReview(review)
             };
         }
-        private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponses(Review review, Submission submission)
+        private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponsesByReview(Review review)
         {
-            List<Answer> answers;
-            if (review == null)
-            {
-                answers = await _context.Answers
-                    .Include(a => a.Question)
-                    .Where(a =>
-                        a.Submission == submission && a.Question.RespondentType == RespondentTypes.Author)
-                    .ToListAsync();
-            }
-            else
-            {
-                answers = await _context.Answers
-                    .Include(a => a.Question)
-                    .Where(a => 
-                        a.Review == review && a.Question.RespondentType == RespondentTypes.Peer)
-                    .ToListAsync();
-            }
+            var answers = await _context.Answers
+                .Include(a => a.Question)
+                .Where(a => 
+                    a.Review == review && a.Question.RespondentType == RespondentTypes.Peer)
+                .ToListAsync();
 
+            return await GetResponsesByAnswers(answers);
+        }
+
+        private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponsesBySubmission(Submission submission)
+        {
+            var answers = await _context.Answers
+                .Include(a => a.Question)
+                .Where(a => 
+                    a.Submission == submission && a.Question.RespondentType == RespondentTypes.Author)
+                .ToListAsync();
+
+            return await GetResponsesByAnswers(answers);
+        }
+        
+        private async Task<IEnumerable<GetAnswerDtoResponse>> GetResponsesByAnswers(IEnumerable<Answer> answers)
+        {
             var resultAnswers = new List<GetAnswerDtoResponse>();
             foreach (var answer in answers)
             {
