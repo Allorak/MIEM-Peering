@@ -372,5 +372,9 @@ namespace patools.Services.Submissions
             return new SuccessfulResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(uncheckedSubmissions);
         }
 
+        public Task<Response<GetSubmissionMetadataDtoResponse>> GetSubmissionMetadata(GetSubmissionMetadataDtoRequest submissionInfo)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
