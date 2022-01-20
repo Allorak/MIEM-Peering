@@ -23,8 +23,8 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
       },
       grades: [1,2,3,4,6,4,10],
       reviewType: PeerTaskTypes.DOUBLE_BLIND,
-      confidenceСoefficients: undefined,
-      currentConfidenceСoefficients: undefined,
+      confidenceFactors: undefined,
+      currentConfidenceFactors: undefined,
       taskType: PeerSteps.SECOND_STEP
     }
   }

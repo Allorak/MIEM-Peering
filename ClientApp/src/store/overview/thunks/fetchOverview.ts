@@ -31,6 +31,7 @@ export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getS
             dispatch(actions.fetchFailed(response.error))
             return
         }
+
         dispatch(actions.fetchSuccess({
             ...response.payload,
             deadlines: {

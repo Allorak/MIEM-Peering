@@ -327,8 +327,8 @@ export type IOverview = {
   deadlines: IDeadlines,
   grades?: number[],
   reviewType: PeerTaskTypes,
-  confidenceСoefficients?: number[],
-  currentConfidenceСoefficients?: number[],
+  confidenceFactors?: number[],
+  currentConfidenceFactors?: number[],
   taskType: PeerSteps
 }
 

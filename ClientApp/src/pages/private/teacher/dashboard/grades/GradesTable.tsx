@@ -1,10 +1,11 @@
 import { FC, useMemo } from "react";
 import { Box, TableBody, TableHead, Tooltip, Typography } from "@mui/material";
-import { SxProps, Theme } from "@mui/system";
+import { style, SxProps, Theme } from "@mui/system";
 
 import { Table, TableBodyCell, TableBodyCellUser, TableBodyRow, TableHeadCell, TableHeadRow } from "../../../../../components/table";
 
 import { IGrades, ReviewQualities } from "../../../../../store/types";
+import { palette } from "../../../../../theme/colors";
 
 
 interface IProps {
@@ -47,7 +48,7 @@ export const GradesTable: FC<IProps> = ({ grades }) => {
         foundCells.finalGrade = true
       }
 
-      if (typeof item.reviewQuality === 'number') {
+      if (item.reviewQuality) {
         foundCells.reviewQuality = true
       }
     }
@@ -58,7 +59,7 @@ export const GradesTable: FC<IProps> = ({ grades }) => {
 
 
   return (
-    <Table sx={styles.tableContainer}>
+    <Table sx={{ margin: "0 auto" }}>
       <TableHead>
         <TableHeadRow>
           <TableHeadCell>{heads.strudent}</TableHeadCell>
@@ -115,21 +116,30 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
 
       <TableBodyCell isCentered>
         <DecoratedText
-          color={studentItem.submitted ? "success.main" : "error.main"}
+          type={studentItem.submitted ? "success" : "error"}
           label={studentItem.submitted ? "Сдана" : "Не сдана"}
         />
       </TableBodyCell>
 
       {flags.finalGrade && (
-        <TableBodyCell isRight>
-          {typeof studentItem.finalGrade === 'number' ? studentItem.finalGrade.toFixed(1) : "---"}
+        <TableBodyCell isCentered>
+          {typeof studentItem.finalGrade === 'number' ? (
+            <Typography
+              variant={"body1"}
+              color={"primary.main"}
+              fontWeight={700}
+              sx={{ textDecoration: "underline" }}
+            >
+              {studentItem.finalGrade.toFixed(1)}
+            </Typography>
+          ) : "---"}
         </TableBodyCell>
       )}
 
       <TableBodyCell isCentered>
         <DecoratedText
-          color={studentItem.teacherReviewed ? "success.main" : "warning.main"}
-          label={studentItem.teacherReviewed ? "Сдана" : "Не сдана"}
+          type={studentItem.teacherReviewed ? "success" : "warning"}
+          label={studentItem.teacherReviewed ? "Да" : "Нет"}
         />
       </TableBodyCell>
 
@@ -137,7 +147,7 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
         <TableBodyCell isCentered>
           {studentItem.reviewQuality && (
             <DecoratedText
-              color={studentItem.reviewQuality === ReviewQualities.GOOD ? "success.main" : studentItem.reviewQuality === ReviewQualities.DECENT ? "warning.main" : "error.main"}
+              type={studentItem.reviewQuality === ReviewQualities.GOOD ? "success" : studentItem.reviewQuality === ReviewQualities.DECENT ? "warning" : "error"}
               label={studentItem.reviewQuality === ReviewQualities.GOOD ? "Лучшая" : studentItem.reviewQuality === ReviewQualities.DECENT ? "Средняя" : "Плохая"}
             />
           )}
@@ -145,7 +155,7 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       )}
 
       {flags.assignedSubmissions && (
-        <TableBodyCell isRight>
+        <TableBodyCell isCentered>
           {typeof studentItem.assignedSubmissions === 'number' && (
             studentItem.assignedSubmissions
           )}
@@ -153,7 +163,7 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       )}
 
       {flags.reviewedSubmissions && (
-        <TableBodyCell isRight>
+        <TableBodyCell isCentered>
           {typeof studentItem.reviewedSubmissions === 'number' && (
             studentItem.reviewedSubmissions
           )}
@@ -169,7 +179,7 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       {flags.nextConfidenceFactor && (
         <TableBodyCell isCentered>
           {typeof studentItem.nextConfidenceFactor === 'number' && (
-            <Typography variant={"body1"} color={"secondary.main"}>
+            <Typography variant={"body1"} color={"secondary.main"} fontWeight={700}>
               {studentItem.nextConfidenceFactor.toFixed(2)}
             </Typography>
           )}
@@ -179,28 +189,30 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
   )
 }
 
-const DecoratedText: FC<{ color: string, label: string }> = ({ color, label }) => {
+const DecoratedText: FC<{ type: 'success' | 'error' | 'warning', label: string }> = ({ type, label }) => {
+
+  const colors = {
+    color: type === 'success' ? palette.fill.success : type === 'error' ? palette.fill.danger : palette.fill.secondary,
+    backgroundColor: type === 'success' ? palette.transparent.success : type === 'error' ? palette.transparent.warning : palette.transparent.secondary
+  }
+
   return (
-    <Box sx={{ ...styles.textDecorationContainer, backgroundColor: color, color }}>
-      <Typography variant={"body1"} color={"inherit"}>
-        {label}
-      </Typography>
-    </Box>
+    <Typography
+      variant={"body1"}
+      sx={{ ...styles.textDecoration, color: colors.color, backgroundColor: colors.backgroundColor }}
+    >
+      {label}
+    </Typography>
   )
 }
 
 
 const styles = {
-  tableContainer: {
-    margin: "0px auto",
-    // maxWidth: "900px",
-    width: "100%"
-  } as SxProps<Theme>,
-  textDecorationContainer: {
-    lineHeight: "18px",
-    opacity: 0.5,
-    padding: "6px 7px",
-    borderRadius: "2px"
+  textDecoration: {
+    lineHeight: "28px",
+    padding: "0px 7px",
+    borderRadius: "5px",
+    display: "inline-block"
   } as SxProps<Theme>,
 }
 
