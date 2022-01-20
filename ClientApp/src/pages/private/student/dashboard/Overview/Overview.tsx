@@ -16,6 +16,7 @@ import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePa
 
 import { fetchOverviewStudent } from "../../../../../store/overviewStudent";
 import { StatusWorkDashboard } from ".";
+import { PeerSteps } from "../../../../../store/types";
 
 
 
@@ -58,16 +59,16 @@ export const Overview: FC = () => {
                 </Box>
               </>
             )}
-            {payload.studentConfidenceСoefficients && (typeof payload.studentConfidenceСoefficients.after === 'number' || typeof payload.studentConfidenceСoefficients.until === 'number') && (
+            {payload.studentConfidenceCoefficients && (typeof payload.studentConfidenceCoefficients.after === 'number' || typeof payload.studentConfidenceCoefficients.before === 'number') && (
               <Box sx={styles.quarterColumn}>
-                <CoefficientsCard {...payload.studentConfidenceСoefficients} />
+                <CoefficientsCard {...payload.studentConfidenceCoefficients} />
               </Box>
             )}
           </Box>
           <Box sx={styles.gridWrapper}>
-            {(payload.step === 'FirstStep') && (
+            {(payload.taskType === PeerSteps.FIRST_STEP) && (
               <Box sx={{ ...styles.quarterColumn, ...styles.tabletMaxWidth }}>
-                <StepCheckBlock step={payload.step} />
+                <StepCheckBlock step={payload.taskType} />
               </Box>
             )}
             {payload.studentGrades && payload.studentGrades.coordinates && payload.studentGrades.coordinates.length > 0 && (

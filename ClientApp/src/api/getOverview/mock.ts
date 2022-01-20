@@ -22,10 +22,10 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         reviewEndDateTime: `${new Date()}`
       },
       grades: [1,2,3,4,6,4,10],
-      type: PeerTaskTypes.DOUBLE_BLIND,
+      reviewType: PeerTaskTypes.DOUBLE_BLIND,
       confidenceСoefficients: undefined,
       currentConfidenceСoefficients: undefined,
-      step: PeerSteps.SECOND_STEP
+      taskType: PeerSteps.SECOND_STEP
     }
   }
 }

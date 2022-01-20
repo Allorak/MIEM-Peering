@@ -55,7 +55,7 @@ export const Dashboard: FC = () => {
     />
   }
 
-  const isFirstStep = dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.step === PeerSteps.FIRST_STEP
+  const isFirstStep = dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.taskType === PeerSteps.FIRST_STEP
 
   const menuItemsP = isFirstStep ? menuItems.map(item => ({ title: item.title, path: generatePath(item.path, { taskId: path.taskId }) })) as IMenu[] :
     menuItems.filter(item => item.path !== paths.teacher.dashboard.experts).map(item => ({ title: item.title, path: generatePath(item.path, { taskId: path.taskId }) })) as IMenu[]
@@ -97,7 +97,7 @@ export const Dashboard: FC = () => {
                 <Route path={paths.teacher.dashboard.checkings} element={<Checkings />} />
                 <Route path={paths.teacher.dashboard.export} element={<ExportGrades />} />
 
-                {dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.step === PeerSteps.FIRST_STEP && (
+                {dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.taskType === PeerSteps.FIRST_STEP && (
                   <Route path={paths.teacher.dashboard.experts} element={<Experts />} />
                 )}
               </Routes>

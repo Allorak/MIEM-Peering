@@ -97,8 +97,8 @@ export const maxSubmissionProps: UseControllerProps<INewTaskSettings, "submissio
   },
 })
 
-export const taskTypeProps: UseControllerProps<INewTaskSettings, "type"> = ({
-  name: "type",
+export const taskTypeProps: UseControllerProps<INewTaskSettings, "reviewType"> = ({
+  name: "reviewType",
   rules: {
     required: {
       value: true,

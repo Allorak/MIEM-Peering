@@ -10,7 +10,7 @@ import ruLocale from "date-fns/locale/ru";
 import { InputLabel } from "../../../../../../components/inputLabel";
 
 import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
-import { IFirstStepSettings, INewTaskSettings, PeerSteps, PeerTaskTypes } from "../../../../../../store/types";
+import { INewTaskSettings, PeerSteps, PeerTaskTypes } from "../../../../../../store/types";
 
 import * as fields from "../formFields"
 import * as globalStyles from "../../../../../../const/styles";
@@ -451,7 +451,7 @@ const initialValue = (): INewTaskSettings => {
     reviewStartDateTime: reviewStartDateTime,
     reviewEndDateTime: reviewEndDateTime,
     submissionsToCheck: 2,
-    type: PeerTaskTypes.DOUBLE_BLIND
+    reviewType: PeerTaskTypes.DOUBLE_BLIND
   }
 
   return taskSettings

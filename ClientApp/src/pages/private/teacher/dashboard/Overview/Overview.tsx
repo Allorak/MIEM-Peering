@@ -209,14 +209,14 @@ export const Overview: FC = () => {
                 </Box>
               </Box>
             )}
-            {payload.type && (
+            {payload.reviewType && (
               <Box sx={styles.quarterColumn}>
-                <TaskTypeBlock type={payload.type} />
+                <TaskTypeBlock type={payload.reviewType} />
               </Box>
             )}
-            {payload.step && (
+            {payload.taskType && (
               <Box sx={styles.quarterColumn}>
-                <StepCheckBlock step={payload.step} />
+                <StepCheckBlock step={payload.taskType} />
               </Box>
             )}
           </Box>

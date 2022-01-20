@@ -1,13 +1,13 @@
 import { FC } from "react";
-import { 
-  HorizontalGridLines, 
-  LineMarkSeries, 
-  LineMarkSeriesPoint, 
-  LineSeries, LineSeriesPoint, 
-  VerticalGridLines, 
-  XAxis, 
-  XYPlot, 
-  YAxis 
+import {
+  HorizontalGridLines,
+  LineMarkSeries,
+  LineMarkSeriesPoint,
+  LineSeries, LineSeriesPoint,
+  VerticalGridLines,
+  XAxis,
+  XYPlot,
+  YAxis
 } from "react-vis";
 import { Box, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
@@ -44,6 +44,26 @@ export const TaskLineGraphStudent: FC<IProps> = ({ graphProps }) => {
       y: peersCoordinate.value,
       x: index
     })) : undefined
+
+  if ((peersGraph.length === 0 || peersGraph.length === 1)) {
+    if (teacherGraph.length > 0 && teacherData) {
+      teacherData.push(
+        {
+          y: teacherGraph[0].value,
+          x: teacherData.length
+        }
+      )
+    }
+
+    if (expertGraph.length > 0 && expertData) {
+      expertData.push(
+        {
+          y: expertGraph[0].value,
+          x: expertData.length
+        }
+      )
+    }
+  }
 
   const teacherColor = palette.hover.danger
   const expertColor = palette.hover.success

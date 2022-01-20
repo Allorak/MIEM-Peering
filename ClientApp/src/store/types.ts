@@ -109,10 +109,10 @@ export type ICourses = {
 
 export type IDashboardTaskProps = {
   userRole: IRole.teacher,
-  step: PeerSteps
+  taskType: PeerSteps
 } | {
   userRole: IRole.student,
-  step: PeerSteps
+  taskType: PeerSteps
 } | {
   userRole: IRole.expert,
 }
@@ -190,25 +190,15 @@ export interface INewTaskSettings {
   reviewEndDateTime: Date | undefined
   submissionsToCheck: number
   experts?: Array<string>
-  type: PeerTaskTypes
+  reviewType: PeerTaskTypes
 }
 
 export enum PeerSteps {
-  FIRST_STEP = 'FirstStep',
-  SECOND_STEP = 'SecondStep',
+  FIRST_STEP = 'Initial',
+  SECOND_STEP = 'Common',
 }
 
-export interface IFirstStepSettings {
-  step: PeerSteps.FIRST_STEP,
-  experts: Array<string>
-}
-
-export interface ISecondStepSettings {
-  step: PeerSteps.SECOND_STEP,
-  taskId: string
-}
-
-export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'stepParams' | 'type'> { }
+export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'reviewType' | 'experts'> { }
 
 export type INewQuestionRubrics = Array<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion>
 
@@ -336,10 +326,10 @@ export type IOverview = {
   statistics: IStatusBar,
   deadlines: IDeadlines,
   grades?: number[],
-  type: PeerTaskTypes,
+  reviewType: PeerTaskTypes,
   confidenceСoefficients?: number[],
   currentConfidenceСoefficients?: number[],
-  step: PeerSteps
+  taskType: PeerSteps
 }
 
 export type IOverviewStudent = {
@@ -347,9 +337,9 @@ export type IOverviewStudent = {
   status: IStatusTask,
   submissionStatus: boolean,
   studentGrades?: IStudentSubmissionGrades,
-  step: PeerSteps,
-  studentConfidenceСoefficients?: {
-    until?: number,
+  taskType: PeerSteps,
+  studentConfidenceCoefficients?: {
+    before?: number,
     after?: number
   }
 }

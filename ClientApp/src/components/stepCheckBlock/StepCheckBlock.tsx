@@ -18,11 +18,11 @@ export const StepCheckBlock: FC<IProps> = ({
   let stepIcon: JSX.Element | undefined
 
   switch (step) {
-    case 'FirstStep':
+    case PeerSteps.FIRST_STEP:
       stepIcon = <StepFirst />
       stepDescription = 'Задания начального типа предназначены для определения коэффициентов доверия студентов курса. Это достигается при помощи привлечения экспертов, и в итоговых оценках за это задание учитывается только их проверка.'
       break;
-    case 'SecondStep':
+    case PeerSteps.SECOND_STEP:
       stepIcon = <StepSecond />
       stepDescription = 'Задания основного типа являются обычными заданиями, где используются только проверки студентов и их коэффициенты доверия (изначально полученные в задании начального типа). По результатам проверок коэффициенты доверия студентов корректируются автоматически.'
       break;

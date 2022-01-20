@@ -52,8 +52,8 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
         minGrade: 0,
         maxGrade: 10
       },
-      step: PeerSteps.FIRST_STEP,
-      studentConfidenceСoefficients: undefined
+      taskType: PeerSteps.FIRST_STEP,
+      studentConfidenceCoefficients: undefined
     }
   }
 }
