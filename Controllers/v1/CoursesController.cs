@@ -160,7 +160,7 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidGuidIdResponse());
 
-            return Ok(await _coursesService.CheckForSecondStep(new CheckForSecondStepDto()
+            return Ok(await _coursesService.CheckForSecondStep(new CanCreateCommonTaskDto()
             {
                 CourseId = courseId,
                 TeacherId = teacherId

@@ -68,7 +68,7 @@ namespace patools.Models
         public bool PeersAssigned { get; set; } = false;
 
         [Required]
-        public ReviewTypes Type { get; set; }
+        public ReviewTypes ReviewType { get; set; }
 
     }
 }

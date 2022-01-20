@@ -66,8 +66,8 @@ namespace patools.Services.PeeringTasks
 
             var status = new GetPeeringTaskStatusDtoResponse
             {
-                submissionsToCheck = task.SubmissionsToCheck,
-                submissionsNumber = checkedWorksCount
+                SubmissionsToCheck = task.SubmissionsToCheck,
+                SubmissionsNumber = checkedWorksCount
             };
 
             var submissionStatus = await _context.Submissions
@@ -113,7 +113,7 @@ namespace patools.Services.PeeringTasks
                         break;
                     case UserRoles.Student:
                         resultReview.Reviewer = ReviewerTypes.Peer;
-                        if (task.Type != ReviewTypes.Open)
+                        if (task.ReviewType != ReviewTypes.Open)
                             resultReview.Name = $"Аноним #{index++}";
                         break;
                     case UserRoles.Teacher:
@@ -137,9 +137,9 @@ namespace patools.Services.PeeringTasks
                 Coordinates = coordinates
             };
 
-            var studentConfidenceCoefficients = new GetPeeringTaskСoefficientsDtoResponse
+            var studentConfidenceCoefficients = new GetPeeringTaskCoefficientsDtoResponse
             {
-                Until =  task.TaskType == TaskTypes.Initial ? taskUserConnection.ConfidenceFactorBeforeTask : null,
+                Before =  task.TaskType == TaskTypes.Initial ? taskUserConnection.ConfidenceFactorBeforeTask : null,
                 After = task.ReviewEndDateTime < DateTime.Now ? taskUserConnection.ConfidenceFactorAfterTask : null
             }; 
 
@@ -150,8 +150,8 @@ namespace patools.Services.PeeringTasks
                 Status = status,
                 SubmissionStatus = submissionStatus,
                 StudentGrades = studentGrades,
-                Step = task.TaskType,
-                StudentConfidenceСoefficients = studentConfidenceCoefficients
+                TaskType = task.TaskType,
+                StudentConfidenceCoefficients = studentConfidenceCoefficients
             });
         }
 
@@ -211,7 +211,7 @@ namespace patools.Services.PeeringTasks
                 ReviewStartDateTime = peeringTask.Settings.ReviewStartDateTime.Value,
                 ReviewEndDateTime = peeringTask.Settings.ReviewEndDateTime.Value,
                 SubmissionsToCheck = peeringTask.Settings.SubmissionsToCheck,
-                Type = peeringTask.Settings.Type
+                ReviewType = peeringTask.Settings.ReviewType
             };
             
             var initialTask = await _context.Tasks
@@ -661,8 +661,8 @@ namespace patools.Services.PeeringTasks
                     Grades = task.ReviewEndDateTime < DateTime.Now ? grades : null,
                     CurrentConfidenceCoefficients = task.TaskType == TaskTypes.Common ? currentConfidenceCoefficients : null,
                     ConfidenceCoefficients = task.ReviewEndDateTime < DateTime.Now ? confidenceCoefficients : null,
-                    Type = task.Type,
-                    Step = task.TaskType
+                    ReviewType = task.ReviewType,
+                    TaskType = task.TaskType
                 });
         }
         

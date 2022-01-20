@@ -235,16 +235,16 @@ namespace patools.Services.Reviews
                 switch (peer.Role)
                 {
                     case { } when expert != null:
-                        resultReview.Reviewer = UserRoles.Expert;
+                        resultReview.Reviewer = ReviewerTypes.Expert;
                         resultReview.ReviewerName = "Эксперт";
                         break;
                     case UserRoles.Student:
-                        resultReview.Reviewer = UserRoles.Student;
-                        if (task.Type != ReviewTypes.Open)
+                        resultReview.Reviewer = ReviewerTypes.Peer;
+                        if (task.ReviewType != ReviewTypes.Open)
                             resultReview.ReviewerName = $"Аноним #{index++}";
                         break;
                     case UserRoles.Teacher:
-                        resultReview.Reviewer = UserRoles.Teacher;
+                        resultReview.Reviewer = ReviewerTypes.Teacher;
                         break;
                     default:
                         return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
@@ -368,7 +368,7 @@ namespace patools.Services.Reviews
                 var resultReview = new GetMyReviewDtoResponse()
                 {
                     SubmissionId = submission.ID,
-                    StudentName = task.Type == ReviewTypes.DoubleBlind ? $"Аноним #{++index}" : student.Fullname
+                    StudentName = task.ReviewType == ReviewTypes.DoubleBlind ? $"Аноним #{++index}" : student.Fullname
                 };
 
                 var teacherReview = await _context.Reviews

@@ -7,7 +7,7 @@ namespace patools.Dtos.Review
 {
     public class GetReviewDtoResponse
     {
-        public UserRoles Reviewer { get; set; }
+        public ReviewerTypes Reviewer { get; set; }
         public string ReviewerName { get; set; }
         public Guid ReviewId { get; set; }
         public float FinalGrade { get; set; }

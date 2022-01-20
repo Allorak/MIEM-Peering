@@ -350,7 +350,7 @@ namespace patools.Services.Submissions
                         return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
                             "There is an error in database");
 
-                    if (task.Type == ReviewTypes.DoubleBlind)
+                    if (task.ReviewType == ReviewTypes.DoubleBlind)
                     {
                         var index = 1;
                         foreach (var submissionToCheck in uncheckedSubmissions)

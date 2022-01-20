@@ -13,8 +13,8 @@ namespace patools.Dtos.Task
         public List<int> Grades { get; set; }
         public List<float?> CurrentConfidenceCoefficients { get; set; }
         public List<float?> ConfidenceCoefficients { get; set; }
-        public ReviewTypes? Type { get; set; }
-        public TaskTypes? Step { get; set; }
+        public ReviewTypes? ReviewType { get; set; }
+        public TaskTypes? TaskType { get; set; }
         public int? CheckedWorksCount { get; set; }
         public int? AssignedWorksCount { get; set; }
     }

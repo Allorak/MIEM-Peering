@@ -12,6 +12,6 @@ namespace patools.Dtos.Task
         public DateTime? ReviewEndDateTime { get; set; }
         public int SubmissionsToCheck {get; set; }
         public List<string> Experts { get; set; }
-        public ReviewTypes Type { get; set; }
+        public ReviewTypes ReviewType { get; set; }
     }
 }

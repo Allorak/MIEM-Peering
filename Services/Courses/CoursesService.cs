@@ -245,7 +245,7 @@ namespace patools.Services.Courses
             return new SuccessfulResponse<string>("Course was updated successfully");
         }
 
-        public async Task<Response<string>> CheckForSecondStep(CheckForSecondStepDto courseInfo)
+        public async Task<Response<string>> CheckForSecondStep(CanCreateCommonTaskDto courseInfo)
         {
             var teacher = await _context.Users.FirstOrDefaultAsync(t => t.ID == courseInfo.TeacherId);
             if (teacher == null)

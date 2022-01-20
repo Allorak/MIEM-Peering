@@ -73,7 +73,7 @@ namespace patools.Services.Users
                 return new SuccessfulResponse<GetUserRoleDtoResponse>(new GetUserRoleDtoResponse()
                 {
                     UserRole = UserRoles.Expert,
-                    Step = null
+                    TaskType = null
                 });
             }
 
@@ -83,7 +83,7 @@ namespace patools.Services.Users
                     return new SuccessfulResponse<GetUserRoleDtoResponse>(new GetUserRoleDtoResponse()
                     {
                         UserRole = UserRoles.Teacher,
-                        Step = task.TaskType
+                        TaskType = task.TaskType
                     });
                 case UserRoles.Teacher:
                     return new NoAccessResponse<GetUserRoleDtoResponse>("This teacher has no access to this task");
@@ -96,7 +96,7 @@ namespace patools.Services.Users
 
                     return new SuccessfulResponse<GetUserRoleDtoResponse>(new GetUserRoleDtoResponse()
                     {
-                        Step = task.TaskType,
+                        TaskType = task.TaskType,
                         UserRole = UserRoles.Student
                     });
                 }

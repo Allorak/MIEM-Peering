@@ -299,7 +299,7 @@ namespace patools
                     TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
-                    Type = ReviewTypes.DoubleBlind
+                    ReviewType = ReviewTypes.DoubleBlind
                 },
                 new Models.PeeringTask
                 {
@@ -315,7 +315,7 @@ namespace patools
                     TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
-                    Type = ReviewTypes.DoubleBlind
+                    ReviewType = ReviewTypes.DoubleBlind
                 },
                 new Models.PeeringTask
                 {
@@ -331,7 +331,7 @@ namespace patools
                     TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
-                    Type = ReviewTypes.DoubleBlind
+                    ReviewType = ReviewTypes.DoubleBlind
                 },
                 new Models.PeeringTask
                 {
@@ -347,7 +347,7 @@ namespace patools
                     TaskType = TaskTypes.Initial,
                     /*ExpertTask = 
                     PeersAssigned = */
-                    Type = ReviewTypes.DoubleBlind
+                    ReviewType = ReviewTypes.DoubleBlind
                 }
             };
 
