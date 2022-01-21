@@ -372,7 +372,8 @@ namespace patools.Services.Reviews
                 };
 
                 var teacherReview = await _context.Reviews
-                    .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == task.Course.Teacher);
+                    .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == task.Course.Teacher &&
+                                              r.SubmissionPeerAssignment.Submission == submission);
 
                 if (teacherReview != null)
                     resultReview.TeacherAnswers = await GetAnswersForReview(teacherReview);
