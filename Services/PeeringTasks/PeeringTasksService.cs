@@ -1013,6 +1013,19 @@ namespace patools.Services.PeeringTasks
                 r.SubmissionPeerAssignment.Peer == teacher
                 && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser);
             studentInfo.TeacherReviewed = teacherReview != null;
+
+            if (taskUser.PeeringTask.SubmissionEndDateTime < DateTime.Now)
+            {
+                var submissionsAssignedToStudent = await _context.SubmissionPeers
+                    .Where(sp =>
+                        sp.Peer == taskUser.Student &&
+                        sp.Submission.PeeringTaskUserAssignment.PeeringTask == taskUser.PeeringTask)
+                    .ToListAsync();
+
+                studentInfo.AssignedSubmissions = submissionsAssignedToStudent.Count;
+                studentInfo.ReviewedSubmissions = await _context.Reviews
+                    .CountAsync(r => submissionsAssignedToStudent.Contains(r.SubmissionPeerAssignment));
+            }
             
             if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
             {
@@ -1022,16 +1035,6 @@ namespace patools.Services.PeeringTasks
             
             if (taskUser.PeeringTask.TaskType != TaskTypes.Common) 
                 return studentInfo;
-
-            var submissionsAssignedToStudent = await _context.SubmissionPeers
-                .Where(sp =>
-                    sp.Peer == taskUser.Student &&
-                    sp.Submission.PeeringTaskUserAssignment.PeeringTask == taskUser.PeeringTask)
-                .ToListAsync();
-
-            studentInfo.AssignedSubmissions = submissionsAssignedToStudent.Count;
-            studentInfo.ReviewedSubmissions = await _context.Reviews
-                .CountAsync(r => submissionsAssignedToStudent.Contains(r.SubmissionPeerAssignment));
 
             if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
                 studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask.Course, reviews);
