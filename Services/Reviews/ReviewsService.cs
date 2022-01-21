@@ -245,7 +245,6 @@ namespace patools.Services.Reviews
                         break;
                     case UserRoles.Teacher:
                         resultReview.Reviewer = ReviewerTypes.Teacher;
-                        resultReview.ReviewerName = "Преподаватель";
                         break;
                     default:
                         return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
