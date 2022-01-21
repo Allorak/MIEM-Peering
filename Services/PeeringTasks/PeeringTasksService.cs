@@ -927,7 +927,9 @@ namespace patools.Services.PeeringTasks
                         return new OperationErrorResponse<string>("There is an error in counting initial confidence factors");
                     courseUser.ConfidenceFactor = confidenceFactor.Value;
                     taskUser.NextConfidenceFactor = confidenceFactor.Value;
-                    taskUser.FinalGrade = (int)Math.Round(expertReview.Grade);
+                    var finalGrade = expertReview.Grade;
+                    finalGrade *= await GetReviewedPercentage(taskUser);
+                    taskUser.FinalGrade = (int)Math.Round(finalGrade);
                 }
                 else
                 {
@@ -1191,6 +1193,7 @@ namespace patools.Services.PeeringTasks
             var resultError = normalizedErrors.Sum() / normalizedErrors.Count;
             Console.WriteLine($"Result error: {resultError}");
             var resultConfidenceFactor = ((1 - resultError)*MaxPossibleGrade + grade)/(2*MaxPossibleGrade);
+            resultConfidenceFactor *= await GetReviewedPercentage(taskUser);
             Console.WriteLine($"Result confidence factor: {resultConfidenceFactor}");
             return resultConfidenceFactor;
         }
@@ -1220,6 +1223,7 @@ namespace patools.Services.PeeringTasks
                 confidenceFactorsSum += peerConfidenceFactor.Value;
             }
             resultGrade /= confidenceFactorsSum;
+            resultGrade *= await GetReviewedPercentage(taskUser);
             Console.WriteLine($"Mid-calculated grade: {resultGrade}");
             var newConfidenceFactor = taskUser.PreviousConfidenceFactor * MaxPossibleGrade;
             newConfidenceFactor += resultGrade;
@@ -1227,6 +1231,20 @@ namespace patools.Services.PeeringTasks
             taskUser.FinalGrade = (int) Math.Round(resultGrade);
             Console.WriteLine($"Final grade: {taskUser.FinalGrade}");
             return newConfidenceFactor;
+        }
+
+        private async Task<float> GetReviewedPercentage(PeeringTaskUser taskUser)
+        {
+            var assignedSubmissions = await _context.SubmissionPeers
+                .Where(sp => sp.Peer == taskUser.Student
+                             && sp.Submission.PeeringTaskUserAssignment.PeeringTask == taskUser.PeeringTask)
+                .ToListAsync();
+
+            var reviewedSubmissions = await _context.Reviews
+                .Where(r => assignedSubmissions.Contains(r.SubmissionPeerAssignment))
+                .ToListAsync();
+
+            return reviewedSubmissions.Count * 1f / assignedSubmissions.Count;
         }
     }
 }
