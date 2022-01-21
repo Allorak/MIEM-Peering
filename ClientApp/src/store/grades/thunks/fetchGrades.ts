@@ -1,25 +1,26 @@
 import { actions } from "..";
 import { AppThunk } from "../../../app/store";
 
+import { getGrades } from "../../../api/getGrades";
+
 import { IErrorCode } from "../../types";
-import { getOverview } from "../../../api/getOverview";
 
 
-export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getState) => {
-    dispatch(actions.reset())
+export const fetchGrades = (taskId: string): AppThunk => async (dispatch, getState) => {
+    dispatch(actions.fetchStarted())
     const accessToken = getState().auth.accessToken
+
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,
             message: 'Ошибка аутентификации', // TODO
         }))
-        console.log("Fetch course error: No access or Role")
+        console.log("Fetch experts error: No access token")
         return
     }
 
-    dispatch(actions.fetchStarted())
     try {
-        const response = await getOverview({ accessToken, taskId })
+        const response = await getGrades({ accessToken, taskId })
         if (!response) {
             dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
@@ -31,16 +32,7 @@ export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getS
             dispatch(actions.fetchFailed(response.error))
             return
         }
-
-        dispatch(actions.fetchSuccess({
-            ...response.payload,
-            deadlines: {
-                submissionEndDateTime: new Date(response.payload.deadlines.submissionEndDateTime),
-                submissionStartDateTime: new Date(response.payload.deadlines.submissionStartDateTime),
-                reviewEndDateTime: new Date(response.payload.deadlines.reviewEndDateTime),
-                reviewStartDateTime: new Date(response.payload.deadlines.reviewStartDateTime),
-            }
-        }))
+        dispatch(actions.fetchSuccess(response.payload.students))
         return
 
     } catch (error) {

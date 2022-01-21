@@ -1,29 +1,23 @@
-
 import { FC, useEffect } from "react";
-
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
-
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
-import { ExpertsTable } from "./ExpertsTable";
-
-import { fetchExperts } from "../../../../../store/experts";
 import { NoData } from "../../../../../components/noData";
+import { fetchGrades } from "../../../../../store/grades";
+import { GradesTable } from "./GradesTable";
 
-
-export const Experts: FC = () => {
-
+export const Grades: FC = () => {
   const dispatch = useAppDispatch()
 
   const { path } = usePrivatePathTDashboard()
 
-  const status = useAppSelector(state => state.experts.isLoading)
-  const error = useAppSelector(state => state.experts.error)
-  const experts = useAppSelector(state => state.experts.payload)
+  const status = useAppSelector(state => state.grades.isLoading)
+  const error = useAppSelector(state => state.grades.error)
+  const grades = useAppSelector(state => state.grades.payload)
 
   useEffect(() => {
     if (path && path.taskId)
-      dispatch(fetchExperts(path.taskId))
+      dispatch(fetchGrades(path.taskId))
   }, [])
 
   return (
@@ -31,11 +25,11 @@ export const Experts: FC = () => {
       isLoading={status}
       error={error}
     >
-      {experts && experts.length > 0 && (
-        <ExpertsTable experts={experts} />
+      {grades && grades.length > 0 && (
+        <GradesTable grades={grades} />
       )}
 
-      {experts && experts.length === 0 && (
+      {grades && grades.length === 0 && (
         <NoData label={"Нет данных"} />
       )}
     </DashboardWorkBox>

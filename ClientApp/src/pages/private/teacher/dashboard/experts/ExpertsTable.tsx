@@ -24,8 +24,11 @@ export const ExpertsTable: FC<IProps> = ({ experts }) => {
         </TableHeadRow>
       </TableHead>
       <TableBody>
-        {experts.map(expert => (
-          <ExpertRow expertItem={expert} />
+        {experts.map((expert, index) => (
+          <ExpertRow
+            key={index}
+            expertItem={expert}
+          />
         ))}
       </TableBody>
     </Table>

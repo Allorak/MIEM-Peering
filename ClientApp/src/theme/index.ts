@@ -21,6 +21,9 @@ const theme = createTheme({
             black: palette.fill.black,
             white: palette.fill.white
         },
+        success: {
+            main: palette.fill.success
+        },
         divider: palette.divider
     },
 

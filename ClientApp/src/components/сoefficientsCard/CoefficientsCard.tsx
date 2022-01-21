@@ -8,25 +8,20 @@ import { Arrow } from "../icons/Arrow";
 
 
 interface IProps {
-  until?: number | undefined
+  before?: number | undefined
   after?: number | undefined
 }
 
 export const CoefficientsCard: FC<IProps> = ({
-  until,
+  before,
   after
 }) => {
   const [flag, setFlag] = useState<boolean>()
   const [proportion, setProportion] = useState<number>()
 
-  if (after && until && !flag && !proportion) {
-    if (after > until) {
-      setFlag(true)
-      setProportion(parseFloat(((after - until) / until * 100).toFixed(2)))
-    } else if (after < until) {
-      setFlag(false)
-      setProportion(parseFloat(((after - until) / until * 100).toFixed(2)))
-    }
+  if (typeof after === 'number' && typeof before === 'number' && !flag && !proportion) {
+    setProportion(parseFloat(((after - before)).toFixed(2)))
+    setFlag(after > before)
   }
 
   return (
@@ -43,7 +38,7 @@ export const CoefficientsCard: FC<IProps> = ({
               {proportion ? (
                 <>
                   <Typography variant={'h5'} sx={{ textDecoration: 'line-through', opacity: '0.4' }}>
-                    {until}
+                    {before}
                   </Typography>
                   <Box sx={styles.arrowRightBlock}>
                     <ArrowRight />
@@ -54,7 +49,7 @@ export const CoefficientsCard: FC<IProps> = ({
                 </>
               ) : (
                 <Typography variant={'h5'}>
-                  {until}
+                  {before}
                 </Typography>
               )
               }
@@ -69,7 +64,7 @@ export const CoefficientsCard: FC<IProps> = ({
                 </Box>
                 <Box sx={styles.proportionTextBlock}>
                   <Typography variant={'body1'} sx={flag === true ? { color: '#42BDA1' } : { color: '#F04461' }}>
-                    {`${proportion}` + ' %'}
+                    {proportion}
                   </Typography>
                 </Box>
               </Box>)}

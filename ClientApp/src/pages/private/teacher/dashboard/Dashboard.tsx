@@ -11,7 +11,7 @@ import { Burger } from '../../../../components/icons/Burger';
 import { IMenu, IMenuTitles, IRole, PeerSteps } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
 
-import { CourseMain } from '../course/main';
+import { Grades } from './grades';
 import { Overview } from './Overview';
 import { Works } from './works';
 import { Experts } from './experts';
@@ -55,7 +55,7 @@ export const Dashboard: FC = () => {
     />
   }
 
-  const isFirstStep = dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.step === PeerSteps.FIRST_STEP
+  const isFirstStep = dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.taskType === PeerSteps.FIRST_STEP
 
   const menuItemsP = isFirstStep ? menuItems.map(item => ({ title: item.title, path: generatePath(item.path, { taskId: path.taskId }) })) as IMenu[] :
     menuItems.filter(item => item.path !== paths.teacher.dashboard.experts).map(item => ({ title: item.title, path: generatePath(item.path, { taskId: path.taskId }) })) as IMenu[]
@@ -65,7 +65,7 @@ export const Dashboard: FC = () => {
       <Box sx={activeMenu ? styles.menuItemBurgerActive : styles.menuItemBurger}
         onClick={() => { setActiveMenu(!activeMenu) }}
       >
-        <Burger svgColor={activeMenu ? "white" : "#CBD5DE"}/>
+        <Burger svgColor={activeMenu ? "white" : "#CBD5DE"} />
       </Box>
       <Box sx={styles.gridWrapper}>
         <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : styles.leftContainer}>
@@ -92,12 +92,12 @@ export const Dashboard: FC = () => {
             <Box>
               <Routes>
                 <Route path={paths.teacher.dashboard.overview} element={<Overview />} />
-                <Route path={paths.teacher.dashboard.grades} element={<CourseMain />} />
+                <Route path={paths.teacher.dashboard.grades} element={<Grades />} />
                 <Route path={paths.teacher.dashboard.works} element={<Works />} />
                 <Route path={paths.teacher.dashboard.checkings} element={<Checkings />} />
                 <Route path={paths.teacher.dashboard.export} element={<ExportGrades />} />
 
-                {dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.step === PeerSteps.FIRST_STEP && (
+                {dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.taskType === PeerSteps.FIRST_STEP && (
                   <Route path={paths.teacher.dashboard.experts} element={<Experts />} />
                 )}
               </Routes>

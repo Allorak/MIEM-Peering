@@ -167,7 +167,7 @@ const initialTask: INewTask = {
     reviewStartDateTime: new Date(),
     reviewEndDateTime: new Date(),
     submissionsToCheck: 2,
-    type: PeerTaskTypes.DOUBLE_BLIND
+    reviewType: PeerTaskTypes.DOUBLE_BLIND
   },
   authorForm: {
     rubrics: [

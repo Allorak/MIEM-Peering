@@ -11,7 +11,7 @@ export const mock = async (requestConfig: AxiosRequestConfig): Promise<IResponse
     success: true,
     payload: {
       userRole: IRole.teacher,
-      step: PeerSteps.FIRST_STEP
+      taskType: PeerSteps.FIRST_STEP
     }
   }
 }
