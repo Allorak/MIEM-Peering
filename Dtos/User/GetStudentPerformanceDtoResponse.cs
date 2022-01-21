@@ -10,8 +10,8 @@ namespace patools.Dtos.User
         public float PreviousConfidenceFactor { get; set; }
         public float? NextConfidenceFactor { get; set; }
         public bool Submitted { get; set; }
-        public int? AssignedPeers { get; set; }
-        public int? ReviewedPeers { get; set; }
+        public int? AssignedSubmissions { get; set; }
+        public int? ReviewedSubmissions { get; set; }
         public bool TeacherReviewed { get; set; }
         public int? FinalGrade { get; set; }
         public ReviewQualities? ReviewQuality { get; set; }

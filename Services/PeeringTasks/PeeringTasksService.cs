@@ -1018,9 +1018,17 @@ namespace patools.Services.PeeringTasks
             
             if (taskUser.PeeringTask.TaskType != TaskTypes.Common) 
                 return studentInfo;
-            
-            studentInfo.AssignedPeers = submissionPeers.Count;
-            studentInfo.ReviewedPeers = reviews.Count;
+
+            var submissionsAssignedToStudent = await _context.SubmissionPeers
+                .Where(sp =>
+                    sp.Peer == taskUser.Student &&
+                    sp.Submission.PeeringTaskUserAssignment.PeeringTask == taskUser.PeeringTask)
+                .ToListAsync();
+
+            studentInfo.AssignedSubmissions = submissionsAssignedToStudent.Count;
+            studentInfo.ReviewedSubmissions = await _context.Reviews
+                .CountAsync(r => submissionsAssignedToStudent.Contains(r.SubmissionPeerAssignment));
+
             if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
                 studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask.Course, reviews);
             return studentInfo;
