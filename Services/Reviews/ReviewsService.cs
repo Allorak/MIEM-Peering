@@ -207,7 +207,6 @@ namespace patools.Services.Reviews
             if (taskUser == null)
                 return new NoAccessResponse<IEnumerable<GetReviewDtoResponse>>("This user has no access to this task");
 
-            //TODO: Change error
             var submission =
                 await _context.Submissions.FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
             if (submission == null)
@@ -232,6 +231,7 @@ namespace patools.Services.Reviews
                          e.PeeringTask == task);
 
                 var resultReview = new GetReviewDtoResponse();
+                resultReview.ReviewerName = peer.Fullname;
                 switch (peer.Role)
                 {
                     case { } when expert != null:
@@ -245,6 +245,7 @@ namespace patools.Services.Reviews
                         break;
                     case UserRoles.Teacher:
                         resultReview.Reviewer = ReviewerTypes.Teacher;
+                        resultReview.ReviewerName = "Преподаватель";
                         break;
                     default:
                         return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
