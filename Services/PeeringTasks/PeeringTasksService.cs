@@ -907,6 +907,7 @@ namespace patools.Services.PeeringTasks
 
             var taskUsers = await _context.TaskUsers
                 .Include(tu => tu.Student)
+                .Include(tu => tu.PeeringTask)
                 .Include(tu => tu.PeeringTask.Course)
                 .Where(tu => tu.PeeringTask == task)
                 .ToListAsync();
@@ -920,8 +921,8 @@ namespace patools.Services.PeeringTasks
 
                 if (task.TaskType == TaskTypes.Initial)
                 {
-                    var expertReview = await GetExpertReview(task,student);
-                    var confidenceFactor = await CountInitialConfidenceFactor(task, student, expertReview.Grade);
+                    var expertReview = await GetExpertReview(taskUser);
+                    var confidenceFactor = await CountInitialConfidenceFactor(taskUser, expertReview.Grade);
                     if (confidenceFactor == null)
                         return new OperationErrorResponse<string>("There is an error in counting initial confidence factors");
                     courseUser.ConfidenceFactor = confidenceFactor.Value;
@@ -1061,8 +1062,11 @@ namespace patools.Services.PeeringTasks
             };
         }
 
-        private async Task<Review> GetExpertReview(PeeringTask task, User student)
+        private async Task<Review> GetExpertReview(PeeringTaskUser taskUser)
         {
+            var student = taskUser.Student;
+            var task = taskUser.PeeringTask;
+            
             var peers = await _context.Reviews
                 .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
                 .Select(r => r.SubmissionPeerAssignment.Peer)
@@ -1081,8 +1085,11 @@ namespace patools.Services.PeeringTasks
             return expertReview;
         }
 
-        private async Task<float?> CountInitialConfidenceFactor(PeeringTask task, User student, float grade)
+        private async Task<float?> CountInitialConfidenceFactor(PeeringTaskUser taskUser, float grade)
         {
+            var task = taskUser.PeeringTask;
+            var student = taskUser.Student;
+            
             var expertUsers = await _context.Experts
                     .Where(e => e.PeeringTask == task)
                     .Select(e => e.User)
