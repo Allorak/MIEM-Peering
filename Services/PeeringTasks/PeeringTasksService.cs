@@ -922,14 +922,15 @@ namespace patools.Services.PeeringTasks
                 if (task.TaskType == TaskTypes.Initial)
                 {
                     var expertReview = await GetExpertReview(taskUser);
-                    var confidenceFactor = await CountInitialConfidenceFactor(taskUser, expertReview.Grade);
+                    var teacherReview = await GetTeacherReview(taskUser);
+                    var grade = teacherReview?.Grade ?? expertReview.Grade;
+                    grade *= await GetReviewedPercentage(taskUser);
+                    var confidenceFactor = await CountInitialConfidenceFactor(taskUser, grade);
                     if (confidenceFactor == null)
                         return new OperationErrorResponse<string>("There is an error in counting initial confidence factors");
                     courseUser.ConfidenceFactor = confidenceFactor.Value;
                     taskUser.NextConfidenceFactor = confidenceFactor.Value;
-                    var finalGrade = expertReview.Grade;
-                    finalGrade *= await GetReviewedPercentage(taskUser);
-                    taskUser.FinalGrade = (int)Math.Round(finalGrade);
+                    taskUser.FinalGrade = (int)Math.Round(grade);
                 }
                 else
                 {
@@ -1087,6 +1088,12 @@ namespace patools.Services.PeeringTasks
             return expertReview;
         }
 
+        private async Task<Review> GetTeacherReview(PeeringTaskUser taskUser)
+        {
+            return await _context.Reviews.FirstOrDefaultAsync(r => 
+                    r.SubmissionPeerAssignment.Peer == taskUser.PeeringTask.Course.Teacher
+                    && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser);
+        }
         private async Task<float?> CountInitialConfidenceFactor(PeeringTaskUser taskUser, float grade)
         {
             var task = taskUser.PeeringTask;
@@ -1113,24 +1120,24 @@ namespace patools.Services.PeeringTasks
                             && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
                 .ToListAsync();
 
-            var peerExpertReviewsDictionary = new Dictionary<Review, Review>();
-            foreach (var peerReview in peerReviews)
-            {
-                var expertReview = expertReviews.Find(er =>
-                    er.SubmissionPeerAssignment.Submission == peerReview.SubmissionPeerAssignment.Submission);
-                if (expertReview == null)
-                {
-                    Console.WriteLine("Expert hasn't reviewed this submission yet");
-                    return null;
-                }
-
-                peerExpertReviewsDictionary[peerReview] = expertReview;
-            }
 
             var normalizedErrors = new List<float>();
             
             foreach (var peerReview in peerReviews)
             {
+                
+                var expertReview = expertReviews.Find(er =>
+                    er.SubmissionPeerAssignment.Submission == peerReview.SubmissionPeerAssignment.Submission);
+
+                var teacherReview = await _context.Reviews
+                    .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == taskUser.PeeringTask.Course.Teacher);
+
+                if (teacherReview == null && expertReview == null)
+                {
+                    Console.WriteLine("Neither experts nor teacher reviewed this submission");
+                    return null;
+                }
+                
                 var peerAnswers = await _context.Answers
                     .Where(a => a.Review == peerReview && a.Question.Type == QuestionTypes.Select)
                     .OrderBy(a => a.Question)
@@ -1138,12 +1145,20 @@ namespace patools.Services.PeeringTasks
                     .ToListAsync();
 
                 var expertAnswers = await _context.Answers
-                    .Where(a => a.Review == peerExpertReviewsDictionary[peerReview] &&
+                    .Where(a => a.Review == expertReview &&
                                 a.Question.Type == QuestionTypes.Select)
                     .OrderBy(a => a.Question)
                     .Include(a => a.Question)
                     .ToListAsync();
 
+                var teacherAnswers = new List<Answer>();
+                if (teacherReview != null)
+                    teacherAnswers = await _context.Answers
+                        .Where(a => a.Review == teacherReview &&
+                                    a.Question.Type == QuestionTypes.Select)
+                        .OrderBy(a => a.Question)
+                        .Include(a => a.Question)
+                        .ToListAsync();
                 var error = 0f;
                 var maxError = 0f;
                 for (var i = 0; i < peerAnswers.Count; i++)
@@ -1155,7 +1170,17 @@ namespace patools.Services.PeeringTasks
                         Console.WriteLine("There is an error in database");
                         return null;
                     }
+                    if(teacherReview != null && teacherAnswers[i].Value == null)
+                    {
+                        Console.WriteLine("There is an error in database");
+                        return null;
+                    }
                     if (peerAnswers[i].Question != expertAnswers[i].Question)
+                    {
+                        Console.WriteLine("There is an error in database");
+                        return null;
+                    }
+                    if(teacherReview != null && peerAnswers[i].Question != teacherAnswers[i].Question)
                     {
                         Console.WriteLine("There is an error in database");
                         return null;
@@ -1177,7 +1202,9 @@ namespace patools.Services.PeeringTasks
                     }
                     
                     var normalizingFactor = (question.CoefficientPercentage.Value / 100);
-                    var answerValuesDifference = Math.Abs(peerAnswers[i].Value.Value - expertAnswers[i].Value.Value);
+                    var answerValuesDifference = teacherReview != null 
+                        ? Math.Abs(peerAnswers[i].Value.Value - teacherAnswers[i].Value.Value) 
+                        : Math.Abs(peerAnswers[i].Value.Value - expertAnswers[i].Value.Value);
                     Console.WriteLine($"Answers difference: {answerValuesDifference}");
                     Console.WriteLine($"Normalizing factor: {normalizingFactor}");
                     error += answerValuesDifference * normalizingFactor;
