@@ -82,10 +82,24 @@ export const TaskAdd: FC = () => {
       if (pathT && pathT.courseId)
         dispatch(createTasks({
           ...JSON.parse(JSON.stringify(newTaskItem)),
-          settings: JSON.parse(JSON.stringify({ ...response, submissionStartDateTime, submissionEndDateTime, reviewStartDateTime, reviewEndDateTime }))
+          settings: JSON.parse(JSON.stringify({
+            submissionStartDateTime,
+            submissionEndDateTime,
+            reviewStartDateTime,
+            reviewEndDateTime,
+            reviewType: response.reviewType,
+            submissionWeight: Number(response.submissionWeight),
+            reviewWeight: Number(response.reviewWeight),
+            submissionsToCheck: Number(response.submissionsToCheck),
+            ...(!hasConfidenceFactor && { experts: response.experts }),
+            ...(hasConfidenceFactor && {
+              goodCoefficientBonus: Number(response.goodCoefficientBonus),
+              badCoefficientPenalty: Number(response.badCoefficientPenalty)
+            })
+          }))
         }, pathT.courseId))
     }
-  }, [step, newTaskItem, pathT])
+  }, [step, newTaskItem, pathT, hasConfidenceFactor])
 
   if (newTaskPayload && newTaskPayload.id
     && pathT && pathT.courseId) {
@@ -167,7 +181,9 @@ const initialTask: INewTask = {
     reviewStartDateTime: new Date(),
     reviewEndDateTime: new Date(),
     submissionsToCheck: 2,
-    reviewType: PeerTaskTypes.DOUBLE_BLIND
+    reviewType: PeerTaskTypes.DOUBLE_BLIND,
+    submissionWeight: 20,
+    reviewWeight: 80
   },
   authorForm: {
     rubrics: [

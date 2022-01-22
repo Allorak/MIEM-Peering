@@ -1,5 +1,5 @@
 //@ts-ignore
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { Controller, useController, useForm } from "react-hook-form";
 import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
@@ -28,18 +28,26 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
   const [popupStatus, setPopupStatus] = useState(false)
   const [currentExpert, setCurrentExpert] = useState<string>()
 
-  const { control, formState, getValues, setValue } = useForm<INewTaskSettings>({
+  const { control, formState, getValues, setValue, watch } = useForm<INewTaskSettings>({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
       ...initialValue(),
-      experts: hasConfidenceFactor ? undefined : []
+      experts: hasConfidenceFactor ? undefined : [],
+      badCoefficientPenalty: -0.5,
+      goodCoefficientBonus: 0.5
     }
   })
 
   const { field: maxSubmissionProps } = useController({ control, ...fields.maxSubmissionProps })
+  const { field: submissionWeightProps } = useController({ control, ...fields.submissionWeightProps })
+  const { field: reviewWeightProps } = useController({ control, ...fields.reviewWeightProps })
   const { field: typeProps } = useController({ control, ...fields.taskTypeProps })
-  const experts = getValues('experts')
+
+  const { field: goodCoefficientBonusProps } = useController({ control, ...fields.goodCoefficientBonusProps })
+  const { field: badCoefficientPenaltyProps } = useController({ control, ...fields.badCoefficientPenaltyProps })
+
+  const experts = watch('experts')
 
   const handleAddOrEditExpert = useCallback((email?: string) => {
     setCurrentExpert(email)
@@ -388,6 +396,72 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
 
           <Box sx={styles.dateBox}>
             <Box>
+              <InputLabel
+                title={"Вес проверки в итоговой оценке (%):"} />
+
+              <TextField
+                type={'number'}
+                InputProps={reviewWeightProps}
+                required
+                variant={'outlined'}
+                autoComplete={'off'}
+                {...(formState.errors.reviewWeight !== undefined && { error: true, helperText: formState.errors.reviewWeight.message })}
+              />
+            </Box>
+          </Box>
+
+          <Box sx={styles.dateBox}>
+            <Box>
+              <InputLabel
+                title={"Вес работы в итоговой оценке (%):"} />
+
+              <TextField
+                type={'number'}
+                InputProps={submissionWeightProps}
+                required
+                variant={'outlined'}
+                autoComplete={'off'}
+                {...(formState.errors.submissionWeight !== undefined && { error: true, helperText: formState.errors.submissionWeight.message })}
+              />
+            </Box>
+          </Box>
+
+          {hasConfidenceFactor && goodCoefficientBonusProps && badCoefficientPenaltyProps && (
+            <>
+              <Box sx={styles.dateBox}>
+                <Box>
+                  <InputLabel
+                    title={"Штраф за плохой текущий коэф. доверия (по 10-ти бальной системе):"} />
+                  <TextField
+                    type={'number'}
+                    InputProps={badCoefficientPenaltyProps}
+                    required
+                    variant={'outlined'}
+                    autoComplete={'off'}
+                    {...(formState.errors.badCoefficientPenalty !== undefined && { error: true, helperText: formState.errors.badCoefficientPenalty.message })}
+                  />
+                </Box>
+              </Box>
+
+              <Box sx={styles.dateBox}>
+                <Box>
+                  <InputLabel
+                    title={"Бонус за хороший текущий коэф. доверия (по 10-ти бальной системе):"} />
+                  <TextField
+                    type={'number'}
+                    InputProps={goodCoefficientBonusProps}
+                    required
+                    variant={'outlined'}
+                    autoComplete={'off'}
+                    {...(formState.errors.goodCoefficientBonus !== undefined && { error: true, helperText: formState.errors.goodCoefficientBonus.message })}
+                  />
+                </Box>
+              </Box>
+            </>
+          )}
+
+          <Box sx={styles.dateBox}>
+            <Box>
               <Typography variant={'h6'}>
                 {hasConfidenceFactor ? secondStepInfo.name : firsStepInfo.name}
               </Typography>
@@ -451,7 +525,9 @@ const initialValue = (): INewTaskSettings => {
     reviewStartDateTime: reviewStartDateTime,
     reviewEndDateTime: reviewEndDateTime,
     submissionsToCheck: 2,
-    reviewType: PeerTaskTypes.DOUBLE_BLIND
+    reviewType: PeerTaskTypes.DOUBLE_BLIND,
+    submissionWeight: 20,
+    reviewWeight: 80
   }
 
   return taskSettings

@@ -191,6 +191,10 @@ export interface INewTaskSettings {
   submissionsToCheck: number
   experts?: Array<string>
   reviewType: PeerTaskTypes
+  submissionWeight: number
+  reviewWeight: number
+  goodCoefficientBonus?: number
+  badCoefficientPenalty?: number
 }
 
 export enum PeerSteps {
@@ -198,7 +202,7 @@ export enum PeerSteps {
   SECOND_STEP = 'Common',
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'reviewType' | 'experts'> { }
+export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'reviewType' | 'experts' | 'submissionWeight' | 'reviewWeight' | 'goodCoefficientBonus' | 'badCoefficientPenalty'> { }
 
 export type INewQuestionRubrics = Array<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion>
 
@@ -261,7 +265,7 @@ export enum IQuestionTypes {
 export const defaultResponses = {
   rateResponses: {
     maxValue: 10,
-    minValue: 1
+    minValue: 0
   },
   multiple: [
     {

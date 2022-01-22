@@ -97,6 +97,78 @@ export const maxSubmissionProps: UseControllerProps<INewTaskSettings, "submissio
   },
 })
 
+export const submissionWeightProps: UseControllerProps<INewTaskSettings, "submissionWeight"> = ({
+  name: "submissionWeight",
+  rules: {
+    required: {
+      value: true,
+      message: "Это обязательное поле"
+    },
+    min: {
+      value: 0,
+      message: "Минимальное значение 0"
+    },
+    max: {
+      value: 100,
+      message: "Максимальное значение 100"
+    }
+  },
+})
+
+export const reviewWeightProps: UseControllerProps<INewTaskSettings, "reviewWeight"> = ({
+  name: "reviewWeight",
+  rules: {
+    required: {
+      value: true,
+      message: "Это обязательное поле"
+    },
+    min: {
+      value: 0,
+      message: "Минимальное значение 0"
+    },
+    max: {
+      value: 100,
+      message: "Максимальное значение 100"
+    }
+  },
+})
+
+export const goodCoefficientBonusProps: UseControllerProps<INewTaskSettings, "goodCoefficientBonus"> = ({
+  name: "goodCoefficientBonus",
+  rules: {
+    required: {
+      value: true,
+      message: "Это обязательное поле"
+    },
+    min: {
+      value: 0,
+      message: "Минимальное значение 0"
+    },
+    max: {
+      value: 2,
+      message: "Максимальное значение 2"
+    }
+  },
+})
+
+export const badCoefficientPenaltyProps: UseControllerProps<INewTaskSettings, "badCoefficientPenalty"> = ({
+  name: "badCoefficientPenalty",
+  rules: {
+    required: {
+      value: true,
+      message: "Это обязательное поле"
+    },
+    max: {
+      value: 0,
+      message: "Максимальное значение 0"
+    },
+    min: {
+      value: -2,
+      message: "Минимальное значение -2"
+    }
+  },
+})
+
 export const taskTypeProps: UseControllerProps<INewTaskSettings, "reviewType"> = ({
   name: "reviewType",
   rules: {
