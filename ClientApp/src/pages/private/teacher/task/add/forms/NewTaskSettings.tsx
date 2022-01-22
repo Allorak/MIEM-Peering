@@ -344,7 +344,10 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
           <Box sx={styles.dateBox}>
             <Box>
               <InputLabel
-                title={"Количество проверок (мин):"} />
+                title={"Количество проверок (мин):"}
+                required
+                description={"Минимальное количество проверок для одной работы. Чем больше проверок, тем больше точность при вычислении итоговой оценки"}
+              />
 
               <TextField
                 type={'number'}
@@ -362,6 +365,11 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
               <InputLabel
                 title={"Выберите тип:"}
                 required
+                description={`Single blind. В этом типе рецензирования автор не знает, кто является рецензентом.
+                
+                Double blind. В этом типе рецензирования рецензенты не знают личности авторов, и наоборот.
+                
+                Open Peer Review. Личность автора и рецензента известна всем участникам во время или после процесса рецензирования.`}
               />
 
               <Select
@@ -397,7 +405,9 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
           <Box sx={styles.dateBox}>
             <Box>
               <InputLabel
-                title={"Вес проверки в итоговой оценке (%):"} />
+                title={"Вес проверки в итоговой оценке (%):"}
+                required
+              />
 
               <TextField
                 type={'number'}
@@ -535,12 +545,12 @@ const initialValue = (): INewTaskSettings => {
 
 const firsStepInfo = {
   description: "В результате данного пирингового задания будут вычислены коэф. доверия. Необходимо участие экспертов",
-  name: "Этап 1"
+  name: "Начальный этап"
 }
 
 const secondStepInfo = {
   description: "Для вычисления итоговой оценки работ будут использованы коэф. доверия студентов",
-  name: "Этап 2"
+  name: "Основной этап"
 }
 
 
