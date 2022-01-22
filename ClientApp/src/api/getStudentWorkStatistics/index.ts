@@ -6,6 +6,8 @@ export type IRequestData = {
     workId: string
 }
 
-export type IResponseData = IWorkStatistics
+export type IResponseData = {
+    statistics: IWorkStatistics
+}
 
 export { getStudentWorkStatistics } from './getStudentWorkStatistics';
