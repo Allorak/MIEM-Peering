@@ -27,7 +27,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpGet("overview/task={taskId:guid}")]
-        public async Task<ActionResult<GetPeeringTaskTeacherOverviewDtoResponse>> GetTaskOverview(Guid taskId)
+        public async Task<ActionResult<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview(Guid taskId)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());

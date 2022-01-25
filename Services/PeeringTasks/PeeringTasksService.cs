@@ -20,6 +20,7 @@ namespace patools.Services.PeeringTasks
     {
         private readonly PAToolsContext _context;
         private readonly IMapper _mapper;
+        private const int MinPossibleGrade = 0;
         private const int MaxPossibleGrade = 10;
         private const float BadAverageConfidenceFactor = 1f/3;
         private const float DecentAverageConfidenceFactor = 2f/3;
@@ -400,30 +401,30 @@ namespace patools.Services.PeeringTasks
 
             var deadlines = await GetTaskDeadlines(task);
 
-            GetPeeringTaskOverviewDtoResponse response;
+            var response = new GetPeeringTaskOverviewDtoResponse();
+            
             switch (user.Role)
             {
                 case {} when await IsExpertUser(user,task):
+                    response = await GetExpertTaskOverview(user,task);
                     break;
                 case UserRoles.Teacher:
                     if (task.Course.Teacher != user)
                         return new NoAccessResponse<GetPeeringTaskOverviewDtoResponse>(
                             "This teacher has no access to the course");
+                    response = await GetTeacherTaskOverview(user,task);
                     break;
                 case UserRoles.Student:
-                    var taskUser = await GetTaskUser(user, task);
-                    if (taskUser == null)
-                        return new NoAccessResponse<GetPeeringTaskOverviewDtoResponse>(
-                            "This student is not assigned to the task");
+                    response = await GetStudentTaskOverview(user,task);
+                    if (response == null)
+                        return new OperationErrorResponse<GetPeeringTaskOverviewDtoResponse>();
                     break;
             }
 
-            response = new GetPeeringTaskStudentOverviewDtoResponse()
-            {
-                AssignedWorksCount = 7,
-                CheckedWorksCount = 3,
-                SubmissionStatus = true
-            };
+
+            response.Deadlines = await GetTaskDeadlines(task);
+            response.TaskType = task.TaskType;
+
             return new SuccessfulResponse<GetPeeringTaskOverviewDtoResponse>(response);
         }
 
@@ -470,11 +471,112 @@ namespace patools.Services.PeeringTasks
         {
             return _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
         }
+
+        private async Task<GetPeeringTaskOverviewDtoResponse> GetExpertTaskOverview(User expert, PeeringTask task)
+        {
+            throw new NotImplementedException();
+        }
+        
+        private async Task<GetPeeringTaskOverviewDtoResponse> GetTeacherTaskOverview(User teacher, PeeringTask task)
+        {
+            throw new NotImplementedException();
+        }
+        
+        private async Task<GetPeeringTaskOverviewDtoResponse> GetStudentTaskOverview(User student, PeeringTask task)
+        {
+            var taskUser = await GetTaskUser(student, task);
+            if (taskUser == null)
+            {
+                Console.WriteLine("This student has no access to this task");
+                return null;
+            }
+
+            var submission = await GetSubmission(taskUser);
+            
+            var confidenceFactors = new GetPeeringTaskConfidenceFactorsDtoResponse()
+            {
+                Before = task.TaskType == TaskTypes.Initial ? null : taskUser.PreviousConfidenceFactor,
+                After = task.ReviewEndDateTime > DateTime.Now ? null : taskUser.NextConfidenceFactor
+            };
+
+            var assignedSubmissions = await GetAssignedSubmissions(student, task);
+            var reviewedSubmissions = await GetReviewedSubmissions(assignedSubmissions);
+
+
+            return new GetPeeringTaskOverviewDtoResponse()
+            {
+                Status = new GetPeeringTaskStatusDtoResponse()
+                {
+                    SubmissionsNumber = assignedSubmissions.Count,
+                    SubmissionsToCheck = assignedSubmissions.Count - reviewedSubmissions.Count
+                },
+                SubmissionStatus = submission != null,
+                StudentGrades = submission == null
+                    ? null
+                    : new GetPeeringTaskStudentGradesDtoResponse()
+                    {
+                        MinGrade = MinPossibleGrade,
+                        MaxGrade = MaxPossibleGrade,
+                        Coordinates = await GetReviewsCoordinates(await GetReviewsForSubmission(submission))
+                    },
+                StudentConfidenceFactors = confidenceFactors
+            };
+        }
+
+        private async Task<Submission> GetSubmission(PeeringTaskUser taskUser)
+        {
+            return await _context.Submissions
+                .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+        }
+
+        private async Task<List<Review>> GetReviewsForSubmission(Submission submission)
+        {
+            return await _context.Reviews
+                .Where(r => r.SubmissionPeerAssignment.Submission == submission)
+                .Include(r => r.SubmissionPeerAssignment.Peer)
+                .ToListAsync();
+        }
+
+        private async Task<List<GetPeeringTaskCoordinatesDtoResponse>> GetReviewsCoordinates(IEnumerable<Review> reviews)
+        {
+            var coordinates = new List<GetPeeringTaskCoordinatesDtoResponse>();
+            var index = 0;
+            foreach (var review in reviews)
+            {
+                var peer = review.SubmissionPeerAssignment.Peer;
+                var task = review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask;
+
+                var expert = await _context.Experts
+                    .FirstOrDefaultAsync(e => e.User == peer && e.PeeringTask == task);
+
+                var resultReview = new GetPeeringTaskCoordinatesDtoResponse();
+                switch (peer.Role)
+                {
+                    case { } when expert != null:
+                        resultReview.Reviewer = ReviewerTypes.Expert;
+                        resultReview.Name = "Эксперт";
+                        break;
+                    case UserRoles.Student:
+                        resultReview.Reviewer = ReviewerTypes.Peer;
+                        if (task.ReviewType != ReviewTypes.Open)
+                            resultReview.Name = $"Аноним #{index++}";
+                        break;
+                    case UserRoles.Teacher:
+                        resultReview.Reviewer = ReviewerTypes.Teacher;
+                        resultReview.Name = task.Course.Teacher.Fullname;
+                        break;
+                }
+
+                resultReview.Value = review.Grade;
+
+                coordinates.Add(resultReview);
+            }
+
+            return coordinates;
+        }
         /*
         public async Task<Response<GetPeeringTaskStudentOverviewDtoResponse>> GetTaskStudentOverview(GetPeeringTaskStudentOverviewRequest taskInfo)
         {
-           // var deadlines = _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
-
             var submissionPeers =
             var checkedWorksCount = await _context.Reviews
                 .CountAsync(r => submissionPeers.Contains(r.SubmissionPeerAssignment));

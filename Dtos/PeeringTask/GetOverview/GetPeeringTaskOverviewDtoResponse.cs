@@ -9,11 +9,13 @@ namespace patools.Dtos.Task
         public TaskTypes? TaskType { get; set; }
         public int? CheckedWorksCount { get; set; }
         public int? AssignedWorksCount { get; set; }
+        
         //Student-only
         public GetPeeringTaskStatusDtoResponse Status { get; set; }
         public bool SubmissionStatus { get; set; }
         public GetPeeringTaskStudentGradesDtoResponse StudentGrades { get; set; }
-        public GetPeeringTaskCoefficientsDtoResponse StudentConfidenceCoefficients { get; set; }
+        public GetPeeringTaskConfidenceFactorsDtoResponse StudentConfidenceFactors { get; set; }
+        
         //Teacher-only
         public GetPeeringTaskStatisticsDtoResponse Statistics { get; set; }
         public List<int> Grades { get; set; }

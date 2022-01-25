@@ -17,8 +17,6 @@ namespace patools
         {
             CreateMap<User,GetRegisteredUserDtoResponse>();
             CreateMap<GetCourseTeacherDtoResponse, GetCourseDtoResponse>();
-            CreateMap<GetPeeringTaskExpertOverviewDtoResponse, GetPeeringTaskTeacherOverviewDtoResponse>();
-            CreateMap<GetPeeringTaskExpertOverviewDtoResponse, GetPeeringTaskStudentOverviewDtoResponse>();
             CreateMap<Course, GetCourseDtoResponse>();
             CreateMap<User, GetTeacherDtoResponse>();
             CreateMap<AddCourseDto, Course>();
