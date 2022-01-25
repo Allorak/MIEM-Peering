@@ -512,20 +512,24 @@ namespace patools.Services.PeeringTasks
 
             return new GetPeeringTaskOverviewDtoResponse()
             {
-                
+
                 AssignedSubmissions = task.ReviewStartDateTime < DateTime.Now
                     ? assignedSubmissions.Count
                     : null,
                 ReviewedSubmissions = task.ReviewStartDateTime < DateTime.Now
                     ? reviewedSubmissions.Count
                     : null,
-                SubmissionStatus = submission != null,
+                SubmissionStatus = task.SubmissionStartDateTime < DateTime.Now
+                    ? submission != null
+                    : null,
                 StudentGrades = submission != null
                     ? new GetPeeringTaskStudentGradesDtoResponse()
                     {
                         MinGrade = MinPossibleGrade,
                         MaxGrade = MaxPossibleGrade,
-                        Coordinates = await GetReviewsCoordinates(await GetReviewsForSubmission(submission))
+                        Coordinates = task.ReviewStartDateTime < DateTime.Now
+                            ? await GetReviewsCoordinates(await GetReviewsForSubmission(submission))
+                            : null
                     }
                     : null,
                 StudentConfidenceFactors = confidenceFactors

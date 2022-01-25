@@ -9,7 +9,7 @@ namespace patools.Dtos.Task
         public TaskTypes? TaskType { get; set; }
         
         //Student-only
-        public bool SubmissionStatus { get; set; }
+        public bool? SubmissionStatus { get; set; }
         public GetPeeringTaskStudentGradesDtoResponse StudentGrades { get; set; }
         public GetPeeringTaskConfidenceFactorsDtoResponse StudentConfidenceFactors { get; set; }
         //Student and expert
