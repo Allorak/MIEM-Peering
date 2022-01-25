@@ -69,6 +69,15 @@ namespace patools.Models
 
         [Required]
         public ReviewTypes ReviewType { get; set; }
+        
+        [Required]
+        public int ReviewWeight { get; set; }
+        
+        [Required]
+        public int SubmissionWeight { get; set; }
+        
+        public int? GoodCoefficientBonus { get; set; }
+        public int? BadCoefficientPenalty { get; set; }
 
     }
 }

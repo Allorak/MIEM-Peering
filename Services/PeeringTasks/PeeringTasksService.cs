@@ -18,10 +18,6 @@ namespace patools.Services.PeeringTasks
 {
     public class PeeringTasksService : BasicService, IPeeringTasksService
     {
-        private const int MinPossibleGrade = 0;
-        private const int MaxPossibleGrade = 10;
-        private const float BadAverageConfidenceFactor = 1f/3;
-        private const float DecentAverageConfidenceFactor = 2f/3;
 
         public PeeringTasksService(PAToolsContext context, IMapper mapper) : base(context, mapper)
         {
@@ -268,8 +264,6 @@ namespace patools.Services.PeeringTasks
             */
             return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(Mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
         }
-    
-        
         
         public async Task<Response<string>> AssignPeers(AssignPeersDto peersInfo)
         {

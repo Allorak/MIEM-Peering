@@ -13,5 +13,9 @@ namespace patools.Dtos.Task
         public int SubmissionsToCheck {get; set; }
         public List<string> Experts { get; set; }
         public ReviewTypes ReviewType { get; set; }
+        public int ReviewWeight { get; set; }
+        public int SubmissionWeight { get; set; }
+        public int? GoodCoefficientBonus { get; set; }
+        public int? BadCoefficientPenalty { get; set; }
     }
 }

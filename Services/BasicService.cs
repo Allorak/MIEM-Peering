@@ -10,6 +10,11 @@ namespace patools.Services
 {
     public class BasicService
     {
+        protected const int MinPossibleGrade = 0;
+        protected const int MaxPossibleGrade = 10;
+        protected const float BadAverageConfidenceFactor = 1f/3;
+        protected const float DecentAverageConfidenceFactor = 2f/3;
+        
         protected readonly PAToolsContext Context;
         protected readonly IMapper Mapper;
 
