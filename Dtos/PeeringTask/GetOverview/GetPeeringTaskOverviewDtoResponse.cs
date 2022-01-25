@@ -9,10 +9,12 @@ namespace patools.Dtos.Task
         public TaskTypes? TaskType { get; set; }
         
         //Student-only
-        public GetPeeringTaskStatusDtoResponse Status { get; set; }
         public bool SubmissionStatus { get; set; }
         public GetPeeringTaskStudentGradesDtoResponse StudentGrades { get; set; }
         public GetPeeringTaskConfidenceFactorsDtoResponse StudentConfidenceFactors { get; set; }
+        //Student and expert
+        public int? ReviewedSubmissions { get; set; }
+        public int? AssignedSubmissions { get; set; }
         
         //Teacher-only
         public GetPeeringTaskStatisticsDtoResponse Statistics { get; set; }
@@ -21,8 +23,5 @@ namespace patools.Dtos.Task
         public List<float?> ConfidenceFactors { get; set; }
         public ReviewTypes? ReviewType { get; set; }
         
-        //Expert-only
-        public int? CheckedWorksCount { get; set; }
-        public int? AssignedWorksCount { get; set; }
     }
 }
