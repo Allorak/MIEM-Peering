@@ -338,7 +338,7 @@ namespace patools.Services.Submissions
             var teacher = await _context.Users.FirstOrDefaultAsync(u =>
                     u.ID == submissionInfo.TeacherId && u.Role == UserRoles.Teacher);
             if (teacher == null)
-                return new InvalidGuidIdResponse<GetSubmissionMetadataDtoResponse>("Invalid student id provided");
+                return new InvalidGuidIdResponse<GetSubmissionMetadataDtoResponse>("Invalid teacher id provided");
 
             if (submission.PeeringTaskUserAssignment.PeeringTask.Course.Teacher != teacher)
                 return new NoAccessResponse<GetSubmissionMetadataDtoResponse>("This teacher has no access to this task ");

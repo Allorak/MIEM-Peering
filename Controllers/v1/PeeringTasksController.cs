@@ -41,6 +41,7 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
 
+            /*
             if (User.IsInRole(UserRoles.Teacher.ToString()))
             {
                 var taskInfo = new GetPeeringTaskTeacherOverviewDtoRequest()
@@ -61,7 +62,12 @@ namespace patools.Controllers.v1
                 return Ok(await _peeringTasksService.GetTaskStudentOverview(taskInfo));
             }
 
-            return Ok(new InvalidJwtTokenResponse());
+            return Ok(new InvalidJwtTokenResponse());*/
+            return Ok(await _peeringTasksService.GetTaskOverview(new GetPeeringTaskOverviewDtoRequest()
+            {
+                TaskId = taskId,
+                UserId = userId
+            }));
         }
 
         [HttpGet("author-form/task={taskId:guid}")]
