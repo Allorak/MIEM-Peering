@@ -7,8 +7,6 @@ namespace patools.Dtos.Task
     {
         public GetPeeringTaskDeadlinesDtoResponse Deadlines { get; set; }
         public TaskTypes? TaskType { get; set; }
-        public int? CheckedWorksCount { get; set; }
-        public int? AssignedWorksCount { get; set; }
         
         //Student-only
         public GetPeeringTaskStatusDtoResponse Status { get; set; }
@@ -22,5 +20,9 @@ namespace patools.Dtos.Task
         public List<float> CurrentConfidenceFactors { get; set; }
         public List<float?> ConfidenceFactors { get; set; }
         public ReviewTypes? ReviewType { get; set; }
+        
+        //Expert-only
+        public int? CheckedWorksCount { get; set; }
+        public int? AssignedWorksCount { get; set; }
     }
 }

@@ -16,7 +16,7 @@ using patools.Models;
 using patools.Errors;
 namespace patools.Services.PeeringTasks
 {
-    public class PeeringTasksService : IPeeringTasksService
+    public class PeeringTasksService : BasicService, IPeeringTasksService
     {
         private readonly PAToolsContext _context;
         private readonly IMapper _mapper;
@@ -25,13 +25,11 @@ namespace patools.Services.PeeringTasks
         private const float BadAverageConfidenceFactor = 1f/3;
         private const float DecentAverageConfidenceFactor = 2f/3;
 
-        public PeeringTasksService(PAToolsContext context, IMapper mapper)
+        public PeeringTasksService(PAToolsContext context, IMapper mapper) : base(context, mapper)
         {
-            _mapper = mapper;
-            _context = context;
         }
 
-        
+
         public async Task<Response<GetNewPeeringTaskDtoResponse>> AddTask(AddPeeringTaskDto peeringTask)
         {
             if (peeringTask.MainInfo == null)
@@ -412,7 +410,7 @@ namespace patools.Services.PeeringTasks
                     if (task.Course.Teacher != user)
                         return new NoAccessResponse<GetPeeringTaskOverviewDtoResponse>(
                             "This teacher has no access to the course");
-                    response = await GetTeacherTaskOverview(user,task);
+                    response = await GetTeacherTaskOverview(task);
                     break;
                 case UserRoles.Student:
                     response = await GetStudentTaskOverview(user,task);
@@ -421,67 +419,58 @@ namespace patools.Services.PeeringTasks
                     break;
             }
 
-
             response.Deadlines = await GetTaskDeadlines(task);
             response.TaskType = task.TaskType;
 
             return new SuccessfulResponse<GetPeeringTaskOverviewDtoResponse>(response);
         }
-
-        private async Task<User> GetUserById(Guid userId)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
-        }
-
-        private async Task<PeeringTask> GetTaskById(Guid taskId)
-        {
-            return await _context.Tasks
-                .Include(t => t.Course)
-                .Include(t => t.Course.Teacher)
-                .FirstOrDefaultAsync(t => t.ID == taskId);
-        }
-
-        private async Task<bool> IsExpertUser(User user, PeeringTask task)
-        {
-            var expert = await _context.Experts
-                .FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
-            return expert != null;
-        }
-
-        private async Task<PeeringTaskUser> GetTaskUser(User student, PeeringTask task)
-        {
-            return await _context.TaskUsers
-                .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
-        }
-        private async Task<List<SubmissionPeer>> GetAssignedSubmissions(User peer, PeeringTask task)
-        {
-            return  await _context.SubmissionPeers
-                .Where(sp => sp.Peer == peer && sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
-                .ToListAsync();
-        }
-
-        private async Task<List<Review>> GetReviewedSubmissions(IEnumerable<SubmissionPeer> assignedSubmissions)
-        {
-            return await _context.Reviews
-                .Where(r => assignedSubmissions.Contains(r.SubmissionPeerAssignment))
-                .ToListAsync();
-        }
-
         private async Task<GetPeeringTaskDeadlinesDtoResponse> GetTaskDeadlines(PeeringTask task)
         {
             return _mapper.Map<GetPeeringTaskDeadlinesDtoResponse>(task);
         }
-
         private async Task<GetPeeringTaskOverviewDtoResponse> GetExpertTaskOverview(User expert, PeeringTask task)
         {
             throw new NotImplementedException();
         }
-        
-        private async Task<GetPeeringTaskOverviewDtoResponse> GetTeacherTaskOverview(User teacher, PeeringTask task)
+        private async Task<GetPeeringTaskOverviewDtoResponse> GetTeacherTaskOverview(PeeringTask task)
         {
-            throw new NotImplementedException();
+            var taskStudents = await GetTaskUserAssignments(task);
+
+            return new GetPeeringTaskOverviewDtoResponse()
+            {
+                //Statistics = ?????
+                Grades = task.ReviewEndDateTime < DateTime.Now 
+                    ? GetFinalGrades(taskStudents) 
+                    : null,
+                CurrentConfidenceFactors = task.TaskType == TaskTypes.Common
+                    ? GetPreviousConfidenceFactors(taskStudents)
+                    : null,
+                ConfidenceFactors = task.ReviewEndDateTime < DateTime.Now 
+                    ? GetNextConfidenceFactors(taskStudents)
+                    : null,
+                ReviewType = task.ReviewType
+            };
         }
-        
+        private async Task<List<PeeringTaskUser>> GetTaskUserAssignments(PeeringTask task)
+        {
+            return await _context.TaskUsers
+                .Where(tu => tu.PeeringTask == task)
+                .ToListAsync();
+        }
+        private List<int> GetFinalGrades(IEnumerable<PeeringTaskUser> taskUsers)
+        {
+            return taskUsers.Select(tu => tu.FinalGrade).ToList();
+        }
+
+        private List<float> GetPreviousConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
+        {
+            return taskUsers.Select(tu => tu.PreviousConfidenceFactor).ToList();
+        }
+
+        private List<float?> GetNextConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
+        {
+            return taskUsers.Select(tu => tu.NextConfidenceFactor).ToList();
+        }
         private async Task<GetPeeringTaskOverviewDtoResponse> GetStudentTaskOverview(User student, PeeringTask task)
         {
             var taskUser = await GetTaskUser(student, task);
@@ -522,11 +511,17 @@ namespace patools.Services.PeeringTasks
                 StudentConfidenceFactors = confidenceFactors
             };
         }
-
-        private async Task<Submission> GetSubmission(PeeringTaskUser taskUser)
+        private async Task<List<SubmissionPeer>> GetAssignedSubmissions(User peer, PeeringTask task)
         {
-            return await _context.Submissions
-                .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+            return  await _context.SubmissionPeers
+                .Where(sp => sp.Peer == peer && sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+        }
+        private async Task<List<Review>> GetReviewedSubmissions(IEnumerable<SubmissionPeer> assignedSubmissions)
+        {
+            return await _context.Reviews
+                .Where(r => assignedSubmissions.Contains(r.SubmissionPeerAssignment))
+                .ToListAsync();
         }
 
         private async Task<List<Review>> GetReviewsForSubmission(Submission submission)
