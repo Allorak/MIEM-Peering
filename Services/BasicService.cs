@@ -8,23 +8,23 @@ namespace patools.Services
 {
     public class BasicService
     {
-        protected readonly PAToolsContext _context;
-        protected readonly IMapper _mapper;
+        protected readonly PAToolsContext Context;
+        protected readonly IMapper Mapper;
         
         protected BasicService(PAToolsContext context, IMapper mapper)
         {
-            _mapper = mapper;
-            _context = context;
+            Mapper = mapper;
+            Context = context;
         }
         
         protected async Task<User> GetUserById(Guid userId)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.ID == userId);
+            return await Context.Users.FirstOrDefaultAsync(u => u.ID == userId);
         }
 
         protected async Task<PeeringTask> GetTaskById(Guid taskId)
         {
-            return await _context.Tasks
+            return await Context.Tasks
                 .Include(t => t.Course)
                 .Include(t => t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskId);
@@ -32,21 +32,21 @@ namespace patools.Services
 
         protected async Task<bool> IsExpertUser(User user, PeeringTask task)
         {
-            var expert = await _context.Experts
+            var expert = await Context.Experts
                 .FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
             return expert != null;
         }
 
         protected async Task<PeeringTaskUser> GetTaskUser(User student, PeeringTask task)
         {
-            return await _context.TaskUsers
+            return await Context.TaskUsers
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
         }
         
         
         protected async Task<Submission> GetSubmission(PeeringTaskUser taskUser)
         {
-            return await _context.Submissions
+            return await Context.Submissions
                 .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
         }
 
