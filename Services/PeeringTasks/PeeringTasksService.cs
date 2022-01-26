@@ -933,37 +933,86 @@ namespace patools.Services.PeeringTasks
                 var student = taskUser.Student;
                 Console.WriteLine($"Student Name: {student.Fullname}");
                 
-                var courseUser = await Context.CourseUsers
-                    .FirstOrDefaultAsync(cu => cu.User == student && cu.Course == task.Course);
+                var courseUser = await GetCourseUser(student,task.Course);
+                if (courseUser == null)
+                    return new OperationErrorResponse<string>($"Student {student.ID} has no access to the course");
 
-                if (task.TaskType == TaskTypes.Initial)
+                switch (task.TaskType)
                 {
-                    var expertReview = await GetExpertReview(taskUser);
-                    var teacherReview = await GetTeacherReview(taskUser);
-                    var grade = teacherReview?.Grade ?? expertReview.Grade;
-                    grade *= await GetReviewedPercentage(taskUser);
-                    var confidenceFactor = await CountInitialConfidenceFactor(taskUser, grade);
-                    if (confidenceFactor == null)
-                        return new OperationErrorResponse<string>("There is an error in counting initial confidence factors");
-                    courseUser.ConfidenceFactor = confidenceFactor.Value;
-                    taskUser.NextConfidenceFactor = confidenceFactor.Value;
-                    taskUser.FinalGrade = (int)Math.Round(grade);
+                    case TaskTypes.Initial when await TryCalculateInitialTaskResults(taskUser, courseUser) == false:
+                        return new OperationErrorResponse<string>();
+                    case TaskTypes.Common when await TryCalculateCommonTaskResults(taskUser, courseUser) == false:
+                        return new OperationErrorResponse<string>();
                 }
-                else
-                {
-                    var confidenceFactor = await CountNewConfidenceFactor(taskUser) ?? taskUser.PreviousConfidenceFactor;
-                    courseUser.ConfidenceFactor = confidenceFactor;
-                    taskUser.NextConfidenceFactor = confidenceFactor;
-                    Console.WriteLine($"Confidence factor before task: {taskUser.PreviousConfidenceFactor}");
-                    Console.WriteLine($"Confidence factor after task: {taskUser.NextConfidenceFactor}");
-                }
-
             }
 
             await Context.SaveChangesAsync();
             return new SuccessfulResponse<string>("Factors recalculated successfully. All grades are set");
         }
 
+        private async Task<bool> TryCalculateInitialTaskResults(PeeringTaskUser taskUser, CourseUser courseUser)
+        {
+            var expertReview = await GetExpertReview(taskUser);
+            var teacherReview = await GetTeacherReview(taskUser);
+            var submissionGrade = teacherReview?.Grade ?? expertReview.Grade;
+            var reviewGrade = await GetReviewedPercentage(taskUser) * MaxPossibleGrade;
+            var confidenceFactor = await CountInitialConfidenceFactor(taskUser, submissionGrade);
+            
+            if (confidenceFactor == null)
+            {
+                Console.WriteLine("There is an error in counting initial confidence factors");
+                return false;
+            }
+            
+            courseUser.ConfidenceFactor = confidenceFactor.Value;
+            taskUser.NextConfidenceFactor = confidenceFactor.Value;
+            taskUser.SubmissionGrade = submissionGrade;
+            taskUser.ReviewGrade = reviewGrade;
+            taskUser.FinalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade,reviewGrade);
+       
+            return true;
+        }
+
+        private static int CalculateResultGrade(PeeringTask task, float submissionGrade, float reviewGrade)
+        {
+            var submissionWeight = task.SubmissionWeight/100f;
+            var reviewWeight = task.ReviewWeight/100f;
+            return (int) Math.Round(submissionGrade * submissionWeight + reviewGrade * reviewWeight);
+        }
+
+        private bool TryGetGradeComment(PeeringTaskUser taskUser, out string gradeComment)
+        {
+            gradeComment = string.Empty;
+            
+            var submissionGrade = taskUser.SubmissionGrade;
+            if (submissionGrade == null)
+                return false;
+            
+            var reviewGrade = taskUser.ReviewGrade;
+            if (reviewGrade == null)
+                return false;
+            
+            var submissionWeight = taskUser.PeeringTask.SubmissionWeight;
+            var reviewWeight = taskUser.PeeringTask.ReviewWeight;
+
+            var floatFinalGrade = submissionGrade * submissionWeight + reviewGrade * reviewWeight;
+            var finalGrade = taskUser.FinalGrade;
+            if (finalGrade == null)
+                return false;
+            
+            gradeComment = $"{submissionGrade:f2}*{submissionWeight:f2} + {reviewGrade:f2}*{reviewWeight:f2} = {floatFinalGrade:f2} -> {finalGrade}";
+            return true;
+        }
+
+        private async Task<bool> TryCalculateCommonTaskResults(PeeringTaskUser taskUser, CourseUser courseUser)
+        {
+            var confidenceFactor = await CountNewConfidenceFactor(taskUser) ?? taskUser.PreviousConfidenceFactor;
+            courseUser.ConfidenceFactor = confidenceFactor;
+            taskUser.NextConfidenceFactor = confidenceFactor;
+            Console.WriteLine($"Confidence factor before task: {taskUser.PreviousConfidenceFactor}");
+            Console.WriteLine($"Confidence factor after task: {taskUser.NextConfidenceFactor}");
+            return true;
+        }
         public async Task<Response<GetPerformanceTableDtoResponse>> GetPerformanceTable(GetPerformanceTableDtoRequest taskInfo)
         {
             var teacher = await Context.Users
@@ -1087,24 +1136,14 @@ namespace patools.Services.PeeringTasks
 
         private async Task<Review> GetExpertReview(PeeringTaskUser taskUser)
         {
-            var student = taskUser.Student;
             var task = taskUser.PeeringTask;
-            
-            var peers = await Context.Reviews
-                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
-                .Select(r => r.SubmissionPeerAssignment.Peer)
-                .ToListAsync();
-                
-            var expert = await Context.Experts
-                .Include(e => e.User)
-                .FirstOrDefaultAsync(e => e.PeeringTask == task && peers.Contains(e.User));
-                
-            var expertReview = await Context.Reviews
-                .FirstOrDefaultAsync(r => 
-                    r.SubmissionPeerAssignment.Peer == expert.User
-                    && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task
-                    && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student == student);
 
+            var expertUsers = await GetExpertUsersForTask(task);
+            var expertReview = await Context.Reviews
+                    .Include(r =>r.SubmissionPeerAssignment.Peer)
+                    .FirstOrDefaultAsync(r =>
+                        r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser
+                        && expertUsers.Contains(r.SubmissionPeerAssignment.Peer));
             return expertReview;
         }
 
@@ -1116,166 +1155,147 @@ namespace patools.Services.PeeringTasks
         }
         private async Task<float?> CountInitialConfidenceFactor(PeeringTaskUser taskUser, float grade)
         {
-            var task = taskUser.PeeringTask;
-            var student = taskUser.Student;
-            
-            var expertUsers = await Context.Experts
-                    .Where(e => e.PeeringTask == task)
-                    .Select(e => e.User)
-                    .ToListAsync();
-            
-            var peerReviews = await Context.Reviews
-                .Include(r => r.SubmissionPeerAssignment)
-                .Include(r => r.SubmissionPeerAssignment.Submission)
-                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment)
-                .Where(r => r.SubmissionPeerAssignment.Peer == student 
-                            && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
-                .ToListAsync();
-
-            var expertReviews = await Context.Reviews
-                .Include(r => r.SubmissionPeerAssignment)
-                .Include(r => r.SubmissionPeerAssignment.Submission)
-                .Include(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment)
-                .Where(r => expertUsers.Contains(r.SubmissionPeerAssignment.Peer)
-                            && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
-                .ToListAsync();
-
-
-            var normalizedErrors = new List<float>();
-            
-            foreach (var peerReview in peerReviews)
+            var reviewsError = await CalculateReviewsError(taskUser);
+            if (reviewsError == null)
             {
-                
-                var expertReview = expertReviews.Find(er =>
-                    er.SubmissionPeerAssignment.Submission == peerReview.SubmissionPeerAssignment.Submission);
-
-                var teacherReview = await Context.Reviews
-                    .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == taskUser.PeeringTask.Course.Teacher);
-
-                if (teacherReview == null && expertReview == null)
-                {
-                    Console.WriteLine("Neither experts nor teacher reviewed this submission");
-                    return null;
-                }
-                
-                var peerAnswers = await Context.Answers
-                    .Where(a => a.Review == peerReview && a.Question.Type == QuestionTypes.Select)
-                    .OrderBy(a => a.Question)
-                    .Include(a => a.Question)
-                    .ToListAsync();
-
-                var expertAnswers = await Context.Answers
-                    .Where(a => a.Review == expertReview &&
-                                a.Question.Type == QuestionTypes.Select)
-                    .OrderBy(a => a.Question)
-                    .Include(a => a.Question)
-                    .ToListAsync();
-
-                var teacherAnswers = new List<Answer>();
-                if (teacherReview != null)
-                    teacherAnswers = await Context.Answers
-                        .Where(a => a.Review == teacherReview &&
-                                    a.Question.Type == QuestionTypes.Select)
-                        .OrderBy(a => a.Question)
-                        .Include(a => a.Question)
-                        .ToListAsync();
-                var error = 0f;
-                var maxError = 0f;
-                for (var i = 0; i < peerAnswers.Count; i++)
-                {
-                    var question = peerAnswers[i].Question;
-                    
-                    if (peerAnswers[i].Value == null || expertAnswers[i].Value == null)
-                    {
-                        Console.WriteLine("There is an error in database");
-                        return null;
-                    }
-                    if(teacherReview != null && teacherAnswers[i].Value == null)
-                    {
-                        Console.WriteLine("There is an error in database");
-                        return null;
-                    }
-                    if (peerAnswers[i].Question != expertAnswers[i].Question)
-                    {
-                        Console.WriteLine("There is an error in database");
-                        return null;
-                    }
-                    if(teacherReview != null && peerAnswers[i].Question != teacherAnswers[i].Question)
-                    {
-                        Console.WriteLine("There is an error in database");
-                        return null;
-                    }
-                    if (question.CoefficientPercentage == null)
-                    {
-                        Console.WriteLine("There is an error in database");
-                        return null;
-                    }
-                    if (question.MinValue == null)
-                    {
-                        Console.WriteLine("There is an error in database");
-                        return null;
-                    }
-                    if (question.MaxValue == null)
-                    {
-                        Console.WriteLine("There is an error in database");
-                        return null;
-                    }
-                    
-                    var normalizingFactor = (question.CoefficientPercentage.Value / 100);
-                    var answerValuesDifference = teacherReview != null 
-                        ? Math.Abs(peerAnswers[i].Value.Value - teacherAnswers[i].Value.Value) 
-                        : Math.Abs(peerAnswers[i].Value.Value - expertAnswers[i].Value.Value);
-                    Console.WriteLine($"Answers difference: {answerValuesDifference}");
-                    Console.WriteLine($"Normalizing factor: {normalizingFactor}");
-                    error += answerValuesDifference * normalizingFactor;
-                    maxError += (question.MaxValue.Value - question.MinValue.Value) * normalizingFactor;
-                }
-                Console.WriteLine($"Error: {error}");
-                Console.WriteLine($"Max Error: {maxError}");
-                
-                normalizedErrors.Add(error/maxError);
-                Console.WriteLine($"Normalized error: {normalizedErrors[^1]}");
+                Console.WriteLine("Error in calculating reviews error");
+                return null;
             }
-            
-            var resultError = normalizedErrors.Sum() / normalizedErrors.Count;
-            Console.WriteLine($"Result error: {resultError}");
-            var resultConfidenceFactor = ((1 - resultError)*MaxPossibleGrade + grade)/(2*MaxPossibleGrade);
-            resultConfidenceFactor *= await GetReviewedPercentage(taskUser);
+            var resultConfidenceFactor = ((1 - reviewsError.Value)*MaxPossibleGrade + grade)/(2*MaxPossibleGrade);
             Console.WriteLine($"Result confidence factor: {resultConfidenceFactor}");
             return resultConfidenceFactor;
         }
 
+        private async Task<float?> CalculateReviewsError(PeeringTaskUser taskUser)
+        {
+            var task = taskUser.PeeringTask;
+            var student = taskUser.Student;
+            var studentReviews = await GetReviewsByPeer(task,student);
+
+            var error = 0f;
+            
+            foreach (var studentReview in studentReviews)
+            {
+                var reviewTaskUser = studentReview.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment;
+                var expertReview = await GetExpertReview(reviewTaskUser);
+                var teacherReview = await GetTeacherReview(reviewTaskUser);
+                
+                if (expertReview == null && teacherReview == null)
+                {
+                    Console.WriteLine("Neither expert nor teacher has reviewed this submission");
+                    return null;
+                }
+                
+                var studentAnswers = await GetReviewSelectAnswers(studentReview);
+                var masterAnswers = teacherReview != null
+                    ? await GetReviewSelectAnswers(teacherReview)
+                    : await GetReviewSelectAnswers(expertReview);
+                var normalizedError = CalculateAnswersNormalizedError(studentAnswers, masterAnswers);
+                if (normalizedError == null)
+                {
+                    Console.WriteLine("There was an error, counting errors");
+                    return null;
+                }
+                error += normalizedError.Value;
+            }
+
+            var resultError = error / studentReviews.Count;
+            Console.WriteLine($"Result Error: {resultError}");
+            return resultError;
+        }
+
+        private static bool AreAnswersValid(Answer answer, Answer masterAnswer)
+        {
+            if (answer.Value == null || masterAnswer.Value == null)
+            {
+                Console.WriteLine("There is an error in database - select answer value is null");
+                return false;
+            }
+            if (answer.Question != masterAnswer.Question)
+            {
+                Console.WriteLine("There is an error in database - answers are not the same");
+                return false;
+            }
+            if (answer.Question.CoefficientPercentage == null)
+            {
+                Console.WriteLine("There is an error in database - select peer question has no coefficientPercentage");
+                return false;
+            }
+            if (answer.Question.MinValue == null)
+            {
+                Console.WriteLine("There is an error in database - select peer question has no minValue");
+                return false;
+            }
+            if (answer.Question.MaxValue == null)
+            {
+                Console.WriteLine("There is an error in database - select peer question has no maxValue");
+                return false;
+            }
+            return true;
+        }
+
+        private static float? CalculateAnswersNormalizedError(List<Answer> answers, List<Answer> masterAnswers)
+        {
+            if (answers.Count != masterAnswers.Count)
+            {
+                Console.WriteLine("Incorrect amount of answers");
+                return null;
+            }
+
+            var error = 0f;
+            var maxError = 0f;
+            for (var i = 0; i < answers.Count; i++)
+            {
+                if (AreAnswersValid(answers[i], masterAnswers[i]) == false)
+                {
+                    Console.WriteLine("Answers are not valid");
+                    return null;
+                }
+
+                var question = answers[i].Question;
+                var normalizingFactor = question.CoefficientPercentage.Value / 100f;
+                var answerValuesDifference = Math.Abs(answers[i].Value.Value - masterAnswers[i].Value.Value);
+                Console.WriteLine($"Answers difference: {answerValuesDifference}");
+                Console.WriteLine($"Normalizing factor: {normalizingFactor}");
+                error += answerValuesDifference * normalizingFactor;
+                maxError += (question.MaxValue.Value - question.MinValue.Value) * normalizingFactor;
+
+            }
+            Console.WriteLine($"Error: {error}");
+            Console.WriteLine($"Max Error: {maxError}");
+            Console.WriteLine($"Normalized Error: {error/maxError}");
+            return error/maxError;
+        }
+
         private async Task<float?> CountNewConfidenceFactor(PeeringTaskUser taskUser)
         {
-            var reviews = await Context.Reviews
-                .Include(r => r.SubmissionPeerAssignment.Peer)
-                .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser)
-                .ToListAsync();
-            
+            var reviews = await GetTaskUserReviews(taskUser);
             if (reviews.Count == 0)
                 return null;
 
             var confidenceFactorsSum = 0f;
-            var resultGrade = 0f;
+            var submissionGrade = 0f;
             foreach (var review in reviews)
             {
-                var peerConfidenceFactor = await Context.CourseUsers
-                    .Where(cu => 
-                        cu.Course == taskUser.PeeringTask.Course && cu.User == review.SubmissionPeerAssignment.Peer)
-                    .Select(cu => cu.ConfidenceFactor)
-                    .FirstOrDefaultAsync();
+                var peerConfidenceFactor = await GetPeerConfidenceFactor(review.SubmissionPeerAssignment.Peer, taskUser.PeeringTask.Course);
                 if (peerConfidenceFactor == null)
                     return null;
-                resultGrade += review.Grade * peerConfidenceFactor.Value;
+                submissionGrade += review.Grade * peerConfidenceFactor.Value;
                 confidenceFactorsSum += peerConfidenceFactor.Value;
             }
-            resultGrade /= confidenceFactorsSum;
-            resultGrade *= await GetReviewedPercentage(taskUser);
-            Console.WriteLine($"Mid-calculated grade: {resultGrade}");
+            submissionGrade /= confidenceFactorsSum;
+            var reviewGrade = await GetReviewedPercentage(taskUser) * 100;
+            var finalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade, reviewGrade);
+           
             var newConfidenceFactor = taskUser.PreviousConfidenceFactor * MaxPossibleGrade;
-            newConfidenceFactor += resultGrade;
+            newConfidenceFactor += finalGrade;
             newConfidenceFactor /= (2*MaxPossibleGrade);
-            taskUser.FinalGrade = (int) Math.Round(resultGrade);
+            
+            taskUser.SubmissionGrade = submissionGrade;
+            taskUser.ReviewGrade = reviewGrade;
+            taskUser.FinalGrade = finalGrade;
+            Console.WriteLine($"Submission grade: {submissionGrade}");
+            Console.WriteLine($"Review grade: {reviewGrade}");
             Console.WriteLine($"Final grade: {taskUser.FinalGrade}");
             return newConfidenceFactor;
         }

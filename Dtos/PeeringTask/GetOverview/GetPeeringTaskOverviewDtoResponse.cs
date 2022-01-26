@@ -18,7 +18,7 @@ namespace patools.Dtos.Task
         
         //Teacher-only
         public GetPeeringTaskStatisticsDtoResponse Statistics { get; set; }
-        public List<int> Grades { get; set; }
+        public List<int?> Grades { get; set; }
         public List<float> CurrentConfidenceFactors { get; set; }
         public List<float?> ConfidenceFactors { get; set; }
         public ReviewTypes? ReviewType { get; set; }
