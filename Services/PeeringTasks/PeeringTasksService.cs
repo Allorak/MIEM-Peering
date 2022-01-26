@@ -115,70 +115,6 @@ namespace patools.Services.PeeringTasks
             return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(Mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
         }
 
-        private async Task<bool> AddQuestions(IEnumerable<AddQuestionDto> questions, PeeringTask task, RespondentTypes respondentType)
-        {
-            foreach(var question in questions)
-            {
-                var newPeerQuestion = Mapper.Map<Question>(question);
-                newPeerQuestion.ID = Guid.NewGuid();
-                newPeerQuestion.PeeringTask = task;
-                newPeerQuestion.RespondentType = respondentType;
-
-                if (respondentType == RespondentTypes.Peer)
-                {
-                    if (!newPeerQuestion.Required)
-                        newPeerQuestion.CoefficientPercentage = null;
-                    else if (newPeerQuestion.Type == QuestionTypes.Select && question.CoefficientPercentage == null)
-                    {
-                        Console.WriteLine("Coefficient Percentage can't be null in a required select question");
-                        return false;
-                    }
-                }
-
-                if (newPeerQuestion.Type == QuestionTypes.Multiple)
-                {
-                    if (await AddVariants(newPeerQuestion, question.Responses) == false)
-                    {
-                        Console.WriteLine("Error occured while adding variants");
-                        return false;
-                    }
-                }
-                
-                await Context.Questions.AddAsync(newPeerQuestion);
-            }
-
-            return true;
-        }
-        
-        private async Task<bool> AddVariants(Question question, List<AddVariantDto> variants)
-        {
-            if (variants == null || variants.Count < 2)
-            {
-                Console.WriteLine("Not enough variants provided in multiple-type question");
-                return false;
-            }
-            
-            var variantIds = new List<int>();
-            foreach (var newVariant in variants.Select(variant => new Variant()
-            {
-                ID = Guid.NewGuid(),
-                Response = variant.Response,
-                Question = question,
-                ChoiceId = variant.Id
-            }))
-            {
-                if (variantIds.Contains(newVariant.ChoiceId))
-                {
-                    Console.WriteLine("Incorrect choice id provided");
-                    return false;
-                }
-                
-                variantIds.Add(newVariant.ChoiceId);
-                await Context.Variants.AddAsync(newVariant);
-            }
-
-            return true;
-        }
         private static bool AreDeadlinesValid(AddPeeringTaskSettingsDto settings)
         {
             if (settings.SubmissionStartDateTime == null ||
@@ -265,6 +201,25 @@ namespace patools.Services.PeeringTasks
 
             return task;
         }
+        
+        private static PeeringTask CreateTaskBase(AddPeeringTaskDto taskInfo, Course course)
+        {
+            return new PeeringTask
+            {
+                ID = Guid.NewGuid(),
+                Title = taskInfo.MainInfo.Title,
+                Description = taskInfo.MainInfo.Description,
+                Course = course,
+                SubmissionStartDateTime = taskInfo.Settings.SubmissionStartDateTime.Value,
+                SubmissionEndDateTime = taskInfo.Settings.SubmissionEndDateTime.Value,
+                ReviewStartDateTime = taskInfo.Settings.ReviewStartDateTime.Value,
+                ReviewEndDateTime = taskInfo.Settings.ReviewEndDateTime.Value,
+                SubmissionsToCheck = taskInfo.Settings.SubmissionsToCheck,
+                ReviewType = taskInfo.Settings.ReviewType,
+                SubmissionWeight = taskInfo.Settings.SubmissionWeight,
+                ReviewWeight = taskInfo.Settings.ReviewWeight
+            };
+        }
 
         private async Task<bool> AddExperts(IEnumerable<string> expertEmails, PeeringTask task)
         {
@@ -290,23 +245,69 @@ namespace patools.Services.PeeringTasks
 
             return true;
         }
-        private static PeeringTask CreateTaskBase(AddPeeringTaskDto taskInfo, Course course)
+        private async Task<bool> AddQuestions(IEnumerable<AddQuestionDto> questions, PeeringTask task, RespondentTypes respondentType)
         {
-            return new PeeringTask
+            foreach(var question in questions)
+            {
+                var newPeerQuestion = Mapper.Map<Question>(question);
+                newPeerQuestion.ID = Guid.NewGuid();
+                newPeerQuestion.PeeringTask = task;
+                newPeerQuestion.RespondentType = respondentType;
+
+                if (respondentType == RespondentTypes.Peer)
+                {
+                    if (!newPeerQuestion.Required)
+                        newPeerQuestion.CoefficientPercentage = null;
+                    else if (newPeerQuestion.Type == QuestionTypes.Select && question.CoefficientPercentage == null)
+                    {
+                        Console.WriteLine("Coefficient Percentage can't be null in a required select question");
+                        return false;
+                    }
+                }
+
+                if (newPeerQuestion.Type == QuestionTypes.Multiple)
+                {
+                    if (await AddVariants(newPeerQuestion, question.Responses) == false)
+                    {
+                        Console.WriteLine("Error occured while adding variants");
+                        return false;
+                    }
+                }
+                
+                await Context.Questions.AddAsync(newPeerQuestion);
+            }
+
+            return true;
+        }
+        
+        private async Task<bool> AddVariants(Question question, List<AddVariantDto> variants)
+        {
+            if (variants == null || variants.Count < 2)
+            {
+                Console.WriteLine("Not enough variants provided in multiple-type question");
+                return false;
+            }
+            
+            var variantIds = new List<int>();
+            foreach (var newVariant in variants.Select(variant => new Variant()
             {
                 ID = Guid.NewGuid(),
-                Title = taskInfo.MainInfo.Title,
-                Description = taskInfo.MainInfo.Description,
-                Course = course,
-                SubmissionStartDateTime = taskInfo.Settings.SubmissionStartDateTime.Value,
-                SubmissionEndDateTime = taskInfo.Settings.SubmissionEndDateTime.Value,
-                ReviewStartDateTime = taskInfo.Settings.ReviewStartDateTime.Value,
-                ReviewEndDateTime = taskInfo.Settings.ReviewEndDateTime.Value,
-                SubmissionsToCheck = taskInfo.Settings.SubmissionsToCheck,
-                ReviewType = taskInfo.Settings.ReviewType,
-                SubmissionWeight = taskInfo.Settings.SubmissionWeight,
-                ReviewWeight = taskInfo.Settings.ReviewWeight
-            };
+                Response = variant.Response,
+                Question = question,
+                ChoiceId = variant.Id
+            }))
+            {
+                if (variantIds.Contains(newVariant.ChoiceId))
+                {
+                    Console.WriteLine("Incorrect choice id provided");
+                    return false;
+                }
+                
+                variantIds.Add(newVariant.ChoiceId);
+                await Context.Variants.AddAsync(newVariant);
+            }
+
+            return true;
         }
         
         public async Task<Response<string>> AssignPeers(AssignPeersDto peersInfo)
@@ -484,7 +485,7 @@ namespace patools.Services.PeeringTasks
             var taskUsers = await GetTaskUserAssignments(task);
             var submissions = await GetSubmissionsForTask(taskUsers);
             var submissionPeers = await GetSubmissionPeerAssignments(submissions);
-            var reviews = await GetReviewsForTask(submissionPeers);
+            var reviews = await GetTaskReviews(submissionPeers);
 
             return new GetPeeringTaskOverviewDtoResponse()
             {
@@ -515,18 +516,7 @@ namespace patools.Services.PeeringTasks
                 ReviewType = task.ReviewType
             };
         }
-        private static List<int> GetFinalGrades(IEnumerable<PeeringTaskUser> taskUsers)
-        {
-            return taskUsers.Select(tu => tu.FinalGrade).ToList();
-        }
-        private static List<float> GetPreviousConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
-        {
-            return taskUsers.Select(tu => tu.PreviousConfidenceFactor).ToList();
-        }
-        private static List<float?> GetNextConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
-        {
-            return taskUsers.Select(tu => tu.NextConfidenceFactor).ToList();
-        }
+        
         private async Task<GetPeeringTaskOverviewDtoResponse> GetStudentTaskOverview(User student, PeeringTask task)
         {
             var taskUser = await GetTaskUser(student, task);
@@ -566,7 +556,7 @@ namespace patools.Services.PeeringTasks
                         MinGrade = MinPossibleGrade,
                         MaxGrade = MaxPossibleGrade,
                         Coordinates = task.ReviewStartDateTime < DateTime.Now
-                            ? await GetReviewsCoordinates(await GetReviewsForSubmission(submission))
+                            ? await GetReviewsCoordinates(await GetSubmissionReviews(submission))
                             : null
                     }
                     : null,
@@ -585,15 +575,7 @@ namespace patools.Services.PeeringTasks
                 .Where(r => assignedSubmissions.Contains(r.SubmissionPeerAssignment))
                 .ToListAsync();
         }
-
-        private async Task<List<Review>> GetReviewsForSubmission(Submission submission)
-        {
-            return await Context.Reviews
-                .Where(r => r.SubmissionPeerAssignment.Submission == submission)
-                .Include(r => r.SubmissionPeerAssignment.Peer)
-                .ToListAsync();
-        }
-
+        
         private async Task<List<GetPeeringTaskCoordinatesDtoResponse>> GetReviewsCoordinates(IEnumerable<Review> reviews)
         {
             var coordinates = new List<GetPeeringTaskCoordinatesDtoResponse>();
@@ -940,18 +922,12 @@ namespace patools.Services.PeeringTasks
 
         public async Task<Response<string>> ChangeConfidenceFactors(ChangeConfidenceFactorDto taskInfo)
         {
-            var task = await Context.Tasks
-                .Include(t => t.Course)
-                .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
+            var task = await GetTaskById(taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<string>("Invalid task id provided");
 
-            var taskUsers = await Context.TaskUsers
-                .Include(tu => tu.Student)
-                .Include(tu => tu.PeeringTask)
-                .Include(tu => tu.PeeringTask.Course)
-                .Where(tu => tu.PeeringTask == task)
-                .ToListAsync();
+            var taskUsers = await GetTaskUserAssignments(task);
+            
             foreach (var taskUser in taskUsers)
             {
                 var student = taskUser.Student;
