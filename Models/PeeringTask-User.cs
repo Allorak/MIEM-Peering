@@ -22,6 +22,8 @@ namespace patools.Models
         public PeeringTaskStates State { get; set; }
 
         public int FinalGrade { get; set; }
+        public float SubmissionGrade { get; set; }
+        public float ReviewGrade { get; set; }
 
         [Required]
         public float PreviousConfidenceFactor { get; set; }
