@@ -43,6 +43,7 @@ namespace patools.Services.Authentication
                     });
             }
 
+            System.Console.WriteLine($"Jwt - {CreateJwtFromUser(user)}");
             return new SuccessfulResponse<GetGoogleRegisteredUserDtoResponse>
             (new GetGoogleRegisteredUserDtoResponse()
             {
@@ -63,7 +64,6 @@ namespace patools.Services.Authentication
             {
                 AccessToken = CreateJwtFromUser(user)
             });
-            System.Console.WriteLine($"Jwt - {response.Payload.AccessToken}");
             return response;
         }
 

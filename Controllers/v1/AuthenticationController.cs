@@ -47,7 +47,6 @@ namespace patools.Controllers.v1
         {
             try
             {
-                System.Console.WriteLine($"Google - {tokenInfo.GoogleToken}"); // TODO: remove after all the testing
                 var googleUser = await GoogleJsonWebSignature.ValidateAsync(tokenInfo.GoogleToken, new GoogleJsonWebSignature.ValidationSettings()
                 {
                     Audience = new[] {_configuration.GetSection("AppSettings:AppId").Value}
