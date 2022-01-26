@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using patools.Enums;
 using patools.Models;
 
 namespace patools.Services
 {
-    public class BasicService
+    public class ServiceBase
     {
         protected const int MinPossibleGrade = 0;
         protected const int MaxPossibleGrade = 10;
@@ -18,7 +19,7 @@ namespace patools.Services
         protected readonly PAToolsContext Context;
         protected readonly IMapper Mapper;
 
-        protected BasicService(PAToolsContext context, IMapper mapper)
+        protected ServiceBase(PAToolsContext context, IMapper mapper)
         {
             Mapper = mapper;
             Context = context;
@@ -29,6 +30,15 @@ namespace patools.Services
             return await Context.Users.FirstOrDefaultAsync(u => u.ID == userId);
         }
 
+        protected async Task<User> GetUserById(Guid userId, UserRoles role)
+        {
+            return await Context.Users.FirstOrDefaultAsync(u => u.ID == userId && u.Role == role); 
+        }
+        
+        protected async Task<User> GetUserByEmail(string email)
+        {
+            return await Context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
         protected async Task<PeeringTask> GetTaskById(Guid taskId)
         {
             return await Context.Tasks
@@ -37,6 +47,12 @@ namespace patools.Services
                 .FirstOrDefaultAsync(t => t.ID == taskId);
         }
 
+        protected async Task<Course> GetCourseById(Guid courseId)
+        {
+            return await Context.Courses
+                .Include(c => c.Teacher)
+                .FirstOrDefaultAsync(c => c.ID == courseId);
+        }
         protected async Task<bool> IsExpertUser(User user, PeeringTask task)
         {
             var expert = await Context.Experts
@@ -50,6 +66,11 @@ namespace patools.Services
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
         }
 
+        protected async Task<CourseUser> GetCourseUser(User student, Course course)
+        {
+            return await Context.CourseUsers.FirstOrDefaultAsync(cu =>
+                cu.Course == course && cu.User == student);
+        }
         protected async Task<Submission> GetSubmission(PeeringTaskUser taskUser)
         {
             return await Context.Submissions
@@ -126,5 +147,12 @@ namespace patools.Services
         {
             return await GetReviewsForTask(await GetSubmissionPeerAssignments(task));
         }
+
+        protected async Task<PeeringTask> GetInitialTask(Course course)
+        {
+            return await Context.Tasks.FirstOrDefaultAsync(t => 
+                t.Course == course && t.TaskType == TaskTypes.Initial);
+        }
+
     }
 }

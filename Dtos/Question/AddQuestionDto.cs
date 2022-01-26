@@ -5,7 +5,7 @@ using patools.Models;
 
 namespace patools.Dtos.Question
 {
-    public class AddAuthorQuestionDto
+    public class AddQuestionDto
     {
         public string Title { get; set; }
         public string Description { get; set; }
@@ -15,5 +15,6 @@ namespace patools.Dtos.Question
         public List<AddVariantDto> Responses { get; set; }
         public int? MinValue { get; set; }
         public int? MaxValue { get; set; }
+        public float? CoefficientPercentage { get; set; }
     }
 }

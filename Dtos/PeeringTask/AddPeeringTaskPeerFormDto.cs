@@ -4,6 +4,6 @@ namespace patools.Dtos.Task
 {
     public class AddPeeringTaskPeerFormDto
     {
-        public AddPeerQuestionDto[] Rubrics { get; set; }
+        public AddQuestionDto[] Rubrics { get; set; }
     }
 }

@@ -16,7 +16,7 @@ using patools.Models;
 using patools.Errors;
 namespace patools.Services.PeeringTasks
 {
-    public class PeeringTasksService : BasicService, IPeeringTasksService
+    public class PeeringTasksService : ServiceBase, IPeeringTasksService
     {
 
         public PeeringTasksService(PAToolsContext context, IMapper mapper) : base(context, mapper)
@@ -35,110 +35,38 @@ namespace patools.Services.PeeringTasks
             if (peeringTask.Settings == null)
                 return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Settings are not provided");
             
-            var course = await Context.Courses
-                .Include(c => c.Teacher)
-                .FirstOrDefaultAsync(c => c.ID == peeringTask.CourseId);
+            var course = await GetCourseById(peeringTask.CourseId);
             if (course == null)
                 return new InvalidGuidIdResponse<GetNewPeeringTaskDtoResponse>("Invalid course id");
 
-            var teacher =
-                await Context.Users.FirstOrDefaultAsync(u =>
-                    u.ID == peeringTask.TeacherId && u.Role == UserRoles.Teacher);
+            var teacher = await GetUserById(peeringTask.TeacherId, UserRoles.Teacher);
             if (teacher == null)
                 return new InvalidGuidIdResponse<GetNewPeeringTaskDtoResponse>("Invalid teacher id provided");
             
             if (course.Teacher != teacher)
                 return new NoAccessResponse<GetNewPeeringTaskDtoResponse>("This teacher has no access to this course");
 
-            if (peeringTask.Settings.SubmissionStartDateTime == null ||
-                peeringTask.Settings.SubmissionEndDateTime == null ||
-                peeringTask.Settings.ReviewStartDateTime == null ||
-                peeringTask.Settings.ReviewEndDateTime == null)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Deadlines can't be null");
+            if (!AreDeadlinesValid(peeringTask.Settings))
+                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Incorrect deadlines in request");
+
+            var initialTask = await GetInitialTask(course);
             
-            // if (peeringTask.Settings.SubmissionStartDateTime < DateTime.Now)
-            //     return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-            //         "Submission start time can't be less than current time");
-            if (peeringTask.Settings.SubmissionStartDateTime > peeringTask.Settings.SubmissionEndDateTime)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                    "Submission start time can't be greater than submission end time");
-            if (peeringTask.Settings.SubmissionEndDateTime > peeringTask.Settings.ReviewStartDateTime)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                    "Submission end time can't be greater than review start time");
-            if (peeringTask.Settings.ReviewStartDateTime > peeringTask.Settings.ReviewEndDateTime)
-                return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                    "Review start time can't be greater than review end time");
-            
-            var newTask = new PeeringTask
-            {
-                ID = Guid.NewGuid(),
-                Title = peeringTask.MainInfo.Title,
-                Description = peeringTask.MainInfo.Description,
-                Course = course,
-                SubmissionStartDateTime = peeringTask.Settings.SubmissionStartDateTime.Value,
-                SubmissionEndDateTime = peeringTask.Settings.SubmissionEndDateTime.Value,
-                ReviewStartDateTime = peeringTask.Settings.ReviewStartDateTime.Value,
-                ReviewEndDateTime = peeringTask.Settings.ReviewEndDateTime.Value,
-                SubmissionsToCheck = peeringTask.Settings.SubmissionsToCheck,
-                ReviewType = peeringTask.Settings.ReviewType
-            };
-            
-            var initialTask = await Context.Tasks
-                .FirstOrDefaultAsync(t => t.Course == course && t.TaskType == TaskTypes.Initial);
+            PeeringTask newTask;
             if (initialTask != null)
             {
                 if (initialTask.ReviewEndDateTime > DateTime.Now)
-                    return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>(
-                        "The initial task hasn't ended yet");
+                    return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("The initial task hasn't ended yet");
                 
-                var courseStudentConnections = await Context.CourseUsers
-                    .Where(cu => cu.Course == course)
-                    .ToListAsync();
-
-                var noConfidenceFactorStudents = courseStudentConnections
-                    .Where(csc => csc.ConfidenceFactor == null)
-                    .ToList();
-
-                if (courseStudentConnections.Count == noConfidenceFactorStudents.Count)
-                    return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>(
-                        "Initial task has ended but no students have confidence factor");
-                
-                foreach (var courseStudent in noConfidenceFactorStudents)
-                {
-                    courseStudent.ConfidenceFactor = 0;
-                }
-
-                newTask.TaskType = TaskTypes.Common;
+                newTask = await CreateCommonTask(peeringTask, course);
             }
             else
             {
-                if (peeringTask.Settings.Experts == null)
-                    return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                        "The task is initial but no experts provided");
-                newTask.TaskType = TaskTypes.Initial;
-                newTask.ExpertsAssigned = false;
-                foreach (var email in peeringTask.Settings.Experts)
-                {
-                    var expertUser = await Context.Users.FirstOrDefaultAsync(u => u.Email == email);
-                    
-                    var courseUser = await Context.CourseUsers.FirstOrDefaultAsync(cu =>
-                            cu.Course == course && cu.User == expertUser);
-                    if (courseUser != null)
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                            $"Expert {expertUser.Email} is a student of this course");
-                    
-                    var expert = new Expert()
-                    {
-                        ID = Guid.NewGuid(),
-                        Email = email,
-                        User = expertUser,
-                        PeeringTask = newTask
-                    };
-
-                    await Context.Experts.AddAsync(expert);
-                }
+                newTask = await CreateInitialTask(peeringTask, course);
             }
 
+            if(newTask == null)
+                return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>();
+            
             await Context.Tasks.AddAsync(newTask);
             //TODO: Feature should be changed later
 
@@ -161,92 +89,14 @@ namespace patools.Services.PeeringTasks
                 };
                 await Context.TaskUsers.AddAsync(taskUser);
             }
-
-            foreach(var authorQuestion in peeringTask.AuthorForm.Rubrics)
-            {
-                var newAuthorQuestion = Mapper.Map<Question>(authorQuestion);
-                newAuthorQuestion.ID = Guid.NewGuid();
-                newAuthorQuestion.PeeringTask = newTask;
-                newAuthorQuestion.RespondentType = RespondentTypes.Author;
-                if (newAuthorQuestion.Type == QuestionTypes.Multiple)
-                {
-                    if(authorQuestion.Responses == null || authorQuestion.Responses.Count < 2)
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                            "Not enough variants provided in multiple-type question");
-                    var variantIds = new List<int>();
-                    foreach (var newVariant in authorQuestion.Responses.Select(variant => new Variant()
-                    {
-                        ID = Guid.NewGuid(),
-                        Response = variant.Response,
-                        Question = newAuthorQuestion,
-                        ChoiceId = variant.Id
-                    }))
-                    {
-                        if (variantIds.Contains(newVariant.ChoiceId))
-                            return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                                "Incorrect choice id provided");
-                        variantIds.Add(newVariant.ChoiceId);
-                        await Context.Variants.AddAsync(newVariant);
-                    }
-
-                    /*
-                    if (!variantIds.Contains(0))
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id 0");
-                    foreach (var variantId in variantIds.Where(variantId => variantId!=0 && !variantIds.Contains(variantId-1)))
-                    {
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id " +
-                            (variantId - 1));
-                    }*/
-                }
-                await Context.Questions.AddAsync(newAuthorQuestion);
-            }
-
-            foreach(var peerQuestion in peeringTask.PeerForm.Rubrics)
-            {
-                var newPeerQuestion = Mapper.Map<Question>(peerQuestion);
-                newPeerQuestion.ID = Guid.NewGuid();
-                newPeerQuestion.PeeringTask = newTask;
-                newPeerQuestion.RespondentType = RespondentTypes.Peer;
-                if (!newPeerQuestion.Required)
-                    newPeerQuestion.CoefficientPercentage = null;
-                else
-                {
-                    if (newPeerQuestion.Type == QuestionTypes.Select && peerQuestion.CoefficientPercentage == null)
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                            "Coefficient Percentage can't be null in a required select question");
-                }
-                if (newPeerQuestion.Type == QuestionTypes.Multiple)
-                {
-                    if(peerQuestion.Responses == null || peerQuestion.Responses.Count < 2)
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                            "Not enough variants provided in multiple-type question");
-                    var variantIds = new List<int>();
-                    foreach (var newVariant in peerQuestion.Responses.Select(variant => new Variant()
-                    {
-                        ID = Guid.NewGuid(),
-                        Response = variant.Response,
-                        Question = newPeerQuestion,
-                        ChoiceId = variant.Id
-                    }))
-                    {
-                        if (variantIds.Contains(newVariant.ChoiceId))
-                            return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>(
-                                "Incorrect choice id provided");
-                        variantIds.Add(newVariant.ChoiceId);
-                        await Context.Variants.AddAsync(newVariant);
-                    }
-                    /*
-                    if (!variantIds.Contains(0))
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id 0");
-                    foreach (var variantId in variantIds.Where(variantId => variantId!=0 && !variantIds.Contains(variantId-1)))
-                    {
-                        return new BadRequestDataResponse<GetNewPeeringTaskDtoResponse>("Missed variant with id " +
-                            (variantId - 1));
-                    }*/
-                }
-                await Context.Questions.AddAsync(newPeerQuestion);
-            }
+            // END of TODO
             
+            if (await AddQuestions(peeringTask.AuthorForm.Rubrics, newTask,RespondentTypes.Author) == false)
+                return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>();
+            
+            if (await AddQuestions(peeringTask.PeerForm.Rubrics, newTask,RespondentTypes.Peer) == false)
+                return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>();
+
             await Context.SaveChangesAsync();
 
             /*
@@ -263,6 +113,200 @@ namespace patools.Services.PeeringTasks
                 }), delay);
             */
             return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(Mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
+        }
+
+        private async Task<bool> AddQuestions(IEnumerable<AddQuestionDto> questions, PeeringTask task, RespondentTypes respondentType)
+        {
+            foreach(var question in questions)
+            {
+                var newPeerQuestion = Mapper.Map<Question>(question);
+                newPeerQuestion.ID = Guid.NewGuid();
+                newPeerQuestion.PeeringTask = task;
+                newPeerQuestion.RespondentType = respondentType;
+
+                if (respondentType == RespondentTypes.Peer)
+                {
+                    if (!newPeerQuestion.Required)
+                        newPeerQuestion.CoefficientPercentage = null;
+                    else if (newPeerQuestion.Type == QuestionTypes.Select && question.CoefficientPercentage == null)
+                    {
+                        Console.WriteLine("Coefficient Percentage can't be null in a required select question");
+                        return false;
+                    }
+                }
+
+                if (newPeerQuestion.Type == QuestionTypes.Multiple)
+                {
+                    if (await AddVariants(newPeerQuestion, question.Responses) == false)
+                    {
+                        Console.WriteLine("Error occured while adding variants");
+                        return false;
+                    }
+                }
+                
+                await Context.Questions.AddAsync(newPeerQuestion);
+            }
+
+            return true;
+        }
+        
+        private async Task<bool> AddVariants(Question question, List<AddVariantDto> variants)
+        {
+            if (variants == null || variants.Count < 2)
+            {
+                Console.WriteLine("Not enough variants provided in multiple-type question");
+                return false;
+            }
+            
+            var variantIds = new List<int>();
+            foreach (var newVariant in variants.Select(variant => new Variant()
+            {
+                ID = Guid.NewGuid(),
+                Response = variant.Response,
+                Question = question,
+                ChoiceId = variant.Id
+            }))
+            {
+                if (variantIds.Contains(newVariant.ChoiceId))
+                {
+                    Console.WriteLine("Incorrect choice id provided");
+                    return false;
+                }
+                
+                variantIds.Add(newVariant.ChoiceId);
+                await Context.Variants.AddAsync(newVariant);
+            }
+
+            return true;
+        }
+        private static bool AreDeadlinesValid(AddPeeringTaskSettingsDto settings)
+        {
+            if (settings.SubmissionStartDateTime == null ||
+                settings.SubmissionEndDateTime == null ||
+                settings.ReviewStartDateTime == null ||
+                settings.ReviewEndDateTime == null)
+            {
+                Console.WriteLine("Deadlines can't be null");
+                return false;
+            }
+            
+            /* if (peeringTask.Settings.SubmissionStartDateTime < DateTime.Now)
+            {
+                Console.WriteLine("Submission start time can't be less than current time");
+                return false;
+            }*/
+            if (settings.SubmissionStartDateTime > settings.SubmissionEndDateTime)
+            {
+                Console.WriteLine("Submission start time can't be greater than submission end time");
+                return false;
+            }
+            if (settings.SubmissionEndDateTime > settings.ReviewStartDateTime)
+            {
+                Console.WriteLine("Submission end time can't be greater than review start time");
+                return false;
+            }
+            if (settings.ReviewStartDateTime > settings.ReviewEndDateTime)
+            {
+                Console.WriteLine("Review start time can't be greater than review end time");
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<PeeringTask> CreateCommonTask(AddPeeringTaskDto taskInfo, Course course)
+        {
+            var task = CreateTaskBase(taskInfo, course);
+
+            var courseStudentConnections = await Context.CourseUsers
+                .Where(cu => cu.Course == course)
+                .ToListAsync();
+
+            var noConfidenceFactorStudents = courseStudentConnections
+                .Where(csc => csc.ConfidenceFactor == null)
+                .ToList();
+
+            if (courseStudentConnections.Count == noConfidenceFactorStudents.Count)
+            {
+                Console.WriteLine("Initial task has ended but no students have confidence factor");
+                return null;
+            }
+                
+            foreach (var courseStudent in noConfidenceFactorStudents)
+            {
+                courseStudent.ConfidenceFactor = 0;
+            }
+
+            task.TaskType = TaskTypes.Common;
+            task.GoodCoefficientBonus = taskInfo.Settings.GoodCoefficientBonus;
+            task.BadCoefficientPenalty = taskInfo.Settings.BadCoefficientPenalty;
+            
+            return task;
+        }
+
+        private async Task<PeeringTask> CreateInitialTask(AddPeeringTaskDto taskInfo, Course course)
+        {
+            if (taskInfo.Settings.Experts == null)
+            {
+                Console.WriteLine("The task is initial but no experts provided");
+                return null;
+            }
+
+            var task = CreateTaskBase(taskInfo, course);
+            
+            task.TaskType = TaskTypes.Initial;
+            task.ExpertsAssigned = false;
+
+            if (await AddExperts(taskInfo.Settings.Experts, task) == false)
+            {
+                Console.WriteLine("Error in adding experts");
+                return null;
+            }
+
+            return task;
+        }
+
+        private async Task<bool> AddExperts(IEnumerable<string> expertEmails, PeeringTask task)
+        {
+            foreach (var email in expertEmails)
+            {
+                var expertUser = await GetUserByEmail(email);
+
+                var courseUser = await GetCourseUser(expertUser, task.Course);
+                if (courseUser != null)
+                {
+                    Console.WriteLine($"Expert {expertUser.Email} is a student of this course");
+                    return false;
+                }
+                
+                await Context.Experts.AddAsync(new Expert()
+                {
+                    ID = Guid.NewGuid(),
+                    Email = email,
+                    User = expertUser,
+                    PeeringTask = task
+                });
+            }
+
+            return true;
+        }
+        private static PeeringTask CreateTaskBase(AddPeeringTaskDto taskInfo, Course course)
+        {
+            return new PeeringTask
+            {
+                ID = Guid.NewGuid(),
+                Title = taskInfo.MainInfo.Title,
+                Description = taskInfo.MainInfo.Description,
+                Course = course,
+                SubmissionStartDateTime = taskInfo.Settings.SubmissionStartDateTime.Value,
+                SubmissionEndDateTime = taskInfo.Settings.SubmissionEndDateTime.Value,
+                ReviewStartDateTime = taskInfo.Settings.ReviewStartDateTime.Value,
+                ReviewEndDateTime = taskInfo.Settings.ReviewEndDateTime.Value,
+                SubmissionsToCheck = taskInfo.Settings.SubmissionsToCheck,
+                ReviewType = taskInfo.Settings.ReviewType,
+                SubmissionWeight = taskInfo.Settings.SubmissionWeight,
+                ReviewWeight = taskInfo.Settings.ReviewWeight
+            };
         }
         
         public async Task<Response<string>> AssignPeers(AssignPeersDto peersInfo)

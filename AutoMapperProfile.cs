@@ -23,8 +23,7 @@ namespace patools
             CreateMap<User,GetNewUserDtoResponse>();
             CreateMap<PeeringTask,GetPeeringTaskDeadlinesDtoResponse>();
             CreateMap<PeeringTask,GetNewPeeringTaskDtoResponse>();
-            CreateMap<AddAuthorQuestionDto,Question>();
-            CreateMap<AddPeerQuestionDto,Question>();
+            CreateMap<AddQuestionDto,Question>();
             CreateMap<PeeringTask,GetPeeringTaskMainInfoDtoResponse>();
             CreateMap<Question,GetAuthorQuestionDtoResponse>();
             CreateMap<AddUserDTO,User>();
@@ -35,6 +34,7 @@ namespace patools
             CreateMap<Variant, GetVariantDtoResponse>();
             CreateMap<Question, GetPeerQuestionDtoResponse>();
             CreateMap<Question, GetAnswerDtoResponse>();
+            CreateMap<AddPeeringTaskDto, PeeringTask>();
         }
     }
 }
