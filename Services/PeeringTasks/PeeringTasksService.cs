@@ -513,7 +513,15 @@ namespace patools.Services.PeeringTasks
                 ConfidenceFactors = task.ReviewEndDateTime < DateTime.Now
                     ? GetNextConfidenceFactors(taskStudents)
                     : null,
-                ReviewType = task.ReviewType
+                ReviewType = task.ReviewType,
+                SubmissionWeight = task.SubmissionWeight,
+                ReviewWeight = task.ReviewWeight,
+                BadConfidencePenalty = task.TaskType == TaskTypes.Common
+                    ? task.BadConfidencePenalty
+                    : null,
+                GoodConfidenceBonus = task.TaskType == TaskTypes.Common
+                    ? task.GoodConfidenceBonus
+                    : null
             };
         }
         
@@ -560,7 +568,15 @@ namespace patools.Services.PeeringTasks
                             : null
                     }
                     : null,
-                StudentConfidenceFactors = confidenceFactors
+                StudentConfidenceFactors = confidenceFactors,
+                SubmissionWeight = task.SubmissionWeight,
+                ReviewWeight = task.ReviewWeight,
+                BadConfidencePenalty = task.TaskType == TaskTypes.Common
+                    ? task.BadConfidencePenalty
+                    : null,
+                GoodConfidenceBonus = task.TaskType == TaskTypes.Common
+                    ? task.GoodConfidenceBonus
+                    : null
             };
         }
         private async Task<List<SubmissionPeer>> GetAssignedSubmissions(User peer, PeeringTask task)
