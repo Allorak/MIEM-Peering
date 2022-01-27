@@ -103,27 +103,50 @@ namespace patools.Services
                 .ToListAsync();
         }
 
-        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignments(IEnumerable<Submission> submissions)
+        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignments(IEnumerable<Submission> submissions, User excludingTeacher = null)
         {
-            return await Context.SubmissionPeers
+            var submissionPeers = await Context.SubmissionPeers
                 .Include(sp => sp.Peer)
                 .Include(sp => sp.Submission.PeeringTaskUserAssignment.Student)
                 .Include(sp => sp.Submission.PeeringTaskUserAssignment.PeeringTask)
                 .Include(sp => sp.Submission.PeeringTaskUserAssignment.PeeringTask.Course.Teacher)
                 .Where(sp => submissions.Contains(sp.Submission))
                 .ToListAsync();
+            if (excludingTeacher != null)
+                submissionPeers = submissionPeers.Where(sp => sp.Peer != excludingTeacher).ToList();
+            return submissionPeers;
         }
 
-        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignments(IEnumerable<PeeringTaskUser> taskUsers)
+        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignments(IEnumerable<PeeringTaskUser> taskUsers, User excludingTeacher = null)
         {
-            return await GetSubmissionPeerAssignments(await GetSubmissionsForTask(taskUsers));
+            return await GetSubmissionPeerAssignments(await GetSubmissionsForTask(taskUsers),excludingTeacher);
         }
         
-        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignments(PeeringTask task)
+        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignments(PeeringTask task, User excludingTeacher = null)
         {
-            return await GetSubmissionPeerAssignments(await GetSubmissionsForTask(task));
+            return await GetSubmissionPeerAssignments(await GetSubmissionsForTask(task),excludingTeacher);
         }
 
+        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignments(Submission submission, User excludingTeacher = null)
+        {
+            var submissionPeers = await Context.SubmissionPeers
+                .Where(sp => sp.Submission == submission)
+                .ToListAsync();
+
+            if (excludingTeacher != null)
+                submissionPeers = submissionPeers.Where(sp => sp.Peer != excludingTeacher).ToList();
+            
+            return submissionPeers;
+        }
+
+        protected async Task<List<SubmissionPeer>> GetSubmissionPeerAssignmentsForPeer(PeeringTask task, User peer)
+        {
+            return await Context.SubmissionPeers
+                .Where(sp =>
+                    sp.Peer == peer &&
+                    sp.Submission.PeeringTaskUserAssignment.PeeringTask == task)
+                .ToListAsync();
+        }
         protected async Task<List<Review>> GetTaskReviews(IEnumerable<SubmissionPeer> submissionPeers)
         {
             return await Context.Reviews
@@ -158,13 +181,10 @@ namespace patools.Services
                 .ToListAsync();
         }
 
-        protected async Task<float?> GetPeerConfidenceFactor(User peer, Course course)
+        protected async Task<float?> GetPeerPreviousConfidenceFactor(User peer, PeeringTask task)
         {
-            return await Context.CourseUsers
-                .Where(cu => 
-                    cu.Course == course && cu.User == peer)
-                .Select(cu => cu.ConfidenceFactor)
-                .FirstOrDefaultAsync();
+            var taskUser = await GetTaskUser(peer, task);
+            return taskUser.PreviousConfidenceFactor;
         }
         protected async Task<List<Review>> GetReviewsByPeer(PeeringTask task, User peer)
         {

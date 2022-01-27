@@ -14,6 +14,10 @@ namespace patools.Dtos.User
         public int? ReviewedSubmissions { get; set; }
         public bool TeacherReviewed { get; set; }
         public int? FinalGrade { get; set; }
+        public float? SubmissionGrade { get; set; }
+        public float? ReviewGrade { get; set; }
+        public string GradeComment { get; set; }
+        public string ConfidenceComment { get; set; }
         public ConfidenceFactorQualities? ReviewQuality { get; set; }
     }
 }
