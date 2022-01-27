@@ -23,5 +23,10 @@ namespace patools.Dtos.Task
         public List<float?> ConfidenceFactors { get; set; }
         public ReviewTypes? ReviewType { get; set; }
         
+        //Teacher and student
+        public int? SubmissionWeight { get; set; }
+        public int? ReviewWeight { get; set; }
+        public float? GoodConfidenceBonus { get; set; }
+        public float? BadConfidencePenalty { get; set; }
     }
 }

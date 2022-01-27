@@ -76,8 +76,8 @@ namespace patools.Models
         [Required]
         public int SubmissionWeight { get; set; }
         
-        public int? GoodCoefficientBonus { get; set; }
-        public int? BadCoefficientPenalty { get; set; }
+        public float? GoodConfidenceBonus { get; set; }
+        public float? BadConfidencePenalty { get; set; }
 
     }
 }

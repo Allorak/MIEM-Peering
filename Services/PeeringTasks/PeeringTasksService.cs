@@ -174,8 +174,8 @@ namespace patools.Services.PeeringTasks
             }
 
             task.TaskType = TaskTypes.Common;
-            task.GoodCoefficientBonus = taskInfo.Settings.GoodCoefficientBonus;
-            task.BadCoefficientPenalty = taskInfo.Settings.BadCoefficientPenalty;
+            task.GoodConfidenceBonus = taskInfo.Settings.GoodConfidenceBonus;
+            task.BadConfidencePenalty = taskInfo.Settings.BadConfidencePenalty;
             
             return task;
         }
@@ -968,16 +968,16 @@ namespace patools.Services.PeeringTasks
             taskUser.NextConfidenceFactor = confidenceFactor.Value;
             taskUser.SubmissionGrade = submissionGrade;
             taskUser.ReviewGrade = reviewGrade;
-            taskUser.FinalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade,reviewGrade);
+            taskUser.FinalGrade = (int) Math.Round(CalculateResultGrade(taskUser.PeeringTask, submissionGrade,reviewGrade));
        
             return true;
         }
 
-        private static int CalculateResultGrade(PeeringTask task, float submissionGrade, float reviewGrade)
+        private static float CalculateResultGrade(PeeringTask task, float submissionGrade, float reviewGrade)
         {
             var submissionWeight = task.SubmissionWeight/100f;
             var reviewWeight = task.ReviewWeight/100f;
-            return (int) Math.Round(submissionGrade * submissionWeight + reviewGrade * reviewWeight);
+            return submissionGrade * submissionWeight + reviewGrade * reviewWeight;
         }
 
         private bool TryGetGradeComment(PeeringTaskUser taskUser, out string gradeComment)
@@ -1107,7 +1107,7 @@ namespace patools.Services.PeeringTasks
             return studentInfo;
         }
 
-        private async Task<ReviewQualities?> GetReviewQuality(Course course, IEnumerable<Review> reviews)
+        private async Task<ConfidenceFactorQualities?> GetReviewQuality(Course course, IEnumerable<Review> reviews)
         {
             var confidenceFactorsSum = 0f;
             var reviewersAmount = 0;
@@ -1128,9 +1128,9 @@ namespace patools.Services.PeeringTasks
             var averageConfidenceFactor = confidenceFactorsSum/reviewersAmount;
             return averageConfidenceFactor switch
             {
-                < BadAverageConfidenceFactor => ReviewQualities.Bad,
-                < DecentAverageConfidenceFactor => ReviewQualities.Decent,
-                _ => ReviewQualities.Good
+                < BadConfidenceFactorBorder => ConfidenceFactorQualities.Bad,
+                < DecentConfidenceFactorBorder => ConfidenceFactorQualities.Decent,
+                _ => ConfidenceFactorQualities.Good
             };
         }
 
@@ -1286,20 +1286,35 @@ namespace patools.Services.PeeringTasks
             submissionGrade /= confidenceFactorsSum;
             var reviewGrade = await GetReviewedPercentage(taskUser) * 100;
             var finalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade, reviewGrade);
-           
+
+            var previousConfidenceFactor = taskUser.PreviousConfidenceFactor;
+            if (GetConfidenceFactorQuality(previousConfidenceFactor) == ConfidenceFactorQualities.Bad)
+                finalGrade -= taskUser.PeeringTask.BadConfidencePenalty.Value;
+            else if (GetConfidenceFactorQuality(previousConfidenceFactor) == ConfidenceFactorQualities.Good)
+                finalGrade += taskUser.PeeringTask.GoodConfidenceBonus.Value;
+            
             var newConfidenceFactor = taskUser.PreviousConfidenceFactor * MaxPossibleGrade;
             newConfidenceFactor += finalGrade;
             newConfidenceFactor /= (2*MaxPossibleGrade);
-            
+
             taskUser.SubmissionGrade = submissionGrade;
             taskUser.ReviewGrade = reviewGrade;
-            taskUser.FinalGrade = finalGrade;
+            taskUser.FinalGrade = (int) Math.Round(finalGrade);
             Console.WriteLine($"Submission grade: {submissionGrade}");
             Console.WriteLine($"Review grade: {reviewGrade}");
             Console.WriteLine($"Final grade: {taskUser.FinalGrade}");
             return newConfidenceFactor;
         }
 
+        private static ConfidenceFactorQualities GetConfidenceFactorQuality(float confidenceFactor)
+        {
+            return confidenceFactor switch
+            {
+                < BadConfidenceFactorBorder => ConfidenceFactorQualities.Bad,
+                < DecentConfidenceFactorBorder => ConfidenceFactorQualities.Decent,
+                _ => ConfidenceFactorQualities.Good
+            };
+        }
         private async Task<float> GetReviewedPercentage(PeeringTaskUser taskUser)
         {
             var assignedSubmissions = await Context.SubmissionPeers

@@ -15,7 +15,7 @@ namespace patools.Dtos.Task
         public ReviewTypes ReviewType { get; set; }
         public int ReviewWeight { get; set; }
         public int SubmissionWeight { get; set; }
-        public int? GoodCoefficientBonus { get; set; }
-        public int? BadCoefficientPenalty { get; set; }
+        public float? GoodConfidenceBonus { get; set; }
+        public float? BadConfidencePenalty { get; set; }
     }
 }
