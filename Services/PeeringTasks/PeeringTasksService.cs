@@ -576,7 +576,16 @@ namespace patools.Services.PeeringTasks
                     : null,
                 GoodConfidenceBonus = task.TaskType == TaskTypes.Common
                     ? task.GoodConfidenceBonus
-                    : null
+                    : null,
+                SubmissionGrade = task.ReviewEndDateTime < DateTime.Now
+                    ? taskUser.SubmissionGrade
+                    : null,
+                ReviewGrade = task.ReviewEndDateTime < DateTime.Now
+                    ? taskUser.ReviewGrade
+                    : null,
+                FinalGrade = task.ReviewEndDateTime < DateTime.Now
+                    ? taskUser.FinalGrade
+                    : null,
             };
         }
         private async Task<List<SubmissionPeer>> GetAssignedSubmissions(User peer, PeeringTask task)
