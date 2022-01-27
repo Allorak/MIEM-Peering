@@ -1,28 +1,30 @@
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { Box, SxProps, Theme } from "@mui/system";
 import { Typography } from "@mui/material";
 
-import { CoefficientIcon } from "../icons/CoefficientIcon";
-import { ArrowRight } from "../icons/ArrowRight";
-import { Arrow } from "../icons/Arrow";
+import { CoefficientIcon } from "../../../../../../components/icons/CoefficientIcon";
+import { ArrowRight } from "../../../../../../components/icons/ArrowRight";
+import { Arrow } from "../../../../../../components/icons/Arrow";
 
 
 interface IProps {
-  before?: number | undefined
-  after?: number | undefined
+  before?: number
+  after?: number
 }
 
-export const CoefficientsCard: FC<IProps> = ({
+export const Coefficients: FC<IProps> = ({
   before,
   after
 }) => {
-  const [flag, setFlag] = useState<boolean>()
-  const [proportion, setProportion] = useState<number>()
 
-  if (typeof after === 'number' && typeof before === 'number' && !flag && !proportion) {
-    setProportion(parseFloat(((after - before)).toFixed(2)))
-    setFlag(after > before)
-  }
+  const cardData = useMemo(() => {
+    if (typeof after === 'number' && typeof before === 'number') {
+      return {
+        proportion: parseFloat(((after - before)).toFixed(2)),
+        flag: after > before
+      }
+    }
+  }, [before, after])
 
   return (
     <Box sx={styles.wrapper}>
@@ -33,41 +35,57 @@ export const CoefficientsCard: FC<IProps> = ({
               <CoefficientIcon />
             </Box>
           </Box>
+
           <Box sx={styles.cardBody}>
             <Box sx={styles.coefficientBlock}>
-              {proportion ? (
+              {cardData ? (
                 <>
                   <Typography variant={'h5'} sx={{ textDecoration: 'line-through', opacity: '0.4' }}>
                     {before}
                   </Typography>
+
                   <Box sx={styles.arrowRightBlock}>
                     <ArrowRight />
                   </Box>
+
                   <Typography variant={'h5'}>
                     {after}
                   </Typography>
                 </>
               ) : (
-                <Typography variant={'h5'}>
-                  {before}
-                </Typography>
-              )
-              }
+                <>
+                  {typeof before === 'number' && (
+                    <Typography variant={'h5'}>
+                      {`${before} - текущий`}
+                    </Typography>
+                  )}
+
+                  {typeof after === 'number' && (
+                    <Typography variant={'h5'}>
+                      {`${after} - итоговый`}
+                    </Typography>
+                  )}
+                </>
+              )}
             </Box>
+
             <Typography variant={'body1'}>
               {"Коэффициент доверия"}
             </Typography>
-            {proportion && (
+
+            {cardData && (
               <Box sx={styles.proportionBlock}>
-                <Box sx={flag === true ? styles.arrowBlock : { ...styles.arrowBlock, ...styles.rotate180 }}>
-                  <Arrow svgColor={flag === true ? '#42BDA1' : '#F04461'} />
+                <Box sx={cardData.flag ? styles.arrowBlock : { ...styles.arrowBlock, ...styles.rotate180 }}>
+                  <Arrow svgColor={cardData.flag ? '#42BDA1' : '#F04461'} />
                 </Box>
+
                 <Box sx={styles.proportionTextBlock}>
-                  <Typography variant={'body1'} sx={flag === true ? { color: '#42BDA1' } : { color: '#F04461' }}>
-                    {proportion}
+                  <Typography variant={'body1'} sx={cardData.flag ? { color: '#42BDA1' } : { color: '#F04461' }}>
+                    {cardData.proportion}
                   </Typography>
                 </Box>
-              </Box>)}
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>

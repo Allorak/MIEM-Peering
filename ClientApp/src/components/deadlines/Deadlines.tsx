@@ -107,7 +107,6 @@ export const Deadlines: FC<IDeadlines> = ({
           </Box>
         )}
       </Box>
-      <Box />
     </Box>
   )
 }

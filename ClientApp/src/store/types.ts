@@ -310,20 +310,16 @@ export enum IMenuTitles {
   MENU_3 = 'Меню 3'
 }
 
-export type IDonutChart = {
-  total: number,
-  proportion: number
-}
-
 export type IStatusBar = {
-  total: number,
-  submissions: number,
-  review: number
+  submissions?: number
+  totalSubmissions?: number
+  reviews?: number
+  totalReviews?: number
 }
 
 export type IStatusTask = {
-  submissionsToCheck: number,
-  submissionsNumber: number
+  assignedSubmissions: number,
+  reviewedSubmissions: number
 }
 
 export type IOverview = {
@@ -333,19 +329,31 @@ export type IOverview = {
   reviewType: PeerTaskTypes,
   confidenceFactors?: number[],
   currentConfidenceFactors?: number[],
-  taskType: PeerSteps
+  taskType: PeerSteps,
+  submissionWeight: number,
+  reviewWeight: number,
+  badConfidencePenalty?: number,
+  goodConfidenceBonus?: number
 }
 
 export type IOverviewStudent = {
   deadlines: IDeadlines,
-  status: IStatusTask,
-  submissionStatus: boolean,
+  assignedSubmissions?: number,
+  reviewedSubmissions?: number
+  submissionStatus?: boolean,
   studentGrades?: IStudentSubmissionGrades,
   taskType: PeerSteps,
-  studentConfidenceCoefficients?: {
+  studentConfidenceFactors?: {
     before?: number,
     after?: number
-  }
+  },
+  submissionGrade?: number,
+  reviewGrade?: number,
+  finalGrade?: number,
+  submissionWeight: number,
+  reviewWeight: number,
+  badConfidencePenalty?: number,
+  goodConfidenceBonus?: number
 }
 
 export type IStudentSubmissionGrades = {
@@ -356,8 +364,8 @@ export type IStudentSubmissionGrades = {
 
 export type IOverviewExpert = {
   deadlines: IDeadlines,
-  checkedWorksCount?: number,
-  assignedWorksCount?: number
+  assignedSubmissions?: number,
+  reviewedSubmissions?: number
 }
 
 export interface IOverviewExpertResponse extends Omit<IOverviewExpert, 'deadlines'> {

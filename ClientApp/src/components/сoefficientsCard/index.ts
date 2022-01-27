@@ -1,1 +1,0 @@
-export { CoefficientsCard } from "./CoefficientsCard";

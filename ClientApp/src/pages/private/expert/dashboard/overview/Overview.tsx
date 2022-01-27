@@ -1,16 +1,16 @@
 import { FC, useEffect } from "react"
-import { Box, SxProps, Theme } from "@mui/system"
-import { Typography } from "@mui/material";
-import { palette } from "../../../../../theme/colors";
+import { SxProps, Theme } from "@mui/system"
+import { Grid } from "@mui/material";
 
 import { Deadlines } from "../../../../../components/deadlines"
-import { DonutChart } from "../../../../../components/donutChart";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathExDashboard } from "../../../../../app/hooks/usePrivatePathExDashboard";
 
 import { fetchOverviewExpert } from "../../../../../store/overviewExpert";
+import { UncheckedSubmissionsCount } from "../../../../../components/uncheckedSubmissionsCount";
+import { CheckedSubmissionsCount } from "../../../../../components/checkedSubmissionsCount";
 
 
 export const Overview: FC = () => {
@@ -27,10 +27,6 @@ export const Overview: FC = () => {
       dispatch(fetchOverviewExpert(path.taskId))
   }, [])
 
-  useEffect(() => {
-    console.log(payload)
-  }, [])
-
   return (
     <DashboardWorkBox
       isLoading={status}
@@ -38,26 +34,31 @@ export const Overview: FC = () => {
     >
       {
         payload && (
-          <>
-            <Deadlines {...payload.deadlines} />
-            {payload.assignedWorksCount && payload.checkedWorksCount && (
-              <Box sx={styles.gridWrapper}>
-                <Box sx={styles.quarterColumn}>
-                  <Box sx={styles.wrapper}>
-                    <Typography variant={'h6'} sx={styles.statisticsBlockTitle}>
-                      {"Статистика проверенных работ"}
-                    </Typography>
-                    <DonutChart
-                      total={payload.assignedWorksCount}
-                      proportion={payload.checkedWorksCount}
-                      color={palette.fill.info}
-                      bgColor={palette.transparent.info}
-                    />
-                  </Box>
-                </Box>
-              </Box>
+          <Grid container spacing={"10px"} padding={"0px 0px 5px 0px"}>
+            <Grid item xs={12} >
+              <Deadlines
+                submissionStartDateTime={payload.deadlines.submissionStartDateTime}
+                submissionEndDateTime={payload.deadlines.submissionEndDateTime}
+                reviewStartDateTime={payload.deadlines.reviewStartDateTime}
+                reviewEndDateTime={payload.deadlines.reviewEndDateTime}
+              />
+            </Grid>
+
+            {typeof payload.reviewedSubmissions === 'number' && typeof payload.assignedSubmissions === 'number' && (
+              <>
+                <Grid item xs={12} sm={6} lg={3}>
+                  <CheckedSubmissionsCount reviewedSubmissions={payload.reviewedSubmissions} />
+                </Grid>
+
+                <Grid item xs={12} sm={6} lg={3}>
+                  <UncheckedSubmissionsCount
+                    assignedSubmissions={payload.assignedSubmissions}
+                    reviewedSubmissions={payload.reviewedSubmissions}
+                  />
+                </Grid>
+              </>
             )}
-          </>
+          </Grid>
         )
       }
     </DashboardWorkBox>

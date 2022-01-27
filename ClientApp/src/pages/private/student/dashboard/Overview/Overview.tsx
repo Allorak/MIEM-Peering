@@ -1,28 +1,23 @@
-import { FC, useEffect } from "react"
-import { SxProps, Theme } from "@mui/system"
-import { Box } from "@mui/material";
+import { FC, useEffect } from "react";
+import { Grid } from "@mui/material";
 
 import { Deadlines } from "../../../../../components/deadlines"
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { StepCheckBlock } from "../../../../../components/stepCheckBlock";
-import { UncheckedFileCard } from "../../../../../components/uncheckedFileCard";
-import { CheckedFileCard } from "../../../../../components/checkedFileCard";
-import { CoefficientsCard } from "../../../../../components/сoefficientsCard";
 import { TaskLineGraphStudent } from "../../../../../components/taskLineGraphStudent";
+import { UncheckedSubmissionsCount } from "../../../../../components/uncheckedSubmissionsCount";
+import { CheckedSubmissionsCount } from "../../../../../components/checkedSubmissionsCount";
+
+import { Coefficients, StatusWorkDashboard, Formula } from "./components";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
 import { fetchOverviewStudent } from "../../../../../store/overviewStudent";
-import { StatusWorkDashboard } from ".";
-import { PeerSteps } from "../../../../../store/types";
-
-
 
 
 export const Overview: FC = () => {
-
   const dispatch = useAppDispatch()
   const { path } = usePrivatePathStDashboard()
 
@@ -41,94 +36,72 @@ export const Overview: FC = () => {
       error={error}
     >
       {payload && (
-        <>
-          <Deadlines {...payload.deadlines} />
-          <Box sx={styles.gridWrapper}>
-            {payload.status && (
-              <>
-                <Box sx={styles.quarterColumn}>
-                  <StatusWorkDashboard submissionStatus={payload.submissionStatus} />
-                </Box>
-                <Box sx={styles.quarterColumn}>
-                  <UncheckedFileCard
-                    {...payload.status} />
-                </Box>
-                <Box sx={styles.quarterColumn}>
-                  <CheckedFileCard
-                    {...payload.status} />
-                </Box>
-              </>
-            )}
-            {payload.studentConfidenceCoefficients && (typeof payload.studentConfidenceCoefficients.after === 'number' || typeof payload.studentConfidenceCoefficients.before === 'number') && (
-              <Box sx={styles.quarterColumn}>
-                <CoefficientsCard {...payload.studentConfidenceCoefficients} />
-              </Box>
-            )}
-          </Box>
-          <Box sx={styles.gridWrapper}>
-            {(payload.taskType === PeerSteps.FIRST_STEP) && (
-              <Box sx={{ ...styles.quarterColumn, ...styles.tabletMaxWidth }}>
-                <StepCheckBlock step={payload.taskType} />
-              </Box>
-            )}
-            {payload.studentGrades && payload.studentGrades.coordinates && payload.studentGrades.coordinates.length > 0 && (
+        <Grid container spacing={"10px"} padding={"0px 0px 5px 0px"}>
+          <Grid item xs={12} >
+            <Deadlines
+              submissionStartDateTime={payload.deadlines.submissionStartDateTime}
+              submissionEndDateTime={payload.deadlines.submissionEndDateTime}
+              reviewStartDateTime={payload.deadlines.reviewStartDateTime}
+              reviewEndDateTime={payload.deadlines.reviewEndDateTime}
+            />
+          </Grid>
+
+          <Grid item xs={12} lg={6}>
+            <StepCheckBlock step={payload.taskType} />
+          </Grid>
+
+          <Grid item xs={12} lg={6} >
+            <Formula
+              coefficientBefore={payload.studentConfidenceFactors?.before}
+              goodCoefficientBonus={payload.goodConfidenceBonus}
+              badCoefficientPenalty={payload.badConfidencePenalty}
+              finalGrade={payload.finalGrade}
+              submissionGrade={payload.submissionGrade}
+              reviewGrade={payload.reviewGrade}
+              submissionWeight={payload.submissionWeight}
+              reviewWeight={payload.reviewWeight}
+            />
+          </Grid>
+
+          {typeof payload.submissionStatus === 'boolean' && (
+            <Grid item xs={12} sm={6} lg={3}>
+              <StatusWorkDashboard submissionStatus={payload.submissionStatus} />
+            </Grid>
+          )}
+
+          {typeof payload.assignedSubmissions === 'number' && typeof payload.reviewedSubmissions === 'number' && (
+            <>
+              <Grid item xs={12} sm={6} lg={3}>
+                <CheckedSubmissionsCount reviewedSubmissions={payload.reviewedSubmissions} />
+              </Grid>
+
+              <Grid item xs={12} sm={6} lg={3}>
+                <UncheckedSubmissionsCount
+                  assignedSubmissions={payload.assignedSubmissions}
+                  reviewedSubmissions={payload.reviewedSubmissions}
+                />
+              </Grid>
+            </>
+          )}
+
+          {payload.studentConfidenceFactors && (typeof payload.studentConfidenceFactors.after === 'number' || typeof payload.studentConfidenceFactors.before === 'number') && (
+            <Grid item xs={12} sm={6} lg={3}>
+              <Coefficients
+                after={payload.studentConfidenceFactors.after}
+                before={payload.studentConfidenceFactors.before}
+              />
+            </Grid>
+          )}
+
+          {payload.studentGrades && payload.studentGrades.coordinates && payload.studentGrades.coordinates.length > 0 && (
+            <Grid item xs={12} lg={9}>
               <TaskLineGraphStudent graphProps={payload.studentGrades} />
-            )}
-          </Box>
-        </>
+            </Grid>
+          )}
+
+
+        </Grid>
       )}
-
-    </DashboardWorkBox>
+    </DashboardWorkBox >
   )
-}
-
-const styles = {
-  gridWrapper: {
-    display: "flex",
-    padding: "0px 0px 10px 0px",
-    gap: "10px",
-    flexWrap: "wrap"
-  } as SxProps<Theme>,
-  tabletMaxWidth: {
-    '@media (max-width: 1321px)': {
-      flexBasis: "100%",
-      flexGrow: 0,
-      flexShrink: 0,
-    }
-  } as SxProps<Theme>,
-  quarterColumn: {
-    flexBasis: "calc(25% - 8px)",
-    flexGrow: 0,
-    flexShrink: 0,
-    '@media (max-width: 1321px)': {
-      flexBasis: "calc(50% - 5px)",
-      flexGrow: 0,
-      flexShrink: 0,
-      minHeight: '142px'
-    },
-    '@media (max-width: 768px)': {
-      flexBasis: "100%",
-      flexGrow: 0,
-      flexShrink: 0,
-    }
-  } as SxProps<Theme>,
-  graphBox: {
-    height: "365px",
-    flexBasis: "calc(75% - 3px)",
-    flexGrow: 0,
-    flexShrink: 0,
-    boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
-    backgroundColor: 'common.white',
-    borderRadius: '4px',
-    overflowX: "auto",
-    overflowY: "hidden",
-    '@media (max-width: 1321px)': {
-      flexBasis: "100%",
-      flexGrow: 0,
-      flexShrink: 0,
-    }
-  } as SxProps<Theme>,
-  quarterColumnItem: {
-    mb: '10px'
-  } as SxProps<Theme>,
 }

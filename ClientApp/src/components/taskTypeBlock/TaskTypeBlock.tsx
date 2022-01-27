@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 
 import { Box, SxProps, Theme } from "@mui/system";
 import { Typography } from "@mui/material";
@@ -16,27 +16,29 @@ interface IProps {
 export const TaskTypeBlock: FC<IProps> = ({
   type
 }) => {
-  let typeDescription: string | undefined
-  let typeName: string | undefined
-  let typeIcon: JSX.Element | undefined
 
-  switch (type) {
-    case PeerTaskTypes.SINGLE_BLIND:
-      typeIcon = <SingleBlind />
-      typeDescription = 'Имена рецензентов скрыты от автора. Анонимность рецензента позволяет принимать решения, справедливость которых не зависит от влияния автора.'
-      typeName = 'Односторонняя «слепая»'
-      break;
-    case PeerTaskTypes.DOUBLE_BLIND:
-      typeIcon = <DoubleBlind />
-      typeDescription = 'Анонимными остаются и автор, и рецензент. Анонимность автора позволяет избежать предвзятости со стороны рецензента.'
-      typeName = 'Двойная «слепая»'
-      break;
-    case PeerTaskTypes.OPEN:
-      typeIcon = <OpenPeer />
-      typeDescription = 'Личности автора и рецензентов известны всем участникам. Некоторые ученые считают, что такое рецензирование – лучший способ избежать жестких комментариев, предотвратить плагиат, пресечь желание рецензента быстрее выполнить свой план работы и получить открытую, честную рецензию.'
-      typeName = 'Открытая'
-      break;
-  }
+  const cardData = useMemo(() => {
+    switch (type) {
+      case PeerTaskTypes.SINGLE_BLIND:
+        return {
+          typeIcon: <SingleBlind />,
+          typeDescription: 'Имена рецензентов скрыты от автора. Анонимность рецензента позволяет принимать решения, справедливость которых не зависит от влияния автора.',
+          typeName: 'Односторонняя «слепая»'
+        }
+      case PeerTaskTypes.DOUBLE_BLIND:
+        return {
+          typeIcon: <DoubleBlind />,
+          typeDescription: 'Анонимными остаются и автор, и рецензент. Анонимность автора позволяет избежать предвзятости со стороны рецензента.',
+          typeName: 'Двойная «слепая»'
+        }
+      case PeerTaskTypes.OPEN:
+        return {
+          typeIcon: <OpenPeer />,
+          typeDescription: 'Личности автора и рецензентов известны всем участникам. Некоторые ученые считают, что такое рецензирование – лучший способ избежать жестких комментариев, предотвратить плагиат, пресечь желание рецензента быстрее выполнить свой план работы и получить открытую, честную рецензию.',
+          typeName: 'Открытая'
+        }
+    }
+  }, [type])
 
   return (
     <Box sx={styles.wrapper}>
@@ -44,26 +46,24 @@ export const TaskTypeBlock: FC<IProps> = ({
         {"Тип проверки"}
       </Typography>
       <Box>
-        {typeIcon && typeDescription && typeName && (
-          <Box>
-            <Box sx={styles.cardHeader}>
-              <Box sx={styles.typeIcon}>
-                {typeIcon}
-              </Box>
-              <Box>
-                <Typography variant='body1' sx={{ ...styles.typeNameColor, ...styles.typeName }}>
-                  {typeName}
-                </Typography>
-              </Box>
+        <Box>
+          <Box sx={styles.cardHeader}>
+            <Box sx={styles.typeIcon}>
+              {cardData.typeIcon}
             </Box>
             <Box>
-              <Box sx={styles.hrBlock}></Box>
-              <Typography variant={'body1'}>
-                {typeDescription}
+              <Typography variant='body1' sx={{ ...styles.typeNameColor, ...styles.typeName }}>
+                {cardData.typeName}
               </Typography>
             </Box>
           </Box>
-        )}
+          <Box>
+            <Box sx={styles.hrBlock}></Box>
+            <Typography variant={'body1'}>
+              {cardData.typeDescription}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
     </Box >
   )

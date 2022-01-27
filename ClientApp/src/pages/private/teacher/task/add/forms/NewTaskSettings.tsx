@@ -407,6 +407,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
               <InputLabel
                 title={"Вес проверки в итоговой оценке (%):"}
                 required
+                description={`Укажите сколько процентов от итоговой оценки составляет доля проверенных работ из назначенных`}
               />
 
               <TextField
@@ -423,7 +424,10 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
           <Box sx={styles.dateBox}>
             <Box>
               <InputLabel
-                title={"Вес работы в итоговой оценке (%):"} />
+                title={"Вес работы в итоговой оценке (%):"}
+                required
+                description={`Укажите сколько процентов от итоговой оценки составляет оценка, полученная студентом за его работу`}
+              />
 
               <TextField
                 type={'number'}
@@ -441,7 +445,10 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
               <Box sx={styles.dateBox}>
                 <Box>
                   <InputLabel
-                    title={"Штраф за плохой текущий коэф. доверия (по 10-ти бальной системе):"} />
+                    title={"Штраф за плохой текущий коэф. доверия (по 10-ти бальной системе):"}
+                    required
+                    description={`Укажите сколько баллов отнимется от итоговой оценки студента, если у него будет «плохой (меньше чем 0.35)» коэффициент доверия на момент начала задания`}
+                  />
                   <TextField
                     type={'number'}
                     InputProps={badCoefficientPenaltyProps}
@@ -456,7 +463,9 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
               <Box sx={styles.dateBox}>
                 <Box>
                   <InputLabel
-                    title={"Бонус за хороший текущий коэф. доверия (по 10-ти бальной системе):"} />
+                    required
+                    title={"Бонус за хороший текущий коэф. доверия (по 10-ти бальной системе):"}
+                    description={`Укажите сколько дополнительных баллов к итоговой оценке получит студент, если у него будет «хороший (больше чем 0.75)» коэффициент доверия на момент начала задания`} />
                   <TextField
                     type={'number'}
                     InputProps={goodCoefficientBonusProps}
@@ -536,8 +545,8 @@ const initialValue = (): INewTaskSettings => {
     reviewEndDateTime: reviewEndDateTime,
     submissionsToCheck: 2,
     reviewType: PeerTaskTypes.DOUBLE_BLIND,
-    submissionWeight: 20,
-    reviewWeight: 80
+    submissionWeight: 80,
+    reviewWeight: 20
   }
 
   return taskSettings
