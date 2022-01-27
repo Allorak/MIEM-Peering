@@ -1161,7 +1161,7 @@ namespace patools.Services.PeeringTasks
                 Console.WriteLine("Error in calculating reviews error");
                 return null;
             }
-            var resultConfidenceFactor = ((1 - reviewsError.Value)*MaxPossibleGrade + grade)/(2*MaxPossibleGrade);
+            var resultConfidenceFactor = await GetReviewedPercentage(taskUser)*((1 - reviewsError.Value)*MaxPossibleGrade + grade)/(2*MaxPossibleGrade);
             Console.WriteLine($"Result confidence factor: {resultConfidenceFactor}");
             return resultConfidenceFactor;
         }
