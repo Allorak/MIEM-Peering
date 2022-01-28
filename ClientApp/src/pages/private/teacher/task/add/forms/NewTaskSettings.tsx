@@ -34,8 +34,8 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
     defaultValues: {
       ...initialValue(),
       experts: hasConfidenceFactor ? undefined : [],
-      badCoefficientPenalty: -0.5,
-      goodCoefficientBonus: 0.5
+      badConfidencePenalty: -0.5,
+      goodConfidenceBonus: 0.5
     }
   })
 
@@ -455,7 +455,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
                     required
                     variant={'outlined'}
                     autoComplete={'off'}
-                    {...(formState.errors.badCoefficientPenalty !== undefined && { error: true, helperText: formState.errors.badCoefficientPenalty.message })}
+                    {...(formState.errors.badConfidencePenalty !== undefined && { error: true, helperText: formState.errors.badConfidencePenalty.message })}
                   />
                 </Box>
               </Box>
@@ -472,7 +472,7 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
                     required
                     variant={'outlined'}
                     autoComplete={'off'}
-                    {...(formState.errors.goodCoefficientBonus !== undefined && { error: true, helperText: formState.errors.goodCoefficientBonus.message })}
+                    {...(formState.errors.goodConfidenceBonus !== undefined && { error: true, helperText: formState.errors.goodConfidenceBonus.message })}
                   />
                 </Box>
               </Box>

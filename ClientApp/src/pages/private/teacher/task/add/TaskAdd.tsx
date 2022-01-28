@@ -93,8 +93,8 @@ export const TaskAdd: FC = () => {
             submissionsToCheck: Number(response.submissionsToCheck),
             ...(!hasConfidenceFactor && { experts: response.experts }),
             ...(hasConfidenceFactor && {
-              goodCoefficientBonus: Number(response.goodCoefficientBonus),
-              badCoefficientPenalty: Number(response.badCoefficientPenalty)
+              goodConfidenceBonus: Number(response.goodConfidenceBonus),
+              badConfidencePenalty: Number(response.badConfidencePenalty)
             })
           }))
         }, pathT.courseId))

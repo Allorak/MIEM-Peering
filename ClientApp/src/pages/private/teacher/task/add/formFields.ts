@@ -133,8 +133,8 @@ export const reviewWeightProps: UseControllerProps<INewTaskSettings, "reviewWeig
   },
 })
 
-export const goodCoefficientBonusProps: UseControllerProps<INewTaskSettings, "goodCoefficientBonus"> = ({
-  name: "goodCoefficientBonus",
+export const goodCoefficientBonusProps: UseControllerProps<INewTaskSettings, "goodConfidenceBonus"> = ({
+  name: "goodConfidenceBonus",
   rules: {
     required: {
       value: true,
@@ -151,8 +151,8 @@ export const goodCoefficientBonusProps: UseControllerProps<INewTaskSettings, "go
   },
 })
 
-export const badCoefficientPenaltyProps: UseControllerProps<INewTaskSettings, "badCoefficientPenalty"> = ({
-  name: "badCoefficientPenalty",
+export const badCoefficientPenaltyProps: UseControllerProps<INewTaskSettings, "badConfidencePenalty"> = ({
+  name: "badConfidencePenalty",
   rules: {
     required: {
       value: true,

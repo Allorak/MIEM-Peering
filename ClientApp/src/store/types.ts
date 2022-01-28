@@ -193,8 +193,8 @@ export interface INewTaskSettings {
   reviewType: PeerTaskTypes
   submissionWeight: number
   reviewWeight: number
-  goodCoefficientBonus?: number
-  badCoefficientPenalty?: number
+  goodConfidenceBonus?: number
+  badConfidencePenalty?: number
 }
 
 export enum PeerSteps {
