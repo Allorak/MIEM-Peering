@@ -47,6 +47,16 @@ namespace patools.Services
                 .FirstOrDefaultAsync(t => t.ID == taskId);
         }
 
+        protected async Task<Submission> GetSubmissionById(Guid submissionId)
+        {
+            return await Context.Submissions
+                .Include(s =>s.PeeringTaskUserAssignment.PeeringTask.Course.Teacher)
+                .Include(s =>s.PeeringTaskUserAssignment.PeeringTask.Course)
+                .Include(s =>s.PeeringTaskUserAssignment.PeeringTask)
+                .Include(s =>s.PeeringTaskUserAssignment.Student)
+                .FirstOrDefaultAsync(s => s.ID == submissionId);
+
+        }
         protected async Task<Course> GetCourseById(Guid courseId)
         {
             return await Context.Courses
@@ -173,6 +183,18 @@ namespace patools.Services
             return await GetTaskReviews(await GetSubmissionPeerAssignments(task));
         }
 
+        protected async Task<List<Question>> GetPeerQuestions(PeeringTask task, QuestionTypes? type = null)
+        {
+            var questions = await Context.Questions
+                .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Peer)
+                .ToListAsync();
+            if (type != null)
+            {
+                questions = questions.Where(q => q.Type == type).ToList();
+            }
+
+            return questions;
+        }
         protected async Task<List<Review>> GetTaskUserReviews(PeeringTaskUser taskUser)
         {
             return await Context.Reviews
