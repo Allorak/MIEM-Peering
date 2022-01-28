@@ -26,9 +26,9 @@ export const Formula: FC<IProps> = ({
   goodCoefficientBonus,
   coefficientBefore
 }) => {
-  const gradeFinal = 'GRADE_final'
-  const gradeSubmission = 'GRADE_submission'
-  const gradeReview = 'GRADE_review'
+  const gradeFinal = 'F'
+  const gradeSubmission = 'S'
+  const gradeReview = 'R'
   const gradeBonusPenalty = 'K'
 
   const formulaByWeights = `${gradeFinal} = ${gradeSubmission} * ${submissionWeight}% + ${gradeReview} * ${reviewWeight}%`
@@ -82,7 +82,7 @@ export const Formula: FC<IProps> = ({
               <>
                 {"У вас плохой текущий коэф. доверия (меньше чем "}
                 <b> {"0.35"}</b >
-                {` ). Штраф ${typeof badCoefficientPenalty === 'number' ? `-${badCoefficientPenalty}` : "-0"}`}
+                {` ). Штраф ${typeof badCoefficientPenalty === 'number' ? `${badCoefficientPenalty}` : "-0"}`}
               </>
             )}
 
