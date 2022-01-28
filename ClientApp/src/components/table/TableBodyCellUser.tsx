@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react"
-import { Box, TableCell as MuiTableCell, Theme, TableCellProps } from "@mui/material"
+import { Box, TableCell as MuiTableCell, Theme, TableCellProps, Typography } from "@mui/material"
 import type { SxProps } from "@mui/system"
 
 
@@ -10,6 +10,7 @@ type IProps = TableCellProps & {
   isCentered?: boolean,
   name: string,
   img?: string
+  email: string
 }
 
 export const TableBodyCellUser: FC<IProps> = ({
@@ -17,6 +18,7 @@ export const TableBodyCellUser: FC<IProps> = ({
   isCentered,
   img,
   name,
+  email,
   sx,
   ...props
 }) => {
@@ -39,7 +41,7 @@ export const TableBodyCellUser: FC<IProps> = ({
           <Box sx={{ ...styles.expertImgWrapper }}>
             <img
               src={img}
-              style={{width: 25, height: 'auto'}}
+              style={{ width: 35, height: 'auto' }}
               alt="Avatar" />
           </Box>
         ) : (
@@ -48,10 +50,30 @@ export const TableBodyCellUser: FC<IProps> = ({
           </Box>
         )
         }
-        {name}
+        <Box lineHeight={1}>
+          {name}
+
+
+          <a href={`mailto: ${email}`}>
+            <Typography
+              variant="body2"
+              sx={{
+                textDecoration: "underline",
+                ":hover": {
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  color: "primary.main"
+                }
+              }}
+            >
+              {email}
+            </Typography>
+
+          </a>
+        </Box>
 
         {children}
-      </Box>
-    </MuiTableCell>
+      </Box >
+    </MuiTableCell >
   )
 }

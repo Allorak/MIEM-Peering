@@ -132,7 +132,11 @@ interface IPropsRow {
 const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
   return (
     <TableBodyRow>
-      <TableBodyCellUser name={studentItem.fullname} img={studentItem.imageUrl} />
+      <TableBodyCellUser
+        name={studentItem.fullname}
+        img={studentItem.imageUrl}
+        email={studentItem.email}
+      />
 
       <TableBodyCell isCentered>
         <DecoratedText

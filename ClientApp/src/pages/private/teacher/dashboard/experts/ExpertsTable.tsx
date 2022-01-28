@@ -17,7 +17,6 @@ export const ExpertsTable: FC<IProps> = ({ experts }) => {
     <Table sx={styles.tableContainer}>
       <TableHead>
         <TableHeadRow>
-          <TableHeadCell>{heads.email}</TableHeadCell>
           <TableHeadCell>{heads.name}</TableHeadCell>
           <TableHeadCell isCentered>{heads.progress}</TableHeadCell>
           <TableHeadCell isButton />
@@ -42,8 +41,11 @@ interface IPropsRow {
 const ExpertRow: FC<IPropsRow> = ({ expertItem }) => {
   return (
     <TableBodyRow>
-      <TableBodyCell>{expertItem.email}</TableBodyCell>
-      <TableBodyCellUser name={expertItem.name ?? "No Name"} img={expertItem.imageUrl} />
+      <TableBodyCellUser
+        name={expertItem.name ?? "No Name"}
+        img={expertItem.imageUrl}
+        email={expertItem.email}
+      />
       <TableBodyCell isCentered >
         {typeof expertItem.tasksAssigned === 'number' && typeof expertItem.tasksCompleted === 'number' && expertItem.tasksAssigned !== 0 ? (
           <Tooltip

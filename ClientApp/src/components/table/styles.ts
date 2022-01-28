@@ -28,16 +28,16 @@ export const expertAvatarWrapper: SxProps<Theme> = {
   justifyContent: 'center',
   alignItems: 'center',
   flexShrink: 0,
-  width: "25px",
-  height: "25px",
+  width: "35px",
+  height: "35px",
   borderRadius: "50%"
 }
 
 export const expertImgWrapper: SxProps<Theme> = {
   overflow: 'hidden',
   flexShrink: 0,
-  width: "25px",
-  height: "25px",
+  width: "35px",
+  height: "35px",
   borderRadius: "50%"
 }
 
