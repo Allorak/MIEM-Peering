@@ -313,19 +313,13 @@ namespace patools.Services.PeeringTasks
         public async Task<Response<string>> AssignPeers(AssignPeersDto peersInfo)
         {
             var startTime = DateTime.Now;
-            var task = await Context.Tasks
-                .Include(t => t.Course.Teacher)
-                .FirstOrDefaultAsync(t => t.ID == peersInfo.TaskId);
+            var task = await GetTaskById(peersInfo.TaskId);
             if (task.PeersAssigned)
                 return new SuccessfulResponse<string>("Peers have been already assigned");
             task.PeersAssigned = true;
             await Context.SaveChangesAsync();
-            var submissions = await Context.Submissions
-                .Where(s => s.PeeringTaskUserAssignment.PeeringTask == task)
-                .Include(s => s.PeeringTaskUserAssignment)
-                .Include(s => s.PeeringTaskUserAssignment.Student)
-                .OrderBy(s => s.PeeringTaskUserAssignment.Student.ID)
-                .ToListAsync();
+            var submissions = await GetSubmissionsForTask(task);
+            submissions = submissions.OrderBy(s => s.PeeringTaskUserAssignment.Student.ID).ToList();
 
             if (submissions.Count == 0)
                 return new SuccessfulResponse<string>("No submissions for this task");
@@ -337,19 +331,15 @@ namespace patools.Services.PeeringTasks
 
             var submissionsToCheck = Math.Min(task.SubmissionsToCheck, submissions.Count - 1);
             task.SubmissionsToCheck = submissionsToCheck;
-            var submissionPeers = new List<SubmissionPeer>();
-            for (var i = 0; i < submissions.Count; i++)
-            {
-                for (var j = 0; j < submissionsToCheck; j++)
-                {
-                    var submissionPeer = new SubmissionPeer()
-                    {
-                        Peer = peers[i],
-                        Submission = submissions[(i+j+1)%peers.Count]
-                    };
-                    submissionPeers.Add(submissionPeer);
-                }
-            }
+
+            var submissionPeers = CreateSubmissionPeers(submissions,peers,submissionsToCheck);
+            
+            var peersWithNoSubmission = await Context.TaskUsers
+                .Where(tu => tu.PeeringTask == task && !peers.Contains(tu.Student))
+                .Select(tu => tu.Student)
+                .ToListAsync();
+
+            submissionPeers.AddRange(CreateSubmissionPeers(submissions,peersWithNoSubmission,submissionsToCheck));
 
             submissionPeers.AddRange(submissions.Select(submission => 
                 new SubmissionPeer() {ID = Guid.NewGuid(), Peer = task.Course.Teacher, Submission = submission}));
@@ -364,6 +354,23 @@ namespace patools.Services.PeeringTasks
                                                   $"| TotalSubmissionPeers: {submissionPeers.Count}");
         }
 
+        private static List<SubmissionPeer> CreateSubmissionPeers(List<Submission> submissions, List<User> peers, int submissionsToCheck)
+        {
+            var submissionPeers = new List<SubmissionPeer>();
+            for (var i = 0; i < peers.Count; i++)
+            {
+                for (var j = 0; j < submissionsToCheck; j++)
+                {
+                    submissionPeers.Add(new SubmissionPeer()
+                    {
+                        Peer = peers[i],
+                        Submission = submissions[(i+j+1)%submissions.Count]
+                    });
+                }
+            }
+
+            return submissionPeers;
+        }
         public async Task<Response<string>> AssignExperts(AssignExpertsDto expertsInfo)
         {
             var startTime = DateTime.Now;
@@ -538,7 +545,7 @@ namespace patools.Services.PeeringTasks
             
             var confidenceFactors = new GetPeeringTaskConfidenceFactorsDtoResponse()
             {
-                Before = task.TaskType == TaskTypes.Initial ? null : taskUser.PreviousConfidenceFactor,
+                Before = taskUser.PreviousConfidenceFactor,
                 After = task.ReviewEndDateTime > DateTime.Now ? null : taskUser.NextConfidenceFactor
             };
 
@@ -979,7 +986,10 @@ namespace patools.Services.PeeringTasks
         {
             var expertReview = await GetExpertReview(taskUser);
             var teacherReview = await GetTeacherReview(taskUser);
-            var submissionGrade = teacherReview?.Grade ?? expertReview.Grade;
+            var submission = await GetSubmission(taskUser);
+            var submissionGrade = submission != null
+                ? teacherReview?.Grade ?? expertReview.Grade
+                : 0;
             var reviewGrade = await GetReviewedPercentage(taskUser) * MaxPossibleGrade;
             var confidenceFactor = await CountInitialConfidenceFactor(taskUser, submissionGrade);
             
@@ -993,7 +1003,7 @@ namespace patools.Services.PeeringTasks
             taskUser.NextConfidenceFactor = confidenceFactor.Value;
             taskUser.SubmissionGrade = submissionGrade;
             taskUser.ReviewGrade = reviewGrade;
-            taskUser.FinalGrade = (int) Math.Round(CalculateResultGrade(taskUser.PeeringTask, submissionGrade,reviewGrade));
+            taskUser.FinalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade,reviewGrade);
        
             return true;
         }
@@ -1005,7 +1015,7 @@ namespace patools.Services.PeeringTasks
             return submissionGrade * submissionWeight + reviewGrade * reviewWeight;
         }
 
-        private static bool TryGetGradeComment(PeeringTaskUser taskUser, out string gradeComment)
+        private static bool TryGetGradeComment(PeeringTaskUser taskUser, out string gradeComment,float? confidenceFactor = null)
         {
             gradeComment = string.Empty;
             
@@ -1020,15 +1030,29 @@ namespace patools.Services.PeeringTasks
             if (reviewGrade == null)
                 return false;
             
-            var submissionWeight = taskUser.PeeringTask.SubmissionWeight;
-            var reviewWeight = taskUser.PeeringTask.ReviewWeight;
+            var submissionWeight = taskUser.PeeringTask.SubmissionWeight/100f;
+            var reviewWeight = taskUser.PeeringTask.ReviewWeight/100f;
 
             var floatFinalGrade = submissionGrade * submissionWeight + reviewGrade * reviewWeight;
             var finalGrade = taskUser.FinalGrade;
             if (finalGrade == null)
                 return false;
             
-            gradeComment = $"{submissionGrade:f2}*{submissionWeight:f2} + {reviewGrade:f2}*{reviewWeight:f2} = {floatFinalGrade:f2} -> {finalGrade}";
+            gradeComment = $"{submissionGrade:f2}*{submissionWeight:f2} + {reviewGrade:f2}*{reviewWeight:f2} = {floatFinalGrade:f2} ";
+            if (taskUser.PeeringTask.TaskType == TaskTypes.Common)
+            {
+                if (confidenceFactor != null)
+                {
+                    var penalty = taskUser.PeeringTask.BadConfidencePenalty.Value;
+                    var bonus = taskUser.PeeringTask.GoodConfidenceBonus.Value;
+                    if (GetConfidenceFactorQuality(confidenceFactor.Value) == ConfidenceFactorQualities.Bad)
+                        gradeComment += $" - {Math.Abs(penalty)} = {(floatFinalGrade + penalty):f2} ";
+                    else if (GetConfidenceFactorQuality(confidenceFactor.Value) == ConfidenceFactorQualities.Good)
+                        gradeComment += $" + {bonus} = {(floatFinalGrade + bonus):f2} ";
+                }
+            }
+
+            gradeComment += $"-> {finalGrade:f2}";
             return true;
         }
 
@@ -1052,7 +1076,7 @@ namespace patools.Services.PeeringTasks
                 confidenceComment = $"Переводим предыдущий коэффициент доверия в шкалу оценивания:{taskUser.PreviousConfidenceFactor:f2} * {MaxPossibleGrade} -> {mappedConfidenceFactor:f2}\n";
                 var averagedGrade = (mappedConfidenceFactor + finalGrade) / 2;
                 confidenceComment +=
-                    $"Усредняем предыдущее значение с итоговой оценкой за задание: {mappedConfidenceFactor:f2} + {finalGrade} / 2 -> {averagedGrade:f2}\n";
+                    $"Усредняем предыдущее значение с итоговой оценкой за задание: {mappedConfidenceFactor:f2} + {finalGrade:f2} / 2 -> {averagedGrade:f2}\n";
                 confidenceComment +=
                     $"Переводим снова в шкалу коэффициентов: {averagedGrade:f2}/{MaxPossibleGrade} -> {nextConfidenceFactor:f2}";
                 return true;
@@ -1105,13 +1129,12 @@ namespace patools.Services.PeeringTasks
             {
                 Fullname = taskUser.Student.Fullname,
                 ImageUrl = taskUser.Student.ImageUrl,
+                Email = taskUser.Student.Email,
                 PreviousConfidenceFactor = taskUser.PreviousConfidenceFactor
             };
 
             var submission = await GetSubmission(taskUser);
             studentInfo.Submitted = submission != null;
-            if (!studentInfo.Submitted)
-                return studentInfo;
 
             var submissionPeers = await GetSubmissionPeerAssignments(submission,teacher);
 
@@ -1202,7 +1225,12 @@ namespace patools.Services.PeeringTasks
                 Console.WriteLine("Error in calculating reviews error");
                 return null;
             }
-            var resultConfidenceFactor = await GetReviewedPercentage(taskUser)*((1 - reviewsError.Value)*MaxPossibleGrade + grade)/(2*MaxPossibleGrade);
+
+            var submissionWeight = taskUser.PeeringTask.SubmissionWeight / 100f;
+            var reviewWeight = taskUser.PeeringTask.ReviewWeight / 100f;
+            var reviewConfidence = (1 - reviewsError.Value) * MaxPossibleGrade * reviewWeight;
+            var submissionConfidence = grade * submissionWeight;
+            var resultConfidenceFactor = await GetReviewedPercentage(taskUser)*(reviewConfidence + submissionConfidence)/(MaxPossibleGrade);
             Console.WriteLine($"Result confidence factor: {resultConfidenceFactor}");
             return resultConfidenceFactor;
         }
@@ -1310,30 +1338,46 @@ namespace patools.Services.PeeringTasks
 
         private async Task<float?> CountNextConfidenceFactor(PeeringTaskUser taskUser)
         {
-            var reviews = await GetTaskUserReviews(taskUser);
-            if (reviews.Count == 0)
-                return null;
-
-            var confidenceFactorsSum = 0f;
             var submissionGrade = 0f;
-            foreach (var review in reviews)
+            var teacherReview = await GetTeacherReview(taskUser);
+            if (teacherReview != null)
             {
-                var peerConfidenceFactor = await GetPeerPreviousConfidenceFactor(review.SubmissionPeerAssignment.Peer, taskUser.PeeringTask);
-                if (peerConfidenceFactor != null)
-                {
-                    submissionGrade += review.Grade * peerConfidenceFactor.Value;
-                    confidenceFactorsSum += peerConfidenceFactor.Value;
-                }
+                submissionGrade = teacherReview.Grade;
+                Console.WriteLine($"TEACHER {submissionGrade}");
             }
-            submissionGrade /= confidenceFactorsSum;
-            var reviewGrade = await GetReviewedPercentage(taskUser) * 100;
+            else
+            {
+                var confidenceFactorsSum = 0f;
+                var reviews = await GetTaskUserReviews(taskUser);
+                if (reviews.Count == 0)
+                    return null;
+
+                foreach (var review in reviews)
+                {
+                    var peerConfidenceFactor = await GetPeerPreviousConfidenceFactor(review.SubmissionPeerAssignment.Peer, taskUser.PeeringTask);
+                    if (peerConfidenceFactor != null)
+                    {
+                        submissionGrade += review.Grade * peerConfidenceFactor.Value;
+                        confidenceFactorsSum += peerConfidenceFactor.Value;
+                    }
+                } 
+                submissionGrade /= confidenceFactorsSum;
+            }
+            var reviewGrade = await GetReviewedPercentage(taskUser) * 10;
             var finalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade, reviewGrade);
 
             var previousConfidenceFactor = taskUser.PreviousConfidenceFactor;
+            if (taskUser.PeeringTask.BadConfidencePenalty == null || taskUser.PeeringTask.GoodConfidenceBonus == null)
+            {
+                Console.WriteLine("Bonus and penalty are null in a common-type task");
+                return null;
+            }
             if (GetConfidenceFactorQuality(previousConfidenceFactor) == ConfidenceFactorQualities.Bad)
-                finalGrade -= taskUser.PeeringTask.BadConfidencePenalty.Value;
+                finalGrade += taskUser.PeeringTask.BadConfidencePenalty.Value;
             else if (GetConfidenceFactorQuality(previousConfidenceFactor) == ConfidenceFactorQualities.Good)
                 finalGrade += taskUser.PeeringTask.GoodConfidenceBonus.Value;
+
+            finalGrade = Math.Clamp(finalGrade, MinPossibleGrade, MaxPossibleGrade);
             
             var newConfidenceFactor = taskUser.PreviousConfidenceFactor * MaxPossibleGrade;
             newConfidenceFactor += finalGrade;
@@ -1341,7 +1385,7 @@ namespace patools.Services.PeeringTasks
 
             taskUser.SubmissionGrade = submissionGrade;
             taskUser.ReviewGrade = reviewGrade;
-            taskUser.FinalGrade = (int) Math.Round(finalGrade);
+            taskUser.FinalGrade = finalGrade;
             Console.WriteLine($"Submission grade: {submissionGrade}");
             Console.WriteLine($"Review grade: {reviewGrade}");
             Console.WriteLine($"Final grade: {taskUser.FinalGrade}");

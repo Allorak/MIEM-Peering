@@ -293,16 +293,6 @@ namespace patools.Services.Submissions
                         return new NoAccessResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
                             " This user is not assigned to this task");
 
-                    if (taskUser.State == PeeringTaskStates.Assigned)
-                        return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
-                            "This student hasn't submissioned yet");
-
-                    var submission =  await _context.Submissions
-                        .FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
-                    if (submission == null)
-                        return new OperationErrorResponse<IEnumerable<GetSubmissionToCheckDtoResponse>>(
-                            "There is an error in database");
-
                     if (task.ReviewType == ReviewTypes.DoubleBlind)
                     {
                         var index = 1;

@@ -15,14 +15,14 @@ namespace patools.Dtos.Task
         
         public float? SubmissionGrade { get; set; }
         public float? ReviewGrade { get; set; }
-        public int? FinalGrade { get; set; }
+        public float? FinalGrade { get; set; }
         //Student and expert
         public int? ReviewedSubmissions { get; set; }
         public int? AssignedSubmissions { get; set; }
         
         //Teacher-only
         public GetPeeringTaskStatisticsDtoResponse Statistics { get; set; }
-        public List<int?> Grades { get; set; }
+        public List<float?> Grades { get; set; }
         public List<float> CurrentConfidenceFactors { get; set; }
         public List<float?> ConfidenceFactors { get; set; }
         public ReviewTypes? ReviewType { get; set; }

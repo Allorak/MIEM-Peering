@@ -224,7 +224,7 @@ namespace patools.Services
                 t.Course == course && t.TaskType == TaskTypes.Initial);
         }
 
-        protected static List<int?> GetFinalGrades(IEnumerable<PeeringTaskUser> taskUsers)
+        protected static List<float?> GetFinalGrades(IEnumerable<PeeringTaskUser> taskUsers)
         {
             return taskUsers.Select(tu => tu.FinalGrade).ToList();
         }
