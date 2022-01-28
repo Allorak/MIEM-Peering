@@ -548,6 +548,7 @@ export enum ReviewQualities {
 
 export interface IGrades {
   fullname: string
+  email: string
   imageUrl?: string
   previousConfidenceFactor: number
   nextConfidenceFactor?: number
@@ -556,5 +557,9 @@ export interface IGrades {
   reviewedSubmissions?: number
   teacherReviewed: boolean
   finalGrade?: number
-  reviewQuality?: ReviewQualities
+  reviewQuality?: ReviewQualities,
+  confidenceComment?: string,
+  gradeComment?: string,
+  reviewGrade?: number,
+  submissionGrade?: number,
 }

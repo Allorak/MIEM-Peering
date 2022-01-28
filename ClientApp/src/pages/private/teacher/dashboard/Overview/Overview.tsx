@@ -61,7 +61,7 @@ export const Overview: FC = () => {
             />
           </Grid>
 
-          {((typeof payload.statistics.submissions === 'number' && typeof payload.statistics.totalSubmissions === 'number') || (typeof payload.statistics.reviews === 'number' && typeof payload.statistics.totalReviews === 'number')) && (
+          {((typeof payload.statistics.submissions === 'number' && payload.statistics.totalSubmissions) || (typeof payload.statistics.reviews === 'number' && payload.statistics.totalReviews)) && (
             <Grid item xs={12} lg={3}>
               <DonutChart
                 submissions={payload.statistics.submissions}

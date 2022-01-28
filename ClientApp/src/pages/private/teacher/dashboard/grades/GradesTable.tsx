@@ -18,6 +18,8 @@ interface IFoundCells {
   reviewedSubmissions: boolean
   finalGrade: boolean
   reviewQuality: boolean
+  reviewGrade: boolean
+  submissionGrade: boolean
 }
 
 export const GradesTable: FC<IProps> = ({ grades }) => {
@@ -28,7 +30,9 @@ export const GradesTable: FC<IProps> = ({ grades }) => {
       assignedSubmissions: false,
       reviewedSubmissions: false,
       finalGrade: false,
-      reviewQuality: false
+      reviewQuality: false,
+      reviewGrade: false,
+      submissionGrade: false
     }
 
     for (const item of grades) {
@@ -51,6 +55,14 @@ export const GradesTable: FC<IProps> = ({ grades }) => {
       if (item.reviewQuality) {
         foundCells.reviewQuality = true
       }
+
+      if (typeof item.reviewGrade === 'number') {
+        foundCells.reviewGrade = true
+      }
+
+      if (typeof item.submissionGrade === 'number') {
+        foundCells.submissionGrade = true
+      }
     }
 
     return foundCells
@@ -65,6 +77,14 @@ export const GradesTable: FC<IProps> = ({ grades }) => {
           <TableHeadCell>{heads.strudent}</TableHeadCell>
 
           <TableHeadCell>{heads.submitted}</TableHeadCell>
+
+          {cells.submissionGrade && (
+            <TableHeadCell>{heads.submissionGrade}</TableHeadCell>
+          )}
+
+          {cells.reviewGrade && (
+            <TableHeadCell>{heads.reviewGrade}</TableHeadCell>
+          )}
 
           {cells.finalGrade && (
             <TableHeadCell>{heads.finalGrade}</TableHeadCell>
@@ -121,6 +141,34 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
         />
       </TableBodyCell>
 
+      {flags.submissionGrade && (
+        <TableBodyCell isCentered>
+          {typeof studentItem.submissionGrade === 'number' ? (
+            <Typography
+              variant={"body1"}
+              color={"success.main"}
+              fontWeight={400}
+            >
+              {studentItem.submissionGrade.toFixed(1)}
+            </Typography>
+          ) : "---"}
+        </TableBodyCell>
+      )}
+
+      {flags.reviewGrade && (
+        <TableBodyCell isCentered>
+          {typeof studentItem.reviewGrade === 'number' ? (
+            <Typography
+              variant={"body1"}
+              color={"info.main"}
+              fontWeight={400}
+            >
+              {studentItem.reviewGrade.toFixed(1)}
+            </Typography>
+          ) : "---"}
+        </TableBodyCell>
+      )}
+
       {flags.finalGrade && (
         <TableBodyCell isCentered>
           {typeof studentItem.finalGrade === 'number' ? (
@@ -130,7 +178,20 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
               fontWeight={700}
               sx={{ textDecoration: "underline" }}
             >
-              {studentItem.finalGrade.toFixed(1)}
+              {studentItem.gradeComment ? (
+                <Tooltip
+                  title={<span style={{ whiteSpace: 'pre-line' }}>{studentItem.gradeComment}</span>}
+                  placeholder={"top"}
+                  arrow
+                >
+                  <Box>
+                    {studentItem.finalGrade.toFixed(1)}
+                  </Box>
+                </Tooltip>
+              ) : (
+                <>{studentItem.finalGrade.toFixed(1)}</>
+              )}
+
             </Typography>
           ) : "---"}
         </TableBodyCell>
@@ -179,8 +240,26 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       {flags.nextConfidenceFactor && (
         <TableBodyCell isCentered>
           {typeof studentItem.nextConfidenceFactor === 'number' && (
-            <Typography variant={"body1"} color={"secondary.main"} fontWeight={700}>
-              {studentItem.nextConfidenceFactor.toFixed(2)}
+            <Typography
+              variant={"body1"}
+              color={"secondary.main"}
+              fontWeight={700}
+              sx={{ textDecoration: "underline" }}
+            >
+              {studentItem.confidenceComment ? (
+                <Tooltip
+                  title={<span style={{ whiteSpace: 'pre-line' }}>{studentItem.confidenceComment}</span>}
+                  placeholder={"top"}
+                  arrow
+                >
+                  <Box>
+
+                    {studentItem.nextConfidenceFactor.toFixed(2)}
+                  </Box>
+                </Tooltip>
+              ) : (
+                <>{studentItem.nextConfidenceFactor.toFixed(2)}</>
+              )}
             </Typography>
           )}
         </TableBodyCell>
@@ -220,11 +299,13 @@ const styles = {
 const heads = {
   strudent: "Студент",
   previousConfidenceFactor: "Коэф. доверия до задания",
-  nextConfidenceFactor: "Результирующий коэф. доверия",
+  nextConfidenceFactor: "Итоговый коэф. доверия",
   submitted: "Сдача работ",
   assignedSubmissions: "Назначено работ",
   reviewedSubmissions: "Проверено",
   teacherReviewed: "Проверено преподавателем",
-  finalGrade: "Оценка за работу",
+  submissionGrade: "Оценка за работу",
+  reviewGrade: "Оценка за проверку",
+  finalGrade: "Итоговая оценка",
   reviewQuality: "Качество проверки"
 }
