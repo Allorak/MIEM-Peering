@@ -1,12 +1,14 @@
+/** Errors && Work Box */
+
 export enum IErrorCode {
-  EXCEPTION = -2, // внутренняя ошибка
-  UNKNOWN = -1, // неизвестная внутренняя ошибка
+  EXCEPTION = -2,
+  UNKNOWN = -1,
   REQUEST = 1,
   RESPONSE = 2,
   NO_ACCESS = 100,
   BAD_REQUEST_DATA = 101,
-  NEED_FORCE = 102, // пользователь может повторить запрос с параметром isForced: true
-  OPERATION_ERROR = 103, // ошибка при выполнении операции
+  NEED_FORCE = 102,
+  OPERATION_ERROR = 103,
   USER_ALREADY_REGISTERED = 104
 }
 
@@ -17,11 +19,15 @@ export type IError = {
 
 export type IStatus = 'EMPTY' | 'FIRST_LOADING' | 'NOT_LOADED' | 'SUCCESS' | 'LOCKED'
 
+/** User Roles */
+
 export enum IRole {
   teacher = 'Teacher',
   student = 'Student',
   expert = 'Expert'
 }
+
+/** Redux Path */
 
 export type IPath = {
   courseId?: string,
@@ -32,6 +38,8 @@ export type IPathDashboard = {
   taskId?: string,
   activeMenuId?: IMenuTitles
 }
+
+/** Google Auth States */
 
 export enum GoogleAuthStatus {
   newUser = "NEW",
@@ -47,6 +55,8 @@ export type IGoogleUserRegistered = {
   user: IUserProfile,
   accessToken: string
 }
+
+/** Identity Status */
 
 export type IRegistretionRequest = {
   googleToken: string,
@@ -75,6 +85,8 @@ export type IRegistrationResponse = {
   accessToken: string
 }
 
+/** User Profile */
+
 export type IUserProfile = {
   id: string,
   email: string,
@@ -92,6 +104,8 @@ export type IAuthRequest = {
 export type IAuthResponse = {
   accessToken: string | undefined,
 }
+
+/** Courses */
 
 export type ICourse = {
   id: string
