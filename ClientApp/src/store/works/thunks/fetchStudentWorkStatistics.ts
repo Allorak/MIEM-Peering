@@ -31,7 +31,7 @@ export const fetchStudentWorkStatistics = (taskId: string, workId: string): AppT
       dispatch(actions.fetchFailed(response.error))
       return
     }
-    dispatch(actions.fetchWorkStatisticsSuccess(response.payload.statistics))
+    dispatch(actions.fetchWorkStatisticsSuccess(response.payload.statistics ?? []))
     return
 
   } catch (error) {
