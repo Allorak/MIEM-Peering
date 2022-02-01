@@ -38,13 +38,14 @@ namespace patools.Controllers.v1
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CourseUser>>> GetCourseUsers()
         {
-            var course = _context.CourseUsers
+            var course = await _context.CourseUsers
                     .Include(course => course.Course)
                     .Include(user => user.User)
                     .Include(course => course.Course.Teacher)
-                    .Select(x => new {x.Course.ID, x.Course.Title, x.Course.Description, x.Course.CourseCode, x.Course.Subject, x.User.Fullname, x.User.Role, x.User.Email, x.User.ImageUrl});
+                    .Select(x => new {x.Course.ID, x.Course.Title, x.Course.Description, x.Course.CourseCode, x.Course.Subject, x.User.Fullname, x.User.Role, x.User.Email, x.User.ImageUrl})
+                    .ToListAsync();
             
-            return Ok(course.ToList());
+            return Ok(course);
         }
         
         // POST: api/v1/CourseUsers/add
