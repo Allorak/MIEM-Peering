@@ -101,7 +101,7 @@ namespace patools.Services.PeeringTasks
             await Context.SaveChangesAsync();
 
             ScheduleAssignments(newTask);
-            
+            ScheduleConfidenceFactorsCalculation(newTask);
             return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(Mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
         }
 
@@ -119,16 +119,18 @@ namespace patools.Services.PeeringTasks
                     TaskId = task.ID
                 }), delay);
         }
+
+        private void ScheduleConfidenceFactorsCalculation(PeeringTask task)
+        {
+            var delay = task.ReviewEndDateTime - DateTime.Now;
+            BackgroundJob.Schedule(() => ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
+            {
+                TaskId = task.ID
+            }),delay);
+        }
+        
         private static bool AreDeadlinesValid(AddPeeringTaskSettingsDto settings)
         {
-            if (settings.SubmissionStartDateTime == null ||
-                settings.SubmissionEndDateTime == null ||
-                settings.ReviewStartDateTime == null ||
-                settings.ReviewEndDateTime == null)
-            {
-                Console.WriteLine("Deadlines can't be null");
-                return false;
-            }
             
             /* if (peeringTask.Settings.SubmissionStartDateTime < DateTime.Now)
             {
@@ -214,10 +216,10 @@ namespace patools.Services.PeeringTasks
                 Title = taskInfo.MainInfo.Title,
                 Description = taskInfo.MainInfo.Description,
                 Course = course,
-                SubmissionStartDateTime = taskInfo.Settings.SubmissionStartDateTime.Value,
-                SubmissionEndDateTime = taskInfo.Settings.SubmissionEndDateTime.Value,
-                ReviewStartDateTime = taskInfo.Settings.ReviewStartDateTime.Value,
-                ReviewEndDateTime = taskInfo.Settings.ReviewEndDateTime.Value,
+                SubmissionStartDateTime = taskInfo.Settings.SubmissionStartDateTime,
+                SubmissionEndDateTime = taskInfo.Settings.SubmissionEndDateTime,
+                ReviewStartDateTime = taskInfo.Settings.ReviewStartDateTime,
+                ReviewEndDateTime = taskInfo.Settings.ReviewEndDateTime,
                 SubmissionsToCheck = taskInfo.Settings.SubmissionsToCheck,
                 ReviewType = taskInfo.Settings.ReviewType,
                 SubmissionWeight = taskInfo.Settings.SubmissionWeight,

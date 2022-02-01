@@ -183,6 +183,11 @@ namespace patools.Services
             return await GetTaskReviews(await GetSubmissionPeerAssignments(task));
         }
 
+        protected async Task<SubmissionPeer> GetSubmissionPeer(Submission submission, User peer)
+        {
+            return await Context.SubmissionPeers
+                .FirstOrDefaultAsync(sp => sp.Submission == submission && sp.Peer == peer);
+        }
         protected async Task<List<Question>> GetPeerQuestions(PeeringTask task, QuestionTypes? type = null)
         {
             var questions = await Context.Questions
@@ -246,6 +251,16 @@ namespace patools.Services
                 t.Course == course && t.TaskType == TaskTypes.Initial);
         }
 
+        protected async Task<Review> GetReview(SubmissionPeer submissionPeer)
+        {
+            return await Context.Reviews.FirstOrDefaultAsync(r => r.SubmissionPeerAssignment == submissionPeer);
+        }
+
+        protected async Task<Review> GetReview(Submission submission, User peer)
+        {
+            var submissionPeer = await GetSubmissionPeer(submission, peer);
+            return submissionPeer != null ? await GetReview(submissionPeer) : null;
+        }
         protected static List<float?> GetFinalGrades(IEnumerable<PeeringTaskUser> taskUsers)
         {
             return taskUsers.Select(tu => tu.FinalGrade).ToList();

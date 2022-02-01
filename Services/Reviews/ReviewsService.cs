@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGeneration.DotNet;
 using patools.Dtos.Answer;
 using patools.Dtos.Review;
 using patools.Dtos.Task;
@@ -15,16 +17,12 @@ using patools.Services.PeeringTasks;
 
 namespace patools.Services.Reviews
 {
-    public class ReviewsService : IReviewsService
+    public class ReviewsService : ServiceBase,IReviewsService
     {
-        private readonly PAToolsContext _context;
-        private readonly IMapper _mapper;
         private readonly IPeeringTasksService _peeringTasksService;
 
-        public ReviewsService(PAToolsContext context, IMapper mapper, IPeeringTasksService peeringTasksService)
+        public ReviewsService(PAToolsContext context, IMapper mapper, IPeeringTasksService peeringTasksService) : base (context, mapper)
         {
-            _mapper = mapper;
-            _context = context;
             _peeringTasksService = peeringTasksService;
         }
 
@@ -33,32 +31,26 @@ namespace patools.Services.Reviews
             if (review.Answers == null)
                 return new BadRequestDataResponse<GetNewReviewDtoResponse>("No answers provided");
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == review.UserId);
-            if (user == null)
+            var peer = await GetUserById(review.UserId);
+            if (peer == null)
                 return new InvalidGuidIdResponse<GetNewReviewDtoResponse>("Invalid user id provided");
 
-            var submission = await _context.Submissions
-                .Include(s => s.PeeringTaskUserAssignment.Student)
-                .Include(s => s.PeeringTaskUserAssignment.PeeringTask)
-                .FirstOrDefaultAsync(s => s.ID == review.SubmissionId);
+            var submission = await GetSubmissionById(review.SubmissionId);
             if (submission == null)
                 return new InvalidGuidIdResponse<GetNewReviewDtoResponse>("Invalid submission id provided");
 
-            var submissionPeerConnection = await _context.SubmissionPeers
-                .FirstOrDefaultAsync(sp => sp.Peer == user && sp.Submission == submission);
+            var task = submission.PeeringTaskUserAssignment.PeeringTask;
+            
+            var submissionPeerConnection = await GetSubmissionPeer(submission, peer);
             if (submissionPeerConnection == null)
                 return new NoAccessResponse<GetNewReviewDtoResponse>("This user can't review this submission");
 
-            var firstReview = await _context.Reviews.FirstOrDefaultAsync(r =>
-                r.SubmissionPeerAssignment.Peer == user && r.SubmissionPeerAssignment.Submission == submission);
+            var firstReview = await GetReview(submissionPeerConnection);
             if (firstReview != null)
                 return new OperationErrorResponse<GetNewReviewDtoResponse>(
                     "This user has already reviewed this submission");
 
-            var expert = await _context.Experts.FirstOrDefaultAsync(e =>
-                e.User == user && e.PeeringTask == submission.PeeringTaskUserAssignment.PeeringTask);
-
-            if (expert == null && user.Role == UserRoles.Student)
+            if (await IsExpertUser(peer, task) == false && peer.Role == UserRoles.Student)
             {
                 if (submission.PeeringTaskUserAssignment.PeeringTask.ReviewStartDateTime > DateTime.Now)
                     return new OperationErrorResponse<GetNewReviewDtoResponse>("Reviewing hasn't started yet");
@@ -72,12 +64,9 @@ namespace patools.Services.Reviews
                 SubmissionPeerAssignment = submissionPeerConnection
             };
             submission.PeeringTaskUserAssignment.State = PeeringTaskStates.Checked;
-            await _context.Reviews.AddAsync(newReview);
+            await Context.Reviews.AddAsync(newReview);
 
-            var questions = await _context.Questions
-                .Where(q => q.PeeringTask == submission.PeeringTaskUserAssignment.PeeringTask &&
-                            q.RespondentType == RespondentTypes.Peer)
-                .ToListAsync();
+            var questions = await GetPeerQuestions(task);
             var answers = new List<Answer>();
             var grades = new List<float>();
             foreach (var answer in review.Answers)
@@ -141,41 +130,17 @@ namespace patools.Services.Reviews
             var resultGrade = grades.Sum();
             newReview.Grade = resultGrade;
 
-            await _context.Answers.AddRangeAsync(answers);
+            await Context.Answers.AddRangeAsync(answers);
 
-            var task = submission.PeeringTaskUserAssignment.PeeringTask;
-            if (task.TaskType == TaskTypes.Initial && expert != null)
+            if (DateTime.Now > task.ReviewEndDateTime)
             {
-                var expertUsers = await _context.Experts
-                    .Where(e => e.PeeringTask == task)
-                    .Select(e => e.User)
-                    .ToListAsync();
-                
-                var assignedReviews = await _context.SubmissionPeers
-                    .Where(sp => sp.Submission.PeeringTaskUserAssignment.PeeringTask == task &&
-                                 expertUsers.Contains(sp.Peer))
-                    .Include(sp => sp.Submission.PeeringTaskUserAssignment.Student)
-                    .ToListAsync();
-
-                var currentReviewsAmount = await _context.Reviews
-                    .CountAsync(r => assignedReviews.Contains(r.SubmissionPeerAssignment));
-
-                if (currentReviewsAmount == assignedReviews.Count)
+                await _peeringTasksService.ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
                 {
-                    if(task.ReviewEndDateTime < DateTime.Now)
-                        await _peeringTasksService.ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
-                        {
-                            TaskId = task.ID
-                        });
-                    else
-                    {
-                        //TODO
-                        //Schedule
-                    }
-                }
+                    TaskId = task.ID
+                });
             }
 
-            await _context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
             return new SuccessfulResponse<GetNewReviewDtoResponse>(new GetNewReviewDtoResponse()
             {
@@ -185,35 +150,35 @@ namespace patools.Services.Reviews
 
         public async Task<Response<IEnumerable<GetReviewDtoResponse>>> GetAllReviews(GetReviewDtoRequest taskInfo)
         {
-            var student = await _context.Users.FirstOrDefaultAsync(
+            var student = await Context.Users.FirstOrDefaultAsync(
                 u => u.ID == taskInfo.StudentId && u.Role == UserRoles.Student);
             if (student == null)
                 return new InvalidGuidIdResponse<IEnumerable<GetReviewDtoResponse>>("Invalid user id provided");
 
-            var task = await _context.Tasks
+            var task = await Context.Tasks
                 .Include(t => t.Course)
                 .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<IEnumerable<GetReviewDtoResponse>>("Invalid task id provided");
 
-            var courseUser = await _context.CourseUsers
+            var courseUser = await Context.CourseUsers
                 .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == student);
             if (courseUser == null)
                 return new NoAccessResponse<IEnumerable<GetReviewDtoResponse>>(
                     "This user is not assigned to this course");
 
-            var taskUser = await _context.TaskUsers
+            var taskUser = await Context.TaskUsers
                 .FirstOrDefaultAsync(tu => tu.Student == student && tu.PeeringTask == task);
             if (taskUser == null)
                 return new NoAccessResponse<IEnumerable<GetReviewDtoResponse>>("This user has no access to this task");
 
             var submission =
-                await _context.Submissions.FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
+                await Context.Submissions.FirstOrDefaultAsync(s => s.PeeringTaskUserAssignment == taskUser);
             if (submission == null)
                 return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
                     "This user hasn't submissioned yet");
 
-            var reviews = await _context.Reviews
+            var reviews = await Context.Reviews
                 .Include(r => r.SubmissionPeerAssignment.Submission)
                 .Include(r => r.SubmissionPeerAssignment.Peer)
                 .Where(r => r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student == student)
@@ -226,7 +191,7 @@ namespace patools.Services.Reviews
             {
                 var peer = review.SubmissionPeerAssignment.Peer;
 
-                var expert = await _context.Experts.FirstOrDefaultAsync(
+                var expert = await Context.Experts.FirstOrDefaultAsync(
                     e => e.User == peer &&
                          e.PeeringTask == task);
 
@@ -254,7 +219,7 @@ namespace patools.Services.Reviews
                 resultReview.ReviewId = review.ID;
                 resultReview.FinalGrade = review.Grade;
 
-                var answers = await _context.Answers
+                var answers = await Context.Answers
                     .Include(a => a.Question)
                     .Where(a => a.Review == review)
                     .ToListAsync();
@@ -262,7 +227,7 @@ namespace patools.Services.Reviews
                 var resultAnswers = new List<GetAnswerDtoResponse>();
                 foreach (var answer in answers)
                 {
-                    var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
+                    var question = await Context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
                     if (question == null)
                         return new OperationErrorResponse<IEnumerable<GetReviewDtoResponse>>(
                             "There is an error in stored data (Questions table)");
@@ -289,7 +254,7 @@ namespace patools.Services.Reviews
                             break;
                         case QuestionTypes.Multiple:
                             resultAnswer.Value = answer.Value;
-                            var responses = await _context.Variants
+                            var responses = await Context.Variants
                                 .Where(v => v.Question == question)
                                 .Select(v => new GetVariantDtoResponse()
                                 {
@@ -314,32 +279,32 @@ namespace patools.Services.Reviews
 
         public async Task<Response<IEnumerable<GetMyReviewDtoResponse>>> GetAllMyReviews(GetMyReviewDtoRequest taskInfo)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(
+            var user = await Context.Users.FirstOrDefaultAsync(
                 u => u.ID == taskInfo.UserId);
             if (user == null)
                 return new InvalidGuidIdResponse<IEnumerable<GetMyReviewDtoResponse>>("Invalid user id provided");
 
-            var task = await _context.Tasks
+            var task = await Context.Tasks
                 .Include(t => t.Course)
                 .Include(t => t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == taskInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<IEnumerable<GetMyReviewDtoResponse>>("Invalid task id provided");
 
-            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
+            var expert = await Context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
 
             switch (user.Role)
             {
                 case { } when expert != null:
                     return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>("Expert can't make this request");
                 case UserRoles.Student:
-                    var courseUser = await _context.CourseUsers
+                    var courseUser = await Context.CourseUsers
                         .FirstOrDefaultAsync(cu => cu.Course == task.Course && cu.User == user);
                     if (courseUser == null)
                         return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>(
                             "This user is not assigned to this course");
 
-                    var taskUser = await _context.TaskUsers
+                    var taskUser = await Context.TaskUsers
                         .FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
                     if (taskUser == null)
                         return new NoAccessResponse<IEnumerable<GetMyReviewDtoResponse>>(
@@ -353,7 +318,7 @@ namespace patools.Services.Reviews
             }
 
             var resultReviews = new List<GetMyReviewDtoResponse>();
-            var reviews = await _context.Reviews
+            var reviews = await Context.Reviews
                 .Where(r => r.SubmissionPeerAssignment.Peer == user &&
                             r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask == task)
                 .Include(r => r.SubmissionPeerAssignment.Submission)
@@ -371,7 +336,7 @@ namespace patools.Services.Reviews
                     StudentName = task.ReviewType == ReviewTypes.DoubleBlind ? $"Аноним #{++index}" : student.Fullname
                 };
 
-                var teacherReview = await _context.Reviews
+                var teacherReview = await Context.Reviews
                     .FirstOrDefaultAsync(r => r.SubmissionPeerAssignment.Peer == task.Course.Teacher &&
                                               r.SubmissionPeerAssignment.Submission == submission);
 
@@ -379,11 +344,11 @@ namespace patools.Services.Reviews
                     resultReview.TeacherAnswers = await GetAnswersForReview(teacherReview);
                 else if (task.TaskType == TaskTypes.Initial)
                 {
-                    var experts = await _context.Experts
+                    var experts = await Context.Experts
                         .Where(e => e.PeeringTask == task)
                         .Select(e => e.User)
                         .ToListAsync();
-                    var expertReview = await _context.Reviews
+                    var expertReview = await Context.Reviews
                         .FirstOrDefaultAsync(r =>
                             r.SubmissionPeerAssignment.Submission == review.SubmissionPeerAssignment.Submission
                             && experts.Contains(r.SubmissionPeerAssignment.Peer));
@@ -402,7 +367,7 @@ namespace patools.Services.Reviews
         private async Task<IEnumerable<GetAnswerDtoResponse>> GetAnswersForReview(Review review)
         {
             
-                var answers = await _context.Answers
+                var answers = await Context.Answers
                     .Include(a => a.Question)
                     .Where(a => a.Review == review)
                     .ToListAsync();
@@ -410,7 +375,7 @@ namespace patools.Services.Reviews
                 var resultAnswers = new List<GetAnswerDtoResponse>();
                 foreach (var answer in answers)
                 {
-                    var question = await _context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
+                    var question = await Context.Questions.FirstOrDefaultAsync(q => q == answer.Question);
 
                     var resultAnswer = new GetAnswerDtoResponse()
                     {
@@ -434,7 +399,7 @@ namespace patools.Services.Reviews
                             break;
                         case QuestionTypes.Multiple:
                             resultAnswer.Value = answer.Value;
-                            var responses = await _context.Variants
+                            var responses = await Context.Variants
                                 .Where(v => v.Question == question)
                                 .Select(v => new GetVariantDtoResponse()
                                 {
