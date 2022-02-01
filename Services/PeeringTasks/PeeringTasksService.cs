@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using AutoMapper;
 using Google.Apis.Util;
@@ -99,22 +100,25 @@ namespace patools.Services.PeeringTasks
 
             await Context.SaveChangesAsync();
 
-            /*
-            var delay = newTask.SubmissionEndDateTime - DateTime.Now;
-            if (newTask.Step == PeeringSteps.FirstStep)
+            ScheduleAssignments(newTask);
+            
+            return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(Mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
+        }
+
+        private void ScheduleAssignments(PeeringTask task)
+        {
+            var delay = task.SubmissionEndDateTime - DateTime.Now;
+            if (task.TaskType == TaskTypes.Initial)
                 BackgroundJob.Schedule(()=>AssignExperts(new AssignExpertsDto()
                 {
-                    TaskId = newTask.ID
+                    TaskId = task.ID
                 }), delay);
             else
                 BackgroundJob.Schedule(()=>AssignPeers(new AssignPeersDto()
                 {
-                    TaskId = newTask.ID
+                    TaskId = task.ID
                 }), delay);
-            */
-            return new SuccessfulResponse<GetNewPeeringTaskDtoResponse>(Mapper.Map<GetNewPeeringTaskDtoResponse>(newTask));
         }
-
         private static bool AreDeadlinesValid(AddPeeringTaskSettingsDto settings)
         {
             if (settings.SubmissionStartDateTime == null ||
@@ -424,6 +428,10 @@ namespace patools.Services.PeeringTasks
             }
 
             await Context.SubmissionPeers.AddRangeAsync(submissionPeers);
+            await AssignPeers(new AssignPeersDto()
+            {
+                TaskId = expertsInfo.TaskId
+            });
             await Context.SaveChangesAsync();
             var endTime = DateTime.Now;
             return new SuccessfulResponse<string>($"Result: Experts assigned successfully for the task with id {task.ID} " +

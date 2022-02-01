@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using Hangfire;
+using Hangfire.PostgreSql;
 using Hangfire.SQLite;
 using patools.Models;
 using patools.Services.Authentication;
@@ -39,7 +40,7 @@ namespace patools
         public void ConfigureServices(IServiceCollection services)
         {
             SetupJwtServices(services);
-            services.AddHangfire(h => h.UseSQLiteStorage(Configuration["ConnectionStrings:Hangfire"]));
+            services.AddHangfire(h => h.UsePostgreSqlStorage(Configuration["ConnectionStrings:Hangfire"]));
             services.AddHangfireServer();
             services.AddControllersWithViews();
             services.AddDbContext<PAToolsContext>();
