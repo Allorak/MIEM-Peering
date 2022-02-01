@@ -50,7 +50,7 @@ namespace patools.Services.Reviews
                 return new OperationErrorResponse<GetNewReviewDtoResponse>(
                     "This user has already reviewed this submission");
 
-            if (await IsExpertUser(peer, task) == false && peer.Role == UserRoles.Student)
+            if (peer != task.Course.Teacher)
             {
                 if (submission.PeeringTaskUserAssignment.PeeringTask.ReviewStartDateTime > DateTime.Now)
                     return new OperationErrorResponse<GetNewReviewDtoResponse>("Reviewing hasn't started yet");
@@ -132,15 +132,17 @@ namespace patools.Services.Reviews
 
             await Context.Answers.AddRangeAsync(answers);
 
-            if (DateTime.Now > task.ReviewEndDateTime)
+            
+
+            await Context.SaveChangesAsync();
+            
+            if (peer == task.Course.Teacher)
             {
                 await _peeringTasksService.ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
                 {
                     TaskId = task.ID
                 });
             }
-
-            await Context.SaveChangesAsync();
 
             return new SuccessfulResponse<GetNewReviewDtoResponse>(new GetNewReviewDtoResponse()
             {

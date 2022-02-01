@@ -981,10 +981,14 @@ namespace patools.Services.PeeringTasks
 
                 switch (task.TaskType)
                 {
-                    case TaskTypes.Initial when await TryCalculateInitialTaskResults(taskUser, courseUser) == false:
-                        return new OperationErrorResponse<string>();
-                    case TaskTypes.Common when await TryCalculateCommonTaskResults(taskUser, courseUser) == false:
-                        return new OperationErrorResponse<string>();
+                    case TaskTypes.Initial :
+                        if(!await TryCalculateInitialTaskResults(taskUser, courseUser))
+                            Console.WriteLine("Initial confidence factor calculation failed");
+                        break;
+                    case TaskTypes.Common:
+                        if(!await TryCalculateCommonTaskResults(taskUser, courseUser))
+                            Console.WriteLine("Initial confidence factor calculation failed");
+                        break;
                 }
             }
 
@@ -996,6 +1000,8 @@ namespace patools.Services.PeeringTasks
         {
             var expertReview = await GetExpertReview(taskUser);
             var teacherReview = await GetTeacherReview(taskUser);
+            if (expertReview == null && teacherReview == null)
+                return false;
             var submission = await GetSubmission(taskUser);
             var submissionGrade = submission != null
                 ? teacherReview?.Grade ?? expertReview.Grade
@@ -1096,7 +1102,8 @@ namespace patools.Services.PeeringTasks
         }
         private async Task<bool> TryCalculateCommonTaskResults(PeeringTaskUser taskUser, CourseUser courseUser)
         {
-            var confidenceFactor = await CountNextConfidenceFactor(taskUser) ?? taskUser.PreviousConfidenceFactor;
+            var submission = await GetSubmission(taskUser);
+            var confidenceFactor = await CountNextConfidenceFactor(taskUser,submission) ?? taskUser.PreviousConfidenceFactor;
             courseUser.ConfidenceFactor = confidenceFactor;
             taskUser.NextConfidenceFactor = confidenceFactor;
             Console.WriteLine($"Confidence factor before task: {taskUser.PreviousConfidenceFactor}");
@@ -1177,27 +1184,25 @@ namespace patools.Services.PeeringTasks
                 return studentInfo;
 
             if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
-                studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask.Course, reviews);
+                studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask, reviews);
             return studentInfo;
         }
 
-        private async Task<ConfidenceFactorQualities?> GetReviewQuality(Course course, IEnumerable<Review> reviews)
+        private async Task<ConfidenceFactorQualities?> GetReviewQuality(PeeringTask task, IEnumerable<Review> reviews)
         {
             var confidenceFactorsSum = 0f;
             var reviewersAmount = 0;
+            if (!reviews.Any())
+                return null;
             foreach (var review in reviews)
             {
-                var courseUser = await Context.CourseUsers.FirstOrDefaultAsync(cu =>
-                    cu.Course == course && cu.User == review.SubmissionPeerAssignment.Peer);
-                if (courseUser.ConfidenceFactor != null)
-                {
-                    reviewersAmount++;
-                    confidenceFactorsSum += courseUser.ConfidenceFactor.Value;
-                }
+                var peer = review.SubmissionPeerAssignment.Peer;
+                var taskUser = await Context.TaskUsers.FirstOrDefaultAsync(
+                    tu => tu.Student == peer && tu.PeeringTask == task);
+                reviewersAmount++;
+                confidenceFactorsSum += taskUser.PreviousConfidenceFactor;
             }
 
-            if (reviewersAmount == 0)
-                return null;
             
             var averageConfidenceFactor = confidenceFactorsSum/reviewersAmount;
             return averageConfidenceFactor switch
@@ -1251,6 +1256,8 @@ namespace patools.Services.PeeringTasks
             var student = taskUser.Student;
             var studentReviews = await GetReviewsByPeer(task,student);
 
+            if (studentReviews.Count == 0)
+                return 1;
             var error = 0f;
             
             foreach (var studentReview in studentReviews)
@@ -1260,10 +1267,7 @@ namespace patools.Services.PeeringTasks
                 var teacherReview = await GetTeacherReview(reviewTaskUser);
                 
                 if (expertReview == null && teacherReview == null)
-                {
-                    Console.WriteLine("Neither expert nor teacher has reviewed this submission");
-                    return null;
-                }
+                    continue;
                 
                 var studentAnswers = await GetReviewSelectAnswers(studentReview);
                 var masterAnswers = teacherReview != null
@@ -1346,7 +1350,7 @@ namespace patools.Services.PeeringTasks
             return error/maxError;
         }
 
-        private async Task<float?> CountNextConfidenceFactor(PeeringTaskUser taskUser)
+        private async Task<float?> CountNextConfidenceFactor(PeeringTaskUser taskUser, Submission submission)
         {
             var submissionGrade = 0f;
             var teacherReview = await GetTeacherReview(taskUser);
@@ -1355,7 +1359,7 @@ namespace patools.Services.PeeringTasks
                 submissionGrade = teacherReview.Grade;
                 Console.WriteLine($"TEACHER {submissionGrade}");
             }
-            else
+            else if (submission != null)
             {
                 var confidenceFactorsSum = 0f;
                 var reviews = await GetTaskUserReviews(taskUser);

@@ -210,15 +210,6 @@ namespace patools.Controllers.v1
             }));
         }
 
-        [HttpPost("confidence-factors/task={taskId:guid}")]
-        public async Task<ActionResult<string>> ConfidenceFactors(Guid taskId)
-        {
-            return Ok(await _peeringTasksService.ChangeConfidenceFactors(new ChangeConfidenceFactorDto()
-            {
-                TaskId = taskId
-            }));
-        }
-
         [HttpGet("get-performance-table/task={taskId:guid}")]
         public async Task<ActionResult<GetPerformanceTableDtoResponse>> GetPerformanceTable(Guid taskId)
         {
