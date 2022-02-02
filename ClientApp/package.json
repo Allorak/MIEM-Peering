@@ -19,6 +19,7 @@
         "date-fns": "^2.25.0",
         "dayjs": "^1.10.7",
         "equation-resolver": "^0.3.2",
+        "file-saver": "^2.0.5",
         "history": "5.0.1",
         "jquery": "^3.6.0",
         "merge": "2.1.1",
@@ -40,6 +41,7 @@
         "universal-cookie": "^4.0.4"
     },
     "devDependencies": {
+        "@types/file-saver": "^2.0.5",
         "@types/history": "4.7.9",
         "@types/jest": "27.0.2",
         "@types/node": "16.11.0",

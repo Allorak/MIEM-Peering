@@ -11,6 +11,7 @@ import { usePrivatePathT } from "../../../../../app/hooks/usePrivatePathT";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { fetchTasks } from "../../../../../store/tasks/thunks/fetchTasks";
 import * as constStyles from '../../../../../const/styles'
+import { NoData } from "../../../../../components/noData";
 
 
 
@@ -75,6 +76,12 @@ export const CourseMain: FC = () => {
                             />
                         )}
                     </Box>
+
+                    {tasks && (tasks.length === 0) && (
+                        <NoData
+                            label={"Задания не найдены. Создайте новое задание"}
+                        />
+                    )}
                 </WorkBox>
             </Box>
         </Box>

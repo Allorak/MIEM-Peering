@@ -1,7 +1,6 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
-import { mock } from './mock'
 
 
 export const getSubmissionDeadlineStatus = async ({
@@ -19,8 +18,6 @@ export const getSubmissionDeadlineStatus = async ({
       'Accept-Language': 'ru',
     }
   }
-
-  if (isMock) return await mock(requestConfig)
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data

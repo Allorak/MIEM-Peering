@@ -12,6 +12,7 @@ import { AddCourse } from "../add"
 import * as constStyles from '../../../../../const/styles'
 import { useNavigate } from "react-router-dom"
 import { ICourses } from "../../../../../store/types"
+import { NoData } from "../../../../../components/noData"
 
 export const TCourseList: FC = () => {
     const dispatch = useAppDispatch()
@@ -88,6 +89,12 @@ export const TCourseList: FC = () => {
                             />
                         )}
                     </Box>
+
+                    {courses && (courses.length === 0) && (
+                        <NoData
+                            label={"Курсы не найдены. Создайте новый курс"}
+                        />
+                    )}
                 </WorkBox>
             </Box>
         </Box>
