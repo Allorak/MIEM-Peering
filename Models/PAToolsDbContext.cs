@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace patools.Models
 {
@@ -22,15 +23,13 @@ namespace patools.Models
         public DbSet<PeeringTaskUser> TaskUsers { get; set; }
         public DbSet<SubmissionPeer> SubmissionPeers { get; set; }
 
-        public string DbPath { get; private set; }
-
+        
+        
         public PAToolsContext()
         {
-            var path = Environment.CurrentDirectory;
-            DbPath = $"{path}{System.IO.Path.DirectorySeparatorChar}app.db";
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite($"Filename={DbPath}");
+            => options.UseNpgsql("Server=localhost;User Id=postgres;Password=ghjuhfvvf2111;Port=5432;Database=PeeringService;");
     }
 }
