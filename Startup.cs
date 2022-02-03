@@ -32,9 +32,11 @@ namespace patools
 {
     public class Startup
     {
+        public static string ConnectionString { get; private set; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            ConnectionString = Configuration["ConnectionStrings:Default"];
         }
 
         public IConfiguration Configuration { get; }

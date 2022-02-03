@@ -23,13 +23,11 @@ namespace patools.Models
         public DbSet<PeeringTaskUser> TaskUsers { get; set; }
         public DbSet<SubmissionPeer> SubmissionPeers { get; set; }
 
-        
-        
         public PAToolsContext()
         {
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseNpgsql("Server=localhost;User Id=postgres;Password=ghjuhfvvf2111;Port=5432;Database=PeeringService;");
+            => options.UseNpgsql(Startup.ConnectionString);
     }
 }
