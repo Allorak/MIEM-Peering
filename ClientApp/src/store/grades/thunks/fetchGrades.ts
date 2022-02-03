@@ -13,9 +13,8 @@ export const fetchGrades = (taskId: string): AppThunk => async (dispatch, getSta
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,
-            message: 'Ошибка аутентификации', // TODO
+            message: 'Ошибка аутентификации',
         }))
-        console.log("Fetch experts error: No access token")
         return
     }
 
@@ -24,7 +23,7 @@ export const fetchGrades = (taskId: string): AppThunk => async (dispatch, getSta
         if (!response) {
             dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
-                message: 'Некорректный ответ сервера', // TODO: i18n
+                message: 'Некорректный ответ сервера',
             }))
             return
         }

@@ -76,7 +76,6 @@ export function Private() {
   }, [taskId, accessToken])
 
   if ((!isAuthorized || !accessToken) && !registrationToken && cookies.get('JWT') == 'undefined') {
-    console.log('Navigate to login')
     return (
       <Navigate
         to={paths.login}
@@ -102,8 +101,6 @@ export function Private() {
   }
 
   if (taskId && dashboardProps && dashboardProps.userRole === IRole.teacher && role !== 't') {
-    console.log('Navigate to Teacher Dashboard')
-
     const pathToMainDashboard = generatePath(paths.teacher.dashboard.overview, { taskId })
 
     return (
@@ -115,8 +112,6 @@ export function Private() {
   }
 
   if (taskId && dashboardProps && dashboardProps.userRole === IRole.student && role !== 'st') {
-    console.log('Navigate to Student Dashboard')
-
     const pathToMainDashboard = generatePath(paths.student.dashboard.overview, { taskId })
 
     return (
@@ -128,8 +123,6 @@ export function Private() {
   }
 
   if (taskId && dashboardProps && dashboardProps.userRole === IRole.expert && role !== 'ex') {
-    console.log('Navigate to Expert Dashboard')
-
     const pathToMainDashboard = generatePath(paths.expert.dashboard.overview, { taskId })
 
     return (
@@ -183,8 +176,6 @@ export function Private() {
   }
 
   if (userProfilePayload && userProfilePayload.role === IRole.teacher) {
-    console.log("Teacher routes")
-
     return (
       <Box sx={styles.wrapper}>
         <PrivateHeader />

@@ -29,12 +29,10 @@ export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
       const isValue = item.type === IQuestionTypes.MULTIPLE || item.type === IQuestionTypes.SELECT_RATE
 
       if (item.required && isResponse && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
-        console.log(item, "!", typeof item.response === 'undefined')
         return
       }
 
       if (item.required && isValue && typeof item.value === 'undefined') {
-        console.log(item, "!", typeof item.value === 'undefined')
         return
       }
     }

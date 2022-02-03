@@ -41,7 +41,9 @@ export const Coefficients: FC<IProps> = ({
               {cardData ? (
                 <>
                   <Typography variant={'h5'} sx={{ textDecoration: 'line-through', opacity: '0.4' }}>
-                    {before}
+                    {typeof before === 'number' && (
+                      before.toFixed(2)
+                    )}
                   </Typography>
 
                   <Box sx={styles.arrowRightBlock}>
@@ -49,20 +51,22 @@ export const Coefficients: FC<IProps> = ({
                   </Box>
 
                   <Typography variant={'h5'}>
-                    {after}
+                    {typeof after === 'number' && (
+                      after.toFixed(2)
+                    )}
                   </Typography>
                 </>
               ) : (
                 <>
                   {typeof before === 'number' && (
                     <Typography variant={'h5'}>
-                      {`${before} - текущий`}
+                      {`${before.toFixed(2)} - текущий`}
                     </Typography>
                   )}
 
                   {typeof after === 'number' && (
                     <Typography variant={'h5'}>
-                      {`${after} - итоговый`}
+                      {`${after.toFixed(2)} - итоговый`}
                     </Typography>
                   )}
                 </>

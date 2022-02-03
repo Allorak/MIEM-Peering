@@ -67,14 +67,12 @@ export const Checkings: FC = () => {
 
   useEffect(() => {
     if (path && path.taskId) {
-      console.log("Get review deadlines...")
       dispatch(fetchReviewStatus(path.taskId))
     }
   }, [])
 
   useEffect(() => {
     if (path && path.taskId && reviewStatus === DeadlineStatus.START) {
-      console.log("Get work list for review...")
       dispatch(actions.reset())
       dispatch(fetchCheckingsWorkList(path.taskId))
     }
@@ -83,7 +81,6 @@ export const Checkings: FC = () => {
   useEffect(() => {
     const flag = reviewStatus === DeadlineStatus.START && studentList && studentList.length > 0
     if (path && path.taskId && flag) {
-      console.log("Get Peer Form for review...")
       dispatch(fetchPeerForm(path.taskId))
       setCurrentWorkIdStudent(studentList[0].submissionId)
       getStudentWork(studentList[0].submissionId)
@@ -93,7 +90,6 @@ export const Checkings: FC = () => {
   useEffect(() => {
     const flag = reviewStatus && reviewStatus !== DeadlineStatus.NOT_STARTED && ((!studentList && reviewStatus !== DeadlineStatus.START) || (studentList && studentList.length === 0 && reviewStatus !== DeadlineStatus.END))
     if (path && path.taskId && flag) {
-      console.log("Get My Reviews...")
       dispatch(fetchReviews(path.taskId))
     }
   }, [studentList, reviewStatus])
@@ -113,7 +109,6 @@ export const Checkings: FC = () => {
 
   const getStudentWork = useCallback((workId: string) => {
     if (path && path.taskId) {
-      console.log("Get Author Work for review...")
       dispatch(fetchStudentWork(path.taskId, workId))
     }
   }, [path])

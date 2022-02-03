@@ -2,9 +2,6 @@ import { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '.'
 
 
-
-
-
 type IUseAuthResult = {
   isAuthorized: boolean,
   authorize: () => void,

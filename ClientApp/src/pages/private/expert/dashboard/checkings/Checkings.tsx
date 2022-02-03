@@ -48,7 +48,6 @@ export const Checkings: FC = () => {
 
   useEffect(() => {
     if (path && path.taskId && reviewStatus && reviewStatus !== DeadlineStatus.NOT_STARTED) {
-      console.log("Getting Works...")
       dispatch(actions.reset())
       dispatch(fetchCheckingsWorkList(path.taskId))
       dispatch(fetchPeerForm(path.taskId))
@@ -57,7 +56,6 @@ export const Checkings: FC = () => {
 
   useEffect(() => {
     if (path && path.taskId) {
-      console.log("Getting Deadlines...")
       dispatch(fetchReviewStatus(path.taskId))
     }
   }, [])
@@ -76,7 +74,6 @@ export const Checkings: FC = () => {
   useEffect(() => {
     const flag = reviewStatus && reviewStatus !== DeadlineStatus.NOT_STARTED && studentList && studentList.length > 0
     if (path && path.taskId && flag) {
-      console.log("Get Peer Form for review...")
       dispatch(fetchPeerForm(path.taskId))
       setCurrentWorkIdStudent(studentList[0].submissionId)
       getStudentWork(studentList[0].submissionId)

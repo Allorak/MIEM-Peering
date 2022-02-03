@@ -25,7 +25,7 @@ export const Navbar: FC = () => {
         <>
             {courses.map(item =>  
                 (item.id == courseId
-                    ? (<CourseTitle key={item.id} courseId={item.id} courseTitle={item.name} />)
+                    ? (<CourseTitle key={item.id} courseTitle={item.name} />)
                     : null
             ))}
         </>
@@ -42,35 +42,30 @@ export const Navbar: FC = () => {
         )
     }
 
-    const TaskItem: FC<{ courseId: string }> = ({
-        courseId
-    }) => {
+    const TaskItem: FC = () => {
         return (
             <Typography variant='h6'
                 sx={{ ...styles.item, ...styles.itemHover }}
-                onClick={() => { console.log(courseId, "Get all tasks") }}
             >
                 Задания
             </Typography>
         )
     }
 
-    const CourseTitle: FC<{ courseId: string, courseTitle: string }> = ({ courseId, courseTitle }) => {
+    const CourseTitle: FC<{ courseTitle: string }> = ({ courseTitle }) => {
         return (
             <Typography variant='h6'
                 sx={{ ...styles.item, ...styles.courseTitle, ...styles.blue }}
-                onClick={() => console.log(courseId)}
             >
                 {courseTitle}
             </Typography>
         )
     }
 
-    const TaskTitle: FC<{ courseId: string, taskId: string, taskTitle: string }> = ({ courseId, taskId, taskTitle }) => {
+    const TaskTitle: FC<{ taskTitle: string }> = ({ taskTitle }) => {
         return (
             <Typography variant='h6'
                 sx={{ ...styles.item, ...styles.itemHover, ...styles.blue }}
-                onClick={() => console.log(courseId, taskId, "Get task")}
             >
                 {taskTitle}
             </Typography>
@@ -110,11 +105,11 @@ export const Navbar: FC = () => {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            <CourseTitle courseId={pathT.courseId} courseTitle={courseItem.title} />
+            <CourseTitle courseTitle={courseItem.title} />
             <SpanDelimetr />
-            <TaskItem courseId={pathT.courseId} />
+            <TaskItem />
             <SpanDelimetr />
-            <TaskTitle courseId={pathT.courseId} taskTitle={taskItem.title} taskId={taskItem.id} />
+            <TaskTitle taskTitle={taskItem.title} />
 
         </>)
     }
@@ -133,11 +128,11 @@ export const Navbar: FC = () => {
         return (<>
             <CourseItem />
             <SpanDelimetr />
-            <CourseTitle courseId={pathSt.courseId} courseTitle={courseItem.title} />
+            <CourseTitle courseTitle={courseItem.title} />
             <SpanDelimetr />
-            <TaskItem courseId={pathSt.courseId} />
+            <TaskItem />
             <SpanDelimetr />
-            <TaskTitle courseId={pathSt.courseId} taskTitle={taskItem.title} taskId={taskItem.id} />
+            <TaskTitle taskTitle={taskItem.title}  />
 
         </>)
     }

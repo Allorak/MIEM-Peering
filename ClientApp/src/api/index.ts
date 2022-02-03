@@ -12,12 +12,10 @@ export const api = axios.create(requestConfig)
 if (process.env.NODE_ENV !== 'production') {
   api.interceptors.request.use(
     (request: AxiosRequestConfig): AxiosRequestConfig => {
-      console.log('[api request]', request)
       return request;
     },
 
     (error: any): IErrorResponse => {
-      console.warn('[api request error]', error)
       throw {
         code: IErrorCode.REQUEST,
         message: error.message,
@@ -27,8 +25,6 @@ if (process.env.NODE_ENV !== 'production') {
 
   api.interceptors.response.use(
     (response: AxiosResponse): AxiosResponse => {
-      console.log('[api response]', response)
-
       if (response.status === 403) {
         return {
           ...response,

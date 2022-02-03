@@ -21,7 +21,7 @@ import clientID from '../../secret/GoogleClientID';
 import Cookies from 'universal-cookie';
 
 export const Login: FC = () => {
-    const cookies = new Cookies(); 
+    const cookies = new Cookies();
     const dispatch = useAppDispatch()
 
     const isAuthorized = useAppSelector(state => state.gAuth.isAuthorized)
@@ -56,7 +56,7 @@ export const Login: FC = () => {
     }
 
     const onGoogleLoginFail = (e: any) => {
-        console.log(e.error)
+        console.log('Google login fail:', e.error)
     }
 
     return (

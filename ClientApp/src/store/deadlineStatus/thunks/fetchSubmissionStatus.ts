@@ -12,9 +12,8 @@ export const fetchSubmissionStatus = (taskId: string): AppThunk => async (dispat
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,
-            message: 'Ошибка аутентификации', // TODO
+            message: 'Ошибка аутентификации',
         }))
-        console.log("Fetch status error")
         return
     }
 
@@ -24,7 +23,7 @@ export const fetchSubmissionStatus = (taskId: string): AppThunk => async (dispat
         if (!response) {
             dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
-                message: 'Некорректный ответ сервера', // TODO: i18n
+                message: 'Некорректный ответ сервера',
             }))
             return
         }

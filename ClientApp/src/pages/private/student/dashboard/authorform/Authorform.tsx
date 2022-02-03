@@ -31,14 +31,12 @@ export const Authorform: FC = () => {
   const [responses, setResponses] = useState<IAuthorForm>()
 
   const onRequest = useCallback((formResponses: IAuthorFormResponses) => {
-    console.log("formResponses:", formResponses)
     if (path && path.taskId && formResponses.answers)
       dispatch(postAuthorformStudent(path.taskId, formResponses))
   }, [path])
 
   const handleOnFormEdit = useCallback((value: string | number | undefined, questionId: string) => {
     setResponses(prev => {
-      console.log(prev)
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
           rubrics: JSON.parse(JSON.stringify(prev.rubrics.map((item) => {

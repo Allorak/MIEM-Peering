@@ -11,9 +11,8 @@ export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getS
     if (!accessToken) {
         dispatch(actions.fetchFailed({
             code: IErrorCode.NO_ACCESS,
-            message: 'Ошибка аутентификации', // TODO
+            message: 'Ошибка аутентификации',
         }))
-        console.log("Fetch course error: No access or Role")
         return
     }
 
@@ -23,7 +22,7 @@ export const fetchOverview = (taskId: string): AppThunk => async (dispatch, getS
         if (!response) {
             dispatch(actions.fetchFailed({
                 code: IErrorCode.RESPONSE,
-                message: 'Некорректный ответ сервера', // TODO: i18n
+                message: 'Некорректный ответ сервера',
             }))
             return
         }

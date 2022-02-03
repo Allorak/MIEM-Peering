@@ -27,7 +27,6 @@ export const overviewExpertSlice = createSlice({
     },
 
     fetchSuccess: (state, { payload }: PayloadAction<IOverviewExpert>) => {
-      console.log(payload, "!")
       state.isLoading = false
       state.error = undefined
       state.isLock = false
