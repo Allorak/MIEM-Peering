@@ -16,7 +16,7 @@ namespace patools.Models
         [DisplayFormat(NullDisplayText = "No description set")]
         public string Description { get; set; }
 
-        [MaxLength(6)]
+        [MaxLength(8)]
         [DisplayFormat(NullDisplayText = "No course code set")]
         public string CourseCode { get; set; }
         

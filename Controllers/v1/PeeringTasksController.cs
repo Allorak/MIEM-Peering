@@ -293,7 +293,7 @@ namespace patools.Controllers.v1
                     + $"{student.SubmissionGrade},{student.ReviewGrade},{student.FinalGrade},{student.TeacherReviewed},{student.ReviewQuality},{student.PreviousConfidenceFactor},{student.NextConfidenceFactor}");
             }
 
-            return File(Encoding.Unicode.GetBytes(builder.ToString()), "text/csv", "PerformanceTable.csv");
+            return File(Encoding.UTF32.GetBytes(builder.ToString()), "text/csv", "PerformanceTable.csv");
         }
 
         [HttpGet("download-excel/task={taskId:guid}")]

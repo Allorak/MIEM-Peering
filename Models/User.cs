@@ -30,8 +30,5 @@ namespace patools.Models
         [DisplayFormat(NullDisplayText = "No image set")]
         [DataType(DataType.ImageUrl)]
         public string ImageUrl { get; set; }
-
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
     }
 }

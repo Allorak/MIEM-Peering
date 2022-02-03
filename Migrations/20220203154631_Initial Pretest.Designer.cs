@@ -4,44 +4,49 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using patools.Models;
 
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    [Migration("20220109005356_Added confidence factor")]
-    partial class Addedconfidencefactor
+    [Migration("20220203154631_Initial Pretest")]
+    partial class InitialPretest
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.11");
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
+                .HasAnnotation("ProductVersion", "5.0.11")
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             modelBuilder.Entity("patools.Models.Answer", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Grade")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("QuestionID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Response")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ReviewID")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("SubmissionID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("Value")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 
                     b.HasIndex("QuestionID");
+
+                    b.HasIndex("ReviewID");
 
                     b.HasIndex("SubmissionID");
 
@@ -52,30 +57,30 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CourseCode")
-                        .HasMaxLength(6)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(300)");
 
                     b.Property<bool>("EnableCode")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Subject")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("TeacherID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("ID");
 
@@ -88,16 +93,16 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<float?>("ConfidenceFactor")
-                        .HasColumnType("REAL");
+                        .HasColumnType("real");
 
                     b.Property<Guid?>("CourseID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("UserID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("ID");
 
@@ -112,17 +117,17 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("PeeringTaskID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("UserID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("ID");
 
@@ -137,12 +142,12 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(10)");
 
                     b.HasKey("ID");
 
@@ -153,16 +158,16 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("GroupID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("StudentID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Subgroup")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 
@@ -177,48 +182,61 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
+
+                    b.Property<float?>("BadConfidencePenalty")
+                        .HasColumnType("real");
 
                     b.Property<Guid?>("CourseID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
-                    b.Property<Guid?>("ExpertTaskID")
-                        .HasColumnType("TEXT");
+                    b.Property<bool?>("ExpertsAssigned")
+                        .HasColumnType("boolean");
+
+                    b.Property<float?>("GoodConfidenceBonus")
+                        .HasColumnType("real");
 
                     b.Property<bool>("PeersAssigned")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("ReviewEndDateTime")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("ReviewEndDateTime")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<DateTime?>("ReviewStartDateTime")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("ReviewStartDateTime")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("Step")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("ReviewType")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("SubmissionEndDateTime")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ReviewWeight")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("SubmissionStartDateTime")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("SubmissionEndDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("SubmissionStartDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("SubmissionWeight")
+                        .HasColumnType("integer");
 
                     b.Property<int>("SubmissionsToCheck")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TaskType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("ID");
 
                     b.HasIndex("CourseID");
-
-                    b.HasIndex("ExpertTaskID");
 
                     b.ToTable("Tasks");
                 });
@@ -227,16 +245,31 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
+
+                    b.Property<float?>("FinalGrade")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("NextConfidenceFactor")
+                        .HasColumnType("real");
 
                     b.Property<Guid?>("PeeringTaskID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("States")
-                        .HasColumnType("INTEGER");
+                    b.Property<float>("PreviousConfidenceFactor")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("ReviewGrade")
+                        .HasColumnType("real");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer");
 
                     b.Property<Guid?>("StudentID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
+
+                    b.Property<float?>("SubmissionGrade")
+                        .HasColumnType("real");
 
                     b.HasKey("ID");
 
@@ -251,40 +284,40 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<float?>("CoefficientPercentage")
-                        .HasColumnType("REAL");
+                        .HasColumnType("real");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<int>("MaxValue")
-                        .HasColumnType("INTEGER");
+                    b.Property<int?>("MaxValue")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("MinValue")
-                        .HasColumnType("INTEGER");
+                    b.Property<int?>("MinValue")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.Property<Guid?>("PeeringTaskID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Required")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("RespondentType")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 
@@ -293,14 +326,33 @@ namespace patools.Migrations
                     b.ToTable("Questions");
                 });
 
+            modelBuilder.Entity("patools.Models.Review", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Grade")
+                        .HasColumnType("real");
+
+                    b.Property<Guid?>("SubmissionPeerAssignmentID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("SubmissionPeerAssignmentID");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("patools.Models.Submission", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("PeeringTaskUserAssignmentID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("ID");
 
@@ -313,13 +365,13 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("PeerID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("SubmissionID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.HasKey("ID");
 
@@ -334,29 +386,23 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Fullname")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("PasswordHash")
-                        .HasColumnType("BLOB");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .HasColumnType("BLOB");
+                        .HasColumnType("text");
 
                     b.Property<int>("Role")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 
@@ -367,18 +413,18 @@ namespace patools.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("ChoiceId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.Property<Guid?>("QuestionID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Response")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("ID");
 
@@ -393,11 +439,17 @@ namespace patools.Migrations
                         .WithMany()
                         .HasForeignKey("QuestionID");
 
+                    b.HasOne("patools.Models.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewID");
+
                     b.HasOne("patools.Models.Submission", "Submission")
                         .WithMany()
                         .HasForeignKey("SubmissionID");
 
                     b.Navigation("Question");
+
+                    b.Navigation("Review");
 
                     b.Navigation("Submission");
                 });
@@ -462,13 +514,7 @@ namespace patools.Migrations
                         .WithMany()
                         .HasForeignKey("CourseID");
 
-                    b.HasOne("patools.Models.PeeringTask", "ExpertTask")
-                        .WithMany()
-                        .HasForeignKey("ExpertTaskID");
-
                     b.Navigation("Course");
-
-                    b.Navigation("ExpertTask");
                 });
 
             modelBuilder.Entity("patools.Models.PeeringTaskUser", b =>
@@ -493,6 +539,15 @@ namespace patools.Migrations
                         .HasForeignKey("PeeringTaskID");
 
                     b.Navigation("PeeringTask");
+                });
+
+            modelBuilder.Entity("patools.Models.Review", b =>
+                {
+                    b.HasOne("patools.Models.SubmissionPeer", "SubmissionPeerAssignment")
+                        .WithMany()
+                        .HasForeignKey("SubmissionPeerAssignmentID");
+
+                    b.Navigation("SubmissionPeerAssignment");
                 });
 
             modelBuilder.Entity("patools.Models.Submission", b =>
