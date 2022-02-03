@@ -18,7 +18,6 @@ export const Registration: FC = () => {
         )
     }
 
-    console.log('registretion return null')
     return null
 
     //тут форма регистрации в будущем

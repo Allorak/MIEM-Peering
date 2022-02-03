@@ -2,7 +2,7 @@ import { FC, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import { Button, Typography } from '@mui/material';
-import { Box, Theme, SxProps} from '@mui/system';
+import { Box, Theme, SxProps } from '@mui/system';
 
 import { useAppSelector } from '../../app/hooks';
 
@@ -17,12 +17,11 @@ export const Error404: FC = () => {
     const userProfile = useAppSelector(state => state.userProfile.payload)
 
     const goToHome = useCallback(() => {
-        console.log('Return to Home')
         if (userProfile)
             history(userProfile.role === IRole.teacher ? paths.teacher.main : paths.student.main)
         else history(paths.root)
     }, [userProfile])
-    
+
     return (
         <Box sx={styles.container}>
             <Box sx={styles.root}>
@@ -31,20 +30,20 @@ export const Error404: FC = () => {
                 </Box>
                 <Box sx={styles.infoblock}>
                     <Box sx={styles.infoblock__description}>
-                        <Box sx={{mb: '30px' }}>
-                            <Typography variant='h5' sx={{ color: '#273AB5'}}>
+                        <Box sx={{ mb: '30px' }}>
+                            <Typography variant='h5' sx={{ color: '#273AB5' }}>
                                 {"Увы, но эта страница где-то затерялась в галактике Интернета"}
                             </Typography>
                         </Box>
-                        <Box sx={{mb: '60px' }}>
-                            <Typography variant='body1' sx={{ color: '#17307A', lineHeight: '24px'}} >
+                        <Box sx={{ mb: '60px' }}>
+                            <Typography variant='body1' sx={{ color: '#17307A', lineHeight: '24px' }} >
                                 {"Вы находитесь здесь, потому что ввели адрес страницы, которая уже не существует или была перемещена по другому адресу"}
                             </Typography>
                         </Box>
                     </Box>
                     <Button variant='contained'
-                            sx={styles.infoblock__button}
-                            onClick={goToHome}
+                        sx={styles.infoblock__button}
+                        onClick={goToHome}
                     >
                         {"Вернуться на Главную"}
                     </Button>
@@ -86,7 +85,7 @@ const styles = {
             maxWidth: '1000px',
             py: '40px',
             px: '90px',
-          }
+        }
     } as SxProps<Theme>,
     infoblock: {
         display: 'flex',

@@ -25,7 +25,7 @@ export const WorkBox: FC<IProps> = ({
     }
 
     if (error)
-        console.log("WorkBox Error:", error)
+        console.log("API Error:", error)
 
     if (isLoading && isLock) {
         return (

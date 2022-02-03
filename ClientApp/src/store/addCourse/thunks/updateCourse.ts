@@ -17,7 +17,6 @@ export const updateCourse = (course: IUpdateCourseRequest): AppThunk => async (d
                 code: IErrorCode.NO_ACCESS,
                 message: 'Ошибка аутентификации', // TODO
             }))
-            console.log("Uodate course error: No access or Role")
             return
         }
 

@@ -17,7 +17,6 @@ export const addCourse = (payload: INewCourseRequest): AppThunk => async (dispat
                 code: IErrorCode.NO_ACCESS,
                 message: 'Ошибка аутентификации', // TODO
             }))
-            console.log("Add course error: No access or Role")
             return
         }
         const response = await postNewCourse({ ...payload, accessToken })

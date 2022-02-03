@@ -1,8 +1,6 @@
 import { AxiosRequestConfig } from 'axios'
 import { IRequestData, IResponseData } from '.'
 import { api, IResponse } from '..'
-import { PeerSteps } from '../../store/types'
-import { mock } from './mock'
 
 
 export const postTask = async ({
@@ -10,9 +8,6 @@ export const postTask = async ({
   courseId,
   task
 }: IRequestData): Promise<IResponse<IResponseData>> => {
-
-  const isMock = false
-  console.log(task)
 
   const requestConfig: AxiosRequestConfig = {
     method: 'POST',
@@ -26,12 +21,6 @@ export const postTask = async ({
       courseId,
     }
   }
-
-  if (isMock) {
-    const response = await mock(requestConfig)
-    return response
-  }
-
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)
   return response.data

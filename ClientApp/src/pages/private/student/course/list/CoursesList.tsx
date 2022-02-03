@@ -11,6 +11,7 @@ import { fetchCourses } from "../../../../../store/courses/thunks/courses"
 import { JoinCourse } from "../join"
 import * as constStyles from '../../../../../const/styles'
 import { useNavigate } from "react-router-dom"
+import { NoData } from "../../../../../components/noData"
 
 export const STCourseList: FC = () => {
     const dispatch = useAppDispatch()
@@ -77,6 +78,12 @@ export const STCourseList: FC = () => {
                             />
                         )}
                     </Box>
+
+                    {courses && (courses.length === 0) && (
+                        <NoData
+                            label={"Курсы не найдены. Вы можете присоедениться по коду курса"}
+                        />
+                    )}
                 </WorkBox>
             </Box>
         </Box>

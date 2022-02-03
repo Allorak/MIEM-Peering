@@ -10,16 +10,15 @@ export const joinCourse = (courseCode: string): AppThunk => async (dispatch, get
         if (!accessToken) {
             dispatch(actions.courseJoinFailed({
                 code: IErrorCode.NO_ACCESS,
-                message: 'Ошибка аутентификации', // TODO
+                message: 'Ошибка аутентификации',
             }))
-            console.log("Join course error: No access or Role")
             return
         }
         const response = await postJoinCourse({ accessToken, courseCode })
         if (!response) {
             dispatch(actions.courseJoinFailed({
                 code: IErrorCode.RESPONSE,
-                message: 'Некорректный ответ сервера', // TODO: i18n
+                message: 'Некорректный ответ сервера',
             }))
             return
         }

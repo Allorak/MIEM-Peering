@@ -41,21 +41,18 @@ export const MyWork: FC = () => {
 
   useEffect(() => {
     if (path && path.taskId) {
-      console.log("Checking submission deadlines")
       dispatch(fetchSubmissionStatus(path.taskId))
     }
   }, [])
 
   useEffect(() => {
     if (path && path.taskId && submissionPayload && submissionPayload !== DeadlineStatus.NOT_STARTED) {
-      console.log("Checking work complition")
       dispatch(fetchWorkSubmissionStatus(path.taskId))
     }
   }, [submissionPayload])
 
   useEffect(() => {
     if (path && path.taskId && submissionPayload && submissionPayload !== DeadlineStatus.NOT_STARTED && submissionWorkPayload === ISubmissionStatus.COMPLETED) {
-      console.log("Getting work")
       dispatch(fetchMyWork(path.taskId))
     }
   }, [submissionPayload, submissionWorkPayload])
@@ -65,7 +62,6 @@ export const MyWork: FC = () => {
     const foundMyWork = myWorkPayload && myWorkPayload.answers.length > 0
 
     if (path && path.taskId && validState && foundMyWork) {
-      console.log("Getting reviews deadlines")
       dispatch(fetchReviewStatus(path.taskId))
     }
   }, [myWorkPayload])
@@ -75,7 +71,6 @@ export const MyWork: FC = () => {
     const foundMyWork = myWorkPayload && myWorkPayload.answers.length > 0
 
     if (path && path.taskId && validState && foundMyWork) {
-      console.log("Getting reviews work")
       dispatch(fetchReviews(path.taskId))
     }
   }, [reviewPayload])
@@ -118,7 +113,6 @@ export const MyWork: FC = () => {
   })
 
   const handleReviewerChange = useCallback((submissionId: string) => {
-    console.log(currentReview)
     const sortArray = myWorkReview?.filter(item => item.reviewId === submissionId)
     if (sortArray && sortArray.length > 0) {
       setCurrentReview(JSON.parse(JSON.stringify(sortArray[0])))

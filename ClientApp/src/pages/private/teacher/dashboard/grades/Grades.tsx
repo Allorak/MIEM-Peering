@@ -1,10 +1,21 @@
-import { FC, useEffect } from "react";
+import { FC, useCallback, useEffect } from "react";
+import { Box, Button, Theme } from "@mui/material";
+import { SxProps } from "@mui/system";
+
+import DownloadIcon from '@mui/icons-material/Download';
+
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
+
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { NoData } from "../../../../../components/noData";
-import { fetchGrades } from "../../../../../store/grades";
+
+import { fetchCsv, fetchExel, fetchGrades } from "../../../../../store/grades";
+
 import { GradesTable } from "./GradesTable";
+import axios from "axios";
+import { saveAs } from 'file-saver'
+
 
 export const Grades: FC = () => {
   const dispatch = useAppDispatch()
@@ -14,11 +25,38 @@ export const Grades: FC = () => {
   const status = useAppSelector(state => state.grades.isLoading)
   const error = useAppSelector(state => state.grades.error)
   const grades = useAppSelector(state => state.grades.payload)
+  const accessToken = useAppSelector(state => state.auth.accessToken)
 
   useEffect(() => {
     if (path && path.taskId)
       dispatch(fetchGrades(path.taskId))
   }, [])
+
+  const getExel = async () => {
+    if (path && path.taskId && accessToken) {
+      fetchExel(path.taskId, accessToken)
+    }
+  }
+
+  const handleDownloadExel = useCallback(() => {
+    if (path && path.taskId && accessToken) {
+      fetchExel(path.taskId, accessToken).then(blob => {
+        if (blob) {
+          saveAs(blob, "MIEM Peering Final Grades")
+        }
+      })
+    }
+  }, [getExel, path, accessToken])
+
+  const handleDownloadCsv = useCallback(() => {
+    if (path && path.taskId && accessToken) {
+      fetchCsv(path.taskId, accessToken).then(blob => {
+        if (blob) {
+          saveAs(blob, "MIEM Peering Final Grades.csv")
+        }
+      })
+    }
+  }, [getExel, path, accessToken])
 
   return (
     <DashboardWorkBox
@@ -26,7 +64,30 @@ export const Grades: FC = () => {
       error={error}
     >
       {grades && grades.length > 0 && (
-        <GradesTable grades={grades} />
+        <>
+          <Box sx={styles.buttonContainer}>
+            <Button
+              variant={'contained'}
+              color={'primary'}
+              startIcon={<DownloadIcon />}
+              sx={styles.downlaodBt}
+              onClick={handleDownloadExel}
+            >
+              {"Exel"}
+            </Button>
+
+            <Button
+              variant={'contained'}
+              color={'secondary'}
+              startIcon={<DownloadIcon />}
+              sx={styles.downlaodBt}
+              onClick={handleDownloadCsv}
+            >
+              {"CSV"}
+            </Button>
+          </Box>
+          <GradesTable grades={grades} />
+        </>
       )}
 
       {grades && grades.length === 0 && (
@@ -34,4 +95,17 @@ export const Grades: FC = () => {
       )}
     </DashboardWorkBox>
   )
+}
+
+const styles = {
+  downlaodBt: {
+    padding: '10px 30px 10px 10px',
+    lineHeight: '1',
+  } as SxProps<Theme>,
+  buttonContainer: {
+    display: "flex",
+    gap: "10px",
+    margin: "0px 0px 20px 0px",
+    justifyContent: "flex-end"
+  } as SxProps<Theme>,
 }

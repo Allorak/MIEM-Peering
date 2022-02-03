@@ -5,7 +5,7 @@ import { useLocation, matchPath } from 'react-router-dom'
 
 import { paths } from "../../app/constants/paths";
 
-import { EStudieses } from "../icons/EStudieses";
+import { MiemPeering } from "../icons/EStudieses";
 import { Logo as Logotype } from "../icons/Logo";
 
 
@@ -23,7 +23,7 @@ export const Logo: FC = () => {
                 <Logotype />
             </Box>
             <Box sx={path ? styles.logoTextContainerHidden : styles.logoTextContainer}>
-                <EStudieses />
+                <MiemPeering />
             </Box>
         </Box>
     )
