@@ -14,8 +14,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.PostgreSql;
 using Hangfire.SQLite;
+using patools.Enums;
 using patools.Models;
 using patools.Services.Authentication;
 using patools.Services.Courses;
@@ -80,7 +82,12 @@ namespace patools
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire-secret-link");
+            /*
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new [] { new MyAuthorizationFilter() }
+            });*/
 
             app.UseEndpoints(endpoints =>
             {
@@ -113,6 +120,17 @@ namespace patools
                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("AppSettings:TokenSecret").Value))
                         };
                     });
+        }
+    }
+    
+    public class MyAuthorizationFilter : IDashboardAuthorizationFilter
+    {
+        public bool Authorize(DashboardContext context)
+        {
+            var httpContext = context.GetHttpContext();
+
+            // Allow all authenticated users to see the Dashboard (potentially dangerous).
+            return httpContext.User.Identity.IsAuthenticated && httpContext.User.IsInRole(UserRoles.Teacher.ToString());
         }
     }
 }
