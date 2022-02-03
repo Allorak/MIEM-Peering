@@ -43,18 +43,23 @@ namespace patools.Services.Courses
             var course = _mapper.Map<Course>(newCourse);
             course.ID = Guid.NewGuid();
 
+            //GetUser - Base
             var teacher = await _context.Users.FirstOrDefaultAsync(u => u.ID == newCourse.TeacherId && u.Role == UserRoles.Teacher);
             if(teacher == null)
                 return new BadRequestDataResponse<GetCourseDtoResponse>("Invalid teacher id");
+            //
             
             course.Teacher = teacher;
+            
+            //GenerateCourseCode
             var courseCodes = await _context.Courses.Select(c => c.CourseCode).ToListAsync();
             do
             {
                 course.CourseCode = RandomString(8);
             } while (courseCodes.Contains(course.CourseCode));
             course.EnableCode = true;
-
+            //
+            
             _context.Courses.Add(course);
             await _context.SaveChangesAsync();
 

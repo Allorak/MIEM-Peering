@@ -31,7 +31,9 @@ namespace patools.Services.Authentication
 
         public async Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email)
         {
+            //GetUser - Base
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            //
             
             if(user == null)
             {
@@ -55,10 +57,12 @@ namespace patools.Services.Authentication
 
         public async Task<Response<GetJwtTokenDtoResponse>> GetJwtByEmail(string email)
         {
+            //GetUser - Base
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if(user == null)
                 return new BadRequestDataResponse<GetJwtTokenDtoResponse>("The user is not registered");
-
+            //
+            
             var response = new SuccessfulResponse<GetJwtTokenDtoResponse>
             (new GetJwtTokenDtoResponse
             {

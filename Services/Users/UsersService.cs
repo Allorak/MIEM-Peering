@@ -24,17 +24,21 @@ namespace patools.Services.Users
 
         public async Task<Response<GetNewUserDtoResponse>> AddGoogleUser(AddUserDTO newUser)
         {
+            //GetUser - Base
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
             if (existingUser != null)
                 return new UserAlreadyRegisteredResponse<GetNewUserDtoResponse>();
-
+            //
+            
             var user = _mapper.Map<User>(newUser);
             user.ID = Guid.NewGuid();
             await _context.Users.AddAsync(user);
 
+            //GetExpert - Base
             var expert = await _context.Experts.FirstOrDefaultAsync(e => e.Email == user.Email);
             if (expert != null)
                 expert.User = user;
+            //
             
             await _context.SaveChangesAsync();
             return new SuccessfulResponse<GetNewUserDtoResponse>(_mapper.Map<GetNewUserDtoResponse>(user));
@@ -51,16 +55,19 @@ namespace patools.Services.Users
 
         public async Task<Response<GetUserRoleDtoResponse>> GetUserRole(GetUserRoleDtoRequest userInfo)
         {
+            //
             var user = await _context.Users.FirstOrDefaultAsync(u => u.ID == userInfo.UserId);
             if (user == null)
                 return new InvalidGuidIdResponse<GetUserRoleDtoResponse>("Invalid user id");
 
+            //
             var task = await _context.Tasks
                 .Include(t => t.Course.Teacher)
                 .FirstOrDefaultAsync(t => t.ID == userInfo.TaskId);
             if (task == null)
                 return new InvalidGuidIdResponse<GetUserRoleDtoResponse>("Invalid task id");
 
+            //
             var expert = await _context.Experts.FirstOrDefaultAsync(e => e.User == user && e.PeeringTask == task);
             if (expert != null)
             {
@@ -83,6 +90,7 @@ namespace patools.Services.Users
                     return new NoAccessResponse<GetUserRoleDtoResponse>("This teacher has no access to this task");
                 case UserRoles.Student:
                 {
+                    //
                     var courseUser = await _context.TaskUsers
                         .FirstOrDefaultAsync(tu => tu.Student == user && tu.PeeringTask == task);
                     if (courseUser == null)
