@@ -19,7 +19,7 @@ namespace patools.Models
         [MaxLength(150)]
         public string Title { get; set; }
 
-        [MaxLength(500)]
+        [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
         [Required]

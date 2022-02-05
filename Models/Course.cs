@@ -12,7 +12,7 @@ namespace patools.Models
         [MaxLength(150)]
         public string Title { get; set; }
 
-        [MaxLength(3000)]
+        [DataType(DataType.MultilineText)]
         [DisplayFormat(NullDisplayText = "No description set")]
         public string Description { get; set; }
 

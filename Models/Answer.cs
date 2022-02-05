@@ -15,6 +15,8 @@ namespace patools.Models
         public Question Question { get; set; }
 
         public int? Value { get; set; }
+        
+        [DataType(DataType.MultilineText)]
         public string Response { get; set; }
     }
 }
