@@ -73,7 +73,7 @@ export const Grades: FC = () => {
               sx={styles.downlaodBt}
               onClick={handleDownloadExel}
             >
-              {"Exel"}
+              {"Excel"}
             </Button>
 
             <Button
