@@ -88,7 +88,7 @@ export const Login: FC = () => {
                     )}
                     onSuccess={onGoogleLoginSuccess}
                     onFailure={onGoogleLoginFail}
-                    cookiePolicy={'single_host_origin'}
+                    cookiePolicy={'none'}
                 />
                 <Box sx={styles.orSeperate}>
                     <span />
