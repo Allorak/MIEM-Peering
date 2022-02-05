@@ -54,6 +54,7 @@ export const AnswerBox: FC<IProps> = ({
           {description && (
             <Typography
               variant={"h6"}
+              sx={{ whiteSpace: 'pre-line' }}
             >
               {description}
             </Typography>
