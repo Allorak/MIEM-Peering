@@ -639,8 +639,7 @@ namespace patools.Services.PeeringTasks
                         break;
                     case UserRoles.Student:
                         resultReview.Reviewer = ReviewerTypes.Peer;
-                        if (task.ReviewType != ReviewTypes.Open)
-                            resultReview.Name = $"Аноним #{index++}";
+                        resultReview.Name = task.ReviewType != ReviewTypes.Open ? $"Аноним #{index++}" : peer.Fullname;
                         break;
                     case UserRoles.Teacher:
                         resultReview.Reviewer = ReviewerTypes.Teacher;
