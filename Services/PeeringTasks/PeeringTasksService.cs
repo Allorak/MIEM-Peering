@@ -621,7 +621,7 @@ namespace patools.Services.PeeringTasks
         private async Task<List<GetPeeringTaskCoordinatesDtoResponse>> GetReviewsCoordinates(IEnumerable<Review> reviews)
         {
             var coordinates = new List<GetPeeringTaskCoordinatesDtoResponse>();
-            var index = 0;
+            var index = 1;
             foreach (var review in reviews)
             {
                 var peer = review.SubmissionPeerAssignment.Peer;
