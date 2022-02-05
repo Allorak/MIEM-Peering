@@ -84,12 +84,12 @@ namespace patools
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseHangfireDashboard("/hangfire-secret-link");
-            /*
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            //app.UseHangfireDashboard("/hangfire-secret-link");
+            
+            app.UseHangfireDashboard("/hangfire-secret-link", new DashboardOptions
             {
                 Authorization = new [] { new MyAuthorizationFilter() }
-            });*/
+            });
 
             app.UseEndpoints(endpoints =>
             {
@@ -132,7 +132,8 @@ namespace patools
             var httpContext = context.GetHttpContext();
 
             // Allow all authenticated users to see the Dashboard (potentially dangerous).
-            return httpContext.User.Identity.IsAuthenticated && httpContext.User.IsInRole(UserRoles.Teacher.ToString());
+            //return httpContext.User.Identity.IsAuthenticated && httpContext.User.IsInRole(UserRoles.Teacher.ToString());
+            return true;
         }
     }
 }
