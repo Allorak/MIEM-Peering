@@ -56,6 +56,7 @@ export const Login: FC = () => {
     }
 
     const onGoogleLoginFail = (e: any) => {
+        alert('Google Auth Error')
         console.log('Google login fail:', e.error)
     }
 
@@ -73,6 +74,10 @@ export const Login: FC = () => {
                 </Box>
                 <GoogleLogin
                     clientId={clientID}
+                    // buttonText="Login"
+                    onSuccess={onGoogleLoginSuccess}
+                    onFailure={onGoogleLoginFail}
+                    cookiePolicy={'single_host_origin'}
                     render={renderProps => (
                         <Button
                             onClick={renderProps.onClick}
@@ -86,9 +91,6 @@ export const Login: FC = () => {
                             {"Войти через Google"}
                         </Button>
                     )}
-                    onSuccess={onGoogleLoginSuccess}
-                    onFailure={onGoogleLoginFail}
-                    cookiePolicy={'none'}
                 />
                 <Box sx={styles.orSeperate}>
                     <span />
