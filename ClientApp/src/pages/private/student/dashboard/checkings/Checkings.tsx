@@ -126,29 +126,35 @@ export const Checkings: FC = () => {
     setCurrentReviewId(submissionId)
   }, [])
 
-  const handleOnFormEdit = useCallback((value: string | number | undefined, questionId: string) => {
+  const handleOnFormEdit = useCallback((value: string | number | File | undefined, questionId: string) => {
     setResponses(prev => {
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
-          rubrics: JSON.parse(JSON.stringify(prev.rubrics.map(item => {
+          rubrics: prev.rubrics.map(item => {
             if (item.questionId !== questionId) return item
 
             switch (item.type) {
               case IQuestionTypes.SELECT_RATE:
               case IQuestionTypes.MULTIPLE:
-                return {
+                return JSON.parse(JSON.stringify({
                   ...item,
-                  ...(typeof value !== 'string' && { value: value })
-                }
+                  ...(typeof value !== 'string' && typeof value !== 'object' && { value: value })
+                }))
 
               case IQuestionTypes.SHORT_TEXT:
               case IQuestionTypes.TEXT:
+                return JSON.parse(JSON.stringify({
+                  ...item,
+                  ...(typeof value !== 'number' && typeof value !== 'object' && { response: value?.trim() })
+                }))
+
+              case IQuestionTypes.FILE:
                 return {
                   ...item,
-                  ...(typeof value !== 'number' && { response: value?.trim() })
+                  ...(typeof value !== "number" && typeof value !== "string" && { file: value })
                 }
             }
-          })))
+          })
         }
       }
     })
