@@ -3,6 +3,7 @@ import { Box, Button, Theme } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import DownloadIcon from '@mui/icons-material/Download';
+import { saveAs } from 'file-saver';
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
@@ -13,8 +14,6 @@ import { NoData } from "../../../../../components/noData";
 import { fetchCsv, fetchExel, fetchGrades } from "../../../../../store/grades";
 
 import { GradesTable } from "./GradesTable";
-import axios from "axios";
-import { saveAs } from 'file-saver'
 
 
 export const Grades: FC = () => {

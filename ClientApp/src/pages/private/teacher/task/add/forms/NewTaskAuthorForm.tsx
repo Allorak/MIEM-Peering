@@ -11,6 +11,8 @@ import { MultipleVisible } from "../../../../../../components/rubrics/multiple";
 import { TextVisible } from "../../../../../../components/rubrics/text";
 import { QuestionBox } from "../../../../../../components/rubrics/questionBox";
 import { ShortTextVisible } from "../../../../../../components/rubrics/shortText";
+import { RatingScaleVisible } from "../../../../../../components/rubrics/ratingScale";
+import { FileUploadPreview } from "../../../../../../components/rubrics/fileUpload/FileUploadPreview";
 
 import { FormReValidateMode, FormValidateMode } from "../../../../../../const/common";
 import { palette } from "../../../../../../theme/colors";
@@ -25,9 +27,9 @@ import {
   IQuestionTypes,
   INewSelectRatingQuestion,
   INewShortTextQuestion,
-  INewTextQuestion
+  INewTextQuestion,
+  INewUploadFileQuestion
 } from "../../../../../../store/types";
-import { RatingScaleVisible } from "../../../../../../components/rubrics/ratingScale";
 
 
 interface IProps {
@@ -43,7 +45,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
 }) => {
 
   const [questions, setQuestions] = useState<INewQuestionRubrics>([])
-  const [currentQuestion, setCurrentQuestion] = useState<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion>()
+  const [currentQuestion, setCurrentQuestion] = useState<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion>()
   const [popupStatus, setPopupStatus] = useState(false)
 
   useEffect(() => {
@@ -52,6 +54,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
         switch (rubric.type) {
           case IQuestionTypes.TEXT:
           case IQuestionTypes.SHORT_TEXT:
+          case IQuestionTypes.FILE:
             return {
               order: rubric.order,
               title: rubric.title,
@@ -84,7 +87,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
     })
   }, [rubrics])
 
-  const onUpdate = useCallback((request: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion) => {
+  const onUpdate = useCallback((request: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion) => {
     if (currentQuestion) {
       setQuestions(prev => {
         return prev.map(question => {
@@ -178,6 +181,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
         switch (rubric.type) {
           case IQuestionTypes.TEXT:
           case IQuestionTypes.SHORT_TEXT:
+          case IQuestionTypes.FILE:
             return {
               order: rubric.order,
               title: rubric.title,
@@ -244,6 +248,10 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               {question.type === IQuestionTypes.SELECT_RATE && (
                 <RatingScaleVisible />
               )}
+
+              {question.type === IQuestionTypes.FILE && (
+                <FileUploadPreview />
+              )}
             </QuestionBox>
           </AnswerBox>
         )
@@ -279,10 +287,10 @@ export const NewTaskAuthorForm: FC<IProps> = ({
 }
 
 interface IQuestionItem {
-  question?: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion
+  question?: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion
   popupStatus: boolean,
   closePopup(value: SetStateAction<boolean>): void,
-  onSubmit: (rubric: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion) => void,
+  onSubmit: (rubric: INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion | INewUploadFileQuestion) => void,
   isPeerForm?: boolean
 }
 
@@ -296,7 +304,7 @@ const UpdateQuestion: FC<IQuestionItem> = ({
 
   const [isSelectRate, setIsSelectRate] = useState<boolean>()
 
-  const { control, formState, reset, setValue, getValues } = useForm<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion>({
+  const { control, formState, reset, setValue, getValues } = useForm<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion>({
     mode: FormValidateMode,
     reValidateMode: FormReValidateMode,
     defaultValues: {
@@ -425,6 +433,16 @@ const UpdateQuestion: FC<IQuestionItem> = ({
       })
     }
 
+    if (request.type === IQuestionTypes.FILE) {
+      onSubmit({
+        order: request.order,
+        description: request.description && request.description.trim() !== "" ? request.description.trim() : undefined,
+        required: request.required,
+        type: IQuestionTypes.FILE,
+        title: request.title
+      })
+    }
+
     if (request.type === IQuestionTypes.SELECT_RATE) {
       if (request.minValue !== undefined && request.maxValue !== undefined && request.maxValue - request.minValue > 0)
         onSubmit({
@@ -525,6 +543,18 @@ const UpdateQuestion: FC<IQuestionItem> = ({
               sx={{ color: 'inherit' }}
             >
               {"Оценка"}
+            </Typography>
+          </Box>
+
+          <Box
+            sx={typeProps.value === IQuestionTypes.FILE ? { ...styles.rubricTypeBt, ...styles.rubricTypeActiveBt } : styles.rubricTypeBt}
+            onClick={() => changeType(IQuestionTypes.FILE)}
+          >
+            <Typography
+              variant={'h6'}
+              sx={{ color: 'inherit' }}
+            >
+              {"Загрузка файла"}
             </Typography>
           </Box>
         </Box>

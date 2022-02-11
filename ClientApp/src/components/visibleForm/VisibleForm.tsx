@@ -8,6 +8,7 @@ import { QuestionBox } from "../rubrics/questionBox";
 import { RatingScaleVisible } from "../rubrics/ratingScale";
 import { ShortTextVisible } from "../rubrics/shortText";
 import { TextVisible } from "../rubrics/text";
+import { FileUploadVisible } from "../rubrics/fileUpload/FileUploadVisible";
 
 import { IQuestionTypes, IStudentWork } from "../../store/types";
 
@@ -65,6 +66,12 @@ export const VisibleForm: FC<IProps> = ({
                 <RatingScaleVisible
                   response={item.value}
                   isResponse
+                />
+              )}
+
+              {item.type === IQuestionTypes.FILE && (
+                <FileUploadVisible
+                  fileId={item.fileId}
                 />
               )}
             </QuestionBox>

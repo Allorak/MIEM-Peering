@@ -218,7 +218,7 @@ export enum PeerSteps {
 
 export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'reviewType' | 'experts' | 'submissionWeight' | 'reviewWeight' | 'goodCoefficientBonus' | 'badCoefficientPenalty'> { }
 
-export type INewQuestionRubrics = Array<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion>
+export type INewQuestionRubrics = Array<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion>
 
 export type INewQuestionItem = {
   order: number
@@ -229,6 +229,10 @@ export type INewQuestionItem = {
 
 export interface INewTextQuestion extends INewQuestionItem {
   type: IQuestionTypes.TEXT,
+}
+
+export interface INewUploadFileQuestion extends INewQuestionItem {
+  type: IQuestionTypes.FILE,
 }
 
 export interface INewShortTextQuestion extends INewQuestionItem {
@@ -267,13 +271,19 @@ export interface ISelectRatingQuestion extends IQuestionItem, INewSelectRatingQu
   value?: number
 }
 
-export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion>
+export interface IUploadFileQuestion extends IQuestionItem, INewUploadFileQuestion {
+  file?: File,
+  fileId?: string
+}
+
+export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion | IUploadFileQuestion>
 
 export enum IQuestionTypes {
   TEXT = 'Text',
   MULTIPLE = 'Multiple',
   SELECT_RATE = 'Select',
   SHORT_TEXT = 'ShortText',
+  FILE = 'File'
 }
 
 export const defaultResponses = {
@@ -475,6 +485,7 @@ export type IQuestionAnswerItem = {
   questionId: string,
   response?: string | number
   value?: string | number
+  file?: File
 }
 
 export type IQuestionAnswers = Array<IQuestionAnswerItem>

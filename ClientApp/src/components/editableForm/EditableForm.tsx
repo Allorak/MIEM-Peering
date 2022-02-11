@@ -8,6 +8,7 @@ import { QuestionBox } from "../rubrics/questionBox";
 import { RatingScaleEditable } from "../rubrics/ratingScale";
 import { ShortTextEditable } from "../rubrics/shortText";
 import { TextEditable } from "../rubrics/text";
+import { FileUploadEditable } from "../rubrics/fileUpload";
 
 import { IPeerForm, IQuestionTypes, IPeerResponses } from "../../store/types";
 
@@ -16,7 +17,7 @@ import * as globalStyles from "../../const/styles";
 interface IProps {
   form: IPeerForm,
   onSubmit: (formResponses: IPeerResponses) => void
-  onEdit: (value: string | number | undefined, questionId: string) => void
+  onEdit: (value: string | number | File | undefined, questionId: string) => void
 }
 
 
@@ -27,12 +28,17 @@ export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
     for (const item of form.rubrics) {
       const isResponse = item.type === IQuestionTypes.SHORT_TEXT || item.type === IQuestionTypes.TEXT
       const isValue = item.type === IQuestionTypes.MULTIPLE || item.type === IQuestionTypes.SELECT_RATE
+      const isFile = item.type === IQuestionTypes.FILE
 
       if (item.required && isResponse && (typeof item.response === 'undefined' || (typeof item.response === 'string' && !item.response.trim()))) {
         return
       }
 
       if (item.required && isValue && typeof item.value === 'undefined') {
+        return
+      }
+
+      if (item.required && isFile && typeof item.file === 'undefined') {
         return
       }
     }
@@ -51,6 +57,11 @@ export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
             return {
               questionId: response.questionId,
               value: response.value
+            }
+          case IQuestionTypes.FILE:
+            return {
+              questionId: response.questionId,
+              file: response.file
             }
         }
       })
@@ -112,6 +123,15 @@ export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
                 value={item.value}
                 maxValue={item.maxValue}
                 minValue={item.minValue}
+              />
+            )}
+
+            {item.type === IQuestionTypes.FILE && (
+              <FileUploadEditable
+                id={item.questionId}
+                required={item.required}
+                value={item.file}
+                onEdit={onEdit}
               />
             )}
           </QuestionBox>
