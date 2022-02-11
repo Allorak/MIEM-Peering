@@ -115,7 +115,7 @@ const styles = {
   wrapper: {
     display: "grid",
     gridGap: "10px",
-    gridTemplateColumns: "repeat(auto-fill, minmax(495px, 1fr) )",
+    gridTemplateColumns: "repeat(auto-fill, minmax(600px, 1fr) )",
     '@media (max-width: 670px)': {
       gridTemplateColumns: "repeat(auto-fill, minmax(100%, 1fr) )"
     }
@@ -144,7 +144,7 @@ const styles = {
   cardsWrapper: {
     display: "grid",
     gridGap: "10px",
-    gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr) )",
+    gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr) )",
     '@media (max-width: 1324px)': {
       gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr) )"
     },

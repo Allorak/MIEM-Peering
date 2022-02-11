@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { NavLink as RouterLink } from 'react-router-dom'
 import { Box, SxProps, Theme } from "@mui/system";
-import { Link, Typography } from "@mui/material";
+import { Link, Typography, useMediaQuery } from "@mui/material";
 
 import { Overview } from "../icons/Overview";
 import { Works } from "../icons/Works";
@@ -18,12 +18,14 @@ import { palette } from "../../theme/colors";
 
 interface IProps {
   items: IMenu[],
-  activeMenu?: IMenuTitles
+  activeMenu?: IMenuTitles,
+  status: boolean
 }
 
 export const DashboardMenu: FC<IProps> = ({
   items,
-  activeMenu
+  activeMenu,
+  status
 }) => {
   return (
     <Box sx={styles.container}>
@@ -31,17 +33,20 @@ export const DashboardMenu: FC<IProps> = ({
         <MenuItem
           key={item.title}
           item={item}
+          status={status}
           isActive={activeMenu ? activeMenu === item.title : false}
         />
       ))}
     </Box>
   )
 }
-
-const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
+  
+const MenuItem: FC<{ item: IMenu, isActive: boolean, status: boolean }> = ({
   item,
-  isActive
+  isActive,
+  status
 }) => {
+  const matches = useMediaQuery('(min-width:768px) and (max-width:2047px)')
 
   const MenuIcon: FC<{ objectType: IMenuTitles }> = ({ objectType }) => {
     switch (objectType) {
@@ -78,7 +83,7 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
       <Typography
         variant={"h6"}
         color={"inherit"}
-        sx={styles.textRow}
+        sx={status && matches ? styles.textRow : !matches ? styles.textRow : styles.hidden }
       >
         {item.title}
       </Typography>
@@ -91,6 +96,9 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '2px'
+  } as SxProps<Theme>,
+  hidden: {
+    display: 'none'
   } as SxProps<Theme>,
   activeMenu: {
     backgroundColor: palette.active.primary,
@@ -113,9 +121,9 @@ const styles = {
     borderRadius: '4px',
     textDecoration: 'none',
     '@media (min-width: 768px)': {
-      justifyContent: 'center',
+      pl: "27px"
     },
-    '@media (min-width: 1280px)': {
+    '@media (min-width: 2048px)': {
       justifyContent: 'flex-start',
       width: 'auto',
       padding: "0px 10px 0px 30px",
@@ -136,10 +144,8 @@ const styles = {
     display: 'block',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    '@media (min-width: 768px)': {
-      display: 'none',
-    },
-    '@media (min-width: 1280px)': {
+    whiteSpace: 'nowrap',
+    '@media (min-width: 2048px)': {
       display: 'block',
     },
   } as SxProps<Theme>,

@@ -1,13 +1,14 @@
 import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { Theme, Box, Typography, useMediaQuery } from "@mui/material";
-import { SxProps } from "@mui/system";
+import { SxProps} from "@mui/system";
 
 import { usePrivatePathTDashboard } from "../../../../app/hooks/usePrivatePathTDashboard";
 import { useAppSelector } from '../../../../app/hooks';
 
 import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
 import { Burger } from '../../../../components/icons/Burger';
+import { ArrowToggler } from '../../../../components/arrowToggler';
 import { IMenu, IMenuTitles, IRole, PeerSteps } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
 
@@ -30,8 +31,10 @@ export const Dashboard: FC = () => {
   const pathToMainDashboard = generatePath(paths.teacher.dashboard.overview, { taskId: path?.taskId })
   const dashboardProps = useAppSelector(state => state.dashboard.payload)
 
+  const [openMenu, setOpenMenu] = useState<boolean>(false)
   const [activeMenu, setActiveMenu] = useState(false)
   const matches = useMediaQuery('(max-width:767px)')
+  const matchesLg = useMediaQuery('(max-width:2047px)')
 
   if (!path) {
     return (
@@ -55,6 +58,10 @@ export const Dashboard: FC = () => {
     />
   }
 
+  const toggleOpenMenu = useCallback((openMenu: boolean) => {
+    setOpenMenu(!openMenu)
+}, [])
+
   const isFirstStep = dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.taskType === PeerSteps.FIRST_STEP
 
   const menuItemsP = isFirstStep ? menuItems.map(item => ({ title: item.title, path: generatePath(item.path, { taskId: path.taskId }) })) as IMenu[] :
@@ -68,12 +75,19 @@ export const Dashboard: FC = () => {
         <Burger svgColor={activeMenu ? "white" : "#CBD5DE"} />
       </Box>
       <Box sx={styles.gridWrapper}>
-        <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : styles.leftContainer}>
-          <Typography variant={"h5"} marginBottom={"30px"}>
+        <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : openMenu && matchesLg && !matches ? styles.leftContainerOpen : styles.leftContainer}>
+          <Typography variant={"h5"} marginBottom={"12px"}>
             {"Меню"}
           </Typography>
+          <Box sx={styles.arrowTogglerBox}>
+            <ArrowToggler 
+              status={openMenu} 
+              toggleOpenMenu={toggleOpenMenu}
+            />
+          </Box>
           <DashboardMenu
             activeMenu={path.activeMenuId}
+            status={openMenu} 
             items={menuItemsP}
           />
         </Box>
@@ -104,7 +118,6 @@ export const Dashboard: FC = () => {
             </Box>
           </Box>
         </Box>
-
       </Box>
     </Box>
   )
@@ -146,13 +159,14 @@ const styles = {
     flexDirection: 'column',
     height: '100%',
     '@media (min-width: 768px)': {
+      position: 'relative',
       display: 'grid',
       gridTemplateColumns: '70px auto',
       gridTemplateAreas: ' "leftContainer rightContainer"',
       margin: "30px auto 15px",
       padding: '0 15px 0 8px',
     },
-    '@media (min-width: 1280px)': {
+    '@media (min-width: 2048px)': {
       gridTemplateColumns: '20% 80%',
     },
   } as SxProps<Theme>,
@@ -167,26 +181,41 @@ const styles = {
     gridArea: 'leftContainer',
     padding: '25px',
     transform: 'TranslateX(-100%)',
-    transition: 'TranslateX 3s',
+    transition: 'all 0.5s',
     '@media (min-width: 768px)': {
       position: 'static',
       display: 'flex',
       flexDirection: 'column',
       gridArea: 'leftContainer',
-      width: '100%',
+      width: '80px',
       height: 'auto',
       minHeight: '100vh',
       overflowY: 'auto',
       transform: 'TranslateX(0)',
-      transition: 'all 0.5s',
+      transition: 'width 0.5s',
       padding: '0 8px 0 0',
       boxShadow: '15px 0px 10px -15px rgba(34, 60, 80, 0.1)',
-      backgroundColor: 'transparent'
+      backgroundColor: '#F5F7FD'
     },
+    '@media (min-width: 2048px)': {
+      width: '100%',
+      maxWidth: '355px'
+    }
+  } as SxProps<Theme>,
+  leftContainerOpen: {
+    position: 'absolute',
+    zIndex: '100',
+    width: '250px',
+    backgroundColor: '#F5F7FD',
+    height: 'auto',
+    minHeight: '100vh',
+    transition: 'width 0.5s',
+    overflowY: 'auto',
+    padding: '0 8px 0',
+    boxShadow: '15px 0px 10px -15px rgba(34, 60, 80, 0.1)',
   } as SxProps<Theme>,
   menuActive: {
     transform: 'TranslateX(0)',
-    transition: 'all 0.5s'
   } as SxProps<Theme>,
   rightContainer: {
     display: 'flex',
@@ -194,10 +223,14 @@ const styles = {
     gridArea: 'rightContainer',
     overflowY: 'auto',
     maxWidth: "100%",
+    minHeight: "100vh",
     padding: '25px 25px 0',
     '@media (min-width: 768px)': {
-      margin: "0px 0px 0px 25px",
+      margin: "0px 0px 0px 35px",
       padding: '0'
+    },
+    '@media (min-width: 2048px)': {
+      margin: "0px 0px 0px 25px",
     },
   } as SxProps<Theme>,
   rightContainerWrapper: {
@@ -212,6 +245,11 @@ const styles = {
     overflowY: "auto",
     touchAction: 'none',
     ...globalStyles.scrollStyles
+  } as SxProps<Theme>,
+  arrowTogglerBox: {
+    display: "flex",
+    justifyContent: "flex-start",
+    mb: "24px"
   } as SxProps<Theme>,
 }
 
