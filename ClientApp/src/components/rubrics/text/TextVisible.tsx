@@ -1,6 +1,8 @@
 import { FC } from "react";
-import { TextField, Tooltip } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
+
+import { scrollStyles } from "../../../const/styles";
 
 
 interface IProps {
@@ -14,26 +16,32 @@ export const TextVisible: FC<IProps> = ({ response, isResponse }) => {
       title={isResponse ? (response ? "Ответ записан" : "Нет ответа") : "Это всего лишь предварительный просмотр"}
       placement={"top"}
     >
-      <TextField
-        sx={styles.textField}
-        name={'name'}
-        variant='outlined'
-        InputProps={{
-          readOnly: true,
-        }}
-        label={"Развернутый ответ"}
-        multiline
-        value={response ?? ""}
-        {...(isResponse === undefined && { rows: 3 })}
-      />
+      <Box sx={styles.visibleEditorWrapper}>
+        <div
+          {...(response && { dangerouslySetInnerHTML: { __html: response } })}
+        />
+        {!response && (
+          <Typography
+            variant={'body1'}
+            color={'warning.main'}
+            fontWeight={'700'}
+          >
+            {"Нет ответа"}
+          </Typography>
+        )}
+      </Box>
     </Tooltip>
   )
 }
 
 const styles = {
-  textField: {
-    "& * :hover": {
-      cursor: 'not-allowed'
-    }
+  visibleEditorWrapper: {
+    border: '1px solid',
+    borderColor: 'divider',
+    borderRadius: '5px',
+    padding: '5px',
+    maxHeight: '60vh',
+    overflow: 'auto',
+    ...scrollStyles
   } as SxProps<Theme>
 }
