@@ -8,7 +8,7 @@ import { InputLabel } from "../../../../../../components/inputLabel";
 import { Popup } from "../../../../../../components/popup";
 import { AnswerBox } from "../../../../../../components/rubrics/answerBox";
 import { MultipleVisible } from "../../../../../../components/rubrics/multiple";
-import { TextVisible } from "../../../../../../components/rubrics/text";
+import { TextPreview } from "../../../../../../components/rubrics/text";
 import { QuestionBox } from "../../../../../../components/rubrics/questionBox";
 import { ShortTextVisible } from "../../../../../../components/rubrics/shortText";
 import { RatingScaleVisible } from "../../../../../../components/rubrics/ratingScale";
@@ -242,7 +242,7 @@ export const NewTaskAuthorForm: FC<IProps> = ({
               )}
 
               {question.type === IQuestionTypes.TEXT && (
-                <TextVisible />
+                <TextPreview />
               )}
 
               {question.type === IQuestionTypes.SELECT_RATE && (
