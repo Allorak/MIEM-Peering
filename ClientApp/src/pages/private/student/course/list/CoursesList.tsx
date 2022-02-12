@@ -2,15 +2,17 @@ import { Button, Typography } from "@mui/material"
 import { Box, SxProps, Theme } from "@mui/system"
 import { FC, useEffect, useState } from "react"
 import { generatePath } from "react-router"
+import { Navigate, useNavigate } from "react-router-dom"
 import { paths } from "../../../../../app/constants/paths"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
 import { CourseCard } from "../../../../../components/courseCard"
 import List from "../../../../../components/list/List"
 import { WorkBox } from "../../../../../components/workBox"
 import { fetchCourses } from "../../../../../store/courses/thunks/courses"
+import { actions as CourseActions } from '../../../../../store/courses';
 import { JoinCourse } from "../join"
 import * as constStyles from '../../../../../const/styles'
-import { useNavigate } from "react-router-dom"
+
 import { NoData } from "../../../../../components/noData"
 
 export const STCourseList: FC = () => {
@@ -21,6 +23,7 @@ export const STCourseList: FC = () => {
     const error = useAppSelector(state => state.courses.error)
     const courses = useAppSelector(state => state.courses.payload)
     const [newJoinCourse, setNewJoinCourse] = useState(false)
+    const [error404, setError404] = useState<Boolean>(false)
 
     useEffect(() => {
         dispatch(fetchCourses())
@@ -36,6 +39,22 @@ export const STCourseList: FC = () => {
         history(generatePath(
             paths.student.courses.course, { courseId: id }
         ))
+    }
+
+    useEffect(() => {
+        if (error && !error404) {
+            dispatch(CourseActions.fetchStarted())
+            setError404(true)
+        }
+    }, [error404, error])
+
+    if (error404) {
+        return (
+            <Navigate
+                to={paths.notFound}
+                replace
+            />
+        )
     }
 
     return (<>

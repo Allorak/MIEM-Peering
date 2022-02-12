@@ -2,16 +2,18 @@ import { Button, Typography } from "@mui/material"
 import { Box, SxProps, Theme } from "@mui/system"
 import { FC, useCallback, useEffect, useState } from "react"
 import { generatePath } from "react-router"
+import { Navigate, useNavigate } from "react-router-dom"
 import { paths } from "../../../../../app/constants/paths"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
 import { CourseCard } from "../../../../../components/courseCard"
 import List from "../../../../../components/list/List"
 import { WorkBox } from "../../../../../components/workBox"
 import { fetchCourses } from "../../../../../store/courses/thunks/courses"
+import { actions as CourseActions } from '../../../../../store/courses';
+import { ICourses } from "../../../../../store/types"
 import { AddCourse } from "../add"
 import * as constStyles from '../../../../../const/styles'
-import { useNavigate } from "react-router-dom"
-import { ICourses } from "../../../../../store/types"
+
 import { NoData } from "../../../../../components/noData"
 
 export const TCourseList: FC = () => {
@@ -24,6 +26,7 @@ export const TCourseList: FC = () => {
 
     const [popupCourseStatus, setPopupCourseStatus] = useState(false)
     const [currentCourse, setCurrentCourse] = useState<ICourses>()
+    const [error404, setError404] = useState<Boolean>(false)
 
     useEffect(() => {
         dispatch(fetchCourses())
@@ -46,6 +49,22 @@ export const TCourseList: FC = () => {
         setCurrentCourse(course)
         setPopupCourseStatus(prev => !prev)
     }, [])
+
+    useEffect(() => {
+        if (error && !error404) {
+            dispatch(CourseActions.fetchStarted())
+            setError404(true)
+        }
+    }, [error404, error])
+
+    if (error404) {
+        return (
+            <Navigate
+                to={paths.notFound}
+                replace
+            />
+        )
+    }
 
     return (<>
         <Box sx={constStyles.container}>

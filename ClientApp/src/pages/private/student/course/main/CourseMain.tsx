@@ -1,15 +1,16 @@
 import { Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import List from "../../../../../components/list/List";
 import { TaskCard } from "../../../../../components/taskCard";
 import { WorkBox } from "../../../../../components/workBox";
-import { useNavigate, generatePath } from "react-router-dom"
+import { useNavigate, generatePath, Navigate } from "react-router-dom"
 import { paths } from "../../../../../app/constants/paths";
 import { usePrivatePathSt } from "../../../../../app/hooks/usePrivatePathSt";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { actions as TasksActions } from '../../../../../store/tasks';
 import { fetchTasks } from "../../../../../store/tasks/thunks/fetchTasks";
-import * as constStyles from '../../../../../const/styles'
+import * as constStyles from '../../../../../const/styles';
 import { NoData } from "../../../../../components/noData";
 
 export const CourseMain: FC = () => {
@@ -19,6 +20,8 @@ export const CourseMain: FC = () => {
     const isLoading = useAppSelector(state => state.tasks.isLoading)
     const error = useAppSelector(state => state.tasks.error)
     const tasks = useAppSelector(state => state.tasks.payload?.tasks)
+
+    const [error404, setError404] = useState<Boolean>(false)
 
     useEffect(() => {
         if (path?.courseId)
@@ -30,6 +33,22 @@ export const CourseMain: FC = () => {
             const taskPath = generatePath(paths.student.dashboard.overview, { taskId: id })
             history(taskPath)
         }
+    }
+
+    useEffect(() => {
+        if (error && !error404) {
+            dispatch(TasksActions.createReset())
+            setError404(true)
+        }
+    }, [error404, error])
+
+    if (error404) {
+        return (
+            <Navigate
+                to={paths.notFound}
+                replace
+            />
+        )
     }
 
     return (

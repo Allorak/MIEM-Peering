@@ -6,6 +6,7 @@ import { SxProps } from "@mui/system";
 import { usePrivatePathTDashboard } from "../../../../app/hooks/usePrivatePathTDashboard";
 import { useAppSelector } from '../../../../app/hooks';
 
+import { Router404 } from '../../../../components/router404';
 import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
 import { Burger } from '../../../../components/icons/Burger';
 import { IMenu, IMenuTitles, IRole, PeerSteps } from '../../../../store/types';
@@ -96,10 +97,10 @@ export const Dashboard: FC = () => {
                 <Route path={paths.teacher.dashboard.works} element={<Works />} />
                 <Route path={paths.teacher.dashboard.checkings} element={<Checkings />} />
                 <Route path={paths.teacher.dashboard.export} element={<ExportGrades />} />
-
                 {dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.taskType === PeerSteps.FIRST_STEP && (
                   <Route path={paths.teacher.dashboard.experts} element={<Experts />} />
-                )}
+                )}  
+                <Route path={'*'} element={<Router404 />} />
               </Routes>
             </Box>
           </Box>

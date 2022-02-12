@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useLocation, RouteProps, matchPath, generatePath } from 'react-router-dom'
 import { Box, SxProps, Theme } from '@mui/system'
 
@@ -29,9 +29,11 @@ import { CircularProgress, Typography } from '@mui/material'
 import Cookies from 'universal-cookie';
 
 import { fetchCourses } from '../../store/courses/thunks/courses'
+import { Error404 } from '../error404'
+import { Router404 } from '../../components/router404'
 
 export function Private() {
-  const cookies = new Cookies();  
+  const cookies = new Cookies();
   const location = useLocation()
   const dispatch = useAppDispatch()
 
@@ -42,13 +44,17 @@ export function Private() {
   const accessToken = useAppSelector(state => state.auth.accessToken)
   const registrationToken = useAppSelector(state => state.registration.googleToken)
   const userProfilePayload = useAppSelector(state => state.userProfile.payload)
+  const userProfileError = useAppSelector(state => state.userProfile.error)
   const dashboardProps = useAppSelector(state => state.dashboard.payload)
+  const dashboardError = useAppSelector(state => state.dashboard.error)
 
   const path = matchPath('/:role/task/:taskId/*', location.pathname)
   const role = path?.params?.role
   const taskId = path?.params?.taskId
 
-  if (!cookies.get('JWT')) { 
+  const [errorFlag, setErrorFlag] = useState<Boolean>(false)
+
+  if (!cookies.get('JWT')) {
     cookies.set('JWT', accessToken)
   }
 
@@ -74,6 +80,24 @@ export function Private() {
       dispatch(fetchDashboard(taskId))
     }
   }, [taskId, accessToken])
+
+  console.log(userProfileError)
+
+  useEffect(() => {
+    if (dashboardError && !errorFlag) {
+      dispatch(DashboardActions.resetState())
+      setErrorFlag(true)
+    }
+  }, [errorFlag, dashboardError])
+
+  if (errorFlag) {
+    return (
+      <Navigate
+        to={paths.notFound}
+        replace
+      />
+      )
+  }
 
   if ((!isAuthorized || !accessToken) && !registrationToken && cookies.get('JWT') == 'undefined') {
     return (
@@ -186,6 +210,7 @@ export function Private() {
             <Route path={paths.teacher.courses.course} element={<TeacherCourseMain />} />
             <Route path={paths.teacher.task.add} element={<TaskAdd />} />
             <Route path={paths.root} element={<TeacherCourseList />} />
+            <Route path={'*'} element={<Router404 />} />
           </Routes>
         </Box>
       </Box>
@@ -202,9 +227,9 @@ export function Private() {
             <Route path={paths.student.main} element={<StudentCourseList />} />
             <Route path={paths.student.courses.course} element={<StudentCourseMain />} />
             <Route path={paths.root} element={<StudentCourseList />} />
-            <Route path={"*"} element={<StudentDashboard />} />
+            <Route path={"*"} element={<Router404 />} />
           </Routes>
-        </Box>  
+        </Box>
       </Box>
     )
   }

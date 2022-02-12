@@ -15,6 +15,7 @@ import { MyWork } from './myWork';
 
 import * as globalStyles from "../../../../const/styles"
 
+import { Router404 } from '../../../../components/router404';
 import { Burger } from '../../../../components/icons/Burger';
 import { Checkings } from './checkings';
 
@@ -89,6 +90,7 @@ export const Dashboard: FC = () => {
                 <Route path={paths.student.dashboard.authorform} element={<Authorform />} />
                 <Route path={paths.student.dashboard.work} element={<MyWork />} />
                 <Route path={paths.student.dashboard.checkings} element={<Checkings />} />
+                <Route path={'*'} element={<Router404 />} />
                 {/* // <Route path={paths.student.dashboard.menu2} element={<Overview />} />
                 // <Route path={paths.student.dashboard.menu1} element={<Overview />} /> */}
               </Routes>
