@@ -54,7 +54,7 @@ export function Private() {
 
   const [errorFlag, setErrorFlag] = useState<Boolean>(false)
 
-  if (!cookies.get('JWT')) {
+  if (!cookies.get('JWT') && accessToken) {
     cookies.set('JWT', accessToken)
   }
 
@@ -99,7 +99,7 @@ export function Private() {
       )
   }
 
-  if ((!isAuthorized || !accessToken) && !registrationToken && cookies.get('JWT') == 'undefined') {
+  if ((!isAuthorized || !accessToken) && !registrationToken && !cookies.get('JWT')) {
     return (
       <Navigate
         to={paths.login}
@@ -235,12 +235,6 @@ export function Private() {
   }
 
   return null
-}
-
-function PrivateRoute(props: RouteProps): React.ReactElement {
-  return (
-    <Route {...props} />
-  )
 }
 
 const styles = {
