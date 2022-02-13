@@ -60,7 +60,7 @@ export function Private() {
 
   useEffect(() => {
     const accessTokenFromCookies = cookies.get('JWT')
-    if (!accessToken && accessTokenFromCookies !== 'undefined' && !userProfilePayload) {
+    if (!accessToken && accessTokenFromCookies && !userProfilePayload) {
       dispatch(authActions.authSuccess(accessTokenFromCookies))
       if (pathT?.courseId || pathSt?.courseId) {
         dispatch(fetchCourses())
