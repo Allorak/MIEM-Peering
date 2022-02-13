@@ -1,19 +1,22 @@
-import { Button, Typography } from "@mui/material"
-import { Box, SxProps, Theme } from "@mui/system"
 import { FC, useEffect, useState } from "react"
 import { generatePath } from "react-router"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { Button, Typography } from "@mui/material"
+import { Box, SxProps, Theme } from "@mui/system"
+
 import { paths } from "../../../../../app/constants/paths"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
+
 import { CourseCard } from "../../../../../components/courseCard"
 import List from "../../../../../components/list/List"
 import { WorkBox } from "../../../../../components/workBox"
+import { NoData } from "../../../../../components/noData"
+
 import { fetchCourses } from "../../../../../store/courses/thunks/courses"
 import { actions as CourseActions } from '../../../../../store/courses';
 import { JoinCourse } from "../join"
-import * as constStyles from '../../../../../const/styles'
 
-import { NoData } from "../../../../../components/noData"
+import * as constStyles from '../../../../../const/styles'
 
 export const STCourseList: FC = () => {
     const dispatch = useAppDispatch()
@@ -23,7 +26,6 @@ export const STCourseList: FC = () => {
     const error = useAppSelector(state => state.courses.error)
     const courses = useAppSelector(state => state.courses.payload)
     const [newJoinCourse, setNewJoinCourse] = useState(false)
-    const [error404, setError404] = useState<Boolean>(false)
 
     useEffect(() => {
         dispatch(fetchCourses())
@@ -42,20 +44,11 @@ export const STCourseList: FC = () => {
     }
 
     useEffect(() => {
-        if (error && !error404) {
+        if (error) {
             dispatch(CourseActions.fetchStarted())
-            setError404(true)
+            history(paths.notFound)
         }
-    }, [error404, error])
-
-    if (error404) {
-        return (
-            <Navigate
-                to={paths.notFound}
-                replace
-            />
-        )
-    }
+    }, [error])
 
     return (<>
         <Box sx={constStyles.container}>

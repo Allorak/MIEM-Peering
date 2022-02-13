@@ -1,9 +1,11 @@
 
-import { useEffect, useState } from 'react'
-import { Routes, Route, Navigate, useLocation, RouteProps, matchPath, generatePath } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Routes, Route, Navigate, useLocation, matchPath, generatePath, useNavigate } from 'react-router-dom'
 import { Box, SxProps, Theme } from '@mui/system'
+import { CircularProgress, Typography } from '@mui/material'
 
 import { PrivateHeader } from '../../components/header'
+import { Router404 } from '../../components/router404'
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
@@ -24,17 +26,14 @@ import { Dashboard as ExpertDashboard } from './expert/dashboard/Dashboard'
 import { STCourseList as StudentCourseList } from './student/course/list'
 import { fetchDashboard, actions as DashboardActions } from '../../store/dashboard'
 import { actions as authActions } from '../../store/auth'
-import { CircularProgress, Typography } from '@mui/material'
+import { fetchCourses } from '../../store/courses/thunks/courses'
 
 import Cookies from 'universal-cookie';
-
-import { fetchCourses } from '../../store/courses/thunks/courses'
-import { Error404 } from '../error404'
-import { Router404 } from '../../components/router404'
 
 export function Private() {
   const cookies = new Cookies();
   const location = useLocation()
+  const history = useNavigate()
   const dispatch = useAppDispatch()
 
   const { path: pathT } = usePrivatePathT()
@@ -44,7 +43,6 @@ export function Private() {
   const accessToken = useAppSelector(state => state.auth.accessToken)
   const registrationToken = useAppSelector(state => state.registration.googleToken)
   const userProfilePayload = useAppSelector(state => state.userProfile.payload)
-  const userProfileError = useAppSelector(state => state.userProfile.error)
   const dashboardProps = useAppSelector(state => state.dashboard.payload)
   const dashboardError = useAppSelector(state => state.dashboard.error)
 
@@ -52,14 +50,13 @@ export function Private() {
   const role = path?.params?.role
   const taskId = path?.params?.taskId
 
-  const [errorFlag, setErrorFlag] = useState<Boolean>(false)
+  const accessTokenFromCookies = cookies.get('JWT')  
 
-  if (!cookies.get('JWT') && accessToken) {
+  if (!accessTokenFromCookies && accessToken && accessToken !== undefined) {
     cookies.set('JWT', accessToken)
   }
 
   useEffect(() => {
-    const accessTokenFromCookies = cookies.get('JWT')
     if (!accessToken && accessTokenFromCookies && !userProfilePayload) {
       dispatch(authActions.authSuccess(accessTokenFromCookies))
       if (pathT?.courseId || pathSt?.courseId) {
@@ -81,25 +78,14 @@ export function Private() {
     }
   }, [taskId, accessToken])
 
-  console.log(userProfileError)
-
   useEffect(() => {
-    if (dashboardError && !errorFlag) {
+    if (dashboardError) {
       dispatch(DashboardActions.resetState())
-      setErrorFlag(true)
+      history(paths.notFound)
     }
-  }, [errorFlag, dashboardError])
+  }, [dashboardError])
 
-  if (errorFlag) {
-    return (
-      <Navigate
-        to={paths.notFound}
-        replace
-      />
-      )
-  }
-
-  if ((!isAuthorized || !accessToken) && !registrationToken && !cookies.get('JWT')) {
+  if ((!isAuthorized || !accessToken) && !registrationToken && !accessTokenFromCookies) {
     return (
       <Navigate
         to={paths.login}

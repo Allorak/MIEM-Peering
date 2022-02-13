@@ -17,7 +17,6 @@ import { Overview } from './overview';
 
 import * as globalStyles from "../../../../const/styles"
 
-
 export const Dashboard: FC = () => {
 
   const {

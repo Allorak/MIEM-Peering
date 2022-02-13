@@ -1,17 +1,21 @@
+import { FC, useEffect } from "react";
+import { useNavigate, generatePath } from "react-router-dom"
 import { Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
-import { FC, useEffect, useState } from "react";
+
 import List from "../../../../../components/list/List";
 import { TaskCard } from "../../../../../components/taskCard";
 import { WorkBox } from "../../../../../components/workBox";
-import { useNavigate, generatePath, Navigate } from "react-router-dom"
+import { NoData } from "../../../../../components/noData";
+
 import { paths } from "../../../../../app/constants/paths";
 import { usePrivatePathSt } from "../../../../../app/hooks/usePrivatePathSt";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+
 import { actions as TasksActions } from '../../../../../store/tasks';
 import { fetchTasks } from "../../../../../store/tasks/thunks/fetchTasks";
+
 import * as constStyles from '../../../../../const/styles';
-import { NoData } from "../../../../../components/noData";
 
 export const CourseMain: FC = () => {
     const dispatch = useAppDispatch()
@@ -20,8 +24,6 @@ export const CourseMain: FC = () => {
     const isLoading = useAppSelector(state => state.tasks.isLoading)
     const error = useAppSelector(state => state.tasks.error)
     const tasks = useAppSelector(state => state.tasks.payload?.tasks)
-
-    const [error404, setError404] = useState<Boolean>(false)
 
     useEffect(() => {
         if (path?.courseId)
@@ -36,20 +38,11 @@ export const CourseMain: FC = () => {
     }
 
     useEffect(() => {
-        if (error && !error404) {
+        if (error) {
             dispatch(TasksActions.createReset())
-            setError404(true)
+            history(paths.notFound)
         }
-    }, [error404, error])
-
-    if (error404) {
-        return (
-            <Navigate
-                to={paths.notFound}
-                replace
-            />
-        )
-    }
+    }, [error])
 
     return (
         <Box sx={constStyles.container}>

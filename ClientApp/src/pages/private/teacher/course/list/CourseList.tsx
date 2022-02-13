@@ -1,20 +1,25 @@
-import { Button, Typography } from "@mui/material"
-import { Box, SxProps, Theme } from "@mui/system"
 import { FC, useCallback, useEffect, useState } from "react"
 import { generatePath } from "react-router"
-import { Navigate, useNavigate } from "react-router-dom"
-import { paths } from "../../../../../app/constants/paths"
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
+import { useNavigate } from "react-router-dom"
+import { Button, Typography } from "@mui/material"
+import { Box, SxProps, Theme } from "@mui/system"
+
+
 import { CourseCard } from "../../../../../components/courseCard"
 import List from "../../../../../components/list/List"
 import { WorkBox } from "../../../../../components/workBox"
+import { NoData } from "../../../../../components/noData"
+
+import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
+import { paths } from "../../../../../app/constants/paths"
+
+import { ICourses } from "../../../../../store/types"
+
 import { fetchCourses } from "../../../../../store/courses/thunks/courses"
 import { actions as CourseActions } from '../../../../../store/courses';
-import { ICourses } from "../../../../../store/types"
 import { AddCourse } from "../add"
-import * as constStyles from '../../../../../const/styles'
 
-import { NoData } from "../../../../../components/noData"
+import * as constStyles from '../../../../../const/styles'
 
 export const TCourseList: FC = () => {
     const dispatch = useAppDispatch()
@@ -51,20 +56,11 @@ export const TCourseList: FC = () => {
     }, [])
 
     useEffect(() => {
-        if (error && !error404) {
+        if (error) {
             dispatch(CourseActions.fetchStarted())
-            setError404(true)
+            history(paths.notFound)
         }
-    }, [error404, error])
-
-    if (error404) {
-        return (
-            <Navigate
-                to={paths.notFound}
-                replace
-            />
-        )
-    }
+    }, [error])
 
     return (<>
         <Box sx={constStyles.container}>
