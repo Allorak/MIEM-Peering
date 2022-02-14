@@ -17,12 +17,14 @@ import { palette } from "../../theme/colors";
 
 
 interface IProps {
+  toggleOpenMenu: (status: boolean) => void,
   items: IMenu[],
   activeMenu?: IMenuTitles,
   status: boolean
 }
 
 export const DashboardMenu: FC<IProps> = ({
+  toggleOpenMenu,
   items,
   activeMenu,
   status
@@ -30,12 +32,17 @@ export const DashboardMenu: FC<IProps> = ({
   return (
     <Box sx={styles.container}>
       {items.map(item => (
-        <MenuItem
+        <Box 
+          onClick={() => toggleOpenMenu(true)}
           key={item.title}
-          item={item}
-          status={status}
-          isActive={activeMenu ? activeMenu === item.title : false}
-        />
+        >
+          <MenuItem
+            key={item.title}
+            item={item}
+            status={status}
+            isActive={activeMenu ? activeMenu === item.title : false}
+          />
+        </Box>
       ))}
     </Box>
   )

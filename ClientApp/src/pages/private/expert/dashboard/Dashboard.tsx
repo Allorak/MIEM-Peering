@@ -56,8 +56,13 @@ export const Dashboard: FC = () => {
   }
 
   const toggleOpenMenu = useCallback((openMenu: boolean) => {
-    setOpenMenu(!openMenu)
-}, [])
+    if (matches) {
+      setActiveMenu(!openMenu)
+    }
+    if (!matches && matchesLg) {
+      setOpenMenu(!openMenu)
+    }
+}, [matches, matchesLg])
 
   const menuItemsP = menuItems.map(item => ({ title: item.title, path: generatePath(item.path, { taskId: path.taskId }) })) as IMenu[]
 
@@ -83,6 +88,7 @@ export const Dashboard: FC = () => {
             activeMenu={path.activeMenuId}
             status={openMenu}
             items={menuItemsP}
+            toggleOpenMenu={toggleOpenMenu}
           />
         </Box>
 
@@ -114,8 +120,11 @@ export const Dashboard: FC = () => {
 
 const styles = {
   container: {
-    maxWidth: "1800px",
+    maxWidth: "2048px",
     margin: "0 auto",
+    '@media (min-width: 2048px)': {
+      maxWidth: "1800px",
+    }
   } as SxProps<Theme>,
   menuItemBurger: {
     position: 'absolute',
@@ -172,7 +181,9 @@ const styles = {
     transform: 'TranslateX(-100%)',
     transition: 'all 0.5s',
     '@media (min-width: 768px)': {
-      position: 'static',
+      position: 'absolute',
+      top: '-30px',
+      left: '-8px',
       display: 'flex',
       flexDirection: 'column',
       gridArea: 'leftContainer',
@@ -182,26 +193,28 @@ const styles = {
       overflowY: 'auto',
       transform: 'TranslateX(0)',
       transition: 'width 0.5s',
-      padding: '0 8px 0 0',
+      padding: '30px 8px 0',
       boxShadow: '15px 0px 10px -15px rgba(34, 60, 80, 0.1)',
-      backgroundColor: '#F5F7FD'
+      backgroundColor: 'white'
     },
     '@media (min-width: 2048px)': {
       width: '100%',
-      maxWidth: '355px'
+      maxWidth: '355px',
+      backgroundColor: '#F5F7FD'
     }
   } as SxProps<Theme>,
   leftContainerOpen: {
     position: 'absolute',
+    top: '-30px',
     zIndex: '100',
     width: '250px',
-    backgroundColor: '#F5F7FD',
     height: 'auto',
     minHeight: '100vh',
     transition: 'width 0.5s',
     overflowY: 'auto',
-    padding: '0 8px 0',
+    padding: '30px 8px 0',
     boxShadow: '15px 0px 10px -15px rgba(34, 60, 80, 0.1)',
+    backgroundColor: 'white'
   } as SxProps<Theme>,
   menuActive: {
     transform: 'TranslateX(0)',
@@ -238,7 +251,7 @@ const styles = {
   arrowTogglerBox: {
     display: "flex",
     justifyContent: "flex-start",
-    mb: "24px"
+    mb: "12px"
   } as SxProps<Theme>,
 }
 
