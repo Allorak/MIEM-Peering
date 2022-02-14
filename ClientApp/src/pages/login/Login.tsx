@@ -14,7 +14,7 @@ import { GoogleLogo as GoogleIcon } from '../../components/icons/GoogleLogo';
 import { palette } from '../../theme/colors';
 
 import { paths } from '../../app/constants/paths';
-import { GoogleAuthStatus, IRole } from '../../store/types';
+import { GoogleAuthStatus, ICookiesToken, IRole } from '../../store/types';
 
 import clientID from '../../secret/GoogleClientID';
 
@@ -50,7 +50,7 @@ export const Login: FC = () => {
 
     const onGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ('accessToken' in response) {
-            cookies.remove('JWT')
+            cookies.remove(ICookiesToken.key)
             dispatch(fetchGAuth(response.tokenId))
         }
     }

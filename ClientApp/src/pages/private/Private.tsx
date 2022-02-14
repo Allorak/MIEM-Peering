@@ -13,7 +13,7 @@ import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
 import { paths } from '../../app/constants/paths'
 import { fetchUserProfile } from '../../store/userProfile'
 
-import { IRole } from '../../store/types'
+import { ICookiesToken, IRole } from '../../store/types'
 
 import * as globalStyles from "../../const/styles"
 import { Dashboard as TeacherDashboard } from './teacher/dashboard/Dashboard'
@@ -50,10 +50,10 @@ export function Private() {
   const role = path?.params?.role
   const taskId = path?.params?.taskId
 
-  const accessTokenFromCookies = cookies.get('JWT')  
+  const accessTokenFromCookies = cookies.get(ICookiesToken.key)  
 
   if (!accessTokenFromCookies && accessToken && accessToken !== undefined) {
-    cookies.set('JWT', accessToken)
+    cookies.set(ICookiesToken.key, accessToken)
   }
 
   useEffect(() => {
