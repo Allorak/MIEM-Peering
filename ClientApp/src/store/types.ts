@@ -56,6 +56,12 @@ export type IGoogleUserRegistered = {
   accessToken: string
 }
 
+/** Cookies token */
+
+export enum ICookiesToken {
+  key = "JWT",
+}
+
 /** Identity Status */
 
 export type IRegistretionRequest = {

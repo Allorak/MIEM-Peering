@@ -7,6 +7,7 @@ import { usePrivatePathExDashboard } from '../../../../app/hooks/usePrivatePathE
 
 import { DashboardMenu } from '../../../../components/menu/DahboardMenu';
 import { Burger } from "../../../../components/icons/Burger";
+import { Router404 } from "../../../../components/router404";
 
 import { IMenu, IMenuTitles } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
@@ -15,7 +16,6 @@ import { Checkings } from "./checkings";
 import { Overview } from './overview';
 
 import * as globalStyles from "../../../../const/styles"
-
 
 export const Dashboard: FC = () => {
 
@@ -27,6 +27,15 @@ export const Dashboard: FC = () => {
   const pathToMainDashboard = generatePath(paths.expert.dashboard.overview, { taskId: path?.taskId })
   const [activeMenu, setActiveMenu] = useState(false)
   const matches = useMediaQuery('(max-width:767px)')
+
+  if (!path?.taskId) {
+    return (
+      <Navigate
+        to={paths.notFound}
+        replace
+      />
+    )
+  }
 
   if (!path) {
     return (
@@ -87,6 +96,7 @@ export const Dashboard: FC = () => {
               <Routes>
                 <Route path={paths.expert.dashboard.overview} element={<Overview />} />
                 <Route path={paths.expert.dashboard.checkings} element={<Checkings />} />
+                <Route path={'*'} element={<Router404 />} />
               </Routes>
             </Box>
           </Box>

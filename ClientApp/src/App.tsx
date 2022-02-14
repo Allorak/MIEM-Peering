@@ -25,6 +25,7 @@ export default () => (
           <Route path={paths.registration.main} element={<Registration />} />
           <Route path={paths.registration.selectRole} element={<Role />} />
           <Route path={'/test'} element={<TestPage />} />
+          <Route path={paths.notFound} element={<Error404 />} />
           <PrivateRoute path={'*'} element={<Private />} />
         </Routes>
       </Wrapper>
