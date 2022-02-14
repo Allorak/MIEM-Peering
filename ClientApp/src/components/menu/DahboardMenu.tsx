@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { NavLink as RouterLink } from 'react-router-dom'
 import { Box, SxProps, Theme } from "@mui/system";
-import { Link, Typography, useMediaQuery } from "@mui/material";
+import { Link, Tooltip, Typography, useMediaQuery } from "@mui/material";
 
 import { Overview } from "../icons/Overview";
 import { Works } from "../icons/Works";
@@ -32,7 +32,7 @@ export const DashboardMenu: FC<IProps> = ({
   return (
     <Box sx={styles.container}>
       {items.map(item => (
-        <Box 
+        <Box
           onClick={() => toggleOpenMenu(true)}
           key={item.title}
         >
@@ -47,7 +47,7 @@ export const DashboardMenu: FC<IProps> = ({
     </Box>
   )
 }
-  
+
 const MenuItem: FC<{ item: IMenu, isActive: boolean, status: boolean }> = ({
   item,
   isActive,
@@ -78,23 +78,32 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean, status: boolean }> = ({
   }
 
   return (
+
     <Link
       to={item.path}
       component={RouterLink}
-      sx={{ ...styles.generalMenu, ...(isActive ? styles.activeMenu : styles.unActiveMenu) }}
+      sx={{textDecoration: "none"}}
     >
-      <Box sx={styles.iconContainer}>
-        <MenuIcon objectType={item.title} />
-      </Box>
-
-      <Typography
-        variant={"h6"}
-        color={"inherit"}
-        sx={status && matches ? styles.textRow : !matches ? styles.textRow : styles.hidden }
+      <Tooltip
+        title={!status && matches ? item.title : ""}
+        placement={"right"}
+        arrow
       >
-        {item.title}
-      </Typography>
-    </Link>
+        <Box sx={{ ...styles.generalMenu, ...(isActive ? styles.activeMenu : styles.unActiveMenu) }}>
+          <Box sx={styles.iconContainer}>
+            <MenuIcon objectType={item.title} />
+          </Box>
+
+          <Typography
+            variant={"h6"}
+            color={"inherit"}
+            sx={status && matches ? styles.textRow : !matches ? styles.textRow : styles.hidden}
+          >
+            {item.title}
+          </Typography>
+        </Box>
+      </Tooltip>
+    </Link >
   )
 }
 
@@ -109,7 +118,10 @@ const styles = {
   } as SxProps<Theme>,
   activeMenu: {
     backgroundColor: palette.active.primary,
-    color: 'common.white'
+    color: 'common.white',
+    ":hover": {
+      backgroundColor: palette.active.primary
+    }
   } as SxProps<Theme>,
   unActiveMenu: {
     color: '#A4ADC8',
@@ -128,7 +140,12 @@ const styles = {
     borderRadius: '4px',
     textDecoration: 'none',
     '@media (min-width: 768px)': {
-      pl: "27px"
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "0px 0px 0px 15px",
+      ":hover": {
+        backgroundColor: "#EBECFC"
+      }
     },
     '@media (min-width: 2048px)': {
       justifyContent: 'flex-start',
@@ -138,12 +155,10 @@ const styles = {
   } as SxProps<Theme>,
   iconContainer: {
     fontSize: "25px",
-
     display: "flex",
     overflow: "hidden",
     flexShrink: '0',
     justifyContent: "center",
-
     width: "25px",
     color: "inherit"
   } as SxProps<Theme>,

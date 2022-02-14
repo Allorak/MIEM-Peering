@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
 import { FC, useCallback, useState } from "react";
 import { Theme, Box, Typography, useMediaQuery } from "@mui/material";
-import { SxProps} from "@mui/system";
+import { SxProps } from "@mui/system";
 
 import { usePrivatePathTDashboard } from "../../../../app/hooks/usePrivatePathTDashboard";
 import { useAppSelector } from '../../../../app/hooks';
@@ -20,6 +20,7 @@ import { Checkings } from './checkings';
 import { ExportGrades } from './exportGrades';
 
 import * as globalStyles from "../../../../const/styles"
+import { palette } from '../../../../theme/colors';
 
 export const Dashboard: FC = () => {
 
@@ -65,7 +66,7 @@ export const Dashboard: FC = () => {
     if (!matches && matchesLg) {
       setOpenMenu(!openMenu)
     }
-}, [matches, matchesLg])
+  }, [matches, matchesLg])
 
   const isFirstStep = dashboardProps && dashboardProps.userRole === IRole.teacher && dashboardProps.taskType === PeerSteps.FIRST_STEP
 
@@ -81,21 +82,28 @@ export const Dashboard: FC = () => {
       </Box>
       <Box sx={styles.gridWrapper}>
         <Box sx={matches && activeMenu ? { ...styles.leftContainer, ...styles.menuActive } : openMenu && matchesLg && !matches ? styles.leftContainerOpen : styles.leftContainer}>
-          <Typography variant={"h5"} marginBottom={"12px"}>
-            {"Меню"}
-          </Typography>
-          <Box sx={styles.arrowTogglerBox}>
-            <ArrowToggler 
-              status={openMenu} 
+          <Box
+            display={'flex'}
+            flexDirection={'column'}
+            height={"100%"}
+            alignContent={"space-between"}
+          >
+            <DashboardMenu
+              activeMenu={path.activeMenuId}
+              status={openMenu}
+              items={menuItemsP}
               toggleOpenMenu={toggleOpenMenu}
             />
+
+            <Box
+              sx={styles.arrowTogglerBox}
+            >
+              <ArrowToggler
+                status={openMenu}
+                toggleOpenMenu={toggleOpenMenu}
+              />
+            </Box>
           </Box>
-          <DashboardMenu
-            activeMenu={path.activeMenuId}
-            status={openMenu}
-            items={menuItemsP}
-            toggleOpenMenu={toggleOpenMenu}
-          />
         </Box>
         <Box
           sx={styles.rightContainer}
@@ -172,7 +180,7 @@ const styles = {
       display: 'grid',
       gridTemplateColumns: '70px auto',
       gridTemplateAreas: ' "leftContainer rightContainer"',
-      margin: "30px auto 15px",
+      margin: "10px auto 15px",
       padding: '0 15px 0 8px',
     },
     '@media (min-width: 2048px)': {
@@ -198,7 +206,7 @@ const styles = {
       display: 'flex',
       flexDirection: 'column',
       gridArea: 'leftContainer',
-      width: '80px',
+      width: '54px',
       height: 'auto',
       minHeight: '100vh',
       overflowY: 'auto',
@@ -261,8 +269,7 @@ const styles = {
   } as SxProps<Theme>,
   arrowTogglerBox: {
     display: "flex",
-    justifyContent: "flex-start",
-    mb: "12px"
+    justifyContent: "flex-start"
   } as SxProps<Theme>,
 }
 
