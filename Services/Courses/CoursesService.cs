@@ -92,7 +92,83 @@ namespace patools.Services.Courses
             if (course == null)
                 return new InvalidGuidIdResponse<string>();
 
+            var teacher =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
+            if (teacher == null)
+                return new BadRequestDataResponse<string>("Invalid teacher id");
+
+            if (course.Teacher.ID != teacherId)
+                return new NoAccessResponse<string>("This teacher has no access to this task");
+
+            var courseUsers = await _context.CourseUsers
+                .Where(cu => cu.Course == course)
+                .ToListAsync();
+
+            var tasks = await _context.Tasks
+                .Where(cu => cu.Course == course)
+                .ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                var taskUsers = await _context.TaskUsers
+                    .Where(ta => ta.PeeringTask == task)
+                    .ToListAsync();
+
+                foreach (var taskUser in taskUsers)
+                {
+                    var submissions = await _context.Submissions
+                        .Where(tu => tu.PeeringTaskUserAssignment == taskUser)
+                        .ToListAsync();
+
+                    foreach (var submission in submissions)
+                    {
+                        var answersSubmission = await _context.Answers
+                            .Where(su => su.Submission == submission)
+                            .ToListAsync();
+
+                        var submissionPeers = await _context.SubmissionPeers
+                            .Where(su => su.Submission == submission)
+                            .ToListAsync();
+                        
+                        foreach (var submissionPeer in submissionPeers)
+                        {
+                            var reviews = await _context.Reviews
+                                .Where(re => re.SubmissionPeerAssignment == submissionPeer)
+                                .ToListAsync();
+                                
+                            foreach (var review in reviews)
+                            {
+                                var answersReview = await _context.Answers
+                                    .Where(re => re.Review == review)
+                                    .ToListAsync();
+
+                                _context.Answers.RemoveRange(answersReview);
+                            }
+
+                            _context.Reviews.RemoveRange(reviews);
+                        }
+
+                        _context.Answers.RemoveRange(answersSubmission);
+                        _context.SubmissionPeers.RemoveRange(submissionPeers);
+                    }
+
+                    _context.Submissions.RemoveRange(submissions);
+                }
+
+                var experts = await _context.Experts
+                    .Where(ta => ta.PeeringTask == task)
+                    .ToListAsync();
+
+                _context.TaskUsers.RemoveRange(taskUsers);
+                _context.Experts.RemoveRange(experts);
+            }
+            
+            _context.CourseUsers.RemoveRange(courseUsers);
+
+            _context.Tasks.RemoveRange(tasks);
+
             _context.Courses.Remove(course);
+
             await _context.SaveChangesAsync();
 
             return new SuccessfulResponse<string>("Course was removed successfully");

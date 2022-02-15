@@ -115,9 +115,9 @@ namespace patools.Controllers.v1
             return Ok(await _coursesService.AddCourse(course));
         }
 
-        // DELETE: api/v1/Courses/delete/5
-        [HttpDelete("delete/{id:guid}")]
-        public async Task<IActionResult> DeleteCourse(Guid id)
+        // DELETE: api/v1/courses/{courseId}
+        [HttpDelete("{courseId}")]
+        public async Task<IActionResult> DeleteCourse(Guid courseId)
         {
             //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
@@ -136,7 +136,7 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidJwtTokenResponse());
 
-            return Ok(await _coursesService.DeleteCourse(teacherId, id));
+            return Ok(await _coursesService.DeleteCourse(teacherId, courseId));
         }
 
 
