@@ -86,13 +86,96 @@ namespace patools.Services.Courses
             return new SuccessfulResponse<GetCourseDtoResponse>(resultCourse);
         }
 
-        public async Task<Response<string>> DeleteCourse(Guid teacherId, Guid courseId)
+        public async Task<Response<string>> DeleteCourse(DeleteCourseDto courseInfo)
         {
-            var course = await _context.Courses.FindAsync(courseId);
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseInfo.CourseId);
             if (course == null)
                 return new InvalidGuidIdResponse<string>();
 
+            var teacher =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == courseInfo.TeacherId && u.Role == UserRoles.Teacher);
+            if (teacher == null)
+                return new BadRequestDataResponse<string>("Invalid teacher id");
+
+            if (course.Teacher.ID != courseInfo.TeacherId)
+                return new NoAccessResponse<string>("This teacher has no access to this task");
+
+            var courseUsers = await _context.CourseUsers
+                .Where(cu => cu.Course == course)
+                .ToListAsync();
+
+            var tasks = await _context.Tasks
+                .Where(cu => cu.Course == course)
+                .ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                var taskUsers = await _context.TaskUsers
+                    .Where(ta => ta.PeeringTask == task)
+                    .ToListAsync();
+
+                var questions = await _context.Questions
+                    .Where(q => q.PeeringTask == task)
+                    .ToListAsync();
+                
+                foreach (var taskUser in taskUsers)
+                {
+                    var submissions = await _context.Submissions
+                        .Where(tu => tu.PeeringTaskUserAssignment == taskUser)
+                        .ToListAsync();
+
+                    foreach (var submission in submissions)
+                    {
+                        var answersSubmission = await _context.Answers
+                            .Where(a => a.Submission == submission)
+                            .ToListAsync();
+
+                        var submissionPeers = await _context.SubmissionPeers
+                            .Where(sp => sp.Submission == submission)
+                            .ToListAsync();
+                        
+                        foreach (var submissionPeer in submissionPeers)
+                        {
+                            var reviews = await _context.Reviews
+                                .Where(r => r.SubmissionPeerAssignment == submissionPeer)
+                                .ToListAsync();
+                                
+                            foreach (var review in reviews)
+                            {
+                                var answersReview = await _context.Answers
+                                    .Where(a => a.Review == review)
+                                    .ToListAsync();
+
+                                _context.Answers.RemoveRange(answersReview);
+                            }
+
+                            _context.Reviews.RemoveRange(reviews);
+                        }
+
+                        _context.Answers.RemoveRange(answersSubmission);
+                        _context.SubmissionPeers.RemoveRange(submissionPeers);
+                    }
+
+                    _context.Submissions.RemoveRange(submissions);
+                }
+
+                var experts = await _context.Experts
+                    .Where(e => e.PeeringTask == task)
+                    .ToListAsync();
+
+                _context.TaskUsers.RemoveRange(taskUsers);
+                _context.Experts.RemoveRange(experts);
+                _context.Questions.RemoveRange(questions);
+            }
+
+            await _context.SaveChangesAsync();
+            
+            _context.CourseUsers.RemoveRange(courseUsers);
+
+            _context.Tasks.RemoveRange(tasks);
+
             _context.Courses.Remove(course);
+
             await _context.SaveChangesAsync();
 
             return new SuccessfulResponse<string>("Course was removed successfully");
