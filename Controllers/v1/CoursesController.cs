@@ -136,7 +136,11 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(teacherIdClaim.Value, out var teacherId))
                 return Ok(new InvalidJwtTokenResponse());
 
-            return Ok(await _coursesService.DeleteCourse(teacherId, courseId));
+            return Ok(await _coursesService.DeleteCourse(new DeleteCourseDto()
+            {
+                CourseId = courseId,
+                TeacherId = teacherId
+            }));
         }
 
 

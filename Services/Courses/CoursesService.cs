@@ -86,18 +86,18 @@ namespace patools.Services.Courses
             return new SuccessfulResponse<GetCourseDtoResponse>(resultCourse);
         }
 
-        public async Task<Response<string>> DeleteCourse(Guid teacherId, Guid courseId)
+        public async Task<Response<string>> DeleteCourse(DeleteCourseDto courseInfo)
         {
-            var course = await _context.Courses.FindAsync(courseId);
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseInfo.CourseId);
             if (course == null)
                 return new InvalidGuidIdResponse<string>();
 
             var teacher =
-                await _context.Users.FirstOrDefaultAsync(u => u.ID == teacherId && u.Role == UserRoles.Teacher);
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == courseInfo.TeacherId && u.Role == UserRoles.Teacher);
             if (teacher == null)
                 return new BadRequestDataResponse<string>("Invalid teacher id");
 
-            if (course.Teacher.ID != teacherId)
+            if (course.Teacher.ID != courseInfo.TeacherId)
                 return new NoAccessResponse<string>("This teacher has no access to this task");
 
             var courseUsers = await _context.CourseUsers
@@ -114,6 +114,10 @@ namespace patools.Services.Courses
                     .Where(ta => ta.PeeringTask == task)
                     .ToListAsync();
 
+                var questions = await _context.Questions
+                    .Where(q => q.PeeringTask == task)
+                    .ToListAsync();
+                
                 foreach (var taskUser in taskUsers)
                 {
                     var submissions = await _context.Submissions
@@ -123,23 +127,23 @@ namespace patools.Services.Courses
                     foreach (var submission in submissions)
                     {
                         var answersSubmission = await _context.Answers
-                            .Where(su => su.Submission == submission)
+                            .Where(a => a.Submission == submission)
                             .ToListAsync();
 
                         var submissionPeers = await _context.SubmissionPeers
-                            .Where(su => su.Submission == submission)
+                            .Where(sp => sp.Submission == submission)
                             .ToListAsync();
                         
                         foreach (var submissionPeer in submissionPeers)
                         {
                             var reviews = await _context.Reviews
-                                .Where(re => re.SubmissionPeerAssignment == submissionPeer)
+                                .Where(r => r.SubmissionPeerAssignment == submissionPeer)
                                 .ToListAsync();
                                 
                             foreach (var review in reviews)
                             {
                                 var answersReview = await _context.Answers
-                                    .Where(re => re.Review == review)
+                                    .Where(a => a.Review == review)
                                     .ToListAsync();
 
                                 _context.Answers.RemoveRange(answersReview);
@@ -156,12 +160,15 @@ namespace patools.Services.Courses
                 }
 
                 var experts = await _context.Experts
-                    .Where(ta => ta.PeeringTask == task)
+                    .Where(e => e.PeeringTask == task)
                     .ToListAsync();
 
                 _context.TaskUsers.RemoveRange(taskUsers);
                 _context.Experts.RemoveRange(experts);
+                _context.Questions.RemoveRange(questions);
             }
+
+            await _context.SaveChangesAsync();
             
             _context.CourseUsers.RemoveRange(courseUsers);
 
