@@ -44,7 +44,6 @@ namespace patools
         public void ConfigureServices(IServiceCollection services)
         {
             SetupJwtServices(services);
-            services.AddMvc();
             services.AddHangfire(h => h.UsePostgreSqlStorage(Configuration["ConnectionStrings:Hangfire"]));
             services.AddHangfireServer();
             services.AddControllersWithViews();
@@ -62,13 +61,10 @@ namespace patools
             services.AddScoped<ICourseUsersService, CourseUsersService>();
             services.AddScoped<IExpertsService, ExpertsService>();
             services.AddScoped<IReviewsService, ReviewsService>();
-            services.AddSwaggerGen();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
