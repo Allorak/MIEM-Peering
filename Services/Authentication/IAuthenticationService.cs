@@ -13,5 +13,7 @@ namespace patools.Services.Authentication
         Task<Response<GetJwtTokenDtoResponse>> GetJwtByEmail(string email);
 
         Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email);
+
+        Task<Response<string>> AuthenticateLti(string userToken);
     }
 }

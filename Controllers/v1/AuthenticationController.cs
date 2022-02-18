@@ -58,5 +58,12 @@ namespace patools.Controllers.v1
                 return Ok(new UnauthorizedUserResponse());
             }
         }
+
+        [HttpPost("lti")]
+        public async Task<ActionResult<Response<bool>>> LtiAuth(GetJwtByLtiRequest tokenInfo)
+        {
+            await _authenticationService.AuthenticateLti(tokenInfo.user_data);
+            return Ok(true);
+        }
     }
 }
