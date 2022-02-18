@@ -90,7 +90,7 @@ namespace patools.Services.PeeringTasks
                 source_id = null,
                 description = null,
                 title = null,
-                url = _configuration.GetSection("LTI:RedirectLink").Value
+                url = $"{_configuration.GetSection("LTI:RedirectLink").Value}/{newTask.ID}" 
             });
 
             if (ltiInfo == null)

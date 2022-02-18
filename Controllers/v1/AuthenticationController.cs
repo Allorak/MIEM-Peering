@@ -59,11 +59,11 @@ namespace patools.Controllers.v1
             }
         }
 
-        [HttpPost("lti")]
-        public async Task<ActionResult<Response<bool>>> LtiAuth(GetJwtByLtiRequest tokenInfo)
+        [HttpPost("lti/{taskId}")]
+        public async Task<ActionResult<Response<bool>>> LtiAuth([FromRoute] Guid taskId, GetJwtByLtiRequest tokenInfo)
         {
             await _authenticationService.AuthenticateLti(tokenInfo.user_data);
-            return Ok(true);
+            return Redirect($"{_configuration.GetSection("LTI:RedirectFromLTI").Value}/{taskId}/overview");
         }
     }
 }
