@@ -111,7 +111,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '2px'
+    gap: '5px'
   } as SxProps<Theme>,
   hidden: {
     display: 'none'

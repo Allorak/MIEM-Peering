@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
 import { IDeadlines } from "../../store/types"
@@ -14,8 +14,8 @@ export const Deadlines: FC<IDeadlines> = ({
 }) => {
 
   return (
-    <Box sx={styles.wrapper}>
-      <Box sx={styles.cardsWrapper}>
+    <Grid container spacing={"10px"}>
+      <Grid item xs={12} md={6} lg={3}>
         {sBegin && typeof sBegin !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.startBox }}>
             <Typography variant={'h6'}>
@@ -37,7 +37,9 @@ export const Deadlines: FC<IDeadlines> = ({
             </Box>
           </Box>
         )}
+      </Grid>
 
+      <Grid item xs={12} md={6} lg={3}>
         {sEnd && typeof sEnd !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.endBox }}>
             <Typography variant={'h6'}>
@@ -60,9 +62,9 @@ export const Deadlines: FC<IDeadlines> = ({
             </Box>
           </Box>
         )}
-      </Box>
+      </Grid>
 
-      <Box sx={styles.cardsWrapper}>
+      <Grid item xs={12} md={6} lg={3}>
         {rBegin && typeof rBegin !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.startBox }}>
             <Typography variant={'h6'}>
@@ -85,7 +87,9 @@ export const Deadlines: FC<IDeadlines> = ({
             </Box>
           </Box>
         )}
+      </Grid>
 
+      <Grid item xs={12} md={6} lg={3}>
         {rEnd && typeof rEnd !== 'string' && (
           <Box sx={{ ...styles.dateBox, ...styles.endBox }}>
             <Typography variant={'h6'}>
@@ -106,20 +110,12 @@ export const Deadlines: FC<IDeadlines> = ({
             </Box>
           </Box>
         )}
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   )
 }
 
 const styles = {
-  wrapper: {
-    display: "grid",
-    gridGap: "10px",
-    gridTemplateColumns: "repeat(auto-fill, minmax(600px, 1fr) )",
-    '@media (max-width: 670px)': {
-      gridTemplateColumns: "repeat(auto-fill, minmax(100%, 1fr) )"
-    }
-  } as SxProps<Theme>,
   dateBox: {
     backgroundColor: 'common.white',
     borderRadius: '4px',
@@ -128,6 +124,8 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'space-between',
     boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
+    height: "100%",
+    boxSizing: "border-box"
   } as SxProps<Theme>,
   fieldsContainer: {
     display: 'flex',
@@ -140,16 +138,5 @@ const styles = {
   } as SxProps<Theme>,
   endBox: {
     borderTop: `7px solid ${palette.fill.primary}`
-  } as SxProps<Theme>,
-  cardsWrapper: {
-    display: "grid",
-    gridGap: "10px",
-    gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr) )",
-    '@media (max-width: 1324px)': {
-      gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr) )"
-    },
-    '@media (max-width: 600px)': {
-      gridTemplateColumns: "repeat(auto-fill, minmax(100%, 1fr) )"
-    }
-  } as SxProps<Theme>,
+  } as SxProps<Theme>
 }

@@ -44,15 +44,15 @@ export const Overview: FC = () => {
             />
           </Grid>
 
-          <Grid item xs={12} lg={6}>
+          <Grid item xs={12} lg={4}>
             <TaskTypeBlock type={payload.reviewType} />
           </Grid>
 
-          <Grid item xs={12} lg={6}>
+          <Grid item xs={12} lg={4}>
             <StepCheckBlock step={payload.taskType} />
           </Grid>
 
-          <Grid item lg={12}>
+          <Grid item xs={12} lg={4}>
             <Formula
               submissionWeight={payload.submissionWeight}
               reviewWeight={payload.reviewWeight}
