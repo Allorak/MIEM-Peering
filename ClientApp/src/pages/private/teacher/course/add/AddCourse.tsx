@@ -5,7 +5,7 @@ import { Popup } from "../../../../../components/popup";
 import { AddCourseForm } from "./AddCourseForm";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { actions, addCourse, updateCourse } from '../../../../../store/addCourse';
+import { actions, addCourse, deleteCourse, updateCourse } from '../../../../../store/addCourse';
 import { paths } from "../../../../../app/constants/paths";
 import { ICourses } from "../../../../../store/types";
 import { fetchCourses } from "../../../../../store/courses/thunks/courses";
@@ -61,6 +61,12 @@ export const AddCourse: FC<IProps> = ({ popupOpen, onCloseHandler, editCourse })
         }
     }, [editCourse])
 
+    const handleOnDelete = useCallback(() => {
+        if (editCourse) {
+            dispatch(deleteCourse(editCourse.id))
+        }
+    }, [editCourse])
+
     return (
         <Popup
             title={editCourse ? 'Изменить' : 'Создать курс'}
@@ -71,6 +77,7 @@ export const AddCourse: FC<IProps> = ({ popupOpen, onCloseHandler, editCourse })
             <AddCourseForm
                 editCourse={editCourse}
                 onRequest={handleRequest}
+                onDelete={handleOnDelete}
             />
         </Popup>
     )
