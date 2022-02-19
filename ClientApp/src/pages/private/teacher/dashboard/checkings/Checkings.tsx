@@ -237,7 +237,7 @@ const styles = {
     }
   } as SxProps<Theme>,
   formContainer: {
-    maxHeight: "calc(100vh - 183px - 125px)",
+    maxHeight: "calc(100vh - 90px - 125px)",
     paddingRight: "5px",
     overflowY: "auto",
     ...globalStyles.scrollStyles,

@@ -31,7 +31,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "15px",
-    maxHeight: "calc(100vh - 183px - 62px)",
+    maxHeight: "calc(100vh - 146px - 62px)",
     '@media (max-width: 900px)': {
       maxHeight: "calc(100vh - 183px - 132px)",
     },
