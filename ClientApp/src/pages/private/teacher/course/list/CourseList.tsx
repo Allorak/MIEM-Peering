@@ -1,18 +1,25 @@
-import { Button, Typography } from "@mui/material"
-import { Box, SxProps, Theme } from "@mui/system"
 import { FC, useCallback, useEffect, useState } from "react"
 import { generatePath } from "react-router"
-import { paths } from "../../../../../app/constants/paths"
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
+import { useNavigate } from "react-router-dom"
+import { Button, Typography } from "@mui/material"
+import { Box, SxProps, Theme } from "@mui/system"
+
+
 import { CourseCard } from "../../../../../components/courseCard"
 import List from "../../../../../components/list/List"
 import { WorkBox } from "../../../../../components/workBox"
-import { fetchCourses } from "../../../../../store/courses/thunks/courses"
-import { AddCourse } from "../add"
-import * as constStyles from '../../../../../const/styles'
-import { useNavigate } from "react-router-dom"
-import { ICourses } from "../../../../../store/types"
 import { NoData } from "../../../../../components/noData"
+
+import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
+import { paths } from "../../../../../app/constants/paths"
+
+import { ICourses } from "../../../../../store/types"
+
+import { fetchCourses } from "../../../../../store/courses/thunks/courses"
+import { actions as CourseActions } from '../../../../../store/courses';
+import { AddCourse } from "../add"
+
+import * as constStyles from '../../../../../const/styles'
 
 export const TCourseList: FC = () => {
     const dispatch = useAppDispatch()
@@ -24,6 +31,7 @@ export const TCourseList: FC = () => {
 
     const [popupCourseStatus, setPopupCourseStatus] = useState(false)
     const [currentCourse, setCurrentCourse] = useState<ICourses>()
+    const [error404, setError404] = useState<Boolean>(false)
 
     useEffect(() => {
         dispatch(fetchCourses())
@@ -46,6 +54,13 @@ export const TCourseList: FC = () => {
         setCurrentCourse(course)
         setPopupCourseStatus(prev => !prev)
     }, [])
+
+    useEffect(() => {
+        if (error) {
+            dispatch(CourseActions.fetchStarted())
+            history(paths.notFound)
+        }
+    }, [error])
 
     return (<>
         <Box sx={constStyles.container}>

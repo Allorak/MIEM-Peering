@@ -1,9 +1,11 @@
 
 import { useEffect } from 'react'
-import { Routes, Route, Navigate, useLocation, RouteProps, matchPath, generatePath } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, matchPath, generatePath, useNavigate } from 'react-router-dom'
 import { Box, SxProps, Theme } from '@mui/system'
+import { CircularProgress, Typography } from '@mui/material'
 
 import { PrivateHeader } from '../../components/header'
+import { Router404 } from '../../components/router404'
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { usePrivatePathT } from "../../app/hooks/usePrivatePathT"
@@ -11,7 +13,7 @@ import { usePrivatePathSt } from "../../app/hooks/usePrivatePathSt"
 import { paths } from '../../app/constants/paths'
 import { fetchUserProfile } from '../../store/userProfile'
 
-import { IRole } from '../../store/types'
+import { ICookiesToken, IRole } from '../../store/types'
 
 import * as globalStyles from "../../const/styles"
 import { Dashboard as TeacherDashboard } from './teacher/dashboard/Dashboard'
@@ -24,15 +26,14 @@ import { Dashboard as ExpertDashboard } from './expert/dashboard/Dashboard'
 import { STCourseList as StudentCourseList } from './student/course/list'
 import { fetchDashboard, actions as DashboardActions } from '../../store/dashboard'
 import { actions as authActions } from '../../store/auth'
-import { CircularProgress, Typography } from '@mui/material'
+import { fetchCourses } from '../../store/courses/thunks/courses'
 
 import Cookies from 'universal-cookie';
 
-import { fetchCourses } from '../../store/courses/thunks/courses'
-
 export function Private() {
-  const cookies = new Cookies();  
+  const cookies = new Cookies();
   const location = useLocation()
+  const history = useNavigate()
   const dispatch = useAppDispatch()
 
   const { path: pathT } = usePrivatePathT()
@@ -43,18 +44,20 @@ export function Private() {
   const registrationToken = useAppSelector(state => state.registration.googleToken)
   const userProfilePayload = useAppSelector(state => state.userProfile.payload)
   const dashboardProps = useAppSelector(state => state.dashboard.payload)
+  const dashboardError = useAppSelector(state => state.dashboard.error)
 
   const path = matchPath('/:role/task/:taskId/*', location.pathname)
   const role = path?.params?.role
   const taskId = path?.params?.taskId
 
-  if (!cookies.get('JWT')) { 
-    cookies.set('JWT', accessToken)
+  const accessTokenFromCookies = cookies.get(ICookiesToken.key)  
+
+  if (!accessTokenFromCookies && accessToken && accessToken !== undefined) {
+    cookies.set(ICookiesToken.key, accessToken)
   }
 
   useEffect(() => {
-    const accessTokenFromCookies = cookies.get('JWT')
-    if (!accessToken && accessTokenFromCookies !== 'undefined' && !userProfilePayload) {
+    if (!accessToken && accessTokenFromCookies && !userProfilePayload) {
       dispatch(authActions.authSuccess(accessTokenFromCookies))
       if (pathT?.courseId || pathSt?.courseId) {
         dispatch(fetchCourses())
@@ -75,7 +78,14 @@ export function Private() {
     }
   }, [taskId, accessToken])
 
-  if ((!isAuthorized || !accessToken) && !registrationToken && cookies.get('JWT') == 'undefined') {
+  useEffect(() => {
+    if (dashboardError) {
+      dispatch(DashboardActions.resetState())
+      history(paths.notFound)
+    }
+  }, [dashboardError])
+
+  if ((!isAuthorized || !accessToken) && !registrationToken && !accessTokenFromCookies) {
     return (
       <Navigate
         to={paths.login}
@@ -186,6 +196,7 @@ export function Private() {
             <Route path={paths.teacher.courses.course} element={<TeacherCourseMain />} />
             <Route path={paths.teacher.task.add} element={<TaskAdd />} />
             <Route path={paths.root} element={<TeacherCourseList />} />
+            <Route path={'*'} element={<Router404 />} />
           </Routes>
         </Box>
       </Box>
@@ -202,20 +213,14 @@ export function Private() {
             <Route path={paths.student.main} element={<StudentCourseList />} />
             <Route path={paths.student.courses.course} element={<StudentCourseMain />} />
             <Route path={paths.root} element={<StudentCourseList />} />
-            <Route path={"*"} element={<StudentDashboard />} />
+            <Route path={"*"} element={<Router404 />} />
           </Routes>
-        </Box>  
+        </Box>
       </Box>
     )
   }
 
   return null
-}
-
-function PrivateRoute(props: RouteProps): React.ReactElement {
-  return (
-    <Route {...props} />
-  )
 }
 
 const styles = {

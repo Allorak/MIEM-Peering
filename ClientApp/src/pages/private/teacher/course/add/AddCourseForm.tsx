@@ -1,6 +1,7 @@
 import { FC, useCallback } from "react";
 import { useController, useForm } from "react-hook-form";
-import { Button, FormControlLabel, Switch, TextField, Typography } from "@mui/material";
+import { Button, FormControlLabel, IconButton, Switch, TextField, Typography } from "@mui/material";
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { Box, SxProps, Theme } from "@mui/system";
 
 import { InputLabel } from "../../../../../components/inputLabel";
@@ -15,14 +16,11 @@ import * as globalStyles from "../../../../../const/styles";
 interface IProps {
     editCourse?: ICourses,
     onRequest: (course: ICourses) => void
+    onDelete: () => void
 }
 interface ICourseItem extends Omit<ICourses, 'id' | 'adminName' | 'adminImageUrl'> { }
-interface IErrors {
-    name: string
-    subject: string
-}
 
-export const AddCourseForm: FC<IProps> = ({ editCourse, onRequest }) => {
+export const AddCourseForm: FC<IProps> = ({ editCourse, onRequest, onDelete }) => {
     const defaultValues: ICourseItem = editCourse ? {
         name: editCourse.name,
         subject: editCourse.subject,
@@ -155,6 +153,19 @@ export const AddCourseForm: FC<IProps> = ({ editCourse, onRequest }) => {
             )}
 
             <Box sx={globalStyles.submitBtContainer}>
+                {editCourse && (
+                    <Box flex={'1 1 100%'}>
+                        <IconButton
+                            color={'error'}
+                            size={'large'}
+                            title={'Удалить курс навсегда'}
+                            onClick={onDelete}
+                        >
+                            <DeleteForeverIcon fontSize={'inherit'} />
+                        </IconButton>
+                    </Box>
+                )}
+
                 <Button
                     type='submit'
                     variant='contained'
@@ -181,11 +192,3 @@ const styles = {
         opacity: 0
     } as SxProps<Theme>,
 }
-
-const initialErrors: IErrors = {
-    name: '',
-    subject: ''
-}
-
-
-

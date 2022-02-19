@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, generatePath } from 'react-router-dom'
 import { usePrivatePathExDashboard } from '../../../../app/hooks/usePrivatePathExDashboard';
 
 import { DashboardRouter } from "../../../../components/dashboardRouter";
+import { Router404 } from "../../../../components/router404";
 
 import { IMenu, IMenuTitles } from '../../../../store/types';
 import { paths } from "../../../../app/constants/paths";
@@ -19,6 +20,15 @@ export const Dashboard: FC = () => {
   } = usePrivatePathExDashboard()
 
   const pathToMainDashboard = generatePath(paths.expert.dashboard.overview, { taskId: path?.taskId })
+
+  if (!path?.taskId) {
+    return (
+      <Navigate
+        to={paths.notFound}
+        replace
+      />
+    )
+  }
 
   if (!path) {
     return (
@@ -54,6 +64,7 @@ export const Dashboard: FC = () => {
       <Routes>
         <Route path={paths.expert.dashboard.overview} element={<Overview />} />
         <Route path={paths.expert.dashboard.checkings} element={<Checkings />} />
+        <Route path={'*'} element={<Router404 />} />
       </Routes>
     </DashboardRouter>
   )

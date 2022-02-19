@@ -1,7 +1,7 @@
 export const paths = {
   root: '/',
   login: '/login',
-  notFound: '/404', // TODO
+  notFound: '/not-found',
 
   registration: {
     main: '/registration',

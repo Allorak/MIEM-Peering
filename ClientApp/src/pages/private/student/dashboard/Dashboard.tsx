@@ -7,6 +7,7 @@ import { paths } from "../../../../app/constants/paths";
 import { IMenu, IMenuTitles } from '../../../../store/types';
 
 import { DashboardRouter } from '../../../../components/dashboardRouter';
+import { Router404 } from "../../../../components/router404";
 
 import { Overview } from './Overview';
 import { Authorform } from './authorform';
@@ -58,6 +59,7 @@ export const Dashboard: FC = () => {
         <Route path={paths.student.dashboard.authorform} element={<Authorform />} />
         <Route path={paths.student.dashboard.work} element={<MyWork />} />
         <Route path={paths.student.dashboard.checkings} element={<Checkings />} />
+        <Route path={'*'} element={<Router404 />} />
       </Routes>
     </DashboardRouter>
   )

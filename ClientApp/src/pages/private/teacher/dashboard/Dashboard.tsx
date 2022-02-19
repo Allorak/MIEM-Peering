@@ -15,6 +15,7 @@ import { Works } from './works';
 import { Experts } from './experts';
 import { Checkings } from './checkings';
 import { ExportGrades } from './exportGrades';
+import { Router404 } from '../../../../components/router404';
 
 
 export const Dashboard: FC = () => {
@@ -86,6 +87,8 @@ export const Dashboard: FC = () => {
         {isExpertsRoute && (
           <Route path={paths.teacher.dashboard.experts} element={<Experts />} />
         )}
+
+        <Route path={'*'} element={<Router404 />} />
       </Routes>
     </DashboardRouter>
   )

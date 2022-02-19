@@ -1,17 +1,22 @@
-import { Button, Typography } from "@mui/material"
-import { Box, SxProps, Theme } from "@mui/system"
 import { FC, useEffect, useState } from "react"
 import { generatePath } from "react-router"
+import { useNavigate } from "react-router-dom"
+import { Button, Typography } from "@mui/material"
+import { Box, SxProps, Theme } from "@mui/system"
+
 import { paths } from "../../../../../app/constants/paths"
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks"
+
 import { CourseCard } from "../../../../../components/courseCard"
 import List from "../../../../../components/list/List"
 import { WorkBox } from "../../../../../components/workBox"
-import { fetchCourses } from "../../../../../store/courses/thunks/courses"
-import { JoinCourse } from "../join"
-import * as constStyles from '../../../../../const/styles'
-import { useNavigate } from "react-router-dom"
 import { NoData } from "../../../../../components/noData"
+
+import { fetchCourses } from "../../../../../store/courses/thunks/courses"
+import { actions as CourseActions } from '../../../../../store/courses';
+import { JoinCourse } from "../join"
+
+import * as constStyles from '../../../../../const/styles'
 
 export const STCourseList: FC = () => {
     const dispatch = useAppDispatch()
@@ -37,6 +42,13 @@ export const STCourseList: FC = () => {
             paths.student.courses.course, { courseId: id }
         ))
     }
+
+    useEffect(() => {
+        if (error) {
+            dispatch(CourseActions.fetchStarted())
+            history(paths.notFound)
+        }
+    }, [error])
 
     return (<>
         <Box sx={constStyles.container}>
