@@ -1,7 +1,7 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { NavLink as RouterLink } from 'react-router-dom'
 import { Box, SxProps, Theme } from "@mui/system";
-import { Link, Typography } from "@mui/material";
+import { Link, Tooltip, Typography, useMediaQuery } from "@mui/material";
 
 import { Overview } from "../icons/Overview";
 import { Works } from "../icons/Works";
@@ -17,31 +17,48 @@ import { palette } from "../../theme/colors";
 
 
 interface IProps {
+  toggleOpenMenu: (status: boolean) => void,
   items: IMenu[],
-  activeMenu?: IMenuTitles
+  activeMenu?: IMenuTitles,
+  status: boolean
 }
 
 export const DashboardMenu: FC<IProps> = ({
+  toggleOpenMenu,
   items,
-  activeMenu
+  activeMenu,
+  status
 }) => {
+
+  const handleMenuClick = useCallback(() => {
+    toggleOpenMenu(true)
+  }, [toggleOpenMenu])
+
   return (
     <Box sx={styles.container}>
       {items.map(item => (
-        <MenuItem
+        <Box
+          onClick={handleMenuClick}
           key={item.title}
-          item={item}
-          isActive={activeMenu ? activeMenu === item.title : false}
-        />
+        >
+          <MenuItem
+            key={item.title}
+            item={item}
+            status={status}
+            isActive={activeMenu ? activeMenu === item.title : false}
+          />
+        </Box>
       ))}
     </Box>
   )
 }
 
-const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
+const MenuItem: FC<{ item: IMenu, isActive: boolean, status: boolean }> = ({
   item,
-  isActive
+  isActive,
+  status
 }) => {
+  const matches = useMediaQuery('(min-width:768px) and (max-width:2047px)')
 
   const MenuIcon: FC<{ objectType: IMenuTitles }> = ({ objectType }) => {
     switch (objectType) {
@@ -69,20 +86,28 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean }> = ({
     <Link
       to={item.path}
       component={RouterLink}
-      sx={{ ...styles.generalMenu, ...(isActive ? styles.activeMenu : styles.unActiveMenu) }}
+      sx={{ textDecoration: "none" }}
     >
-      <Box sx={styles.iconContainer}>
-        <MenuIcon objectType={item.title} />
-      </Box>
-
-      <Typography
-        variant={"h6"}
-        color={"inherit"}
-        sx={styles.textRow}
+      <Tooltip
+        title={!status && matches ? item.title : ""}
+        placement={"right"}
+        arrow
       >
-        {item.title}
-      </Typography>
-    </Link>
+        <Box sx={{ ...styles.generalMenu, ...(isActive ? styles.activeMenu : styles.unActiveMenu) }}>
+          <Box sx={styles.iconContainer}>
+            <MenuIcon objectType={item.title} />
+          </Box>
+
+          <Typography
+            variant={"h6"}
+            color={"inherit"}
+            sx={status && matches ? styles.textRow : !matches ? styles.textRow : styles.hidden}
+          >
+            {item.title}
+          </Typography>
+        </Box>
+      </Tooltip>
+    </Link >
   )
 }
 
@@ -90,11 +115,17 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '2px'
+    gap: '5px'
+  } as SxProps<Theme>,
+  hidden: {
+    display: 'none'
   } as SxProps<Theme>,
   activeMenu: {
     backgroundColor: palette.active.primary,
-    color: 'common.white'
+    color: 'common.white',
+    ":hover": {
+      backgroundColor: palette.active.primary
+    }
   } as SxProps<Theme>,
   unActiveMenu: {
     color: '#A4ADC8',
@@ -113,9 +144,14 @@ const styles = {
     borderRadius: '4px',
     textDecoration: 'none',
     '@media (min-width: 768px)': {
-      justifyContent: 'center',
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "0px 0px 0px 15px",
+      ":hover": {
+        backgroundColor: "#EBECFC"
+      }
     },
-    '@media (min-width: 1280px)': {
+    '@media (min-width: 2048px)': {
       justifyContent: 'flex-start',
       width: 'auto',
       padding: "0px 10px 0px 30px",
@@ -123,12 +159,10 @@ const styles = {
   } as SxProps<Theme>,
   iconContainer: {
     fontSize: "25px",
-
     display: "flex",
     overflow: "hidden",
     flexShrink: '0',
     justifyContent: "center",
-
     width: "25px",
     color: "inherit"
   } as SxProps<Theme>,
@@ -136,10 +170,8 @@ const styles = {
     display: 'block',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    '@media (min-width: 768px)': {
-      display: 'none',
-    },
-    '@media (min-width: 1280px)': {
+    whiteSpace: 'nowrap',
+    '@media (min-width: 2048px)': {
       display: 'block',
     },
   } as SxProps<Theme>,
