@@ -72,7 +72,10 @@ export const DashboardRouter: FC<IProps> = ({
   }, [])
 
   const rightContainerSx = useMemo((): SxProps<Theme> => (
-    isActiveMenu ? styles.rightContainerLock : styles.rightContainerWrapper
+    isActiveMenu ? {
+      ...styles.rightContainerWrapper,
+      touchAction: 'none',
+    } : styles.rightContainerWrapper
   ), [])
 
   const menuItemTitleMarginBottom = useMemo(() => (
@@ -242,16 +245,9 @@ const styles = {
     },
   } as SxProps<Theme>,
   rightContainerWrapper: {
-    maxHeight: "calc(100vh - 147px)",
+    maxHeight: "calc(100vh - 141px)",
     paddingRight: "8px",
     overflowY: "auto",
     ...globalStyles.scrollStyles
-  } as SxProps<Theme>,
-  rightContainerLock: {
-    maxHeight: "calc(100vh - 147px)",
-    paddingRight: "8px",
-    overflowY: "auto",
-    touchAction: 'none',
-    ...globalStyles.scrollStyles
-  } as SxProps<Theme>,
+  } as SxProps<Theme>
 }
