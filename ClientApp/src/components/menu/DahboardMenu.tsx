@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { NavLink as RouterLink } from 'react-router-dom'
 import { Box, SxProps, Theme } from "@mui/system";
 import { Link, Tooltip, Typography, useMediaQuery } from "@mui/material";
@@ -29,11 +29,16 @@ export const DashboardMenu: FC<IProps> = ({
   activeMenu,
   status
 }) => {
+
+  const handleMenuClick = useCallback(() => {
+    toggleOpenMenu(true)
+  }, [toggleOpenMenu])
+
   return (
     <Box sx={styles.container}>
       {items.map(item => (
         <Box
-          onClick={() => toggleOpenMenu(true)}
+          onClick={handleMenuClick}
           key={item.title}
         >
           <MenuItem
@@ -78,11 +83,10 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean, status: boolean }> = ({
   }
 
   return (
-
     <Link
       to={item.path}
       component={RouterLink}
-      sx={{textDecoration: "none"}}
+      sx={{ textDecoration: "none" }}
     >
       <Tooltip
         title={!status && matches ? item.title : ""}

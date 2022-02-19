@@ -1,10 +1,12 @@
-import { Box, Theme, Tooltip, Typography } from "@mui/material";
+
+import { FC, useCallback, useMemo } from "react";
+import { Box, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
 
-import { FC } from "react";
 import { palette } from "../../theme/colors";
 
 import { Vector } from "../icons/Vector";
+
 
 type IProps = {
   status: boolean,
@@ -15,17 +17,27 @@ export const ArrowToggler: FC<IProps> = ({
   status,
   toggleOpenMenu
 }) => {
+
+  const handleTooglerClick = useCallback(() => {
+    toggleOpenMenu(status)
+  }, [toggleOpenMenu, status])
+
+  const togglerBtSx = useMemo(() => {
+    return status ? {
+      ...styles.togglerButton,
+      ...styles.togglerButtonActive
+    } : styles.togglerButton
+  }, [status])
+
   return (
     <Box
       sx={styles.wrapper}
-      onClick={() => toggleOpenMenu(status)}>
-      <Box
-        sx={status === true ? { ...styles.togglerButton, ...styles.togglerButtonActive } : styles.togglerButton}
-      >
-        <Vector
-          {...{ svgColor: palette.active.primary }}
-        />
+      onClick={handleTooglerClick}
+    >
+      <Box sx={togglerBtSx}>
+        <Vector svgColor={palette.active.primary} />
       </Box>
+
       {status && (
         <Typography
           lineHeight={"54px"}
@@ -44,16 +56,14 @@ export const ArrowToggler: FC<IProps> = ({
 
 const styles = {
   wrapper: {
-    '@media (min-width: 768px)': {
-      mt: "5px",
-      display: 'flex',
-      minWidth: '100%',
-      height: '54px',
-      borderRadius: '4px',
-      ":hover": {
-        backgroundColor: "#EBECFC",
-        cursor: "pointer"
-      }
+    mt: "5px",
+    display: 'flex',
+    minWidth: '100%',
+    height: '54px',
+    borderRadius: '4px',
+    ":hover": {
+      backgroundColor: "#EBECFC",
+      cursor: "pointer"
     },
     '@media (min-width: 2048px)': {
       display: 'none',
@@ -61,12 +71,13 @@ const styles = {
   } as SxProps<Theme>,
 
   togglerButton: {
-    padding: "15px 15px",
     cursor: "pointer",
     transition: "transform 0.3s ease-out",
     color: "black",
+    padding: "13px",
     '@media (min-width: 768px)': {
-      display: 'flex'
+      display: 'flex',
+      padding: "15px",
     },
     '@media (min-width: 2048px)': {
       display: 'none'
