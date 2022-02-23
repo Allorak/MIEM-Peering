@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import {
   HorizontalGridLines,
   LineMarkSeries,
-  LineMarkSeriesPoint,
-  LineSeries, LineSeriesPoint,
+  LineSeries,
+  LineSeriesPoint,
   VerticalGridLines,
   XAxis,
   XYPlot,
@@ -14,7 +14,7 @@ import { SxProps } from "@mui/system";
 
 import { palette } from "../../theme/colors";
 
-import { IStudentSubmissionGrades, Reviewers } from "../../store/types";
+import { IStudentSubmissionGrades, IWorkReviewСoordinates, Reviewers } from "../../store/types";
 
 import * as globalStyles from "../../const/styles";
 
@@ -23,47 +23,61 @@ interface IProps {
 }
 
 export const TaskLineGraphStudent: FC<IProps> = ({ graphProps }) => {
-  const teacherGraph = graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.TEACHER)
-  const expertGraph = graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.EXPERT)
-  const peersGraph = graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.PEER)
+  const teacherGraph = useMemo(() => {
+    return graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.TEACHER)
+  }, [graphProps])
 
-  const teacherData: LineSeriesPoint[] | undefined = teacherGraph.length > 0 && peersGraph.length > 0 ?
-    peersGraph.map((peersCoordinate, index) => ({
-      y: teacherGraph[0].value,
-      x: index
-    })) : undefined
+  const expertGraph = useMemo(() => {
+    return graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.EXPERT)
+  }, [graphProps])
 
-  const expertData: LineSeriesPoint[] | undefined = expertGraph.length > 0 && peersGraph.length > 0 ?
-    peersGraph.map((peersCoordinate, index) => ({
-      y: expertGraph[0].value,
-      x: index
-    })) : undefined
+  const peersGraph = useMemo(() => {
+    return graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.PEER)
+  }, [graphProps])
 
-  const peersData: LineMarkSeriesPoint[] | undefined = peersGraph.length > 0 ?
-    peersGraph.map((peersCoordinate, index) => ({
-      y: peersCoordinate.value,
-      x: index
-    })) : undefined
+  const dataLength = useMemo(() => {
+    return peersGraph.length > 1 ? peersGraph.length : 2
+  }, [peersGraph])
 
-  if ((peersGraph.length === 0 || peersGraph.length === 1)) {
-    if (teacherGraph.length > 0 && teacherData) {
-      teacherData.push(
-        {
+  const teacherData = useMemo((): LineSeriesPoint[] | undefined => {
+    if (teacherGraph.length > 0) {
+      const graphData: LineSeriesPoint[] = []
+      for (let i = 0; i < dataLength; i++) {
+        graphData.push({
           y: teacherGraph[0].value,
-          x: teacherData.length
-        }
-      )
-    }
+          x: i
+        })
+      }
 
-    if (expertGraph.length > 0 && expertData) {
-      expertData.push(
-        {
-          y: expertGraph[0].value,
-          x: expertData.length
-        }
-      )
+      return graphData
     }
-  }
+  }, [teacherGraph, dataLength])
+
+  const expertData = useMemo((): LineSeriesPoint[] | undefined => {
+    if (expertGraph.length > 0) {
+      const graphData: LineSeriesPoint[] = []
+      for (let i = 0; i < dataLength; i++) {
+        graphData.push({
+          y: expertGraph[0].value,
+          x: i
+        })
+      }
+
+      return graphData
+    }
+  }, [expertGraph, dataLength])
+
+  const peersData = useMemo((): LineSeriesPoint[] | undefined => {
+    if (peersGraph.length > 0) {
+      const clonePeersGraph: IWorkReviewСoordinates[] = JSON.parse(JSON.stringify(peersGraph))
+      return clonePeersGraph.map((item, index) => (
+        {
+          y: item.value,
+          x: index
+        }
+      ))
+    }
+  }, [peersGraph, dataLength])
 
   const teacherColor = palette.hover.danger
   const expertColor = palette.hover.success
