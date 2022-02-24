@@ -212,7 +212,7 @@ namespace patools.Services.PeeringTasks
                 new AuthenticationHeaderValue("Bearer", _configuration.GetSection("LTI:AppToken").Value);
             var httpResponseMessage = await httpClient.PostAsync(_configuration.GetSection("LTI:CreateTaskLink").Value,content);
             if (httpResponseMessage.IsSuccessStatusCode == false)
-                BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade), TimeSpan.FromSeconds(10));
+                BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade), TimeSpan.FromSeconds(13));
             return "Success";
         }
         private static bool AreDeadlinesValid(AddPeeringTaskSettingsDto settings)
@@ -1078,7 +1078,8 @@ namespace patools.Services.PeeringTasks
             }
 
             await Context.SaveChangesAsync();
-            await ScheduleLtiGrades(task);
+            if(task.SharedSecret != null && task.ConsumerKey != null)
+                await ScheduleLtiGrades(task);
             return new SuccessfulResponse<string>("Factors recalculated successfully. All grades are set");
         }
 

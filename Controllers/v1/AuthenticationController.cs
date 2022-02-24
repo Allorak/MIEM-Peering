@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.Net.Http;
+using System.Text;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
 using patools.Dtos.Auth;
@@ -7,6 +10,9 @@ using patools.Dtos.User;
 using Microsoft.AspNetCore.Authentication;
 using patools.Services.Authentication;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using patools.Errors;
 
 namespace patools.Controllers.v1
@@ -60,10 +66,35 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("lti/{taskId}")]
-        public async Task<ActionResult<Response<bool>>> LtiAuth([FromRoute] Guid taskId, GetJwtByLtiRequest tokenInfo)
+        public async void LtiAuth([FromRoute] Guid taskId,[FromForm] GetJwtByLtiRequest tokenInfo)
         {
-            await _authenticationService.AuthenticateLti(tokenInfo.user_data);
-            return Redirect($"{_configuration.GetSection("LTI:RedirectFromLTI").Value}/{taskId}/overview");
+            var isUserRegisteredResult = await _authenticationService.IsLtiTokenUserRegistered(tokenInfo.user_data);
+            if (isUserRegisteredResult.Success == false)
+                return;
+            if (isUserRegisteredResult.Payload != "")
+            {
+                try
+                {
+                    Response.Cookies.Append("JWT", isUserRegisteredResult.Payload);
+                    Response.Redirect($"{_configuration.GetSection("LTI:RedirectFromLTI").Value}/{taskId}/overview");
+                }
+                catch
+                {
+                    
+                }
+
+                return;
+            }
+
+            try
+            {
+                Response.Cookies.Append("JWT", "");
+                Response.Redirect("~/login");
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using patools.Dtos.Auth;
 using patools.Dtos.User;
@@ -26,22 +27,18 @@ using Org.BouncyCastle.Security;
 
 namespace patools.Services.Authentication
 {
-    public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService : ServiceBase,IAuthenticationService
     {
-        private readonly PAToolsContext _context;
-        private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-        public AuthenticationService(PAToolsContext context, IMapper mapper, IConfiguration configuration)
+        public AuthenticationService(PAToolsContext context, IMapper mapper, IConfiguration configuration) : base(context,mapper)
         {
             _configuration = configuration;
-            _mapper = mapper;
-            _context = context;
         }
 
         public async Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email)
         {
             //GetUser - Base
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await Context.Users.FirstOrDefaultAsync(u => u.Email == email);
             //
             
             if(user == null)
@@ -60,62 +57,48 @@ namespace patools.Services.Authentication
             {
                 Status = "REGISTERED",
                 AccessToken = CreateJwtFromUser(user),
-                User = _mapper.Map<GetRegisteredUserDtoResponse>(user)
+                User = Mapper.Map<GetRegisteredUserDtoResponse>(user)
             });
         }
 
-        public async Task<Response<string>> AuthenticateLti(string userToken)
+        public async Task<Response<string>> IsLtiTokenUserRegistered(string userToken)
         {
-            var tokenParts = userToken.Split(".");
-            var header = tokenParts[0];
-            var payload = tokenParts[1];
-            var signature = tokenParts[2];
-
-            var decryptedSignature = Base64UrlDecode(signature);
-            
-            var keyBytes = Convert.FromBase64String(_configuration.GetSection("LTI:OpenKey").Value); // your key here
-    
-            var asymmetricKeyParameter = PublicKeyFactory.CreateKey(keyBytes);
-            var rsaKeyParameters = (RsaKeyParameters)asymmetricKeyParameter;
-            var rsaParameters = new RSAParameters
-            {
-                Modulus = rsaKeyParameters.Modulus.ToByteArrayUnsigned(),
-                Exponent = rsaKeyParameters.Exponent.ToByteArrayUnsigned()
-            };
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(rsaParameters);
- 
-            var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(header + '.' + payload));
- 
-            var rsaDeformatter = new RSAPKCS1SignatureDeformatter(rsa);
-            rsaDeformatter.SetHashAlgorithm("SHA256");
-            if (!rsaDeformatter.VerifySignature(hash, decryptedSignature))
-                return new InvalidJwtTokenResponse<string>();
-            var payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(payload));
+            Console.WriteLine(userToken);
+            var payload = userToken.Split(".")[1];
+            var payloadJson = Encoding.UTF8.GetString(FromBase64Url(payload));
             var payloadData = JObject.Parse(payloadJson);
 
-            Console.WriteLine(payloadData["user_email"]);
-            Console.WriteLine(payloadData["user_is_student"]);
-            Console.WriteLine(payloadData["user_is_instructor"]);
-            Console.WriteLine(payloadData["user_full_name"]);
-            return new SuccessfulResponse<string>("Token validated successfully");
-        }
+            if (!payloadData.ContainsKey("user_email"))
+                return new InvalidJwtTokenResponse<string>();
+            if (!payloadData.ContainsKey("user_is_student"))
+                return new InvalidJwtTokenResponse<string>();
+            if (!payloadData.ContainsKey("user_is_instructor"))
+                return new InvalidJwtTokenResponse<string>();
+            if (!payloadData.ContainsKey("user_full_name"))
+                return new InvalidJwtTokenResponse<string>();
 
-        private static byte[] Base64UrlDecode(string input)
+            var email = payloadData["user_email"]?.ToString();
+            var isStudent = payloadData["user_is_student"]?.ToString() == "True";
+            var isTeacher = payloadData["user_is_instructor"]?.ToString()  == "True";
+            var fullname = payloadData["user_full_name"]?.ToString();
+
+            var user = await GetUserByEmail(email);
+
+            return user != null ? new SuccessfulResponse<string>(CreateJwtFromUser(user)) : new SuccessfulResponse<string>("");
+        }
+        private static byte[] FromBase64Url(string base64Url)
         {
-            var output = input;
-            output = output.Replace('-', '+'); 
-            output = output.Replace('_', '/');
-            output += new string('=', output.Length % 4);
-            var converted = Convert.FromBase64String(output);
-            return converted;
+            var padded = base64Url.Length % 4 == 0
+                ? base64Url : base64Url + "===="[(base64Url.Length % 4)..];
+            var base64 = padded.Replace("_", "/")
+                .Replace("-", "+");
+            return Convert.FromBase64String(base64);
         }
         
         public async Task<Response<GetJwtTokenDtoResponse>> GetJwtByEmail(string email)
         {
             //GetUser - Base
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await Context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if(user == null)
                 return new BadRequestDataResponse<GetJwtTokenDtoResponse>("The user is not registered");
             //
@@ -145,7 +128,7 @@ namespace patools.Services.Authentication
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(permClaims),
-                Expires = DateTime.Now.AddDays(10),
+                Expires = DateTime.Now.AddDays(14),
                 SigningCredentials = credentials
             };
 
