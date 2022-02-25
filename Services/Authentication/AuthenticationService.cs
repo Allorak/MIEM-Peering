@@ -21,9 +21,6 @@ using patools.Dtos.User;
 using patools.Errors;
 using patools.Models;
 using SystemTask = System.Threading.Tasks;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
 
 namespace patools.Services.Authentication
 {

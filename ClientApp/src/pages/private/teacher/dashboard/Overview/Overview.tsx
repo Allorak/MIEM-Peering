@@ -34,7 +34,7 @@ export const Overview: FC = () => {
       error={error}
     >
       {payload && (
-        <Grid container spacing={"10px"} padding={"0px 0px 5px 0px"}>
+        <Grid container spacing={"10px"} pb={"10px"} boxSizing={'border-box'}>
           <Grid item xs={12} >
             <Deadlines
               submissionStartDateTime={payload.deadlines.submissionStartDateTime}
@@ -44,15 +44,15 @@ export const Overview: FC = () => {
             />
           </Grid>
 
-          <Grid item xs={12} lg={6}>
+          <Grid item xs={12} lg={4}>
             <TaskTypeBlock type={payload.reviewType} />
           </Grid>
 
-          <Grid item xs={12} lg={6}>
+          <Grid item xs={12} lg={4}>
             <StepCheckBlock step={payload.taskType} />
           </Grid>
 
-          <Grid item lg={12}>
+          <Grid item xs={12} lg={4}>
             <Formula
               submissionWeight={payload.submissionWeight}
               reviewWeight={payload.reviewWeight}

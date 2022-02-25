@@ -28,12 +28,11 @@ export const WorkResponse: FC<IProps> = ({ responses }) => {
 
 const styles = {
   wrapper: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-    maxHeight: "calc(100vh - 183px - 62px)",
-    '@media (max-width: 900px)': {
-      maxHeight: "calc(100vh - 183px - 132px)",
+    maxHeight: "calc(100vh - 146px - 62px)",
+    pb: "5px",
+    boxSizing: "border-box",
+    '@media (max-width: 899px)': {
+      maxHeight: "calc(100vh - 258px)",
     },
     overflowY: 'auto',
     ...scrollStyles

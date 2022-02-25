@@ -36,7 +36,7 @@ export const Overview: FC = () => {
       error={error}
     >
       {payload && (
-        <Grid container spacing={"10px"} padding={"0px 0px 5px 0px"}>
+        <Grid container spacing={"10px"} pb={"10px"} boxSizing={'border-box'}>
           <Grid item xs={12} >
             <Deadlines
               submissionStartDateTime={payload.deadlines.submissionStartDateTime}

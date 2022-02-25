@@ -2,13 +2,12 @@ import { FC } from "react";
 import { Typography, Box, useMediaQuery, FormControl, Select, MenuItem } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 
-import { IWorkItem } from "../../../../../store/types";
-
-import { scrollStyles } from "../../../../../const/styles";
+import { IWorkItem } from "../../store/types";
+import { scrollStyles } from "../../const/styles";
 
 
 interface IProps {
-  worksCatalog?: IWorkItem[]
+  worksCatalog: IWorkItem[]
   activeWorkId: string
   onWorkChange(workId: string): void
 }
@@ -19,11 +18,11 @@ export const WorksList: FC<IProps> = ({
   worksCatalog
 }) => {
 
-  const matches = useMediaQuery('(max-width:900px)');
+  const matches = useMediaQuery('(max-width:899px)');
 
   return (
     <Box sx={styles.wrapper}>
-      {!matches && worksCatalog && worksCatalog.length > 0 && (
+      {!matches && (
         worksCatalog.map((work, index) => (
           <Box
             key={work.submissionId}
@@ -37,8 +36,8 @@ export const WorksList: FC<IProps> = ({
         ))
       )}
 
-      {matches && worksCatalog && worksCatalog.length > 0 && (
-        <FormControl fullWidth>
+      {matches && (
+        <FormControl fullWidth >
           <Select
             value={activeWorkId}
             onChange={(e) => { onWorkChange(e.target.value) }}
@@ -64,7 +63,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',
-    maxHeight: "calc(100vh - 183px)",
+    maxHeight: "calc(100vh - 145px)",
     overflowY: 'auto',
     ...scrollStyles
   } as SxProps<Theme>,

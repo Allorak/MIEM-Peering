@@ -35,44 +35,45 @@ export const Formula: FC<IProps> = ({
       <Typography variant={'h6'}>
         {"Формула для расчета итоговой оценки"}
       </Typography>
+      <Box margin={"auto 0"}>
+        <Box textAlign={"center"}>
+          <Equation
+            style={{ fontSize: "21px" }}
+            value={finalFormula}
+          />
+        </Box>
 
-      <Box textAlign={"center"}>
-        <Equation
-          style={{ fontSize: "21px" }}
-          value={finalFormula}
-        />
+        <Typography
+          variant={'body1'}
+          whiteSpace={"pre-line"}
+          textAlign={"center"}
+        >
+          <Equation value={gradeFinal} />
+          {" -- итоговая оценка."}
+          <br />
+
+          <Equation value={gradeSubmission} />
+          {" -- оценка за работу. "}
+          <br />
+
+          <Equation value={gradeReview} />
+          {" -- оценка за проверку. "}
+          <br />
+
+          {(badCoefficientPenalty || goodCoefficientBonus) && (
+            <>
+              <Equation value={gradeBonusPenalty} />
+              {" --  бонус или штраф за "}
+              <b>{"текущий"}</b>
+              {" коэф. доверия. Если у студента текущий коэф. доверия меньше чем 0.35, то будет штраф "}
+              <b>{typeof badCoefficientPenalty === 'number' ? `${badCoefficientPenalty}.` : "-0."}</b>
+
+              {" Если у студента текущий коэф. доверия больше чем 0.75, то будет бонус  "}
+              <b>{typeof goodCoefficientBonus === 'number' ? `+${goodCoefficientBonus}.` : "+0."}</b>
+            </>
+          )}
+        </Typography>
       </Box>
-
-      <Typography
-        variant={'body1'}
-        whiteSpace={"pre-line"}
-        textAlign={"center"}
-      >
-        <Equation value={gradeFinal} />
-        {" -- итоговая оценка."}
-        <br />
-
-        <Equation value={gradeSubmission} />
-        {" -- оценка за работу. "}
-        <br />
-
-        <Equation value={gradeReview} />
-        {" -- оценка за проверку. "}
-        <br />
-
-        {(badCoefficientPenalty || goodCoefficientBonus) && (
-          <>
-            <Equation value={gradeBonusPenalty} />
-            {" --  бонус или штраф за "}
-            <b>{"текущий"}</b>
-            {" коэф. доверия. Если у студента текущий коэф. доверия меньше чем 0.35, то будет штраф "}
-            <b>{typeof badCoefficientPenalty === 'number' ? `${badCoefficientPenalty}.` : "-0."}</b>
-
-            {" Если у студента текущий коэф. доверия больше чем 0.75, то будет бонус  "}
-            <b>{typeof goodCoefficientBonus === 'number' ? `+${goodCoefficientBonus}.` : "+0."}</b>
-          </>
-        )}
-      </Typography>
     </Box >
   )
 }
@@ -87,6 +88,6 @@ const styles = {
     display: 'flex',
     boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
     gap: "10px",
-    flexDirection: "column"
+    flexDirection: "column",
   } as SxProps<Theme>,
 }

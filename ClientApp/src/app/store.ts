@@ -10,12 +10,10 @@ import { reducer as tasks } from '../store/tasks'
 import { reducer as overview } from '../store/overview'
 import { reducer as overviewStudent } from '../store/overviewStudent'
 import { reducer as overviewExpert } from '../store/overviewExpert'
-import { reducer as works } from '../store/works'
 import { reducer as experts } from '../store/experts'
 import { reducer as checkings } from '../store/checkings'
 import { reducer as authorForm } from '../store/authorformStudent'
 import { reducer as dashboard } from '../store/dashboard'
-import { reducer as deadlineStatus } from '../store/deadlineStatus'
 import { reducer as myWork } from '../store/myWork'
 import { reducer as grades } from '../store/grades'
 
@@ -27,7 +25,6 @@ export const store = configureStore({
     userProfile,
     registration,
     dashboard,
-    deadlineStatus,
     courses,
     newCourse,
     joinCourse,
@@ -35,7 +32,6 @@ export const store = configureStore({
     overview,
     overviewStudent,
     overviewExpert,
-    works,
     experts,
     checkings,
     authorForm,
