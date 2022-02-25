@@ -95,57 +95,68 @@ export const TaskLineGraphStudent: FC<IProps> = ({ graphProps }) => {
         >
           {"Результаты проверки"}
         </Typography>
-
         <Box
-          sx={styles.graphContainer}
+          sx={{
+            display: "flex",
+            justifyContent: "center"
+          }}
         >
-          <XYPlot
-            height={300}
-            width={980}
-            xType="linear"
-            onTouchMove={(e) => e.preventDefault()}
-            yDomain={[graphProps.minGrade, graphProps.maxGrade]}
+          <Box
+            sx={{
+              height: "355px",
+              overflowY: "auto",
+              ...globalStyles.scrollStyles
+            }}
           >
-            <HorizontalGridLines />
-            <VerticalGridLines />
-            <YAxis title="Оценки" />
-            <XAxis />
 
-            {teacherData && (
-              <LineSeries
-                style={{
-                  strokeWidth: '2px'
-                }}
-                color={teacherColor}
-                data={teacherData}
-                animation={{ damping: 20, stiffness: 80 }}
-              />
-            )}
+            <XYPlot
+              height={300}
+              width={980}
+              xType="linear"
+              onTouchMove={(e) => e.preventDefault()}
+              yDomain={[graphProps.minGrade, graphProps.maxGrade]}
+            >
+              <HorizontalGridLines />
+              <VerticalGridLines />
+              <YAxis title="Оценки" />
+              <XAxis />
 
-            {expertData && (
-              <LineSeries
-                style={{
-                  strokeWidth: '2px',
-                  opacity: 0.8
-                }}
-                color={expertColor}
-                data={expertData}
-                animation={{ damping: 10, stiffness: 40 }}
-              />
-            )}
+              {teacherData && (
+                <LineSeries
+                  style={{
+                    strokeWidth: '2px'
+                  }}
+                  color={teacherColor}
+                  data={teacherData}
+                  animation={{ damping: 20, stiffness: 80 }}
+                />
+              )}
 
-            {peersData && (
-              <LineMarkSeries
-                style={{
-                  strokeWidth: '2px'
-                }}
-                lineStyle={{ stroke: peersColor, opacity: 0.8 }}
-                markStyle={{ fill: peersColor, strokeWidth: "0px" }}
-                data={peersData}
-                animation={{ damping: 10, stiffness: 20 }}
-              />
-            )}
-          </XYPlot>
+              {expertData && (
+                <LineSeries
+                  style={{
+                    strokeWidth: '2px',
+                    opacity: 0.8
+                  }}
+                  color={expertColor}
+                  data={expertData}
+                  animation={{ damping: 10, stiffness: 40 }}
+                />
+              )}
+
+              {peersData && (
+                <LineMarkSeries
+                  style={{
+                    strokeWidth: '2px'
+                  }}
+                  lineStyle={{ stroke: peersColor, opacity: 0.8 }}
+                  markStyle={{ fill: peersColor, strokeWidth: "0px" }}
+                  data={peersData}
+                  animation={{ damping: 10, stiffness: 20 }}
+                />
+              )}
+            </XYPlot>
+          </Box>
         </Box>
       </Box>
 
@@ -228,7 +239,6 @@ const styles = {
     }
   } as SxProps<Theme>,
   graphContainer: {
-    margin: "0px auto",
     overflow: "auto",
     ...globalStyles.scrollStyles
   } as SxProps<Theme>,

@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { generatePath, NavLink as RouterLink } from 'react-router-dom'
 import { Link, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
@@ -7,36 +7,122 @@ import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { EditableForm } from "../../../../../components/editableForm";
 import { AccessTime } from "../../../../../components/assessTime";
 
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
-import { fetchAuthorformStudent, fetchWorkSubmissionStatus, postAuthorformStudent } from "../../../../../store/authorformStudent";
-import { DeadlineStatus, IAuthorForm, IAuthorFormResponses, IQuestionTypes, ISubmissionStatus } from "../../../../../store/types";
+import { fetchAuthorForm, fetchSubmissionPossibility, postSubmission } from "../../../../../store/authorformStudent";
+import { DeadlineStatus, IAuthorForm, IAuthorFormResponses, IError, IQuestionTypes, ISubmissionStatus } from "../../../../../store/types";
 import { fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
 
 import { paths } from "../../../../../app/constants/paths";
 
 
 export const Authorform: FC = () => {
-  const dispatch = useAppDispatch()
   const { path } = usePrivatePathStDashboard()
 
-  const statusDeadline = useAppSelector(state => state.deadlineStatus.isLoading)
-  const submissionStatus = useAppSelector(state => state.deadlineStatus.submissionStatus)
-  const submissionWorkStatus = useAppSelector(state => state.authorForm.submissionWorkStatus)
-  const submissionError = useAppSelector(state => state.deadlineStatus.error)
-  const status = useAppSelector(state => state.authorForm.isLoading)
-  const error = useAppSelector(state => state.authorForm.error)
-  const authorForm = useAppSelector(state => state.authorForm.authorFormPayload)
-  const [responses, setResponses] = useState<IAuthorForm>()
+  const pathToWork = generatePath(paths.student.dashboard.work, { taskId: path?.taskId })
+
+  const accessToken = useAppSelector(state => state.auth.accessToken)
+
+  const [isLoadingDeadlineStatus, setLoadingDeadlineStatus] = useState(false)
+  const [submissionDeadlineStatus, setSubmissionDeadlineStatus] = useState<DeadlineStatus>()
+
+  const [isLoadingSubmissionPossibility, setLoadingSubmissionPossibility] = useState(false)
+  const [submissionPossibility, setSubmissionPossibility] = useState<ISubmissionStatus>()
+
+  const [isLoadingAuthorForm, setLoadingAuthorForm] = useState(false)
+  const [authorForm, setAuthorForm] = useState<IAuthorForm>()
+
+  const [isLoadingSubmission, setLoadingSubmission] = useState(false)
+  const [submission, setSumbission] = useState<IAuthorForm>()
+
+  const [error, setError] = useState<IError>()
+
+  useEffect(() => {
+    getSubmissionStatus()
+  }, [])
+
+  useEffect(() => {
+    getSubmissionPossibility()
+  }, [submissionDeadlineStatus])
+
+  useEffect(() => {
+    getAuthorForm()
+  }, [submissionPossibility])
+
+  useEffect(() => {
+    if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0) {
+      setSumbission(authorForm)
+    }
+  }, [authorForm])
+
+  const getSubmissionStatus = useCallback(() => {
+    if (path && path.taskId && accessToken) {
+      setLoadingDeadlineStatus(true)
+      fetchSubmissionStatus(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setSubmissionDeadlineStatus(response.payload.state)
+        } else {
+          setSubmissionDeadlineStatus(undefined)
+          setError(response.error)
+        }
+        setLoadingDeadlineStatus(false)
+      })
+    }
+  }, [path, accessToken])
+
+  const getSubmissionPossibility = useCallback(() => {
+    if (path && path.taskId && accessToken && submissionDeadlineStatus && submissionDeadlineStatus !== DeadlineStatus.NOT_STARTED) {
+      setLoadingSubmissionPossibility(true)
+      fetchSubmissionPossibility(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setSubmissionPossibility(response.payload)
+        } else {
+          setSubmissionPossibility(undefined)
+          setError(error)
+        }
+        setLoadingSubmissionPossibility(false)
+      })
+    }
+  }, [submissionDeadlineStatus, path, accessToken])
+
+  const getAuthorForm = useCallback(() => {
+    if (path && path.taskId && accessToken && submissionDeadlineStatus === DeadlineStatus.START && submissionPossibility === ISubmissionStatus.NOT_COMPLETED) {
+      setLoadingAuthorForm(true)
+      fetchAuthorForm(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setAuthorForm(JSON.parse(
+            JSON.stringify(response.payload)
+          ))
+        } else {
+          setAuthorForm(undefined)
+          setError(response.error)
+        }
+        setLoadingAuthorForm(false)
+      })
+    }
+  }, [path, accessToken, submissionDeadlineStatus, submissionPossibility])
 
   const onRequest = useCallback((formResponses: IAuthorFormResponses) => {
-    if (path && path.taskId && formResponses.answers)
-      dispatch(postAuthorformStudent(path.taskId, formResponses))
-  }, [path])
+    if (path && path.taskId && formResponses.answers && accessToken) {
+      setLoadingSubmission(true)
+      postSubmission(path.taskId, formResponses, accessToken).then(response => {
+        if (response.success) {
+          setSumbission(undefined)
+          setAuthorForm(undefined)
+          setSubmissionPossibility(undefined)
+          setSubmissionDeadlineStatus(undefined)
+        } else {
+          setError(response.error)
+        }
+        setLoadingSubmission(false)
+        getSubmissionStatus()
+      })
+    }
+  }, [path, accessToken])
 
   const handleOnFormEdit = useCallback((value: string | number | File | undefined, questionId: string) => {
-    setResponses(prev => {
+    setSumbission(prev => {
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
           rubrics: prev.rubrics.map(item => {
@@ -67,61 +153,34 @@ export const Authorform: FC = () => {
         }
       }
     })
-  }, [responses])
+  }, [submission])
 
-  useEffect(() => {
-    if (authorForm && authorForm.rubrics && authorForm.rubrics.length > 0) {
-      setResponses(JSON.parse(JSON.stringify(authorForm)))
-    }
-  }, [authorForm])
-
-  useEffect(() => {
-    if (path && path.taskId && submissionStatus === DeadlineStatus.START && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED) {
-      dispatch(fetchAuthorformStudent(path.taskId))
-    }
-  }, [submissionStatus, submissionWorkStatus])
-
-  useEffect(() => {
-    if (path && path.taskId) {
-      dispatch(fetchSubmissionStatus(path.taskId))
-    }
-  }, [])
-
-  useEffect(() => {
-    if (path && path.taskId && submissionStatus && submissionStatus !== DeadlineStatus.NOT_STARTED) {
-      dispatch(fetchWorkSubmissionStatus(path.taskId))
-    }
-  }, [submissionStatus])
-
-  const mainStatus = submissionStatus ? status : statusDeadline
-  const mainError = submissionStatus ? error : submissionError
-
-  const pathToWork = generatePath(paths.student.dashboard.work, { taskId: path?.taskId })
+  const dashboardLoading = useMemo(() => (
+    isLoadingDeadlineStatus ?? isLoadingSubmissionPossibility ?? isLoadingAuthorForm ?? isLoadingSubmission
+  ), [isLoadingDeadlineStatus, isLoadingSubmissionPossibility, isLoadingAuthorForm, isLoadingSubmission])
 
   return (
     <DashboardWorkBox
-      isLoading={mainStatus}
-      error={mainError}
+      isLoading={dashboardLoading}
+      error={error}
     >
-      {responses && responses.rubrics && responses.rubrics.length > 0 && submissionStatus === DeadlineStatus.START && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED && (
-        <>
-          <EditableForm
-            form={responses}
-            onSubmit={onRequest}
-            onEdit={handleOnFormEdit}
-          />
-        </>
+      {submissionDeadlineStatus === DeadlineStatus.START && submissionPossibility === ISubmissionStatus.NOT_COMPLETED && authorForm && submission && (
+        <EditableForm
+          form={submission}
+          onSubmit={onRequest}
+          onEdit={handleOnFormEdit}
+        />
       )}
 
-      {submissionStatus && submissionStatus === DeadlineStatus.NOT_STARTED && (
+      {submissionDeadlineStatus === DeadlineStatus.NOT_STARTED && (
         <AccessTime label={"Доступ ограничен"} />
       )}
 
-      {submissionStatus && submissionStatus === DeadlineStatus.END && submissionWorkStatus === ISubmissionStatus.NOT_COMPLETED && (
+      {submissionDeadlineStatus === DeadlineStatus.END && submissionPossibility === ISubmissionStatus.NOT_COMPLETED && (
         <AccessTime label={"Доступ ограничен. Работа не сдана"} />
       )}
 
-      {submissionStatus && submissionWorkStatus === ISubmissionStatus.COMPLETED && (submissionStatus === DeadlineStatus.START || submissionStatus === DeadlineStatus.END) && (
+      {submissionDeadlineStatus && submissionDeadlineStatus !== DeadlineStatus.NOT_STARTED && submissionPossibility === ISubmissionStatus.COMPLETED && (
         <>
           <AccessTime label={"Работа успешно сдана!"} />
 

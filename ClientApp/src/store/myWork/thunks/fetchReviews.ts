@@ -1,42 +1,6 @@
-import { actions } from "..";
-import { AppThunk } from "../../../app/store";
-
-import { IErrorCode } from "../../types";
 import { getMyWorkReviews } from "../../../api/getMyWorkReviews";
 
 
-export const fetchReviews = (taskId: string): AppThunk => async (dispatch, getState) => {
-    dispatch(actions.fetchReviewsStarted())
-    const accessToken = getState().auth.accessToken
-
-    if (!accessToken) {
-        dispatch(actions.fetchFailed({
-            code: IErrorCode.NO_ACCESS,
-            message: 'Ошибка аутентификации',
-        }))
-        return
-    }
-
-    try {
-        const response = await getMyWorkReviews({ accessToken, taskId })
-        if (!response) {
-            dispatch(actions.fetchFailed({
-                code: IErrorCode.RESPONSE,
-                message: 'Некорректный ответ сервера',
-            }))
-            return
-        }
-        if (!response.success) {
-            dispatch(actions.fetchFailed(response.error))
-            return
-        }
-        dispatch(actions.fetchReviewsSuccess(JSON.parse(JSON.stringify(response.payload))))
-        return
-
-    } catch (error) {
-        dispatch(actions.fetchFailed({
-            code: IErrorCode.REQUEST,
-            message: 'Не удалось выполнить запрос'
-        }));
-    }
+export const fetchReviews = async (taskId: string, accessToken: string) => {
+    return await getMyWorkReviews({ accessToken, taskId })
 }

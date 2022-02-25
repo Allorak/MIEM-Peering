@@ -1,5 +1,6 @@
-export { fetchMyWork } from "./thunks/fetchMyWork";
+export { fetchSubmission } from "./thunks/fetchSubmission";
 export { fetchReviews } from "./thunks/fetchReviews";
+export { fetchSubmissionId } from "./thunks/fetchSubmissionId";
 
 export {
   actions,
