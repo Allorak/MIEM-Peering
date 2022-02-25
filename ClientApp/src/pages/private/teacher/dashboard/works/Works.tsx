@@ -1,12 +1,12 @@
 import React from "react";
 import { FC, useCallback, useEffect, useState } from "react";
 import { Box, SxProps, Theme } from "@mui/system";
-import { Button, Typography } from "@mui/material";
+import { Button, Grid, Typography, useMediaQuery } from "@mui/material";
 import Slide from '@mui/material/Slide';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import { TransitionProps } from '@mui/material/transitions';
 
-import { WorksList } from "./WorksList";
+
 import { WorkResponse } from "./WorkResponse";
 import { WorkStatistics } from "./WorkStatistics";
 
@@ -15,10 +15,11 @@ import { fetchWorkList, fetchStudentWork, fetchStudentWorkStatistics } from "../
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { Popup } from "../../../../../components/popup";
 import { NoData } from "../../../../../components/noData";
+import { WorksList } from "../../../../../components/workList";
 
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
-import { IWorkItem } from "../../../../../store/types";
+import { IError, IStudentWork, IWorkItem, IWorks, IWorkStatistics } from "../../../../../store/types";
 
 import * as globalStyles from "../../../../../const/styles";
 
@@ -34,56 +35,102 @@ const Transition = React.forwardRef(function Transition(
 
 export const Works: FC = () => {
 
-  const dispatch = useAppDispatch()
+  const matches = useMediaQuery('(max-width:899px)');
 
   const { path } = usePrivatePathTDashboard()
 
-  const isWorkListLoading = useAppSelector(state => state.works.isWorkListLoading)
-  const isWorkListLock = useAppSelector(state => state.works.isWorkListLock)
-  const isStudentWorkLoading = useAppSelector(state => state.works.isStudentWorkLoading)
-  const isStudentWorkLock = useAppSelector(state => state.works.isStudentWorkLock)
-  const isStudentWorkStatisticLoading = useAppSelector(state => state.works.isWorkStatisticsLoading)
-  const workList = useAppSelector(state => state.works.workList?.submissionsInfo)
-  const studentWork = useAppSelector(state => state.works.studentWork)
-  const workStatistics = useAppSelector(state => state.works.workStatistics)
-  const error = useAppSelector(state => state.works.error)
+  const accessToken = useAppSelector(state => state.auth.accessToken)
+
+  const [isWorkListLoading, setWorkListLoading] = useState(false)
+  const [workList, setWorkList] = useState<IWorks>()
+
+  const [isStudentWorkLoading, setStudentWorkLoading] = useState(false)
+  const [studentWork, setStudentWork] = useState<IStudentWork>()
+
+  const [isStudentWorkStatisticLoading, setStudentWorkStatisticLoading] = useState(false)
+  const [workStatistics, setWorkStatistics] = useState<IWorkStatistics | null>()
+
+  const [error, setError] = useState<IError>()
 
   const [activeWork, setActiveWork] = useState<IWorkItem>()
   const [popupStatus, setPopupStatus] = useState<boolean>(false)
 
   useEffect(() => {
-    if (path && path.taskId)
-      dispatch(fetchWorkList(path.taskId))
+    getWorkList()
   }, [])
 
   useEffect(() => {
-    if (workList && workList.length > 0 && !activeWork) {
-      const defaultSelectedWork = workList[0]
-      requestWorkResponsesById(defaultSelectedWork.submissionId)
-      setActiveWork(JSON.parse(JSON.stringify(defaultSelectedWork)))
+    if (workList && workList.submissionsInfo.length > 0) {
+      const defaultWork = workList.submissionsInfo[0]
+      setActiveWork(defaultWork)
+      getStudentWork(defaultWork.submissionId)
     }
   }, [workList])
 
-  const requestWorkResponsesById = useCallback((workId: string) => {
-    if (path && path.taskId)
-      dispatch(fetchStudentWork(path.taskId, workId))
-  }, [path])
+  const getWorkList = useCallback(() => {
+    if (path && path.taskId && accessToken) {
+      setWorkListLoading(true)
+      fetchWorkList(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setWorkList(JSON.parse(JSON.stringify(response.payload ?? { submissionsInfo: [] })))
+        } else {
+          setError(response.error)
+          setWorkList(undefined)
+        }
+        setWorkListLoading(false)
+      })
+    }
+  }, [path?.taskId, accessToken])
 
-  const handleOnStatistics = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const getStudentWork = useCallback((workId: string) => {
+    if (path && path.taskId && accessToken) {
+      setStudentWorkLoading(true)
+      fetchStudentWork(path.taskId, workId, accessToken).then(response => {
+        if (response.success) {
+          setStudentWork(JSON.parse(JSON.stringify({
+            responses: response.payload.answers
+          })))
+        } else {
+          setError(response.error)
+          setStudentWork(undefined)
+        }
+        setStudentWorkLoading(false)
+      })
+    }
+  }, [accessToken, path?.taskId])
+
+  const getWorkStatistics = useCallback((workId: string) => {
+    if (path && path.taskId && accessToken) {
+      setStudentWorkStatisticLoading(true)
+      fetchStudentWorkStatistics(path.taskId, workId, accessToken).then(response => {
+        if (response.success) {
+          setWorkStatistics(JSON.parse(
+            JSON.stringify(response.payload.statistics ?? [])
+          ))
+        } else {
+          setError(response.error)
+          setWorkStatistics(undefined)
+        }
+        setStudentWorkStatisticLoading(false)
+      })
+    }
+  }, [path?.taskId, accessToken])
+
+  const handleOnStatistics = useCallback(() => {
     if (path && path.taskId && activeWork) {
       setPopupStatus(prev => !prev)
-      dispatch(fetchStudentWorkStatistics(path.taskId, activeWork.submissionId))
+      getWorkStatistics(activeWork.submissionId)
     }
-  }, [popupStatus, activeWork])
+  }, [activeWork])
 
   const handleOnWorkChange = useCallback((workId: string) => {
-    if (workList && workList.length > 0) {
-      const workItem = workList.find(work => work.submissionId === workId)
+    if (workList && workList.submissionsInfo.length > 0 && activeWork && activeWork.submissionId !== workId) {
+      const workItem = workList.submissionsInfo.find(work => work.submissionId === workId)
       if (workItem) {
         setActiveWork(
           JSON.parse(JSON.stringify(workItem))
         )
-        requestWorkResponsesById(workItem.submissionId)
+        getStudentWork(workItem.submissionId)
       }
     }
   }, [activeWork, workList])
@@ -91,12 +138,18 @@ export const Works: FC = () => {
   return (
     <DashboardWorkBox
       isLoading={isWorkListLoading}
-      isLock={isWorkListLock}
       error={error}
     >
-      {workList && workList.length > 0 && activeWork && (
-        <Box sx={styles.gridContainer}>
-          <Box sx={styles.leftContainer}>
+      {workList && workList.submissionsInfo.length > 0 && activeWork && (
+        <Grid container spacing={{ xs: "5px", md: "10px", lg: "25px" }} direction={matches ? 'row' : 'row-reverse'}>
+          <Grid item xs={12} md={2}>
+            <WorksList
+              worksCatalog={workList.submissionsInfo}
+              activeWorkId={activeWork.submissionId}
+              onWorkChange={handleOnWorkChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={10}>
             <Box sx={styles.topActionBox}>
               <Typography
                 variant={"body1"}
@@ -117,7 +170,7 @@ export const Works: FC = () => {
                 variant={"contained"}
                 color={"primary"}
                 startIcon={<QueryStatsIcon sx={{ margin: "0px -8px 0px 0px" }} />}
-                sx={styles.addBt}
+                sx={styles.metaDataBt}
                 onClick={handleOnStatistics}
               >
                 {"Метаданные"}
@@ -126,23 +179,14 @@ export const Works: FC = () => {
 
             <DashboardWorkBox
               isLoading={isStudentWorkLoading}
-              isLock={isStudentWorkLock}
               error={error}
             >
               {studentWork && (
                 <WorkResponse responses={studentWork} />
               )}
             </DashboardWorkBox>
-          </Box>
-
-          <Box sx={styles.rightContainer}>
-            <WorksList
-              worksCatalog={workList}
-              activeWorkId={activeWork.submissionId}
-              onWorkChange={handleOnWorkChange}
-            />
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
       )}
 
       {activeWork && (
@@ -168,7 +212,7 @@ export const Works: FC = () => {
         </Popup>
       )}
 
-      {workList && workList.length === 0 && (
+      {workList && workList.submissionsInfo.length === 0 && (
         <NoData label={"Пока никто не сдал работу..."} />
       )}
     </DashboardWorkBox>
@@ -176,44 +220,23 @@ export const Works: FC = () => {
 }
 
 const styles = {
-  gridContainer: {
-    display: "flex",
-    gap: "25px",
-    width: "100%",
-    alignItems: "flex-start",
-    '@media (max-width: 900px)': {
-      flexDirection: "column-reverse",
-      gap: "10px",
-    }
-  } as SxProps<Theme>,
-  leftContainer: {
-    flex: "1 1 100%",
-    '@media (max-width: 900px)': {
-      flex: "1 1 auto",
-      width: "100%"
-    }
-  } as SxProps<Theme>,
-  rightContainer: {
-    flex: "0 0 230px",
-    '@media (max-width: 900px)': {
-      flex: "1 1 auto",
-      width: "100%"
-    }
-  } as SxProps<Theme>,
   topActionBox: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    margin: "0px 0px 20px 0px"
+    margin: "0px 0px 20px 0px",
+    '@media (max-width: 899px)': {
+      margin: "0px 0px 10px 0px",
+    }
   } as SxProps<Theme>,
-  addBt: {
+  metaDataBt: {
     padding: "8px 20px",
-    '@media (max-width: 900px)': {
+    '@media (max-width: 899px)': {
       flex: "1 1 100%"
     }
   } as SxProps<Theme>,
   subTitle: {
-    '@media (max-width: 900px)': {
+    '@media (max-width: 899px)': {
       display: "none",
       opacity: 0,
       width: "0px",

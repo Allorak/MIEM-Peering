@@ -1,0 +1,1 @@
+export { CheckingsComponent } from "./CheckingsComponent";

@@ -1,234 +1,321 @@
-import { FC, useCallback, useEffect, useState } from "react";
-import { Box, Theme, Typography } from "@mui/material";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { Box, Grid, Theme, Typography, useMediaQuery } from "@mui/material";
 import { SxProps } from "@mui/system";
 
-import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
 import { AccessTime } from "../../../../../components/assessTime";
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { NoData } from "../../../../../components/noData";
 import { VisibleForm } from "../../../../../components/visibleForm";
+import { WorksList } from "../../../../../components/workList";
 
-import { fetchWorkSubmissionStatus } from "../../../../../store/authorformStudent";
+import { fetchSubmissionPossibility } from "../../../../../store/authorformStudent";
 import { fetchReviewStatus, fetchSubmissionStatus } from "../../../../../store/deadlineStatus";
-import { fetchMyWork, fetchReviews } from "../../../../../store/myWork";
-import { DeadlineStatus, IMyWorkReviewsItem, IRole, ISubmissionStatus } from "../../../../../store/types";
+import { fetchSubmission, fetchSubmissionId, fetchReviews } from "../../../../../store/myWork";
 
-import { ReviewsList } from "./ReviewsList";
+import { DeadlineStatus, IError, IMyWorkForm, IMyWorkReviews, IRole, ISubmissionStatus, IWorkItem } from "../../../../../store/types";
 
 import { palette } from "../../../../../theme/colors";
-import * as globalStyles from "../../../../../const/styles"
+import { scrollStyles } from "../../../../../const/styles";
 
 
 export const MyWork: FC = () => {
-  const dispatch = useAppDispatch()
   const { path } = usePrivatePathStDashboard()
 
-  const submissionWorkStatus = useAppSelector(state => state.authorForm.isLoading)
-  const submissionWorkPayload = useAppSelector(state => state.authorForm.submissionWorkStatus)
-  const submissionWorkError = useAppSelector(state => state.authorForm.error)
-  const submissionStatus = useAppSelector(state => state.deadlineStatus.isLoading)
-  const submissionError = useAppSelector(state => state.deadlineStatus.error)
-  const submissionPayload = useAppSelector(state => state.deadlineStatus.submissionStatus)
-  const reviewPayload = useAppSelector(state => state.deadlineStatus.reviewStatus)
-  const myWorkStatus = useAppSelector(state => state.myWork.isLoading)
-  const myWorkError = useAppSelector(state => state.myWork.error)
-  const myWorkPayload = useAppSelector(state => state.myWork.payload)
-  const myWorkReview = useAppSelector(state => state.myWork.reviews)
+  const matches = useMediaQuery('(max-width:899px)')
 
-  const [currentReview, setCurrentReview] = useState<IMyWorkReviewsItem>()
+  const accessToken = useAppSelector(state => state.auth.accessToken)
+
+  const [isLoadingDeadlineStatus, setLoadingDeadlineStatus] = useState(false)
+  const [submissionDeadlineStatus, setSubmissionDeadlineStatus] = useState<DeadlineStatus>()
+  const [reviewDeadlineStatus, setReviewDeadlineStatus] = useState<DeadlineStatus>()
+
+
+  const [isLoadingSubmissionPossibility, setLoadingSubmissionPossibility] = useState(false)
+  const [submissionPossibility, setSubmissionPossibility] = useState<ISubmissionStatus>()
+
+  const [isLoadingSubmissionId, setLoadingSubmissionId] = useState(false)
+  const [submissionId, setSubmissionId] = useState<string>()
+
+  const [isLoadingSubmission, setLoadingSubmission] = useState(false)
+  const [submission, setSubmission] = useState<IMyWorkForm>()
+
+  const [isLoadingReview, setLoadingReview] = useState(false)
+  const [review, setReview] = useState<IMyWorkReviews>()
+
+  const [error, setError] = useState<IError>()
+
+  const [activeReviewId, setActiveReviewId] = useState<string>()
 
   useEffect(() => {
-    if (path && path.taskId) {
-      dispatch(fetchSubmissionStatus(path.taskId))
-    }
+    getSubmissionStatus()
   }, [])
 
   useEffect(() => {
-    if (path && path.taskId && submissionPayload && submissionPayload !== DeadlineStatus.NOT_STARTED) {
-      dispatch(fetchWorkSubmissionStatus(path.taskId))
-    }
-  }, [submissionPayload])
+    getSubmissionPossibility()
+    getReviewDeadline()
+  }, [submissionDeadlineStatus])
 
   useEffect(() => {
-    if (path && path.taskId && submissionPayload && submissionPayload !== DeadlineStatus.NOT_STARTED && submissionWorkPayload === ISubmissionStatus.COMPLETED) {
-      dispatch(fetchMyWork(path.taskId))
-    }
-  }, [submissionPayload, submissionWorkPayload])
+    getSubmissionId()
+  }, [submissionPossibility])
 
   useEffect(() => {
-    const validState = submissionPayload === DeadlineStatus.END && submissionWorkPayload === ISubmissionStatus.COMPLETED
-    const foundMyWork = myWorkPayload && myWorkPayload.answers.length > 0
-
-    if (path && path.taskId && validState && foundMyWork) {
-      dispatch(fetchReviewStatus(path.taskId))
-    }
-  }, [myWorkPayload])
+    getSubmission()
+  }, [submissionId])
 
   useEffect(() => {
-    const validState = submissionPayload === DeadlineStatus.END && submissionWorkPayload === ISubmissionStatus.COMPLETED && reviewPayload && reviewPayload !== DeadlineStatus.NOT_STARTED
-    const foundMyWork = myWorkPayload && myWorkPayload.answers.length > 0
-
-    if (path && path.taskId && validState && foundMyWork) {
-      dispatch(fetchReviews(path.taskId))
-    }
-  }, [reviewPayload])
+    getReview()
+  }, [submission, reviewDeadlineStatus])
 
   useEffect(() => {
-    if (myWorkReview && myWorkReview.length > 0 && !currentReview) {
-      setCurrentReview(myWorkReview[0])
+    if (review && review.length > 0) {
+      setActiveReviewId(review[0].reviewId)
     }
-  }, [myWorkReview])
+  }, [review])
 
-  const mainStatus = submissionStatus ? submissionStatus : (submissionWorkStatus ? submissionWorkStatus : myWorkStatus)
-  const mainError = submissionError ? submissionError : (submissionWorkError ? submissionWorkError : myWorkError)
-
-  const submissionDeadlineInvalid = submissionPayload && submissionPayload === DeadlineStatus.NOT_STARTED
-  const submissionDeadlineValid = submissionPayload && submissionPayload !== DeadlineStatus.NOT_STARTED
-
-  const workNotFound = submissionDeadlineValid && submissionWorkPayload === ISubmissionStatus.NOT_COMPLETED
-  const workFound = submissionWorkPayload === ISubmissionStatus.COMPLETED
-
-  const reviewDeadlineInvalid = reviewPayload && reviewPayload === DeadlineStatus.NOT_STARTED
-  const reviewDeadlineValid = reviewPayload && reviewPayload !== DeadlineStatus.NOT_STARTED
-
-  const reviewsNotFound = (myWorkReview && myWorkReview.length === 0) || (submissionPayload !== DeadlineStatus.END)
-
-  const reviewsList = myWorkReview?.map(item => {
-    if (item.reviewer === IRole.teacher) return {
-      submissionId: item.reviewId,
-      studentName: `${item.reviewerName} - Преподаватель`
+  const getSubmissionStatus = useCallback(() => {
+    if (path && path.taskId && accessToken) {
+      setLoadingDeadlineStatus(true)
+      fetchSubmissionStatus(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setSubmissionDeadlineStatus(response.payload.state)
+        } else {
+          setSubmissionDeadlineStatus(undefined)
+          setError(response.error)
+        }
+        setLoadingDeadlineStatus(false)
+      })
     }
+  }, [path, accessToken])
 
-    if (item.reviewer === IRole.student) return {
-      submissionId: item.reviewId,
-      studentName: `${item.reviewerName} - Пир`
+  const getReviewDeadline = useCallback(() => {
+    if (path && path.taskId && accessToken && submissionDeadlineStatus === DeadlineStatus.END) {
+      setLoadingDeadlineStatus(true)
+      fetchReviewStatus(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setReviewDeadlineStatus(response.payload.state)
+        } else {
+          setReviewDeadlineStatus(undefined)
+          setError(response.error)
+        }
+        setLoadingDeadlineStatus(false)
+      })
     }
+  }, [path, accessToken, submissionDeadlineStatus])
 
-    return {
-      submissionId: item.reviewId,
-      studentName: item.reviewerName,
+  const getSubmissionPossibility = useCallback(() => {
+    if (path && path.taskId && accessToken && submissionDeadlineStatus && submissionDeadlineStatus !== DeadlineStatus.NOT_STARTED) {
+      setLoadingSubmissionPossibility(true)
+      fetchSubmissionPossibility(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setSubmissionPossibility(response.payload)
+        } else {
+          setSubmissionPossibility(undefined)
+          setError(error)
+        }
+        setLoadingSubmissionPossibility(false)
+      })
     }
-  })
+  }, [submissionDeadlineStatus, path, accessToken])
+
+  const getSubmissionId = useCallback(() => {
+    if (path && path.taskId && accessToken && submissionDeadlineStatus &&
+      submissionDeadlineStatus !== DeadlineStatus.NOT_STARTED &&
+      submissionPossibility === ISubmissionStatus.COMPLETED) {
+
+      setLoadingSubmissionId(true)
+      fetchSubmissionId(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setSubmissionId(response.payload.submissionId)
+        } else {
+          setError(response.error)
+          setSubmission(undefined)
+        }
+        setLoadingSubmissionId(false)
+      })
+    }
+  }, [submissionDeadlineStatus, submissionPossibility, path, accessToken])
+
+  const getSubmission = useCallback(() => {
+    if (submissionId && accessToken && submissionDeadlineStatus &&
+      submissionDeadlineStatus !== DeadlineStatus.NOT_STARTED &&
+      submissionPossibility === ISubmissionStatus.COMPLETED) {
+
+      setLoadingSubmission(true)
+      fetchSubmission(submissionId, accessToken).then(response => {
+        if (response.success) {
+          setSubmission(response.payload)
+        } else {
+          setError(response.error)
+          setSubmission(undefined)
+        }
+        setLoadingSubmission(false)
+      })
+    }
+  }, [submissionId, accessToken, submissionDeadlineStatus, submissionPossibility])
+
+  const getReview = useCallback(() => {
+    if (submissionDeadlineStatus === DeadlineStatus.END &&
+      accessToken && submissionId && submission && path && path.taskId &&
+      submissionPossibility === ISubmissionStatus.COMPLETED && reviewDeadlineStatus &&
+      reviewDeadlineStatus !== DeadlineStatus.NOT_STARTED) {
+
+      setLoadingReview(true)
+      fetchReviews(path.taskId, accessToken).then(response => {
+        if (response.success) {
+          setReview(response.payload)
+        } else {
+          setError(response.error)
+          setReview(undefined)
+        }
+        setLoadingReview(false)
+      })
+    }
+  }, [path, submissionId, accessToken, submissionDeadlineStatus, submissionPossibility, reviewDeadlineStatus])
 
   const handleReviewerChange = useCallback((submissionId: string) => {
-    const sortArray = myWorkReview?.filter(item => item.reviewId === submissionId)
-    if (sortArray && sortArray.length > 0) {
-      setCurrentReview(JSON.parse(JSON.stringify(sortArray[0])))
+    if (activeReviewId !== submissionId) {
+      const sortArray = review?.find(item => item.reviewId === submissionId)
+      if (sortArray) {
+        setActiveReviewId(sortArray.reviewId)
+      }
     }
-  }, [setCurrentReview, myWorkReview, currentReview])
+  }, [review, activeReviewId])
+
+  const dashboardLoading = useMemo(() => (
+    isLoadingDeadlineStatus ?? isLoadingSubmissionPossibility ?? isLoadingSubmissionId ?? isLoadingSubmission ?? isLoadingReview
+  ), [isLoadingDeadlineStatus, isLoadingSubmissionPossibility, isLoadingSubmissionId, isLoadingSubmission, isLoadingReview])
+
+  const activeReview = useMemo(() => {
+    if (review && review.length > 0) {
+      return review.find(item => item.reviewId === activeReviewId)
+    }
+  }, [review, activeReviewId])
+
+  const reviewCatalog = useMemo((): IWorkItem[] | undefined => {
+    if (review && review.length > 0) {
+      return review.map(item => ({
+        submissionId: item.reviewId,
+        studentName: item.reviewer === IRole.teacher ? `${item.reviewerName} (преподаватель)` : item.reviewer === IRole.student ? `${item.reviewerName} (пир)` : item.reviewerName
+      }))
+    }
+  }, [review])
 
   return (
     <DashboardWorkBox
-      isLoading={mainStatus}
-      error={mainError}
+      isLoading={dashboardLoading}
+      error={error}
     >
-      {myWorkPayload && myWorkPayload.answers && myWorkPayload.answers.length > 0 && workFound && (reviewDeadlineInvalid || reviewsNotFound) && (
-        <VisibleForm
-          form={{ responses: myWorkPayload.answers }}
-          answerBoxColor={palette.fill.success}
-        />
+      {submissionDeadlineStatus && submissionDeadlineStatus !== DeadlineStatus.NOT_STARTED && submission && submission.answers.length > 0 && (
+        <>
+          {review && review.length > 0 && activeReview && activeReviewId && reviewCatalog && (
+            <Grid container
+              spacing={{ xs: "5px", md: "10px", lg: "25px" }}
+              direction={matches ? 'row' : 'row-reverse'}
+            >
+              <Grid item xs={12} md={2} >
+                <WorksList
+                  worksCatalog={reviewCatalog}
+                  onWorkChange={handleReviewerChange}
+                  activeWorkId={activeReviewId}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={10}>
+                <Grid container xs={12}
+                  gap={{ xs: "5px", md: "10px" }}
+                  wrap={!matches ? 'nowrap' : 'wrap'}
+                >
+                  <Grid item xs={12} md={6}>
+                    <Box
+                      display={'flex'}
+                      height={'40px'}
+                      alignItems={'center'}
+                      mb={!matches ? "20px" : "10px"}
+                    >
+                      <Typography
+                        variant={"h6"}
+                        color={"#273AB5"}
+                      >
+                        {"Мои ответы:"}
+                      </Typography>
+                    </Box>
+
+                    <Box
+                      maxHeight={!matches ? "calc(100vh - 205px)" : "100%"}
+                      sx={styles.formWrapper}
+                    >
+                      <VisibleForm
+                        form={{ responses: submission.answers }}
+                        answerBoxColor={palette.fill.success}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <Box
+                      display={'flex'}
+                      height={'40px'}
+                      alignItems={'center'}
+                      mb={!matches ? "20px" : "10px"}
+                    >
+                      <Typography
+                        variant={"h6"}
+                        color={"#273AB5"}
+                      >
+                        {`Результаты проверок (${activeReview.reviewerName}, оценка ${activeReview.finalGrade}):`}
+                      </Typography>
+                    </Box>
+
+                    <Box
+                      maxHeight={!matches ? "calc(100vh - 205px)" : "100%"}
+                      sx={styles.formWrapper}
+                    >
+                      <VisibleForm
+                        form={{ responses: activeReview.answers }}
+                        answerBoxColor={palette.fill.success}
+                      />
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+
+          {(review && review.length === 0 || !review || review === null) && !activeReview && !activeReviewId && !reviewCatalog && (
+            <Box
+              pb={"15px"}
+              boxSizing={"border-box"}
+            >
+              <VisibleForm
+                form={{ responses: submission.answers }}
+                answerBoxColor={palette.fill.success}
+              />
+            </Box>
+          )}
+        </>
       )}
 
-      {myWorkPayload && myWorkPayload.answers && myWorkPayload.answers.length > 0 && workFound &&
-        reviewDeadlineValid && myWorkReview && myWorkReview.length > 0 && currentReview &&
-        reviewsList && reviewsList.length > 0 &&
-        (
-          <Box sx={styles.container}>
-            <ReviewsList
-              selectedReviewId={currentReview.reviewId}
-              reviewsList={reviewsList}
-              onReviewerChange={handleReviewerChange}
-            />
-
-            <Box sx={styles.formWrapper}>
-              <Box sx={styles.formContainer}>
-                <Typography
-                  variant={"h6"}
-                  sx={styles.subTitle}
-                >
-                  {"Мои ответы:"}
-                </Typography>
-
-                <VisibleForm
-                  form={{ responses: myWorkPayload.answers }}
-                  answerBoxColor={palette.fill.success} /
-                >
-              </Box>
-
-              <Box sx={styles.formContainer}>
-                <Typography
-                  variant={"h6"}
-                  sx={styles.subTitle}
-                >
-                  {`Результаты проверок (${currentReview.reviewerName}, оценка ${currentReview.finalGrade}):`}
-                </Typography>
-
-                <VisibleForm
-                  form={{ responses: currentReview.answers }}
-                  answerBoxColor={palette.fill.info}
-                />
-              </Box>
-            </Box>
-          </Box>
-        )
-      }
-
-      {submissionDeadlineInvalid && (
+      {submissionDeadlineStatus === DeadlineStatus.NOT_STARTED && (
         <AccessTime label={"Доступ ограничен"} />
       )}
 
-      {workNotFound && (
-        <>
-          <NoData label={"Вашу работу не нашли"} />
-        </>
+      {submissionDeadlineStatus && submissionDeadlineStatus !== DeadlineStatus.NOT_STARTED && (!submission || submission.answers.length === 0) && submissionPossibility === ISubmissionStatus.NOT_COMPLETED && (
+        <NoData label={"Вашу работу не нашли"} />
       )}
     </DashboardWorkBox>
   )
 }
 
 const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    gap: "10px"
-  } as SxProps<Theme>,
-  listContainer: {
-    display: "flex",
-    gap: "5px"
-  } as SxProps<Theme>,
   formWrapper: {
-    display: "flex",
-    gap: "10px",
-    '@media (max-width: 900px)': {
-      flexDirection: "column",
-      gap: "0px",
-    }
-  } as SxProps<Theme>,
-  formContainer: {
-    flex: "0 1 50%",
-    maxHeight: "calc(100vh - 183px - 70px)",
-    overflowY: "auto",
-    ...globalStyles.scrollStyles,
-    '@media (max-width: 900px)': {
-      flex: "0 0 100%",
-      maxHeight: "unset",
-    }
-  } as SxProps<Theme>,
-  subTitle: {
-    color: "#5A7180",
-    margin: "15px 0px 7px 0px",
-  } as SxProps<Theme>,
-  errorDeadlineContainer: {
-    margin: "50px 0px 0px 0px",
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    gap: "10px",
-    flexDirection: "column",
-    color: "#A4ADC8",
-    fontSize: "58px"
-  } as SxProps<Theme>,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    pb: "5px",
+    boxSizing: "border-box",
+    ...scrollStyles
+  } as SxProps<Theme>
 }

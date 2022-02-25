@@ -3,6 +3,6 @@ export {
   reducer,
 } from './authorformStudentSlice'
 
-export { fetchAuthorformStudent } from "./thunks/fetchAuthorformStudent";
-export { postAuthorformStudent } from "./thunks/postAuthorformStudent";
-export { fetchWorkSubmissionStatus } from "./thunks/fetchWorkSubmissionStatus";
+export { fetchAuthorForm } from "./thunks/fetchAuthorForm";
+export { postSubmission } from "./thunks/postSubmission";
+export { fetchSubmissionPossibility } from "./thunks/fetchSubmissionPossibility";
