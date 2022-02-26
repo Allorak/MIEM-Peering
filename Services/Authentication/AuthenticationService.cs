@@ -21,15 +21,20 @@ using patools.Dtos.User;
 using patools.Errors;
 using patools.Models;
 using SystemTask = System.Threading.Tasks;
+using patools.Enums;
 
 namespace patools.Services.Authentication
 {
     public class AuthenticationService : ServiceBase,IAuthenticationService
     {
         private readonly IConfiguration _configuration;
+        private readonly PAToolsContext _context;
+        private readonly IMapper _mapper;
         public AuthenticationService(PAToolsContext context, IMapper mapper, IConfiguration configuration) : base(context,mapper)
         {
             _configuration = configuration;
+            _context = context;
+            _mapper = mapper;
         }
 
         public async Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email)
@@ -37,7 +42,7 @@ namespace patools.Services.Authentication
             //GetUser - Base
             var user = await Context.Users.FirstOrDefaultAsync(u => u.Email == email);
             //
-            
+
             if(user == null)
             {
                 return new SuccessfulResponse<GetGoogleRegisteredUserDtoResponse>
@@ -58,7 +63,7 @@ namespace patools.Services.Authentication
             });
         }
 
-        public async Task<Response<string>> IsLtiTokenUserRegistered(string userToken)
+        public async Task<Response<string>> IsLtiTokenUserRegistered(string userToken, Guid taskId)
         {
             Console.WriteLine(userToken);
             var payload = userToken.Split(".")[1];
@@ -79,10 +84,71 @@ namespace patools.Services.Authentication
             var isTeacher = payloadData["user_is_instructor"]?.ToString()  == "True";
             var fullname = payloadData["user_full_name"]?.ToString();
 
+            // Found user
             var user = await GetUserByEmail(email);
+            if (user != null)
+            {
+                return new SuccessfulResponse<string>(CreateJwtFromUser(user));
+            }
 
-            return user != null ? new SuccessfulResponse<string>(CreateJwtFromUser(user)) : new SuccessfulResponse<string>("");
+            // Register user
+            var newUser = new AddUserDTO()
+                {
+                    Email = email,
+                    Fullname = fullname,
+                    Role = isStudent ? UserRoles.Student : UserRoles.Teacher,
+                    ImageUrl = ""
+                };
+
+            var addedUser = await AddUser(newUser);
+
+            var newUser1 = await GetUserByEmail(email);
+
+            if (addedUser.Success)
+            {
+                if (addedUser.Payload.Role == UserRoles.Student)
+                {
+                    var task = await _context.Tasks.FirstOrDefaultAsync(task => task.ID == taskId);
+                    if (task != null)
+                    {
+                        var course = task.Course;
+
+                        var courseUser = new CourseUser()
+                        {
+                            ID = Guid.NewGuid(),
+                            Course = course,
+                            User = newUser1
+                        };
+                        await _context.AddAsync(courseUser);
+
+                        var tasks = await _context.Tasks
+                            .Where(t => t.Course == course)
+                            .ToListAsync();
+
+                        foreach(var i in tasks)
+                        {
+                            var taskUser = new PeeringTaskUser()
+                            {
+                                ID = Guid.NewGuid(),
+                                PeeringTask = i,
+                                Student = newUser1,
+                                State = PeeringTaskStates.Assigned
+                            };
+                            await _context.AddAsync(taskUser);
+                        }
+                        await _context.SaveChangesAsync();
+
+                        return new SuccessfulResponse<string>(CreateJwtFromUser(newUser1));
+
+
+                    }
+                    return new InvalidJwtTokenResponse<string>();
+                }
+                return new InvalidJwtTokenResponse<string>();
+            }
+            return new InvalidJwtTokenResponse<string>();
         }
+
         private static byte[] FromBase64Url(string base64Url)
         {
             var padded = base64Url.Length % 4 == 0
@@ -91,7 +157,29 @@ namespace patools.Services.Authentication
                 .Replace("-", "+");
             return Convert.FromBase64String(base64);
         }
-        
+
+        private async Task<Response<GetNewUserDtoResponse>> AddUser(AddUserDTO newUser)
+        {
+            //GetUser - Base
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+            if (existingUser != null)
+                return new UserAlreadyRegisteredResponse<GetNewUserDtoResponse>();
+            //
+
+            var user = _mapper.Map<User>(newUser);
+            user.ID = Guid.NewGuid();
+            await _context.Users.AddAsync(user);
+
+            //GetExpert - Base
+            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.Email == user.Email);
+            if (expert != null)
+                expert.User = user;
+            //
+
+            await _context.SaveChangesAsync();
+            return new SuccessfulResponse<GetNewUserDtoResponse>(_mapper.Map<GetNewUserDtoResponse>(user));
+        }
+
         public async Task<Response<GetJwtTokenDtoResponse>> GetJwtByEmail(string email)
         {
             //GetUser - Base
@@ -99,7 +187,7 @@ namespace patools.Services.Authentication
             if(user == null)
                 return new BadRequestDataResponse<GetJwtTokenDtoResponse>("The user is not registered");
             //
-            
+
             var response = new SuccessfulResponse<GetJwtTokenDtoResponse>
             (new GetJwtTokenDtoResponse
             {
