@@ -495,11 +495,18 @@ namespace patools.Services.Submissions
                 resultAnswer.QuestionId = answer.Question.ID;
                 resultAnswer.Value = answer.Value;
                 resultAnswer.Response = answer.Response;
+                resultAnswer.FileId = await GetFileIdByAnswer(answer);
                 resultAnswer.Responses = await GetVariants(answer.Question);
                 resultAnswers.Add(resultAnswer);
             }
 
             return resultAnswers;
+        }
+
+        private async Task<Guid?> GetFileIdByAnswer(Answer answer)
+        {
+            return (await Context.AnswerFiles
+                .FirstOrDefaultAsync(af => af.Answer == answer))?.ID;
         }
         private async Task<IEnumerable<GetVariantDtoResponse>> GetVariants(Question question)
         {
