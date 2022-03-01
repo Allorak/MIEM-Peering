@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using patools.Dtos.Submission;
 using patools.Dtos.SubmissionPeer;
 using patools.Enums;
@@ -24,5 +26,7 @@ namespace patools.Services.Submissions
         Task<Response<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog(GetSubmissionToCheckDtoRequest taskInfo);
 
         Task<Response<GetSubmissionMetadataDtoResponse>> GetSubmissionMetadata(GetSubmissionMetadataDtoRequest submissionInfo);
+
+        Task<Response<GetFileByIdDtoResponse>> GetAnswerFileById(GetFileByIdDtoRequest fileInfo);
     }
 }

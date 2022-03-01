@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Answer;
 using patools.Dtos.Submission;
@@ -106,18 +108,21 @@ namespace patools.Services.Submissions
                         Directory.CreateDirectory(path);
                     }
                     var dateTime = DateTime.Now;
-                    var filename =
+                    var storedFilename =
                         $"{dateTime.Year}{dateTime.Month}{dateTime.Day}{dateTime.Hour}{dateTime.Minute}{dateTime.Second}_{newSubmission.ID}";
 
-                    await using (var fileStream = new FileStream(Path.Combine(path,filename),FileMode.Create,FileAccess.Write))
+                    var filepath = Path.Combine(path, storedFilename);
+                    await using (var fileStream = new FileStream(filepath,FileMode.Create,FileAccess.Write))
                     {
                         await answer.File.CopyToAsync(fileStream);
+                        await fileStream.DisposeAsync();
                     }
 
                     var answerFile = new AnswerFile()
                     {
                         Answer = newAnswer,
-                        Filename = filename
+                        FilePath = filepath,
+                        FileName = answer.File.Name
                     };
                     Context.AnswerFiles.Add(answerFile);
                 }
@@ -388,6 +393,53 @@ namespace patools.Services.Submissions
             return new SuccessfulResponse<GetSubmissionMetadataDtoResponse>(new GetSubmissionMetadataDtoResponse()
             {
                 Statistics = resultStatistics
+            });
+        }
+
+        public async Task<Response<GetFileByIdDtoResponse>> GetAnswerFileById(GetFileByIdDtoRequest fileInfo)
+        {
+            var user = await GetUserById(fileInfo.UserId);
+            if (user == null)
+                return new InvalidGuidIdResponse<GetFileByIdDtoResponse>("Invalid user id provided");
+
+            var answerFile = await Context.AnswerFiles
+                .Include(af => af.Answer)
+                .Include(af => af.Answer.Question)
+                .Include(af => af.Answer.Question.PeeringTask)
+                .Include(af => af.Answer.Question.PeeringTask.Course)
+                .Include(af => af.Answer.Question.PeeringTask.Course.Teacher)
+                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment.Student)
+                .FirstOrDefaultAsync(af => af.ID == fileInfo.AnswerFileId);
+            if (answerFile == null)
+                return new InvalidGuidIdResponse<GetFileByIdDtoResponse>("Invalid file id provided");
+
+            var task = answerFile.Answer.Question.PeeringTask;
+            var submission = answerFile.Answer.Submission;
+            
+            switch (user.Role)
+            {
+                case {} when await IsExpertUser(user,task):
+                    if (task.ReviewStartDateTime > DateTime.Now)
+                        return new NoAccessResponse<GetFileByIdDtoResponse>("Reviewing stage hasn't started yet");
+                    break;
+                case UserRoles.Teacher when user != task.Course.Teacher:
+                    return new NoAccessResponse<GetFileByIdDtoResponse>("This teacher has no access to this file");
+                case UserRoles.Student when user != submission.PeeringTaskUserAssignment.Student:
+                    var submissionPeer = await GetSubmissionPeer(submission, user);
+                    if (submissionPeer == null)
+                        return new NoAccessResponse<GetFileByIdDtoResponse>("This student has no access to this file");
+                    if(task.ReviewStartDateTime>DateTime.Now)
+                        return new NoAccessResponse<GetFileByIdDtoResponse>("Reviewing stage hasn't started yet");
+                    break;
+            }
+
+            var fileContents = await File.ReadAllBytesAsync(answerFile.FilePath);
+            new FileExtensionContentTypeProvider().TryGetContentType(answerFile.FilePath, out var contentType);
+            return new SuccessfulResponse<GetFileByIdDtoResponse>(new GetFileByIdDtoResponse()
+            {
+                FileContents = fileContents,
+                FileName = answerFile.FileName,
+                ContentType = contentType ?? "application/octet-stream"
             });
         }
 
