@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -78,9 +80,13 @@ namespace patools.Services.Submissions
                         case QuestionTypes.Select when answer.Value<question.MinValue || answer.Value>question.MaxValue:
                             return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
                                 "Answer for a select question is out of range");
+                        case QuestionTypes.File when answer.File == null:
+                            return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                                "There is no answer for a required question");
                     }
                 }
-                newAnswers.Add(new Answer
+
+                var newAnswer = new Answer
                 {
                     ID = Guid.NewGuid(),
                     Submission = newSubmission,
@@ -88,7 +94,33 @@ namespace patools.Services.Submissions
                     Response = answer.Response,
                     Value = answer.Value,
                     Review = null
-                });
+                };
+                newAnswers.Add(newAnswer);
+
+                if (newAnswer.Question.Type == QuestionTypes.File)
+                {
+                    var directory = System.IO.Directory.GetCurrentDirectory();
+                    var path = Path.Combine(directory, "/AnswerFiles");
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    var dateTime = DateTime.Now;
+                    var filename =
+                        $"{dateTime.Year}{dateTime.Month}{dateTime.Day}{dateTime.Hour}{dateTime.Minute}{dateTime.Second}_{newSubmission.ID}";
+
+                    await using (var fileStream = new FileStream(Path.Combine(path,filename),FileMode.Create,FileAccess.Write))
+                    {
+                        await answer.File.CopyToAsync(fileStream);
+                    }
+
+                    var answerFile = new AnswerFile()
+                    {
+                        Answer = newAnswer,
+                        Filename = filename
+                    };
+                    Context.AnswerFiles.Add(answerFile);
+                }
 
                 questions.Remove(question);
             }
