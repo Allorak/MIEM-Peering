@@ -11,12 +11,14 @@ import { useAppSelector } from "../../../app/hooks";
 
 import { fetchFile } from "../../../store/downloadFile";
 
+import { IFileInputItem } from "../../../store/types";
+
 
 interface IProps {
-  fileIds?: string[]
+  files?: IFileInputItem[]
 }
 
-export const FileUploadVisible: FC<IProps> = ({ fileIds }) => {
+export const FileUploadVisible: FC<IProps> = ({ files }) => {
   const accessToken = useAppSelector(state => state.auth.accessToken)
 
   const handleDownloadFile = useCallback((fileId: string) => {
@@ -32,9 +34,9 @@ export const FileUploadVisible: FC<IProps> = ({ fileIds }) => {
   return (
     <Box sx={styles.filesWrapper}>
 
-      {fileIds && fileIds.length > 0 ? (
+      {files && files.length > 0 ? (
         <Box>
-          {fileIds.map(fileId => (
+          {files.map(item => (
             <>
               <ArticleOutlinedIcon
                 sx={{
@@ -47,12 +49,12 @@ export const FileUploadVisible: FC<IProps> = ({ fileIds }) => {
                 variant={'body1'}
                 flex={'1 1 100%'}
               >
-                {`File - ${fileIds}`}
+                {item.name}
               </Typography>
 
               <IconButton
                 title={'Скачать'}
-                onClick={() => handleDownloadFile(fileId)}
+                onClick={() => handleDownloadFile(item.id)}
               >
                 <FileDownloadIcon
                   sx={{
