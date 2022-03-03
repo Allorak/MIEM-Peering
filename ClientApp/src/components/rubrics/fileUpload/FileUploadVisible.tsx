@@ -21,23 +21,29 @@ interface IProps {
 export const FileUploadVisible: FC<IProps> = ({ files }) => {
   const accessToken = useAppSelector(state => state.auth.accessToken)
 
-  const handleDownloadFile = useCallback((fileId: string) => {
+  const handleDownloadFile = useCallback((fileId: string, fileName: string) => {
     if (fileId && accessToken) {
-      fetchFile(fileId, accessToken).then(blob => {
-        if (blob) {
-          saveAs(blob)
+      fetchFile(fileId, accessToken).then(file => {
+        if (file) {
+          saveAs(file, fileName)
         }
       })
     }
   }, [])
 
   return (
-    <Box sx={styles.filesWrapper}>
+    <>
 
       {files && files.length > 0 ? (
-        <Box>
+        <Box
+          display={"flex"}
+          gap={'5px'}
+          flexDirection={'column'}
+        >
           {files.map(item => (
-            <>
+            <Box
+              sx={styles.filesWrapper}
+            >
               <ArticleOutlinedIcon
                 sx={{
                   color: 'secondary.main',
@@ -48,13 +54,16 @@ export const FileUploadVisible: FC<IProps> = ({ files }) => {
               <Typography
                 variant={'body1'}
                 flex={'1 1 100%'}
+                lineHeight={0}
+                sx={styles.fileName}
+                onClick={() => handleDownloadFile(item.id, item.name)}
               >
                 {item.name}
               </Typography>
 
               <IconButton
                 title={'Скачать'}
-                onClick={() => handleDownloadFile(item.id)}
+                onClick={() => handleDownloadFile(item.id, item.name)}
               >
                 <FileDownloadIcon
                   sx={{
@@ -63,7 +72,7 @@ export const FileUploadVisible: FC<IProps> = ({ files }) => {
                   }}
                 />
               </IconButton>
-            </>
+            </Box>
           ))}
 
         </Box>
@@ -85,7 +94,7 @@ export const FileUploadVisible: FC<IProps> = ({ files }) => {
         </>
       )}
 
-    </Box>
+    </>
   )
 }
 
@@ -94,16 +103,20 @@ const styles = {
     backgroundColor: 'common.white',
     display: 'flex',
     width: '100%',
-    minHeight: '50px',
-    padding: '10px',
+    px: '5px',
     border: "1px solid",
     borderColor: '#e0e7ff',
     borderRadius: '10px',
     alignItems: 'center',
     gap: '15px',
-    ":hover": {
-      borderColor: 'common.black'
-    },
     boxSizing: "border-box",
+  } as SxProps<Theme>,
+
+  fileName: {
+    textDecoration: 'underline',
+    ":hover": {
+      cursor: 'pointer',
+      color: 'primary.main'
+    }
   } as SxProps<Theme>,
 }
