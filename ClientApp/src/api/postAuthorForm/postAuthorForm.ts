@@ -17,7 +17,7 @@ export const postAuthorForm = async ({
         return {
           questionId: item.questionId,
           ...(item.file && item.file.length > 0 && {
-            fileIds: item.file.map((file, index) => (`#${index}-${item.questionId}-${file.name}`))
+            fileIds: item.file.map((file, index) => (`${file.name}`))
           })
         }
       }
@@ -29,7 +29,7 @@ export const postAuthorForm = async ({
   responses.answers.map((item) => {
     if (item.file && item.file.length > 0) {
       item.file.map((file, index) => {
-        formData.append("files", file, `#${index}-${item.questionId}-${file.name}`)
+        formData.append("files", file, `${file.name}`)
       })
     }
   })

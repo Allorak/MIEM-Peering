@@ -16,7 +16,7 @@ namespace patools.Dtos.Answer
         public string Response { get; set; }
         public int? Value { get; set; }
 
-        public Guid? FileId { get; set; }
+        public IEnumerable<GetAnswerFileInfoDto> Files { get; set; }
         public int? MinValue { get; set; }
         public int? MaxValue { get; set; }
         public IEnumerable<GetVariantDtoResponse> Responses { get; set; }

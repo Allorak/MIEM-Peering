@@ -63,6 +63,7 @@ namespace patools.Services.Submissions
                 .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Author)
                 .ToListAsync();
             var newAnswers = new List<Answer>();
+            var fileIndex = 0;
             foreach (var answer in submission.Answers)
             {
                 var question = questions.FirstOrDefault(q => q.ID == answer.QuestionId);
@@ -82,7 +83,7 @@ namespace patools.Services.Submissions
                         case QuestionTypes.Select when answer.Value<question.MinValue || answer.Value>question.MaxValue:
                             return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
                                 "Answer for a select question is out of range");
-                        case QuestionTypes.File when answer.FileId == null:
+                        case QuestionTypes.File when answer.FileIds == null || !answer.FileIds.Any():
                             return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
                                 "There is no answer for a required question");
                     }
@@ -101,35 +102,40 @@ namespace patools.Services.Submissions
 
                 if (newAnswer.Question.Type == QuestionTypes.File)
                 {
-                    var file = submission.Files.FirstOrDefault(f => f.FileName == answer.FileId);
-                    if (file == null)
-                        return new BadRequestDataResponse<GetNewSubmissionDtoResponse>("The filename in answer is incorrect");
-
-                    var directory = System.IO.Directory.GetCurrentDirectory();
-                    var path = Path.Combine(directory, "AnswerFiles",task.ID.ToString());
+                    var directory = Directory.GetCurrentDirectory();
+                    var path = Path.Combine(directory, "AnswerFiles",task.ID.ToString(),newSubmission.ID.ToString());
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
                     }
 
-                    var dateTime = DateTime.Now;
-                    var storedFilename =
-                        $"{dateTime.Year}{dateTime.Month}{dateTime.Day}{dateTime.Hour}{dateTime.Minute}{dateTime.Second}_{file.FileName}";
-
-                    var filepath = Path.Combine(path, storedFilename);
-                    await using (var fileStream = new FileStream(filepath,FileMode.Create,FileAccess.Write))
+                    foreach (var fileId in answer.FileIds)
                     {
-                        await file.CopyToAsync(fileStream);
-                        await fileStream.DisposeAsync();
+                        var file = submission.Files.FirstOrDefault(f => f.FileName == fileId);
+                        if (file == null)
+                            return new BadRequestDataResponse<GetNewSubmissionDtoResponse>("The filename in answer is incorrect");
+
+                        var dateTime = DateTime.Now;
+                        var dateTimeString = $"{dateTime.Year:d4}-{dateTime.Month:d2}-{dateTime.Day:d2} {dateTime.Hour:d2}:{dateTime.Minute:d2}:{dateTime.Second:d2}:{dateTime.Millisecond:d3}";
+                        var extension = fileId.Split('.').Last();
+                        var exposedFilename = $"Peering File #{++fileIndex} [{dateTimeString}].{extension}";
+                        var storedFilename = $"#{fileIndex} - {file.FileName}";
+
+                        var filepath = Path.Combine(path, storedFilename);
+                        await using (var fileStream = new FileStream(filepath,FileMode.Create,FileAccess.Write))
+                        {
+                            await file.CopyToAsync(fileStream);
+                            await fileStream.DisposeAsync();
+                        }
+
+                        var answerFile = new AnswerFile()
+                        {
+                            Answer = newAnswer,
+                            FilePath = filepath,
+                            FileName = exposedFilename
+                        };
+                        Context.AnswerFiles.Add(answerFile);
                     }
-
-                    var answerFile = new AnswerFile()
-                    {
-                        Answer = newAnswer,
-                        FilePath = filepath,
-                        FileName = file.FileName
-                    };
-                    Context.AnswerFiles.Add(answerFile);
                 }
 
                 questions.Remove(question);
@@ -552,7 +558,11 @@ namespace patools.Services.Submissions
                 resultAnswer.QuestionId = answer.Question.ID;
                 resultAnswer.Value = answer.Value;
                 resultAnswer.Response = answer.Response;
-                resultAnswer.FileId = await GetFileIdByAnswer(answer);
+                if (answer.Question.Type == QuestionTypes.File)
+                {
+                    var attachedFiles = await GetFilesByAnswer(answer);
+                    resultAnswer.Files = attachedFiles.Count > 0 ? attachedFiles : null;
+                }
                 resultAnswer.Responses = await GetVariants(answer.Question);
                 resultAnswers.Add(resultAnswer);
             }
@@ -560,10 +570,16 @@ namespace patools.Services.Submissions
             return resultAnswers;
         }
 
-        private async Task<Guid?> GetFileIdByAnswer(Answer answer)
+        private async Task<List<GetAnswerFileInfoDto>> GetFilesByAnswer(Answer answer)
         {
-            return (await Context.AnswerFiles
-                .FirstOrDefaultAsync(af => af.Answer == answer))?.ID;
+            return await Context.AnswerFiles
+                .Where(af => af.Answer == answer)
+                .Select(af => new GetAnswerFileInfoDto()
+                {
+                    Id = af.ID,
+                    Name = af.FileName
+                })
+                .ToListAsync();
         }
         private async Task<IEnumerable<GetVariantDtoResponse>> GetVariants(Question question)
         {
