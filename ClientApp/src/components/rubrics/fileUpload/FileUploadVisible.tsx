@@ -13,53 +13,58 @@ import { fetchFile } from "../../../store/downloadFile";
 
 
 interface IProps {
-  fileId?: string
+  fileIds?: string[]
 }
 
-export const FileUploadVisible: FC<IProps> = ({ fileId }) => {
+export const FileUploadVisible: FC<IProps> = ({ fileIds }) => {
   const accessToken = useAppSelector(state => state.auth.accessToken)
 
-  const handleDownloadFile = useCallback(() => {
+  const handleDownloadFile = useCallback((fileId: string) => {
     if (fileId && accessToken) {
       fetchFile(fileId, accessToken).then(blob => {
         if (blob) {
-          saveAs(blob, `MIEM Peering Submission - ${fileId}`)
+          saveAs(blob)
         }
       })
     }
-  }, [fileId])
+  }, [])
 
   return (
     <Box sx={styles.filesWrapper}>
 
-      {fileId ? (
-        <>
-          <ArticleOutlinedIcon
-            sx={{
-              color: 'secondary.main',
-              fontSize: '30px'
-            }}
-          />
+      {fileIds && fileIds.length > 0 ? (
+        <Box>
+          {fileIds.map(fileId => (
+            <>
+              <ArticleOutlinedIcon
+                sx={{
+                  color: 'secondary.main',
+                  fontSize: '30px'
+                }}
+              />
 
-          <Typography
-            variant={'body1'}
-            flex={'1 1 100%'}
-          >
-            {`File - ${fileId}`}
-          </Typography>
+              <Typography
+                variant={'body1'}
+                flex={'1 1 100%'}
+              >
+                {`File - ${fileIds}`}
+              </Typography>
 
-          <IconButton
-            title={'Скачать'}
-            onClick={handleDownloadFile}
-          >
-            <FileDownloadIcon
-              sx={{
-                color: 'primary.main',
-                fontSize: '30px'
-              }}
-            />
-          </IconButton>
-        </>
+              <IconButton
+                title={'Скачать'}
+                onClick={() => handleDownloadFile(fileId)}
+              >
+                <FileDownloadIcon
+                  sx={{
+                    color: 'primary.main',
+                    fontSize: '30px'
+                  }}
+                />
+              </IconButton>
+            </>
+          ))}
+
+        </Box>
       ) : (
         <>
           <ErrorOutlineIcon

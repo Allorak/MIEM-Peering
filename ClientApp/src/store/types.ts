@@ -279,7 +279,7 @@ export interface ISelectRatingQuestion extends IQuestionItem, INewSelectRatingQu
 
 export interface IUploadFileQuestion extends IQuestionItem, INewUploadFileQuestion {
   file?: File[],
-  fileId?: string
+  fileIds?: string[]
 }
 
 export type IQuestionRubrics = Array<ITextQuestion | IShortTextQuestion | IMultipleQuiestion | ISelectRatingQuestion | IUploadFileQuestion>

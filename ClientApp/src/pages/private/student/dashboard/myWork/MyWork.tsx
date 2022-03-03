@@ -132,6 +132,7 @@ export const MyWork: FC = () => {
           setSubmissionId(response.payload.submissionId)
         } else {
           setError(response.error)
+          setSubmissionId(undefined)
           setSubmission(undefined)
         }
         setLoadingSubmissionId(false)

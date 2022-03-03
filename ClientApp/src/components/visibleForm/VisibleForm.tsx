@@ -71,7 +71,7 @@ export const VisibleForm: FC<IProps> = ({
 
               {item.type === IQuestionTypes.FILE && (
                 <FileUploadVisible
-                  fileId={item.fileId}
+                  fileIds={item.fileIds}
                 />
               )}
             </QuestionBox>
