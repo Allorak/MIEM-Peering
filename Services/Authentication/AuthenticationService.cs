@@ -84,69 +84,54 @@ namespace patools.Services.Authentication
             var isTeacher = payloadData["user_is_instructor"]?.ToString()  == "True";
             var fullname = payloadData["user_full_name"]?.ToString();
 
-            // Found user
             var user = await GetUserByEmail(email);
             if (user != null)
             {
                 return new SuccessfulResponse<string>(CreateJwtFromUser(user));
             }
 
-            // Register user
-            var newUser = new AddUserDTO()
+            var newUser = new User()
                 {
+                    ID = Guid.NewGuid(),
                     Email = email,
                     Fullname = fullname,
-                    Role = isStudent ? UserRoles.Student : UserRoles.Teacher,
-                    ImageUrl = ""
+                    Role = isStudent ? UserRoles.Student : UserRoles.Teacher
                 };
 
-            var addedUser = await AddUser(newUser);
+            await _context.Users.AddAsync(newUser);
 
-            var newUser1 = await GetUserByEmail(email);
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskId);
+            if (task == null)
+                return new InvalidGuidIdResponse<string>("Invalid task id provided");
 
-            if (addedUser.Success)
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c == task.Course);
+            if (course == null)
+                return new OperationErrorResponse<string>("The database has an error");
+
+            await _context.CourseUsers.AddAsync(new CourseUser()
             {
-                if (addedUser.Payload.Role == UserRoles.Student)
+                ID = Guid.NewGuid(),
+                User = newUser,
+                Course = course,
+                ConfidenceFactor = 0
+            });
+
+            var tasks = await _context.Tasks.Where(t => t.Course == course).ToListAsync();
+            foreach (var peeringTask in tasks)
+            {
+                await _context.TaskUsers.AddAsync(new PeeringTaskUser()
                 {
-                    var task = await _context.Tasks.FirstOrDefaultAsync(task => task.ID == taskId);
-                    if (task != null)
-                    {
-                        var course = task.Course;
-
-                        var courseUser = new CourseUser()
-                        {
-                            ID = Guid.NewGuid(),
-                            Course = course,
-                            User = newUser1
-                        };
-                        await _context.AddAsync(courseUser);
-
-                        var tasks = await _context.Tasks
-                            .Where(t => t.Course == course)
-                            .ToListAsync();
-
-                        foreach(var i in tasks)
-                        {
-                            var taskUser = new PeeringTaskUser()
-                            {
-                                ID = Guid.NewGuid(),
-                                PeeringTask = i,
-                                Student = newUser1,
-                                State = PeeringTaskStates.Assigned
-                            };
-                            await _context.AddAsync(taskUser);
-                        }
-                        await _context.SaveChangesAsync();
-
-                        return new SuccessfulResponse<string>(CreateJwtFromUser(newUser1));
-
-
-                    }
-                    return new InvalidJwtTokenResponse<string>();
-                }
-                return new InvalidJwtTokenResponse<string>();
+                    ID = Guid.NewGuid(),
+                    PeeringTask = peeringTask,
+                    Student = newUser,
+                    PreviousConfidenceFactor = 0,
+                    State = PeeringTaskStates.Assigned
+                });
             }
-            return new InvalidJwtTokenResponse<string>();
+            await _context.SaveChangesAsync();
+            return new SuccessfulResponse<string>(CreateJwtFromUser(newUser));
         }
 
         private static byte[] FromBase64Url(string base64Url)

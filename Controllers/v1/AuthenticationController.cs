@@ -109,7 +109,6 @@ namespace patools.Controllers.v1
             try
             {
                 Response.Cookies.Append("JWT", "");
-                // register user
                 return Redirect("~/not-found");
             }
             catch
