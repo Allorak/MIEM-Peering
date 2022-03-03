@@ -213,6 +213,7 @@ export interface INewTaskSettings {
   reviewType: PeerTaskTypes
   submissionWeight: number
   reviewWeight: number
+  ltiEnable: boolean
   goodConfidenceBonus?: number
   badConfidencePenalty?: number
 }
@@ -222,7 +223,7 @@ export enum PeerSteps {
   SECOND_STEP = 'Common',
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'reviewType' | 'experts' | 'submissionWeight' | 'reviewWeight' | 'goodCoefficientBonus' | 'badCoefficientPenalty'> { }
+export interface IDeadlines extends Omit<INewTaskSettings, 'ltiEnable' | 'submissionsToCheck' | 'reviewType' | 'experts' | 'submissionWeight' | 'reviewWeight' | 'goodCoefficientBonus' | 'badCoefficientPenalty'> { }
 
 export type INewQuestionRubrics = Array<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion>
 

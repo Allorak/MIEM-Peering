@@ -115,7 +115,9 @@ export const TaskAdd: FC = () => {
     >
       {hasConfidenceFactor !== undefined && (
         <>
-          <Subheader activeStep={step} />
+          <Subheader
+            activeStep={step}
+          />
 
           <Box sx={styles.stepsContainer}>
             <Box sx={styles.container}>
@@ -183,7 +185,8 @@ const initialTask: INewTask = {
     submissionsToCheck: 2,
     reviewType: PeerTaskTypes.DOUBLE_BLIND,
     submissionWeight: 20,
-    reviewWeight: 80
+    reviewWeight: 80,
+    ltiEnable: false
   },
   authorForm: {
     rubrics: [

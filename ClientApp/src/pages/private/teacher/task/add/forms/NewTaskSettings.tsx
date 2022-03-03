@@ -1,7 +1,7 @@
 //@ts-ignore
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { Controller, useController, useForm } from "react-hook-form";
-import { Box, Button, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
+import { Box, Button, MenuItem, Select, Switch, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import DateAdapter from '@mui/lab/AdapterDateFns';
 import { LocalizationProvider, MobileDatePicker, TimePicker } from "@mui/lab";
@@ -490,6 +490,30 @@ export const NewTaskSettings: FC<IProps> = ({ onSubmit, hasConfidenceFactor }) =
               </Typography>
             </Box>
           </Box>
+
+          <Box sx={styles.dateBox}>
+            <Box
+              display={'flex'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              <InputLabel title={"Поддержка LTI провайдера:"} />
+
+              <Controller
+                control={control}
+                name={'ltiEnable'}
+                render={({ field: { ref, ...rest } }) => (
+                  <Switch
+                    {...rest}
+                    sx={{ mb: "12px" }}
+                  />
+                )}
+              />
+            </Box>
+            <Typography variant={'body1'}>
+              {"LTI провайдер позволяет сделать интеграцию с Вашей системой управления обучением."}
+            </Typography>
+          </Box>
         </Box>
 
         {!hasConfidenceFactor && experts && (
@@ -546,7 +570,8 @@ const initialValue = (): INewTaskSettings => {
     submissionsToCheck: 2,
     reviewType: PeerTaskTypes.DOUBLE_BLIND,
     submissionWeight: 80,
-    reviewWeight: 20
+    reviewWeight: 20,
+    ltiEnable: false
   }
 
   return taskSettings
