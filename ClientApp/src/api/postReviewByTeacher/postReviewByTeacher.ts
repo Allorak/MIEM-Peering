@@ -14,11 +14,13 @@ export const postReviewByTeacher = async ({
 
   formData.append('submissionId', workId)
   formData.append("answers", JSON.stringify(
-    responses.answers.map((item, index) => {
+    responses.answers.map((item) => {
       if (item.file) {
         return {
           questionId: item.questionId,
-          fileId: `#${index}-${item.file.name}`
+          ...(item.file && item.file.length > 0 && {
+            fileIds: item.file.map((file, index) => (`#${index}-${item.questionId}-${file.name}`))
+          })
         }
       }
       return item
@@ -26,9 +28,11 @@ export const postReviewByTeacher = async ({
 
   ))
 
-  responses.answers.map((item, index) => {
-    if (item.file) {
-      formData.append("files[]", item.file, `#${index}-${item.file.name}`)
+  responses.answers.map((item) => {
+    if (item.file && item.file.length > 0) {
+      item.file.map((file, index) => {
+        formData.append("files[]", file, `#${index}-${item.questionId}-${file.name}`)
+      })
     }
   })
 

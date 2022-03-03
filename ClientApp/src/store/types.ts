@@ -278,7 +278,7 @@ export interface ISelectRatingQuestion extends IQuestionItem, INewSelectRatingQu
 }
 
 export interface IUploadFileQuestion extends IQuestionItem, INewUploadFileQuestion {
-  file?: File,
+  file?: File[],
   fileId?: string
 }
 
@@ -491,7 +491,7 @@ export type IQuestionAnswerItem = {
   questionId: string,
   response?: string | number
   value?: string | number
-  file?: File
+  file?: File[]
 }
 
 export type IQuestionAnswers = Array<IQuestionAnswerItem>

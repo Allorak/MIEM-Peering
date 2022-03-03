@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
-import { Box, IconButton, Theme, Typography } from "@mui/material";
+import { Box, Button, IconButton, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useDropzone } from 'react-dropzone'
 
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -11,8 +12,8 @@ import { palette } from "../../../theme/colors";
 
 
 interface IProps {
-  value?: File
-  onEdit: (value: File | undefined, id: string) => void,
+  value?: File[]
+  onEdit: (value: File[] | undefined, id: string) => void,
   required: boolean,
   id: string
 }
@@ -29,39 +30,51 @@ export const FileUploadEditable: FC<IProps> = ({
     isDragAccept,
     getRootProps,
     getInputProps,
-  } = useDropzone({ multiple: false, maxSize: 10000000 })
+  } = useDropzone({ multiple: true, maxSize: 10000000 })
 
   useEffect(() => {
     if (acceptedFiles && acceptedFiles.length > 0) {
-      onEdit(acceptedFiles[0], id)
+      const newFiles = acceptedFiles.map(item => item)
+      if (file && file.length > 0) {
+        onEdit(newFiles.concat(file).map(item => item), id)
+      } else {
+        onEdit(newFiles.map(item => item), id)
+      }
     }
   }, [acceptedFiles])
 
-  const handleDeleteFile = useCallback(() => {
+  const handleDeleteFile = useCallback((currentFile: File) => {
+    if (file && file.length > 0) {
+      const newFiles = file.map(item => item)
+      const filteredArray = newFiles.filter(item => item !== currentFile)
+      console.log(filteredArray)
+      onEdit(filteredArray.length > 0 ? filteredArray.map(item => item) : undefined, id)
+      return
+    }
     onEdit(undefined, id)
-  }, [])
+  }, [file, id])
 
   const dragSx = useMemo(() => {
     return isDragAccept ? styles.dragAccept : required ? { ...styles.dragFill, borderColor: 'error.main' } : styles.dragFill
   }, [isDragAccept, required])
 
-  const fileSize = useMemo(() => {
-    if (file) {
+  const fileSize = useCallback((currentFile: File) => {
+    if (currentFile) {
       var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 
-      if (file.size === 0) return '0 Byte';
+      if (currentFile.size === 0) return '0 Byte';
 
-      var i = parseInt(Math.floor(Math.log(file.size) / Math.log(1024)).toString())
-      return Math.round(file.size / Math.pow(1024, i)) + ' ' + sizes[i];
+      var i = parseInt(Math.floor(Math.log(currentFile.size) / Math.log(1024)).toString())
+      return Math.round(currentFile.size / Math.pow(1024, i)) + ' ' + sizes[i];
 
     }
 
     return ""
-  }, [file])
+  }, [])
 
   return (
     <>
-      {!file ? (
+      {(!file || file.length === 0) ? (
         <Box
           {...getRootProps()}
           sx={dragSx}
@@ -97,33 +110,52 @@ export const FileUploadEditable: FC<IProps> = ({
           }
         </Box>
       ) : (
-        <Box sx={styles.filesWrapper}>
-          <ArticleOutlinedIcon
-            sx={{
-              color: 'primary.main',
-              fontSize: '30px'
-            }}
-          />
-
-          <Typography
-            variant={'body1'}
-            flex={'1 1 100%'}
+        <>
+          <Box
+            display={"flex"}
+            flexDirection={"column-reverse"}
+            gap={"5px"}
           >
-            {`${file.name} - ${fileSize}`}
-          </Typography>
+            {file.map(item => (
+              <Box sx={styles.filesWrapper}>
+                <ArticleOutlinedIcon
+                  sx={{
+                    color: 'primary.main',
+                    fontSize: '30px'
+                  }}
+                />
 
+                <Typography
+                  variant={'body1'}
+                  flex={'1 1 100%'}
+                >
+                  {`${item.name} - ${fileSize(item)}`}
+                </Typography>
+
+                <IconButton
+                  title={'Удалить документ'}
+                  onClick={() => handleDeleteFile(item)}
+                >
+                  <DeleteOutlineOutlinedIcon
+                    sx={{
+                      color: 'error.main',
+                      fontSize: '30px'
+                    }}
+                  />
+                </IconButton>
+              </Box>
+            ))}
+
+
+          </Box>
           <IconButton
-            title={'Удалить документ'}
-            onClick={handleDeleteFile}
+            title={'Добавить'}
+            onClick={getRootProps().onClick}
+            color={'secondary'}
           >
-            <DeleteOutlineOutlinedIcon
-              sx={{
-                color: 'error.main',
-                fontSize: '30px'
-              }}
-            />
+            <AddCircleOutlineIcon />
           </IconButton>
-        </Box>
+        </>
       )}
     </>
   );
@@ -149,16 +181,12 @@ const styles = {
     backgroundColor: 'common.white',
     display: 'flex',
     width: '100%',
-    minHeight: '50px',
-    padding: '10px',
+    px: '5px',
     border: "1px solid",
     borderColor: '#e0e7ff',
     borderRadius: '10px',
     alignItems: 'center',
     gap: '5px',
-    ":hover": {
-      borderColor: 'common.black'
-    },
     boxSizing: "border-box",
   } as SxProps<Theme>,
 
