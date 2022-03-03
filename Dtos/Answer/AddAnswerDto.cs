@@ -10,6 +10,6 @@ namespace patools.Dtos.Answer
         
         public string Response { get; set; }    
         public int? Value { get; set; }
-        public IFormFile File { get; set; }
+        public string FileId { get; set; }
     }
 }

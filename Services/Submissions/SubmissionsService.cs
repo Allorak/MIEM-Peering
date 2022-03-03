@@ -82,7 +82,7 @@ namespace patools.Services.Submissions
                         case QuestionTypes.Select when answer.Value<question.MinValue || answer.Value>question.MaxValue:
                             return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
                                 "Answer for a select question is out of range");
-                        case QuestionTypes.File when answer.File == null:
+                        case QuestionTypes.File when answer.FileId == null:
                             return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
                                 "There is no answer for a required question");
                     }
@@ -101,20 +101,25 @@ namespace patools.Services.Submissions
 
                 if (newAnswer.Question.Type == QuestionTypes.File)
                 {
+                    var file = submission.Files.FirstOrDefault(f => f.FileName == answer.FileId);
+                    if (file == null)
+                        return new BadRequestDataResponse<GetNewSubmissionDtoResponse>("The filename in answer is incorrect");
+
                     var directory = System.IO.Directory.GetCurrentDirectory();
-                    var path = Path.Combine(directory, "/AnswerFiles");
+                    var path = Path.Combine(directory, "AnswerFiles",task.ID.ToString());
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
                     }
+
                     var dateTime = DateTime.Now;
                     var storedFilename =
-                        $"{dateTime.Year}{dateTime.Month}{dateTime.Day}{dateTime.Hour}{dateTime.Minute}{dateTime.Second}_{newSubmission.ID}";
+                        $"{dateTime.Year}{dateTime.Month}{dateTime.Day}{dateTime.Hour}{dateTime.Minute}{dateTime.Second}_{file.FileName}";
 
                     var filepath = Path.Combine(path, storedFilename);
                     await using (var fileStream = new FileStream(filepath,FileMode.Create,FileAccess.Write))
                     {
-                        await answer.File.CopyToAsync(fileStream);
+                        await file.CopyToAsync(fileStream);
                         await fileStream.DisposeAsync();
                     }
 
@@ -122,7 +127,7 @@ namespace patools.Services.Submissions
                     {
                         Answer = newAnswer,
                         FilePath = filepath,
-                        FileName = answer.File.Name
+                        FileName = file.FileName
                     };
                     Context.AnswerFiles.Add(answerFile);
                 }

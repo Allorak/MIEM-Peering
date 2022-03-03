@@ -10,7 +10,7 @@ export const getFileById = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/tasks/download-excel/task=${fileId}`,
+    url: `/api/v1/submissions/answer-file/file=${fileId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },

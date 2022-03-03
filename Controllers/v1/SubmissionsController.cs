@@ -1,9 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BrunoZell.ModelBinding;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using patools.Dtos.Answer;
 using patools.Dtos.Submission;
 using patools.Enums;
 using patools.Errors;
@@ -28,8 +36,15 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission)
+        public async Task<ActionResult<GetNewSubmissionDtoResponse>> AddSubmission([FromForm] Guid taskId, [FromForm] [ModelBinder(BinderType = typeof(JsonModelBinder))] AddAnswerDto[] answers,  [FromForm] IList<IFormFile> files)
         {
+            var submission = new AddSubmissionDto()
+            {
+                TaskId = taskId,
+                Answers = answers,
+                Files = files
+            };
+
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
 

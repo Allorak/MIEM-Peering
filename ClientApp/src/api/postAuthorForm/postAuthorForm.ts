@@ -26,7 +26,7 @@ export const postAuthorForm = async ({
 
   responses.answers.map((item, index) => {
     if (item.file) {
-      formData.append("files[]", item.file, `#${index}-${item.file.name}`)
+      formData.append("files", item.file, `#${index}-${item.file.name}`)
     }
   })
 
