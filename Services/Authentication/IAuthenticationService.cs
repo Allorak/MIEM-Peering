@@ -14,6 +14,6 @@ namespace patools.Services.Authentication
 
         Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email);
 
-        Task<Response<string>> IsLtiTokenUserRegistered(string userToken, Guid taskId);
+        Task<Response<LtiAuthenticationResponseDto>> LtiAuthentication(string userToken, Guid taskId);
     }
 }

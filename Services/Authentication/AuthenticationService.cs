@@ -63,7 +63,7 @@ namespace patools.Services.Authentication
             });
         }
 
-        public async Task<Response<string>> IsLtiTokenUserRegistered(string userToken, Guid taskId)
+        public async Task<Response<LtiAuthenticationResponseDto>> LtiAuthentication(string userToken, Guid taskId)
         {
             Console.WriteLine(userToken);
             var payload = userToken.Split(".")[1];
@@ -71,13 +71,13 @@ namespace patools.Services.Authentication
             var payloadData = JObject.Parse(payloadJson);
 
             if (!payloadData.ContainsKey("user_email"))
-                return new InvalidJwtTokenResponse<string>();
+                return new InvalidJwtTokenResponse<LtiAuthenticationResponseDto>();
             if (!payloadData.ContainsKey("user_is_student"))
-                return new InvalidJwtTokenResponse<string>();
+                return new InvalidJwtTokenResponse<LtiAuthenticationResponseDto>();
             if (!payloadData.ContainsKey("user_is_instructor"))
-                return new InvalidJwtTokenResponse<string>();
+                return new InvalidJwtTokenResponse<LtiAuthenticationResponseDto>();
             if (!payloadData.ContainsKey("user_full_name"))
-                return new InvalidJwtTokenResponse<string>();
+                return new InvalidJwtTokenResponse<LtiAuthenticationResponseDto>();
 
             var email = payloadData["user_email"]?.ToString();
             var isStudent = payloadData["user_is_student"]?.ToString() == "True";
@@ -87,7 +87,11 @@ namespace patools.Services.Authentication
             var user = await GetUserByEmail(email);
             if (user != null)
             {
-                return new SuccessfulResponse<string>(CreateJwtFromUser(user));
+                return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
+                {
+                    Token = CreateJwtFromUser(user),
+                    Role = isTeacher ? UserRoles.Teacher : UserRoles.Student
+                });
             }
 
             var newUser = new User()
@@ -104,11 +108,11 @@ namespace patools.Services.Authentication
                 .Include(t => t.Course)
                 .FirstOrDefaultAsync(t => t.ID == taskId);
             if (task == null)
-                return new InvalidGuidIdResponse<string>("Invalid task id provided");
+                return new InvalidGuidIdResponse<LtiAuthenticationResponseDto>("Invalid task id provided");
 
             var course = await _context.Courses.FirstOrDefaultAsync(c => c == task.Course);
             if (course == null)
-                return new OperationErrorResponse<string>("The database has an error");
+                return new OperationErrorResponse<LtiAuthenticationResponseDto>("The database has an error");
 
             await _context.CourseUsers.AddAsync(new CourseUser()
             {
@@ -131,7 +135,11 @@ namespace patools.Services.Authentication
                 });
             }
             await _context.SaveChangesAsync();
-            return new SuccessfulResponse<string>(CreateJwtFromUser(newUser));
+            return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
+            {
+                Token = CreateJwtFromUser(newUser),
+                Role = isTeacher ? UserRoles.Teacher : UserRoles.Student
+            });
         }
 
         private static byte[] FromBase64Url(string base64Url)
