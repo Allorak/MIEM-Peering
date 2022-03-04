@@ -90,6 +90,7 @@ export const TaskAdd: FC = () => {
             reviewType: response.reviewType,
             submissionWeight: Number(response.submissionWeight),
             reviewWeight: Number(response.reviewWeight),
+            ltiEnable: response.ltiEnable,
             submissionsToCheck: Number(response.submissionsToCheck),
             ...(!hasConfidenceFactor && { experts: response.experts }),
             ...(hasConfidenceFactor && {
