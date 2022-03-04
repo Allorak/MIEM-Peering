@@ -109,32 +109,37 @@ namespace patools.Services.Submissions
                         Directory.CreateDirectory(path);
                     }
 
-                    foreach (var fileId in answer.FileIds)
+                    if (answer.FileIds != null)
                     {
-                        var file = submission.Files.FirstOrDefault(f => f.FileName == fileId);
-                        if (file == null)
-                            return new BadRequestDataResponse<GetNewSubmissionDtoResponse>("The filename in answer is incorrect");
-
-                        var dateTime = DateTime.Now;
-                        var dateTimeString = $"{dateTime.Year:d4}-{dateTime.Month:d2}-{dateTime.Day:d2} {dateTime.Hour:d2}:{dateTime.Minute:d2}:{dateTime.Second:d2}:{dateTime.Millisecond:d3}";
-                        var extension = fileId.Split('.').Last();
-                        var exposedFilename = $"Peering File #{++fileIndex} [{dateTimeString}].{extension}";
-                        var storedFilename = $"#{fileIndex} - {file.FileName}";
-
-                        var filepath = Path.Combine(path, storedFilename);
-                        await using (var fileStream = new FileStream(filepath,FileMode.Create,FileAccess.Write))
+                        foreach (var fileId in answer.FileIds)
                         {
-                            await file.CopyToAsync(fileStream);
-                            await fileStream.DisposeAsync();
+                            var file = submission.Files.FirstOrDefault(f => f.FileName == fileId);
+                            if (file == null)
+                                return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                                    "The filename in answer is incorrect");
+
+                            var dateTime = DateTime.Now;
+                            var dateTimeString =
+                                $"{dateTime.Year:d4}-{dateTime.Month:d2}-{dateTime.Day:d2} {dateTime.Hour:d2}:{dateTime.Minute:d2}:{dateTime.Second:d2}:{dateTime.Millisecond:d3}";
+                            var extension = fileId.Split('.').Last();
+                            var exposedFilename = $"Peering File #{++fileIndex} [{dateTimeString}].{extension}";
+                            var storedFilename = $"#{fileIndex} - {file.FileName}";
+
+                            var filepath = Path.Combine(path, storedFilename);
+                            await using (var fileStream = new FileStream(filepath, FileMode.Create, FileAccess.Write))
+                            {
+                                await file.CopyToAsync(fileStream);
+                                await fileStream.DisposeAsync();
+                            }
+
+                            var answerFile = new AnswerFile()
+                            {
+                                Answer = newAnswer,
+                                FilePath = filepath,
+                                FileName = exposedFilename
+                            };
+                            Context.AnswerFiles.Add(answerFile);
                         }
-
-                        var answerFile = new AnswerFile()
-                        {
-                            Answer = newAnswer,
-                            FilePath = filepath,
-                            FileName = exposedFilename
-                        };
-                        Context.AnswerFiles.Add(answerFile);
                     }
                 }
 
@@ -544,6 +549,7 @@ namespace patools.Services.Submissions
                 .Include(a => a.Question)
                 .Where(a => 
                     a.Submission == submission && a.Question.RespondentType == RespondentTypes.Author)
+                .OrderBy(a => a.Question.Order)
                 .ToListAsync();
 
             return await GetResponsesByAnswers(answers);
@@ -579,6 +585,7 @@ namespace patools.Services.Submissions
                     Id = af.ID,
                     Name = af.FileName
                 })
+                .OrderBy(af => af.Name)
                 .ToListAsync();
         }
         private async Task<IEnumerable<GetVariantDtoResponse>> GetVariants(Question question)
