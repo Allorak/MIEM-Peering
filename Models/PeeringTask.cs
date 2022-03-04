@@ -81,6 +81,7 @@ namespace patools.Models
         public float? BadConfidencePenalty { get; set; }
 
         //For LTI Integration
+        public bool LtiEnabled { get; set; }
         public int LtiTaskId { get; set; }
         public string SharedSecret { get; set; }
         public string ConsumerKey { get; set; }

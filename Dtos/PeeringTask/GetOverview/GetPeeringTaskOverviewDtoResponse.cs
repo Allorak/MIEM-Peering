@@ -5,6 +5,8 @@ namespace patools.Dtos.Task
 {
     public class GetPeeringTaskOverviewDtoResponse
     {
+        public string Title { get; set; }
+        public string Description { get; set; }
         public GetPeeringTaskDeadlinesDtoResponse Deadlines { get; set; }
         public TaskTypes? TaskType { get; set; }
         
@@ -26,6 +28,8 @@ namespace patools.Dtos.Task
         public List<float> CurrentConfidenceFactors { get; set; }
         public List<float?> ConfidenceFactors { get; set; }
         public ReviewTypes? ReviewType { get; set; }
+        public string LtiSharedSecret { get; set; }
+        public string LtiConsumerKey { get; set; }
 
         //Teacher and student
         public int? SubmissionWeight { get; set; }

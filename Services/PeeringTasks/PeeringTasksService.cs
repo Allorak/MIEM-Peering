@@ -83,27 +83,31 @@ namespace patools.Services.PeeringTasks
 
             if(newTask == null)
                 return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>();
-            
-            var ltiInfo = await CreateLtiBridge(new CreateLtiTaskDto()
-            {
-                return_user_data = true,
-                source_id = null,
-                description = null,
-                title = null,
-                url = $"{_configuration.GetSection("LTI:RedirectLink").Value}/{newTask.ID}" 
-            });
 
-            if (ltiInfo == null)
+            if (peeringTask.Settings.LtiEnable)
             {
-                Console.WriteLine("Lti Bridge has Failed");
+                newTask.LtiEnabled = true;
+                var ltiInfo = await CreateLtiBridge(new CreateLtiTaskDto()
+                {
+                    return_user_data = true,
+                    source_id = null,
+                    description = null,
+                    title = null,
+                    url = $"{_configuration.GetSection("LTI:RedirectLink").Value}/{newTask.ID}"
+                });
+
+                if (ltiInfo == null)
+                {
+                    Console.WriteLine("Lti Bridge has Failed");
+                }
+                else
+                {
+                    newTask.ConsumerKey = ltiInfo.consumer_key;
+                    newTask.LtiTaskId = ltiInfo.id;
+                    newTask.SharedSecret = ltiInfo.shared_secret;
+                }
             }
-            else
-            {
-                newTask.ConsumerKey = ltiInfo.consumer_key;
-                newTask.LtiTaskId = ltiInfo.id;
-                newTask.SharedSecret = ltiInfo.shared_secret;
-            }
-            
+
             await Context.Tasks.AddAsync(newTask);
             //TODO: Feature should be changed later
 
@@ -560,6 +564,8 @@ namespace patools.Services.PeeringTasks
 
             response.Deadlines = GetTaskDeadlines(task);
             response.TaskType = task.TaskType;
+            response.Title = task.Title;
+            response.Description = task.Description != string.Empty ? task.Description : null;
 
             return new SuccessfulResponse<GetPeeringTaskOverviewDtoResponse>(response);
         }
@@ -624,7 +630,9 @@ namespace patools.Services.PeeringTasks
                     : null,
                 GoodConfidenceBonus = task.TaskType == TaskTypes.Common
                     ? task.GoodConfidenceBonus
-                    : null
+                    : null,
+                LtiConsumerKey = task.LtiEnabled ? task.ConsumerKey : null,
+                LtiSharedSecret = task.LtiEnabled ? task.SharedSecret : null
             };
         }
         

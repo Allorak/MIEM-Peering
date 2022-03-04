@@ -17,5 +17,6 @@ namespace patools.Dtos.Task
         public int SubmissionWeight { get; set; }
         public float? GoodConfidenceBonus { get; set; }
         public float? BadConfidencePenalty { get; set; }
+        public bool LtiEnable { get; set; }
     }
 }
