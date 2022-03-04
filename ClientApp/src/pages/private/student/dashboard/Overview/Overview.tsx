@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePathStDashboard";
 
 import { fetchOverviewStudent } from "../../../../../store/overviewStudent";
+import { TaskMainOverview } from "../../../../../components/taskMainOverview";
 
 
 export const Overview: FC = () => {
@@ -37,6 +38,13 @@ export const Overview: FC = () => {
     >
       {payload && (
         <Grid container spacing={"10px"} pb={"10px"} boxSizing={'border-box'}>
+          <Grid item xs={12} >
+            <TaskMainOverview
+              title={payload.title}
+              description={payload.description}
+            />
+          </Grid>
+
           <Grid item xs={12} >
             <Deadlines
               submissionStartDateTime={payload.deadlines.submissionStartDateTime}

@@ -213,6 +213,7 @@ export interface INewTaskSettings {
   reviewType: PeerTaskTypes
   submissionWeight: number
   reviewWeight: number
+  ltiEnable: boolean
   goodConfidenceBonus?: number
   badConfidencePenalty?: number
 }
@@ -222,7 +223,7 @@ export enum PeerSteps {
   SECOND_STEP = 'Common',
 }
 
-export interface IDeadlines extends Omit<INewTaskSettings, 'submissionsToCheck' | 'reviewType' | 'experts' | 'submissionWeight' | 'reviewWeight' | 'goodCoefficientBonus' | 'badCoefficientPenalty'> { }
+export interface IDeadlines extends Omit<INewTaskSettings, 'ltiEnable' | 'submissionsToCheck' | 'reviewType' | 'experts' | 'submissionWeight' | 'reviewWeight' | 'goodCoefficientBonus' | 'badCoefficientPenalty'> { }
 
 export type INewQuestionRubrics = Array<INewTextQuestion | INewShortTextQuestion | INewMultipleQuiestion | INewSelectRatingQuestion | INewUploadFileQuestion>
 
@@ -363,7 +364,11 @@ export type IOverview = {
   submissionWeight: number,
   reviewWeight: number,
   badConfidencePenalty?: number,
-  goodConfidenceBonus?: number
+  goodConfidenceBonus?: number,
+  title: string,
+  description?: string,
+  ltiSharedSecret?: string,
+  ltiConsumerKey?: string
 }
 
 export type IOverviewStudent = {
@@ -383,7 +388,9 @@ export type IOverviewStudent = {
   submissionWeight: number,
   reviewWeight: number,
   badConfidencePenalty?: number,
-  goodConfidenceBonus?: number
+  goodConfidenceBonus?: number,
+  title: string,
+  description?: string,
 }
 
 export type IStudentSubmissionGrades = {
@@ -395,7 +402,9 @@ export type IStudentSubmissionGrades = {
 export type IOverviewExpert = {
   deadlines: IDeadlines,
   assignedSubmissions?: number,
-  reviewedSubmissions?: number
+  reviewedSubmissions?: number,
+  title: string,
+  description?: string,
 }
 
 export interface IOverviewExpertResponse extends Omit<IOverviewExpert, 'deadlines'> {
