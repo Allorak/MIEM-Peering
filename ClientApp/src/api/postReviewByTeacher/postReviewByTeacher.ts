@@ -44,10 +44,7 @@ export const postReviewByTeacher = async ({
       'Accept-Language': 'ru',
       'Content-Type': 'multipart/form-data'
     },
-    data: {
-      submissionId: workId,
-      answers: responses.answers
-    }
+    data: formData
   }
 
   const response = await api.request<IResponse<IResponseData>>(requestConfig)

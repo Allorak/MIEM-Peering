@@ -5,7 +5,7 @@ import { saveAs } from 'file-saver';
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 
 import { useAppSelector } from "../../../app/hooks";
 
@@ -77,10 +77,18 @@ export const FileUploadVisible: FC<IProps> = ({ files }) => {
 
         </Box>
       ) : (
-        <>
-          <ErrorOutlineIcon
+        <Box
+          display={'flex'}
+          alignItems={'center'}
+          gap={'10px'}
+          border={'1px solid'}
+          borderColor={'#e0e7ff'}
+          borderRadius={'10px'}
+          padding={'5px'}
+        >
+          <DoNotDisturbIcon
             sx={{
-              color: 'warning.main',
+              color: 'error.main',
               fontSize: '30px'
             }}
           />
@@ -89,9 +97,9 @@ export const FileUploadVisible: FC<IProps> = ({ files }) => {
             variant={'body1'}
             flex={'1 1 100%'}
           >
-            {`Файл не обнаружен`}
+            {`Файл не загружен`}
           </Typography>
-        </>
+        </Box>
       )}
 
     </>
@@ -114,6 +122,9 @@ const styles = {
 
   fileName: {
     textDecoration: 'underline',
+    textOverflow: 'ellipsis',
+    overflowX: 'clip',
+    whiteSpace: "nowrap",
     ":hover": {
       cursor: 'pointer',
       color: 'primary.main'
