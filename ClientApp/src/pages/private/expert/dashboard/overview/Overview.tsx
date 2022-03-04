@@ -11,6 +11,7 @@ import { usePrivatePathExDashboard } from "../../../../../app/hooks/usePrivatePa
 import { fetchOverviewExpert } from "../../../../../store/overviewExpert";
 import { UncheckedSubmissionsCount } from "../../../../../components/uncheckedSubmissionsCount";
 import { CheckedSubmissionsCount } from "../../../../../components/checkedSubmissionsCount";
+import { TaskMainOverview } from "../../../../../components/taskMainOverview";
 
 
 export const Overview: FC = () => {
@@ -35,6 +36,14 @@ export const Overview: FC = () => {
       {
         payload && (
           <Grid container spacing={"10px"} pb={"10px"} boxSizing={'border-box'}>
+
+            <Grid item xs={12} >
+              <TaskMainOverview
+                title={payload.title}
+                description={payload.description}
+              />
+            </Grid>
+
             <Grid item xs={12} >
               <Deadlines
                 submissionStartDateTime={payload.deadlines.submissionStartDateTime}
