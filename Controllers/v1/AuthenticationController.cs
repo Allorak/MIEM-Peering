@@ -86,8 +86,9 @@ namespace patools.Controllers.v1
                         : $"~/t/task/{taskId}/overview";
                     return Redirect(redirectLink);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Console.WriteLine(e.Message);
                     return Redirect("~/not-found");
                 }
 

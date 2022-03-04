@@ -34,6 +34,9 @@ namespace patools.Services.PeeringTasks
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+        private const int LtiHourBreakBorder = 5;
+        private const int LtiDayBreakBorder = 10;
+        private const int LtiMaxTries = 15;
         public PeeringTasksService(PAToolsContext context, IMapper mapper,IHttpClientFactory httpClientFactory, Microsoft.Extensions.Configuration.IConfiguration configuration) : base(context, mapper)
         {
             _httpClientFactory = httpClientFactory;
@@ -194,14 +197,15 @@ namespace patools.Services.PeeringTasks
                 if (taskUser.FinalGrade != null)
                 {
                     var grade = taskUser.FinalGrade.Value / 10;
-                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, grade), delay);
+                    var assignmentId = taskUser.PeeringTask.LtiTaskId;
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, grade, assignmentId,0), delay);
                     delay += TimeSpan.FromSeconds(5);
                 }
             }
             return "Lti grades scheduled successfully";
         }
 
-        public async Task<string> ReturnLtiGrade(string email, float studentGrade)
+        public async Task<string> ReturnLtiGrade(string email, float studentGrade, int assignmentId, int tryCount)
         {
             var content = new StringContent(
                 JsonSerializer.Serialize(new
@@ -211,13 +215,35 @@ namespace patools.Services.PeeringTasks
                 }),
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json);
+            Console.WriteLine(await content.ReadAsStringAsync());
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", _configuration.GetSection("LTI:AppToken").Value);
-            var httpResponseMessage = await httpClient.PostAsync(_configuration.GetSection("LTI:CreateTaskLink").Value,content);
-            if (httpResponseMessage.IsSuccessStatusCode == false)
-                BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade), TimeSpan.FromSeconds(13));
-            return "Success";
+            var gradeLink = _configuration.GetSection("LTI:CreateTaskLink").Value + $"/{assignmentId}/grades";
+            var httpResponseMessage = await httpClient.PostAsync(gradeLink,content);
+            Console.WriteLine(httpResponseMessage.IsSuccessStatusCode);
+            if (httpResponseMessage.IsSuccessStatusCode)
+                return "Success";
+
+            if (tryCount >= LtiMaxTries) return "Failure";
+            
+            switch (tryCount)
+            {
+                case LtiHourBreakBorder:
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade, assignmentId, tryCount + 1),
+                        TimeSpan.FromHours(1));
+                    break;
+                case LtiDayBreakBorder:
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade, assignmentId, tryCount + 1),
+                        TimeSpan.FromDays(1));
+                    break;
+                default:
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade, assignmentId, tryCount + 1),
+                        TimeSpan.FromSeconds(15));
+                    break;
+            }
+
+            return "Failure";
         }
         private static bool AreDeadlinesValid(AddPeeringTaskSettingsDto settings)
         {
@@ -1086,7 +1112,7 @@ namespace patools.Services.PeeringTasks
             }
 
             await Context.SaveChangesAsync();
-            if(task.SharedSecret != null && task.ConsumerKey != null)
+            if(task.LtiEnabled)
                 await ScheduleLtiGrades(task);
             return new SuccessfulResponse<string>("Factors recalculated successfully. All grades are set");
         }

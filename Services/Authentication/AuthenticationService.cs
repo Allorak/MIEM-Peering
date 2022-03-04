@@ -84,9 +84,57 @@ namespace patools.Services.Authentication
             var isTeacher = payloadData["user_is_instructor"]?.ToString()  == "True";
             var fullname = payloadData["user_full_name"]?.ToString();
 
+            var task = await _context.Tasks
+                .Include(t => t.Course)
+                .FirstOrDefaultAsync(t => t.ID == taskId);
+            Console.WriteLine("Task - "+task);
+            if (task == null)
+                return new InvalidGuidIdResponse<LtiAuthenticationResponseDto>("Invalid task id provided");
+
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c == task.Course);
+            Console.WriteLine("Course - "+course);
+            if (course == null)
+                return new OperationErrorResponse<LtiAuthenticationResponseDto>("The database has an error");
+            
             var user = await GetUserByEmail(email);
             if (user != null)
             {
+                var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu => cu.Course == course && cu.User == user);
+                Console.WriteLine("CourseUser - "+courseUser);
+                if (courseUser == null)
+                {
+                    await _context.CourseUsers.AddAsync(new CourseUser()
+                    {
+                        ID = Guid.NewGuid(),
+                        Course = course,
+                        User = user,
+                        ConfidenceFactor = 0
+                    });
+                }
+
+                var assignedTasks = await _context.TaskUsers
+                    .Where(tu => tu.PeeringTask.Course == course && tu.Student == user)
+                    .Select(tu => tu.PeeringTask)
+                    .ToListAsync();
+
+                var tasksWithoutAccess = await _context.Tasks
+                    .Where(t => t.Course == course && !assignedTasks.Contains(t))
+                    .ToListAsync();
+
+                foreach (var unassignedTask in tasksWithoutAccess)
+                {
+                    await _context.TaskUsers.AddAsync(new PeeringTaskUser()
+                    {
+                        ID = Guid.NewGuid(),
+                        PeeringTask = unassignedTask,
+                        Student = user,
+                        State = PeeringTaskStates.Assigned,
+                        PreviousConfidenceFactor = 0
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+                
                 return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
                 {
                     Token = CreateJwtFromUser(user),
@@ -103,37 +151,30 @@ namespace patools.Services.Authentication
                 };
 
             await _context.Users.AddAsync(newUser);
-
-            var task = await _context.Tasks
-                .Include(t => t.Course)
-                .FirstOrDefaultAsync(t => t.ID == taskId);
-            if (task == null)
-                return new InvalidGuidIdResponse<LtiAuthenticationResponseDto>("Invalid task id provided");
-
-            var course = await _context.Courses.FirstOrDefaultAsync(c => c == task.Course);
-            if (course == null)
-                return new OperationErrorResponse<LtiAuthenticationResponseDto>("The database has an error");
-
-            await _context.CourseUsers.AddAsync(new CourseUser()
+            if (newUser.Role == UserRoles.Student)
             {
-                ID = Guid.NewGuid(),
-                User = newUser,
-                Course = course,
-                ConfidenceFactor = 0
-            });
-
-            var tasks = await _context.Tasks.Where(t => t.Course == course).ToListAsync();
-            foreach (var peeringTask in tasks)
-            {
-                await _context.TaskUsers.AddAsync(new PeeringTaskUser()
+                await _context.CourseUsers.AddAsync(new CourseUser()
                 {
                     ID = Guid.NewGuid(),
-                    PeeringTask = peeringTask,
-                    Student = newUser,
-                    PreviousConfidenceFactor = 0,
-                    State = PeeringTaskStates.Assigned
+                    User = newUser,
+                    Course = course,
+                    ConfidenceFactor = 0
                 });
+
+                var tasks = await _context.Tasks.Where(t => t.Course == course).ToListAsync();
+                foreach (var peeringTask in tasks)
+                {
+                    await _context.TaskUsers.AddAsync(new PeeringTaskUser()
+                    {
+                        ID = Guid.NewGuid(),
+                        PeeringTask = peeringTask,
+                        Student = newUser,
+                        PreviousConfidenceFactor = 0,
+                        State = PeeringTaskStates.Assigned
+                    });
+                }
             }
+
             await _context.SaveChangesAsync();
             return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
             {
