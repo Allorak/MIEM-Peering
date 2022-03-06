@@ -27,6 +27,5 @@ namespace patools.Services.Submissions
 
         Task<Response<GetSubmissionMetadataDtoResponse>> GetSubmissionMetadata(GetSubmissionMetadataDtoRequest submissionInfo);
 
-        Task<Response<GetFileByIdDtoResponse>> GetAnswerFileById(GetFileByIdDtoRequest fileInfo);
     }
 }

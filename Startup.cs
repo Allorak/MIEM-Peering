@@ -23,6 +23,7 @@ using patools.Services.Authentication;
 using patools.Services.Courses;
 using patools.Services.CourseUsers;
 using patools.Services.Experts;
+using patools.Services.Files;
 using patools.Services.Submissions;
 using patools.Services.Users;
 using patools.Services.PeeringTasks;
@@ -62,6 +63,7 @@ namespace patools
             services.AddScoped<ICourseUsersService, CourseUsersService>();
             services.AddScoped<IExpertsService, ExpertsService>();
             services.AddScoped<IReviewsService, ReviewsService>();
+            services.AddScoped<IFilesService, FilesService>();
             services.AddSwaggerGen();
         }
 

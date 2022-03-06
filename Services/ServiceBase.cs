@@ -63,6 +63,17 @@ namespace patools.Services
                 .Include(c => c.Teacher)
                 .FirstOrDefaultAsync(c => c.ID == courseId);
         }
+        protected async Task<AnswerFile> GetAnswerFileById(Guid fileId)
+        {
+            return await Context.AnswerFiles
+                .Include(af => af.Answer)
+                .Include(af => af.Answer.Question)
+                .Include(af => af.Answer.Question.PeeringTask)
+                .Include(af => af.Answer.Question.PeeringTask.Course)
+                .Include(af => af.Answer.Question.PeeringTask.Course.Teacher)
+                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment.Student)
+                .FirstOrDefaultAsync(af => af.ID == fileId);
+        }
         protected async Task<bool> IsExpertUser(User user, PeeringTask task)
         {
             var expert = await Context.Experts
@@ -281,5 +292,7 @@ namespace patools.Services
                 .Select(e => e.User)
                 .ToListAsync();
         }
+        
+        
     }
 }

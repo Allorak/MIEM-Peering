@@ -31,7 +31,7 @@ export const postReviewByTeacher = async ({
   responses.answers.map((item) => {
     if (item.file && item.file.length > 0) {
       item.file.map((file, index) => {
-        formData.append("files[]", file, `#${index}-${item.questionId}-${file.name}`)
+        formData.append("files", file, `#${index}-${item.questionId}-${file.name}`)
       })
     }
   })

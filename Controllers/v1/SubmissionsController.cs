@@ -17,6 +17,7 @@ using patools.Enums;
 using patools.Errors;
 using patools.Models;
 using patools.Services.Courses;
+using patools.Services.Files;
 using patools.Services.Submissions;
 using patools.Services.PeeringTasks;
 
@@ -28,11 +29,13 @@ namespace patools.Controllers.v1
     {
         private readonly PAToolsContext _context;
         private readonly ISubmissionsService _submissionsService;
+        private readonly IFilesService _filesService;
         
-        public SubmissionsController(PAToolsContext context, ISubmissionsService submissionsService)
+        public SubmissionsController(PAToolsContext context, ISubmissionsService submissionsService, IFilesService filesService)
         {
             _context = context;
             _submissionsService = submissionsService;
+            _filesService = filesService;
         }
 
         [HttpPost("add")]
@@ -214,7 +217,7 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
             
-            var result = await _submissionsService.GetAnswerFileById(new GetFileByIdDtoRequest()
+            var result = await _filesService.GetAnswerFileById(new GetFileByIdDtoRequest()
             {
                 AnswerFileId = fileId,
                 UserId = userId

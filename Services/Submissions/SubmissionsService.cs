@@ -16,13 +16,16 @@ using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
+using patools.Services.Files;
 
 namespace patools.Services.Submissions
 {
     public class SubmissionsService : ServiceBase, ISubmissionsService
     {
-        public SubmissionsService(PAToolsContext context, IMapper mapper) : base(context, mapper)
+        private readonly IFilesService _filesService;
+        public SubmissionsService(PAToolsContext context, IMapper mapper, IFilesService filesService) : base(context, mapper)
         {
+            _filesService = filesService;
         }
         
         public async Task<Response<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission)
@@ -103,7 +106,7 @@ namespace patools.Services.Submissions
                 if (newAnswer.Question.Type == QuestionTypes.File)
                 {
                     var directory = Directory.GetCurrentDirectory();
-                    var path = Path.Combine(directory, "AnswerFiles",task.ID.ToString(),newSubmission.ID.ToString());
+                    var path = Path.Combine(directory, "AnswerFiles",task.ID.ToString(),"Submissions",newSubmission.ID.ToString());
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
@@ -412,53 +415,6 @@ namespace patools.Services.Submissions
             });
         }
 
-        public async Task<Response<GetFileByIdDtoResponse>> GetAnswerFileById(GetFileByIdDtoRequest fileInfo)
-        {
-            var user = await GetUserById(fileInfo.UserId);
-            if (user == null)
-                return new InvalidGuidIdResponse<GetFileByIdDtoResponse>("Invalid user id provided");
-
-            var answerFile = await Context.AnswerFiles
-                .Include(af => af.Answer)
-                .Include(af => af.Answer.Question)
-                .Include(af => af.Answer.Question.PeeringTask)
-                .Include(af => af.Answer.Question.PeeringTask.Course)
-                .Include(af => af.Answer.Question.PeeringTask.Course.Teacher)
-                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment.Student)
-                .FirstOrDefaultAsync(af => af.ID == fileInfo.AnswerFileId);
-            if (answerFile == null)
-                return new InvalidGuidIdResponse<GetFileByIdDtoResponse>("Invalid file id provided");
-
-            var task = answerFile.Answer.Question.PeeringTask;
-            var submission = answerFile.Answer.Submission;
-            
-            switch (user.Role)
-            {
-                case {} when await IsExpertUser(user,task):
-                    if (task.ReviewStartDateTime > DateTime.Now)
-                        return new NoAccessResponse<GetFileByIdDtoResponse>("Reviewing stage hasn't started yet");
-                    break;
-                case UserRoles.Teacher when user != task.Course.Teacher:
-                    return new NoAccessResponse<GetFileByIdDtoResponse>("This teacher has no access to this file");
-                case UserRoles.Student when user != submission.PeeringTaskUserAssignment.Student:
-                    var submissionPeer = await GetSubmissionPeer(submission, user);
-                    if (submissionPeer == null)
-                        return new NoAccessResponse<GetFileByIdDtoResponse>("This student has no access to this file");
-                    if(task.ReviewStartDateTime>DateTime.Now)
-                        return new NoAccessResponse<GetFileByIdDtoResponse>("Reviewing stage hasn't started yet");
-                    break;
-            }
-
-            var fileContents = await File.ReadAllBytesAsync(answerFile.FilePath);
-            new FileExtensionContentTypeProvider().TryGetContentType(answerFile.FilePath, out var contentType);
-            return new SuccessfulResponse<GetFileByIdDtoResponse>(new GetFileByIdDtoResponse()
-            {
-                FileContents = fileContents,
-                FileName = answerFile.FileName,
-                ContentType = contentType ?? "application/octet-stream"
-            });
-        }
-
         private async Task<GetStatisticDtoResponse> GetFinalGradesStatistic(IEnumerable<Review> reviews)
         { 
             return new GetStatisticDtoResponse()
@@ -564,30 +520,14 @@ namespace patools.Services.Submissions
                 resultAnswer.QuestionId = answer.Question.ID;
                 resultAnswer.Value = answer.Value;
                 resultAnswer.Response = answer.Response;
-                if (answer.Question.Type == QuestionTypes.File)
-                {
-                    var attachedFiles = await GetFilesByAnswer(answer);
-                    resultAnswer.Files = attachedFiles.Count > 0 ? attachedFiles : null;
-                }
+                resultAnswer.Files = await _filesService.GetFilesByAnswer(answer);
                 resultAnswer.Responses = await GetVariants(answer.Question);
                 resultAnswers.Add(resultAnswer);
             }
 
             return resultAnswers;
         }
-
-        private async Task<List<GetAnswerFileInfoDto>> GetFilesByAnswer(Answer answer)
-        {
-            return await Context.AnswerFiles
-                .Where(af => af.Answer == answer)
-                .Select(af => new GetAnswerFileInfoDto()
-                {
-                    Id = af.ID,
-                    Name = af.FileName
-                })
-                .OrderBy(af => af.Name)
-                .ToListAsync();
-        }
+        
         private async Task<IEnumerable<GetVariantDtoResponse>> GetVariants(Question question)
         {
             return await Context.Variants
