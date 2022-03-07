@@ -250,8 +250,10 @@ namespace patools.Services.Reviews
                     e => e.User == peer &&
                          e.PeeringTask == task);
 
-                var resultReview = new GetReviewDtoResponse();
-                resultReview.ReviewerName = peer.Fullname;
+                var resultReview = new GetReviewDtoResponse
+                {
+                    ReviewerName = peer.Fullname
+                };
                 switch (peer.Role)
                 {
                     case { } when expert != null:
@@ -277,6 +279,7 @@ namespace patools.Services.Reviews
                 var answers = await Context.Answers
                     .Include(a => a.Question)
                     .Where(a => a.Review == review)
+                    .OrderBy(a => a.Question.Order)
                     .ToListAsync();
 
                 var resultAnswers = new List<GetAnswerDtoResponse>();
