@@ -28,13 +28,9 @@ namespace patools.Services.Authentication
     public class AuthenticationService : ServiceBase,IAuthenticationService
     {
         private readonly IConfiguration _configuration;
-        private readonly PAToolsContext _context;
-        private readonly IMapper _mapper;
         public AuthenticationService(PAToolsContext context, IMapper mapper, IConfiguration configuration) : base(context,mapper)
         {
             _configuration = configuration;
-            _context = context;
-            _mapper = mapper;
         }
 
         public async Task<Response<GetGoogleRegisteredUserDtoResponse>> FindUserByEmail(string email)
@@ -84,29 +80,30 @@ namespace patools.Services.Authentication
             var isTeacher = payloadData["user_is_instructor"]?.ToString()  == "True";
             var fullname = payloadData["user_full_name"]?.ToString();
 
-            var task = await _context.Tasks
+            var task = await Context.Tasks
                 .Include(t => t.Course)
                 .FirstOrDefaultAsync(t => t.ID == taskId);
             if (task == null)
                 return new InvalidGuidIdResponse<LtiAuthenticationResponseDto>("Invalid task id provided");
 
-            var course = await _context.Courses.FirstOrDefaultAsync(c => c == task.Course);
+            var course = await Context.Courses.FirstOrDefaultAsync(c => c == task.Course);
             if (course == null)
                 return new OperationErrorResponse<LtiAuthenticationResponseDto>("The database has an error");
             
             var user = await GetUserByEmail(email);
+            var expert = await Context.Experts.FirstOrDefaultAsync(e => e.Email == email);
             if (user != null)
             {
-                if (isTeacher)
+                if (isTeacher || expert!=null)
                     return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
                     {
-                        Role = UserRoles.Teacher,
+                        Role = user.Role,
                         Token = CreateJwtFromUser(user)
                     });
-                var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu => cu.Course == course && cu.User == user);
+                var courseUser = await Context.CourseUsers.FirstOrDefaultAsync(cu => cu.Course == course && cu.User == user);
                 if (courseUser == null)
                 {
-                    await _context.CourseUsers.AddAsync(new CourseUser()
+                    await Context.CourseUsers.AddAsync(new CourseUser()
                     {
                         ID = Guid.NewGuid(),
                         Course = course,
@@ -115,18 +112,18 @@ namespace patools.Services.Authentication
                     });
                 }
 
-                var assignedTasks = await _context.TaskUsers
+                var assignedTasks = await Context.TaskUsers
                     .Where(tu => tu.PeeringTask.Course == course && tu.Student == user)
                     .Select(tu => tu.PeeringTask)
                     .ToListAsync();
 
-                var tasksWithoutAccess = await _context.Tasks
+                var tasksWithoutAccess = await Context.Tasks
                     .Where(t => t.Course == course && !assignedTasks.Contains(t))
                     .ToListAsync();
 
                 foreach (var unassignedTask in tasksWithoutAccess)
                 {
-                    await _context.TaskUsers.AddAsync(new PeeringTaskUser()
+                    await Context.TaskUsers.AddAsync(new PeeringTaskUser()
                     {
                         ID = Guid.NewGuid(),
                         PeeringTask = unassignedTask,
@@ -137,7 +134,7 @@ namespace patools.Services.Authentication
                     });
                 }
 
-                await _context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
                 
                 return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
                 {
@@ -154,10 +151,21 @@ namespace patools.Services.Authentication
                     Role = isStudent ? UserRoles.Student : UserRoles.Teacher
                 };
 
-            await _context.Users.AddAsync(newUser);
+            await Context.Users.AddAsync(newUser);
+            if (expert != null)
+            {
+                expert.User = newUser;
+                await Context.SaveChangesAsync();
+                return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
+                {
+                    Role = newUser.Role,
+                    Token = CreateJwtFromUser(newUser)
+                });
+            }
+
             if (newUser.Role == UserRoles.Student)
             {
-                await _context.CourseUsers.AddAsync(new CourseUser()
+                await Context.CourseUsers.AddAsync(new CourseUser()
                 {
                     ID = Guid.NewGuid(),
                     User = newUser,
@@ -165,10 +173,10 @@ namespace patools.Services.Authentication
                     ConfidenceFactor = 0
                 });
 
-                var tasks = await _context.Tasks.Where(t => t.Course == course).ToListAsync();
+                var tasks = await Context.Tasks.Where(t => t.Course == course).ToListAsync();
                 foreach (var peeringTask in tasks)
                 {
-                    await _context.TaskUsers.AddAsync(new PeeringTaskUser()
+                    await Context.TaskUsers.AddAsync(new PeeringTaskUser()
                     {
                         ID = Guid.NewGuid(),
                         PeeringTask = peeringTask,
@@ -180,7 +188,7 @@ namespace patools.Services.Authentication
                 }
             }
 
-            await _context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
             return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
             {
                 Token = CreateJwtFromUser(newUser),
@@ -200,23 +208,23 @@ namespace patools.Services.Authentication
         private async Task<Response<GetNewUserDtoResponse>> AddUser(AddUserDTO newUser)
         {
             //GetUser - Base
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+            var existingUser = await Context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
             if (existingUser != null)
                 return new UserAlreadyRegisteredResponse<GetNewUserDtoResponse>();
             //
 
-            var user = _mapper.Map<User>(newUser);
+            var user = Mapper.Map<User>(newUser);
             user.ID = Guid.NewGuid();
-            await _context.Users.AddAsync(user);
+            await Context.Users.AddAsync(user);
 
             //GetExpert - Base
-            var expert = await _context.Experts.FirstOrDefaultAsync(e => e.Email == user.Email);
+            var expert = await Context.Experts.FirstOrDefaultAsync(e => e.Email == user.Email);
             if (expert != null)
                 expert.User = user;
             //
 
-            await _context.SaveChangesAsync();
-            return new SuccessfulResponse<GetNewUserDtoResponse>(_mapper.Map<GetNewUserDtoResponse>(user));
+            await Context.SaveChangesAsync();
+            return new SuccessfulResponse<GetNewUserDtoResponse>(Mapper.Map<GetNewUserDtoResponse>(user));
         }
 
         public async Task<Response<GetJwtTokenDtoResponse>> GetJwtByEmail(string email)
