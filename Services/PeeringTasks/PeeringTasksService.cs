@@ -1211,26 +1211,7 @@ namespace patools.Services.PeeringTasks
                 _ => ConfidenceFactorQualities.Good
             };
         }
-
-        private async Task<Review> GetExpertReview(PeeringTaskUser taskUser)
-        {
-            var task = taskUser.PeeringTask;
-
-            var expertUsers = await GetExpertUsersForTask(task);
-            var expertReview = await Context.Reviews
-                    .Include(r =>r.SubmissionPeerAssignment.Peer)
-                    .FirstOrDefaultAsync(r =>
-                        r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser
-                        && expertUsers.Contains(r.SubmissionPeerAssignment.Peer));
-            return expertReview;
-        }
-
-        private async Task<Review> GetTeacherReview(PeeringTaskUser taskUser)
-        {
-            return await Context.Reviews.FirstOrDefaultAsync(r => 
-                    r.SubmissionPeerAssignment.Peer == taskUser.PeeringTask.Course.Teacher
-                    && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser);
-        }
+        
         private async Task<float?> CountInitialConfidenceFactor(PeeringTaskUser taskUser, float grade)
         {
             var reviewsError = await CalculateReviewsError(taskUser);

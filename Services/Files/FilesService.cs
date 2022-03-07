@@ -74,6 +74,7 @@ namespace patools.Services.Files
             }
             else if (review != null)
             {
+                var taskUser = review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment;
                 switch (user.Role)
                 {
                     case { } when await IsExpertUser(user, task):
@@ -83,7 +84,10 @@ namespace patools.Services.Files
                     case UserRoles.Teacher when user != task.Course.Teacher:
                         return new NoAccessResponse<GetFileByIdDtoResponse>("This teacher has no access to this file");
                     case UserRoles.Student
-                        when user != review.SubmissionPeerAssignment.Peer && user != review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student:
+                        when review != await GetExpertReview(taskUser) && 
+                             review != await GetTeacherReview(taskUser) && 
+                             user != review.SubmissionPeerAssignment.Peer && 
+                             user != taskUser.Student:
                         return new NoAccessResponse<GetFileByIdDtoResponse>(
                                 "This student has no access to this file");
                 }
