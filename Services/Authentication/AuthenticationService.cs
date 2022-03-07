@@ -87,20 +87,23 @@ namespace patools.Services.Authentication
             var task = await _context.Tasks
                 .Include(t => t.Course)
                 .FirstOrDefaultAsync(t => t.ID == taskId);
-            Console.WriteLine("Task - "+task);
             if (task == null)
                 return new InvalidGuidIdResponse<LtiAuthenticationResponseDto>("Invalid task id provided");
 
             var course = await _context.Courses.FirstOrDefaultAsync(c => c == task.Course);
-            Console.WriteLine("Course - "+course);
             if (course == null)
                 return new OperationErrorResponse<LtiAuthenticationResponseDto>("The database has an error");
             
             var user = await GetUserByEmail(email);
             if (user != null)
             {
+                if (isTeacher)
+                    return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
+                    {
+                        Role = UserRoles.Teacher,
+                        Token = CreateJwtFromUser(user)
+                    });
                 var courseUser = await _context.CourseUsers.FirstOrDefaultAsync(cu => cu.Course == course && cu.User == user);
-                Console.WriteLine("CourseUser - "+courseUser);
                 if (courseUser == null)
                 {
                     await _context.CourseUsers.AddAsync(new CourseUser()
@@ -129,7 +132,8 @@ namespace patools.Services.Authentication
                         PeeringTask = unassignedTask,
                         Student = user,
                         State = PeeringTaskStates.Assigned,
-                        PreviousConfidenceFactor = 0
+                        PreviousConfidenceFactor = 0,
+                        JoinedByLti = true
                     });
                 }
 
@@ -138,7 +142,7 @@ namespace patools.Services.Authentication
                 return new SuccessfulResponse<LtiAuthenticationResponseDto>(new LtiAuthenticationResponseDto()
                 {
                     Token = CreateJwtFromUser(user),
-                    Role = isTeacher ? UserRoles.Teacher : UserRoles.Student
+                    Role = UserRoles.Student
                 });
             }
 
@@ -170,7 +174,8 @@ namespace patools.Services.Authentication
                         PeeringTask = peeringTask,
                         Student = newUser,
                         PreviousConfidenceFactor = 0,
-                        State = PeeringTaskStates.Assigned
+                        State = PeeringTaskStates.Assigned,
+                        JoinedByLti = true
                     });
                 }
             }

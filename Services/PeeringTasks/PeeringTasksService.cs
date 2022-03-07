@@ -190,55 +190,56 @@ namespace patools.Services.PeeringTasks
         private async Task<string> ScheduleLtiGrades(PeeringTask task)
         {
             var delay = TimeSpan.FromSeconds(10);
-            var taskUsers = await GetTaskUserAssignments(task);
+            var taskUsers = (await GetTaskUserAssignments(task)).Where( tu => tu.JoinedByLti);
             foreach (var taskUser in taskUsers)
             {
-                var email = taskUser.Student.Email;
                 if (taskUser.FinalGrade != null)
                 {
-                    var grade = taskUser.FinalGrade.Value / 10;
                     var assignmentId = taskUser.PeeringTask.LtiTaskId;
-                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, grade, assignmentId,0), delay);
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(taskUser, assignmentId,0), delay);
                     delay += TimeSpan.FromSeconds(5);
                 }
             }
             return "Lti grades scheduled successfully";
         }
 
-        public async Task<string> ReturnLtiGrade(string email, float studentGrade, int assignmentId, int tryCount)
+        public async Task<string> ReturnLtiGrade(PeeringTaskUser taskUser, int assignmentId, int tryCount)
         {
             var content = new StringContent(
                 JsonSerializer.Serialize(new
                 {
-                    grade = studentGrade,
-                    user_email = email
+                    grade = taskUser.FinalGrade!=null ? taskUser.FinalGrade.Value/10 : 0,
+                    user_email = taskUser.Student.Email
                 }),
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json);
-            Console.WriteLine(await content.ReadAsStringAsync());
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", _configuration.GetSection("LTI:AppToken").Value);
             var gradeLink = _configuration.GetSection("LTI:CreateTaskLink").Value + $"/{assignmentId}/grades";
             var httpResponseMessage = await httpClient.PostAsync(gradeLink,content);
-            Console.WriteLine(httpResponseMessage.IsSuccessStatusCode);
             if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                var databaseTaskUser = await Context.TaskUsers.FirstOrDefaultAsync(tu => tu == taskUser);
+                databaseTaskUser.ReceivedLtiGrade = true;
+                await Context.SaveChangesAsync();
                 return "Success";
+            }
 
             if (tryCount >= LtiMaxTries) return "Failure";
             
             switch (tryCount)
             {
                 case LtiHourBreakBorder:
-                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade, assignmentId, tryCount + 1),
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(taskUser, assignmentId, tryCount + 1),
                         TimeSpan.FromHours(1));
                     break;
                 case LtiDayBreakBorder:
-                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade, assignmentId, tryCount + 1),
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(taskUser, assignmentId, tryCount + 1),
                         TimeSpan.FromDays(1));
                     break;
                 default:
-                    BackgroundJob.Schedule(() => ReturnLtiGrade(email, studentGrade, assignmentId, tryCount + 1),
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(taskUser, assignmentId, tryCount + 1),
                         TimeSpan.FromSeconds(15));
                     break;
             }
@@ -1092,7 +1093,6 @@ namespace patools.Services.PeeringTasks
             foreach (var taskUser in taskUsers)
             {
                 var student = taskUser.Student;
-                Console.WriteLine($"Student Name: {student.Fullname}");
                 
                 var courseUser = await GetCourseUser(student,task.Course);
                 if (courseUser == null)
