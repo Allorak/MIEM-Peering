@@ -20,5 +20,7 @@ namespace patools.Dtos.User
         public string GradeComment { get; set; }
         public string ConfidenceComment { get; set; }
         public ConfidenceFactorQualities? ReviewQuality { get; set; }
+        public bool JoinedByLti { get; set; }
+        public bool ReceivedLtiGrade { get; set; }
     }
 }

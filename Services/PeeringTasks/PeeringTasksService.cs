@@ -1268,7 +1268,9 @@ namespace patools.Services.PeeringTasks
                 Fullname = taskUser.Student.Fullname,
                 ImageUrl = taskUser.Student.ImageUrl,
                 Email = taskUser.Student.Email,
-                PreviousConfidenceFactor = taskUser.PreviousConfidenceFactor
+                PreviousConfidenceFactor = taskUser.PreviousConfidenceFactor,
+                JoinedByLti = taskUser.JoinedByLti,
+                ReceivedLtiGrade = taskUser.ReceivedLtiGrade
             };
 
             var submission = await GetSubmission(taskUser);
