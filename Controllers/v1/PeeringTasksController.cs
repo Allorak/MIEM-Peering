@@ -31,12 +31,14 @@ namespace patools.Controllers.v1
             "Назначено работ",
             "Проверено работ",
             "Оценка за работу",
-            "Оценка за проверку",
+            "Оценка за количество проверок",
             "Итоговая оценка",
             "Проверена учителем",
             "Качество проверки",
             "Предыдущий коэффициент доверия",
-            "Итоговый коэффициент доверия"
+            "Итоговый коэффициент доверия",
+            "Присоединился по LTI",
+            "Оценка отправлена в LTI"
         };
 
         public TasksController(PAToolsContext context, IPeeringTasksService peeringTasksService)
@@ -289,8 +291,11 @@ namespace patools.Controllers.v1
             foreach (var student in performanceTable.Students)
             {
                 builder.AppendLine(
-                    $"{student.Fullname},{student.Email},{student.Submitted},{student.AssignedSubmissions},{student.ReviewedSubmissions}"
-                    + $"{student.SubmissionGrade},{student.ReviewGrade},{student.FinalGrade},{student.TeacherReviewed},{student.ReviewQuality},{student.PreviousConfidenceFactor},{student.NextConfidenceFactor}");
+                    $"{student.Fullname},{student.Email},{student.Submitted},{student.AssignedSubmissions}," +
+                    $"{student.ReviewedSubmissions},{student.SubmissionGrade},{student.ReviewGrade},"+
+                    $"{student.FinalGrade},{student.TeacherReviewed},{student.ReviewQuality},"+
+                    $"{student.PreviousConfidenceFactor},{student.NextConfidenceFactor},{student.JoinedByLti}"+
+                    $"{student.ReceivedLtiGrade}");
             }
 
             return File(Encoding.UTF32.GetBytes(builder.ToString()), "text/csv", "PerformanceTable.csv");
@@ -346,6 +351,8 @@ namespace patools.Controllers.v1
                 worksheet.Cell(currentRow, 10).Value = student.ReviewQuality;
                 worksheet.Cell(currentRow, 11).Value = student.PreviousConfidenceFactor;
                 worksheet.Cell(currentRow, 12).Value = student.NextConfidenceFactor;
+                worksheet.Cell(currentRow, 13).Value = student.JoinedByLti;
+                worksheet.Cell(currentRow, 14).Value = student.ReceivedLtiGrade;
             }
 
             await using var stream = new MemoryStream();
