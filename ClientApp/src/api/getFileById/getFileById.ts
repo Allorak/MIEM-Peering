@@ -10,7 +10,7 @@ export const getFileById = async ({
 
   const requestConfig: AxiosRequestConfig = {
     method: 'GET',
-    url: `/api/v1/submissions/answer-file/file=${fileId}`,
+    url: `/api/v1/files/answer-file/file=${fileId}`,
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },

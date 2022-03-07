@@ -203,28 +203,5 @@ namespace patools.Controllers.v1
                 TeacherId = teacherId
             }));
         }
-
-        [HttpGet("answer-file/file={fileId:guid}")]
-        public async Task<IActionResult> GetAnswerFile(Guid fileId)
-        {
-            if(!User.Identity.IsAuthenticated)
-                return Ok(new UnauthorizedUserResponse());
-            
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(userIdClaim == null)
-                return Ok(new InvalidJwtTokenResponse());
-            
-            if(!Guid.TryParse(userIdClaim.Value, out var userId))
-                return Ok(new InvalidGuidIdResponse());
-            
-            var result = await _filesService.GetAnswerFileById(new GetFileByIdDtoRequest()
-            {
-                AnswerFileId = fileId,
-                UserId = userId
-            });
-            if (result.Success == false)
-                return Ok(result);
-            return File(result.Payload.FileContents, result.Payload.ContentType, result.Payload.FileName);
-        }
     }
 }
