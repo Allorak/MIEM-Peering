@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.Net.Http;
+using System.Text;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
 using patools.Dtos.Auth;
@@ -7,7 +10,12 @@ using patools.Dtos.User;
 using Microsoft.AspNetCore.Authentication;
 using patools.Services.Authentication;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using patools.Errors;
+using Newtonsoft.Json;
+using patools.Enums;
 
 namespace patools.Controllers.v1
 {
@@ -57,6 +65,37 @@ namespace patools.Controllers.v1
             {
                 return Ok(new UnauthorizedUserResponse());
             }
+        }
+
+        [HttpPost("lti/{taskId}")]
+        public async Task<RedirectResult> LtiAuth([FromRoute] Guid taskId, [FromForm]GetJwtByLtiRequest tokenInfo)
+        {
+            var authenticationResult = await _authenticationService.LtiAuthentication(tokenInfo.user_data, taskId);
+
+            if (authenticationResult.Success == false)
+                return Redirect("~/not-found");
+
+            if (authenticationResult.Payload.Token != "")
+            {
+                try
+                {
+                    
+                    Response.Cookies.Append("JWT", authenticationResult.Payload.Token);
+                    var redirectLink = authenticationResult.Payload.Role == UserRoles.Student
+                        ? $"~/st/task/{taskId}/overview"
+                        : $"~/t/task/{taskId}/overview";
+                    return Redirect(redirectLink);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return Redirect("~/not-found");
+                }
+
+            }
+
+            Response.Cookies.Append("JWT", "");
+            return Redirect("~/not-found");
         }
     }
 }

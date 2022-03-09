@@ -11,41 +11,16 @@ import { palette } from "../../theme/colors";
 import { Logo } from "../logo";
 import { Navbar } from "../navbar";
 import { UserAcc } from "../userIco";
-import { usePrivatePathTDashboard } from "../../app/hooks/usePrivatePathTDashboard";
-import { Button } from "@mui/material";
-import { api } from "../../api";
-import { AxiosRequestConfig } from "axios";
 
 export const PrivateHeader: FC = () => {
     const history = useNavigate()
+
     const userProfile = useAppSelector(state => state.userProfile.payload)
-    const accessToken = useAppSelector(state => state.auth.accessToken)
 
     const goToHome = useCallback(() => {
         if (userProfile)
             history(userProfile.role === IRole.teacher ? paths.teacher.main : paths.student.main)
     }, [userProfile])
-
-    const { path } = usePrivatePathTDashboard()
-
-    const handleLtiTestBt = useCallback(() => {
-        if (path && path.taskId && accessToken) {
-            const config: AxiosRequestConfig = {
-                url: `/api/v1/authentication/lti/${path.taskId}`,
-                method: "POST",
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Accept-Language': 'ru',
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            }
-
-            console.log('[LTI Request]', config)
-            api.request(config).then(response => {
-                console.log('[LTI Response]', response)
-            })
-        }
-    }, [path, accessToken])
 
     return (
         <Box sx={styles.wrapper}>
@@ -62,19 +37,6 @@ export const PrivateHeader: FC = () => {
                     </Box>
                 </Box>
                 <Box sx={styles.rightItem}>
-                    {path && path.taskId && (
-                        <Button
-                            variant={'contained'}
-                            sx={{
-                                padding: "0px",
-                                mr: "10px"
-                            }}
-                            onClick={handleLtiTestBt}
-                        >
-                            {"LTI Test"}
-                        </Button>
-                    )}
-
                     <Box>
                         <UserAcc />
                     </Box>

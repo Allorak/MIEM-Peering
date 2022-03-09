@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react";
-import { Grid } from "@mui/material";
+import { Box, Divider, Grid, Typography } from "@mui/material";
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { TaskTypeBlock } from "../../../../../components/taskTypeBlock";
@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
 
 import { fetchOverview } from "../../../../../store/overview";
+import { TaskMainOverview } from "../../../../../components/taskMainOverview";
 
 
 export const Overview: FC = () => {
@@ -35,6 +36,15 @@ export const Overview: FC = () => {
     >
       {payload && (
         <Grid container spacing={"10px"} pb={"10px"} boxSizing={'border-box'}>
+          <Grid item xs={12} >
+            <TaskMainOverview
+              title={payload.title}
+              description={payload.description}
+              ltiConsumerKey={payload.ltiConsumerKey}
+              ltiSharedSecret={payload.ltiSharedSecret}
+            />
+          </Grid>
+
           <Grid item xs={12} >
             <Deadlines
               submissionStartDateTime={payload.deadlines.submissionStartDateTime}

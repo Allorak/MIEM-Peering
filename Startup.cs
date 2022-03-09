@@ -45,7 +45,11 @@ namespace patools
         public void ConfigureServices(IServiceCollection services)
         {
             SetupJwtServices(services);
+
+            services.AddHttpClient();
+
             services.AddMvc();
+
             services.AddHangfire(h => h.UsePostgreSqlStorage(Configuration["ConnectionStrings:Hangfire"]));
             services.AddHangfireServer();
             services.AddControllersWithViews();

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using patools.Models;
@@ -9,9 +10,10 @@ using patools.Models;
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220306212751_Added lti checks for user")]
+    partial class Addedltichecksforuser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,28 +51,6 @@ namespace patools.Migrations
                     b.HasIndex("SubmissionID");
 
                     b.ToTable("Answers");
-                });
-
-            modelBuilder.Entity("patools.Models.AnswerFile", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("AnswerID")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("FileName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FilePath")
-                        .HasColumnType("text");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("AnswerID");
-
-                    b.ToTable("AnswerFiles");
                 });
 
             modelBuilder.Entity("patools.Models.Course", b =>
@@ -488,15 +468,6 @@ namespace patools.Migrations
                     b.Navigation("Review");
 
                     b.Navigation("Submission");
-                });
-
-            modelBuilder.Entity("patools.Models.AnswerFile", b =>
-                {
-                    b.HasOne("patools.Models.Answer", "Answer")
-                        .WithMany()
-                        .HasForeignKey("AnswerID");
-
-                    b.Navigation("Answer");
                 });
 
             modelBuilder.Entity("patools.Models.Course", b =>

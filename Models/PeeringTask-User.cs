@@ -28,5 +28,8 @@ namespace patools.Models
         [Required]
         public float PreviousConfidenceFactor { get; set; }
         public float? NextConfidenceFactor { get; set; }
+
+        public bool JoinedByLti { get; set; }
+        public bool ReceivedLtiGrade { get; set; }
     }
 }
