@@ -13,6 +13,8 @@ namespace patools.Enums
         [EnumMember(Value = "multiple")]
         Multiple = 2,
         [EnumMember(Value = "select")]
-        Select = 3
+        Select = 3,
+        [EnumMember(Value = "file")]
+        File = 4
     }
 }

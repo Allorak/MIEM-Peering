@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 
 namespace patools.Dtos.Answer
 {
@@ -8,5 +11,6 @@ namespace patools.Dtos.Answer
         
         public string Response { get; set; }    
         public int? Value { get; set; }
+        public IEnumerable<string> FileIds { get; set; }
     }
 }

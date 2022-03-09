@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using patools.Models;
@@ -9,9 +10,10 @@ using patools.Models;
 namespace patools.Migrations
 {
     [DbContext(typeof(PAToolsContext))]
-    partial class PAToolsContextModelSnapshot : ModelSnapshot
+    [Migration("20220301191903_Changed AnswerFile model")]
+    partial class ChangedAnswerFilemodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -206,9 +208,6 @@ namespace patools.Migrations
                     b.Property<float?>("BadConfidencePenalty")
                         .HasColumnType("real");
 
-                    b.Property<string>("ConsumerKey")
-                        .HasColumnType("text");
-
                     b.Property<Guid?>("CourseID")
                         .HasColumnType("uuid");
 
@@ -220,12 +219,6 @@ namespace patools.Migrations
 
                     b.Property<float?>("GoodConfidenceBonus")
                         .HasColumnType("real");
-
-                    b.Property<bool>("LtiEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LtiTaskId")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("PeersAssigned")
                         .HasColumnType("boolean");
@@ -241,9 +234,6 @@ namespace patools.Migrations
 
                     b.Property<int>("ReviewWeight")
                         .HasColumnType("integer");
-
-                    b.Property<string>("SharedSecret")
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("SubmissionEndDateTime")
                         .HasColumnType("timestamp without time zone");
@@ -281,9 +271,6 @@ namespace patools.Migrations
                     b.Property<float?>("FinalGrade")
                         .HasColumnType("real");
 
-                    b.Property<bool>("JoinedByLti")
-                        .HasColumnType("boolean");
-
                     b.Property<float?>("NextConfidenceFactor")
                         .HasColumnType("real");
 
@@ -292,9 +279,6 @@ namespace patools.Migrations
 
                     b.Property<float>("PreviousConfidenceFactor")
                         .HasColumnType("real");
-
-                    b.Property<bool>("ReceivedLtiGrade")
-                        .HasColumnType("boolean");
 
                     b.Property<float?>("ReviewGrade")
                         .HasColumnType("real");

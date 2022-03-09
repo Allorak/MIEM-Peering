@@ -17,7 +17,7 @@ import * as globalStyles from "../../const/styles";
 interface IProps {
   form: IPeerForm,
   onSubmit: (formResponses: IPeerResponses) => void
-  onEdit: (value: string | number | File | undefined, questionId: string) => void
+  onEdit: (value: string | number | File[] | undefined, questionId: string) => void
 }
 
 
@@ -38,7 +38,7 @@ export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
         return
       }
 
-      if (item.required && isFile && typeof item.file === 'undefined') {
+      if (item.required && isFile && (typeof item.file === 'undefined' || item.file.length === 0)) {
         return
       }
     }
@@ -61,7 +61,7 @@ export const EditableForm: FC<IProps> = ({ form, onSubmit, onEdit }) => {
           case IQuestionTypes.FILE:
             return {
               questionId: response.questionId,
-              file: response.file
+              file: response.file ? response.file.map(item => item) : undefined
             }
         }
       })

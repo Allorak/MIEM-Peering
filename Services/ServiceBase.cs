@@ -63,6 +63,31 @@ namespace patools.Services
                 .Include(c => c.Teacher)
                 .FirstOrDefaultAsync(c => c.ID == courseId);
         }
+        protected async Task<AnswerFile> GetAnswerFileById(Guid fileId)
+        {
+            return await Context.AnswerFiles
+                .Include(af => af.Answer)
+                .Include(af => af.Answer.Question)
+                .Include(af => af.Answer.Question.PeeringTask)
+                .Include(af => af.Answer.Question.PeeringTask.Course)
+                .Include(af => af.Answer.Question.PeeringTask.Course.Teacher)
+                .Include(af => af.Answer.Submission)
+                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment)
+                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment.Student)
+                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment.PeeringTask)
+                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment.PeeringTask.Course)
+                .Include(af => af.Answer.Submission.PeeringTaskUserAssignment.PeeringTask.Course.Teacher)
+                .Include(af => af.Answer.Review)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment.Peer)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment.Submission)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask.Course)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.PeeringTask.Course.Teacher)
+                .Include(af => af.Answer.Review.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment.Student)
+                .FirstOrDefaultAsync(af => af.ID == fileId);
+        }
         protected async Task<bool> IsExpertUser(User user, PeeringTask task)
         {
             var expert = await Context.Experts
@@ -280,6 +305,26 @@ namespace patools.Services
                 .Where(e => e.PeeringTask == task)
                 .Select(e => e.User)
                 .ToListAsync();
+        }
+        
+        protected async Task<Review> GetExpertReview(PeeringTaskUser taskUser)
+        {
+            var task = taskUser.PeeringTask;
+
+            var expertUsers = await GetExpertUsersForTask(task);
+            var expertReview = await Context.Reviews
+                .Include(r =>r.SubmissionPeerAssignment.Peer)
+                .FirstOrDefaultAsync(r =>
+                    r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser
+                    && expertUsers.Contains(r.SubmissionPeerAssignment.Peer));
+            return expertReview;
+        }
+
+        protected async Task<Review> GetTeacherReview(PeeringTaskUser taskUser)
+        {
+            return await Context.Reviews.FirstOrDefaultAsync(r => 
+                r.SubmissionPeerAssignment.Peer == taskUser.PeeringTask.Course.Teacher
+                && r.SubmissionPeerAssignment.Submission.PeeringTaskUserAssignment == taskUser);
         }
     }
 }

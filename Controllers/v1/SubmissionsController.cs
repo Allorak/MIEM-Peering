@@ -1,14 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BrunoZell.ModelBinding;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using patools.Dtos.Answer;
 using patools.Dtos.Submission;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
 using patools.Services.Courses;
+using patools.Services.Files;
 using patools.Services.Submissions;
 using patools.Services.PeeringTasks;
 
@@ -20,16 +29,25 @@ namespace patools.Controllers.v1
     {
         private readonly PAToolsContext _context;
         private readonly ISubmissionsService _submissionsService;
+        private readonly IFilesService _filesService;
         
-        public SubmissionsController(PAToolsContext context, ISubmissionsService submissionsService)
+        public SubmissionsController(PAToolsContext context, ISubmissionsService submissionsService, IFilesService filesService)
         {
             _context = context;
             _submissionsService = submissionsService;
+            _filesService = filesService;
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission)
+        public async Task<ActionResult<GetNewSubmissionDtoResponse>> AddSubmission([FromForm] Guid taskId, [FromForm] [ModelBinder(BinderType = typeof(JsonModelBinder))] AddAnswerDto[] answers,  [FromForm] IList<IFormFile> files)
         {
+            var submission = new AddSubmissionDto()
+            {
+                TaskId = taskId,
+                Answers = answers,
+                Files = files
+            };
+
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
 
