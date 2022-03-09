@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -12,6 +13,7 @@ using patools.Dtos.CourseUser;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
+using patools.Services.Files;
 
 namespace patools.Services.Courses
 {
@@ -19,11 +21,13 @@ namespace patools.Services.Courses
     {
         private readonly PAToolsContext _context;
         private readonly IMapper _mapper;
+        private readonly IFilesService _filesService;
 
-        public CoursesService(PAToolsContext context, IMapper mapper)
+        public CoursesService(PAToolsContext context, IMapper mapper, IFilesService filesService)
         {
             _mapper = mapper;
             _context = context;
+            _filesService = filesService;
         }
 
         public static string RandomString(int length)
@@ -130,6 +134,19 @@ namespace patools.Services.Courses
                             .Where(a => a.Submission == submission)
                             .ToListAsync();
 
+                        foreach (var answer in answersSubmission)
+                        {
+                            var answerFiles = await _context.AnswerFiles
+                                .Where(af => af.Answer == answer)
+                                .ToListAsync();
+                            foreach (var file in answerFiles)
+                            {
+                                File.Delete(file.FilePath);
+                            }
+                            _context.AnswerFiles.RemoveRange(answerFiles);
+                        }
+                       
+                        
                         var submissionPeers = await _context.SubmissionPeers
                             .Where(sp => sp.Submission == submission)
                             .ToListAsync();
@@ -146,12 +163,20 @@ namespace patools.Services.Courses
                                     .Where(a => a.Review == review)
                                     .ToListAsync();
 
+                                foreach (var answer in answersReview)
+                                {
+                                    var answerFiles = await _context.AnswerFiles
+                                        .Where(af => af.Answer == answer)
+                                        .ToListAsync();
+                                    _context.AnswerFiles.RemoveRange(answerFiles);
+                                }
+
                                 _context.Answers.RemoveRange(answersReview);
                             }
 
                             _context.Reviews.RemoveRange(reviews);
                         }
-
+                        
                         _context.Answers.RemoveRange(answersSubmission);
                         _context.SubmissionPeers.RemoveRange(submissionPeers);
                     }
@@ -166,6 +191,11 @@ namespace patools.Services.Courses
                 _context.TaskUsers.RemoveRange(taskUsers);
                 _context.Experts.RemoveRange(experts);
                 _context.Questions.RemoveRange(questions);
+                
+                
+                var reviewFilesDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "AnswerFiles",task.ID.ToString());
+                Directory.Delete(reviewFilesDirectoryPath,true);
+
             }
 
             await _context.SaveChangesAsync();
