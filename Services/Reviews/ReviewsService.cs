@@ -335,6 +335,7 @@ namespace patools.Services.Reviews
                 resultReviews.Add(resultReview);
             }
 
+            resultReviews = resultReviews.OrderBy(r => r.ReviewerName).ToList();
             return new SuccessfulResponse<IEnumerable<GetReviewDtoResponse>>(resultReviews);
         }
 
@@ -422,6 +423,7 @@ namespace patools.Services.Reviews
                 resultReviews.Add(resultReview);
             }
 
+            resultReviews = resultReviews.OrderBy(r => r.StudentName).ToList();
             return new SuccessfulResponse<IEnumerable<GetMyReviewDtoResponse>>(resultReviews);
         }
 
