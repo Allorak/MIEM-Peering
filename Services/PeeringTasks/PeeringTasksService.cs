@@ -1463,7 +1463,6 @@ namespace patools.Services.PeeringTasks
             if (teacherReview != null)
             {
                 submissionGrade = teacherReview.Grade;
-                Console.WriteLine($"TEACHER {submissionGrade}");
             }
             else if (submission != null)
             {
@@ -1528,6 +1527,9 @@ namespace patools.Services.PeeringTasks
                              && sp.Submission.PeeringTaskUserAssignment.PeeringTask == taskUser.PeeringTask)
                 .ToListAsync();
 
+            if (assignedSubmissions.Count == 0)
+                return 0;
+            
             var reviewedSubmissions = await Context.Reviews
                 .Where(r => assignedSubmissions.Contains(r.SubmissionPeerAssignment))
                 .ToListAsync();
