@@ -68,13 +68,10 @@ namespace patools
             services.AddScoped<IExpertsService, ExpertsService>();
             services.AddScoped<IReviewsService, ReviewsService>();
             services.AddScoped<IFilesService, FilesService>();
-            services.AddSwaggerGen();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
