@@ -196,7 +196,9 @@ namespace patools.Services.PeeringTasks
                 if (taskUser.FinalGrade != null)
                 {
                     var assignmentId = taskUser.PeeringTask.LtiTaskId;
-                    BackgroundJob.Schedule(() => ReturnLtiGrade(taskUser, assignmentId,0), delay);
+                    if (assignmentId == null)
+                        return "Wrong Task selected";
+                    BackgroundJob.Schedule(() => ReturnLtiGrade(taskUser, assignmentId.Value,0), delay);
                     delay += TimeSpan.FromSeconds(5);
                 }
             }

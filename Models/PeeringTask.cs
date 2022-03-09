@@ -82,7 +82,7 @@ namespace patools.Models
 
         //For LTI Integration
         public bool LtiEnabled { get; set; }
-        public int LtiTaskId { get; set; }
+        public int? LtiTaskId { get; set; }
         public string SharedSecret { get; set; }
         public string ConsumerKey { get; set; }
     }
