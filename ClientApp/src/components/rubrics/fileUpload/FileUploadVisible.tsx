@@ -5,66 +5,90 @@ import { saveAs } from 'file-saver';
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 
 import { useAppSelector } from "../../../app/hooks";
 
 import { fetchFile } from "../../../store/downloadFile";
 
+import { IFileInputItem } from "../../../store/types";
+
 
 interface IProps {
-  fileId?: string
+  files?: IFileInputItem[]
 }
 
-export const FileUploadVisible: FC<IProps> = ({ fileId }) => {
+export const FileUploadVisible: FC<IProps> = ({ files }) => {
   const accessToken = useAppSelector(state => state.auth.accessToken)
 
-  const handleDownloadFile = useCallback(() => {
+  const handleDownloadFile = useCallback((fileId: string, fileName: string) => {
     if (fileId && accessToken) {
-      fetchFile(fileId, accessToken).then(blob => {
-        if (blob) {
-          saveAs(blob, `MIEM Peering Submission - ${fileId}`)
+      fetchFile(fileId, accessToken).then(file => {
+        if (file) {
+          saveAs(file, fileName)
         }
       })
     }
-  }, [fileId])
+  }, [])
 
   return (
-    <Box sx={styles.filesWrapper}>
+    <>
 
-      {fileId ? (
-        <>
-          <ArticleOutlinedIcon
-            sx={{
-              color: 'secondary.main',
-              fontSize: '30px'
-            }}
-          />
+      {files && files.length > 0 ? (
+        <Box
+          display={"flex"}
+          gap={'5px'}
+          flexDirection={'column'}
+        >
+          {files.map(item => (
+            <Box
+              sx={styles.filesWrapper}
+            >
+              <ArticleOutlinedIcon
+                sx={{
+                  color: 'secondary.main',
+                  fontSize: '30px'
+                }}
+              />
 
-          <Typography
-            variant={'body1'}
-            flex={'1 1 100%'}
-          >
-            {`File - ${fileId}`}
-          </Typography>
+              <Typography
+                variant={'body1'}
+                flex={'1 1 100%'}
+                lineHeight={0}
+                sx={styles.fileName}
+                onClick={() => handleDownloadFile(item.id, item.name)}
+              >
+                {item.name}
+              </Typography>
 
-          <IconButton
-            title={'Скачать'}
-            onClick={handleDownloadFile}
-          >
-            <FileDownloadIcon
-              sx={{
-                color: 'primary.main',
-                fontSize: '30px'
-              }}
-            />
-          </IconButton>
-        </>
+              <IconButton
+                title={'Скачать'}
+                onClick={() => handleDownloadFile(item.id, item.name)}
+              >
+                <FileDownloadIcon
+                  sx={{
+                    color: 'primary.main',
+                    fontSize: '30px'
+                  }}
+                />
+              </IconButton>
+            </Box>
+          ))}
+
+        </Box>
       ) : (
-        <>
-          <ErrorOutlineIcon
+        <Box
+          display={'flex'}
+          alignItems={'center'}
+          gap={'10px'}
+          border={'1px solid'}
+          borderColor={'#e0e7ff'}
+          borderRadius={'10px'}
+          padding={'5px'}
+        >
+          <DoNotDisturbIcon
             sx={{
-              color: 'warning.main',
+              color: 'error.main',
               fontSize: '30px'
             }}
           />
@@ -73,12 +97,12 @@ export const FileUploadVisible: FC<IProps> = ({ fileId }) => {
             variant={'body1'}
             flex={'1 1 100%'}
           >
-            {`Файл не обнаружен`}
+            {`Файл не загружен`}
           </Typography>
-        </>
+        </Box>
       )}
 
-    </Box>
+    </>
   )
 }
 
@@ -87,16 +111,23 @@ const styles = {
     backgroundColor: 'common.white',
     display: 'flex',
     width: '100%',
-    minHeight: '50px',
-    padding: '10px',
+    px: '5px',
     border: "1px solid",
     borderColor: '#e0e7ff',
     borderRadius: '10px',
     alignItems: 'center',
     gap: '15px',
-    ":hover": {
-      borderColor: 'common.black'
-    },
     boxSizing: "border-box",
+  } as SxProps<Theme>,
+
+  fileName: {
+    textDecoration: 'underline',
+    textOverflow: 'ellipsis',
+    overflowX: 'clip',
+    whiteSpace: "nowrap",
+    ":hover": {
+      cursor: 'pointer',
+      color: 'primary.main'
+    }
   } as SxProps<Theme>,
 }

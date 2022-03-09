@@ -22,6 +22,7 @@ namespace patools.Models
         public DbSet<GroupUser> GroupUsers { get; set; }
         public DbSet<PeeringTaskUser> TaskUsers { get; set; }
         public DbSet<SubmissionPeer> SubmissionPeers { get; set; }
+        public DbSet<AnswerFile> AnswerFiles { get; set; }
 
         public PAToolsContext()
         {

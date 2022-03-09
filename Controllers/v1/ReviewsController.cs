@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BrunoZell.ModelBinding;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using patools.Dtos.Answer;
 using patools.Dtos.Review;
 using patools.Enums;
 using patools.Errors;
@@ -25,7 +29,7 @@ namespace patools.Controllers.v1
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<GetNewReviewDtoResponse>> AddReview(AddReviewDto review)
+        public async Task<ActionResult<GetNewReviewDtoResponse>> AddReview([FromForm] Guid submissionId, [FromForm] [ModelBinder(BinderType = typeof(JsonModelBinder))] AddAnswerDto[] answers,  [FromForm] IList<IFormFile> files)
         {
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
@@ -39,8 +43,13 @@ namespace patools.Controllers.v1
             if(!Guid.TryParse(userIdClaim.Value, out var userId))
                 return Ok(new InvalidGuidIdResponse());
 
-            review.UserId = userId;
-            return Ok(await _reviewsService.AddReview(review));
+            return Ok(await _reviewsService.AddReview(new AddReviewDto()
+            {
+                UserId = userId,
+                Answers = answers,
+                SubmissionId = submissionId,
+                Files = files
+            }));
         }
 
         [HttpGet("get-all/task={taskId}")]

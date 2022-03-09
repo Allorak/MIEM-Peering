@@ -139,7 +139,7 @@ export const CheckingsComponent: FC<IProps> = ({
     }
   }, [activeWorkId])
 
-  const handleOnFormEdit = useCallback((value: string | number | File | undefined, questionId: string) => {
+  const handleOnFormEdit = useCallback((value: string | number | File[] | undefined, questionId: string) => {
     setReview(prev => {
       if (prev && prev.rubrics && prev.rubrics.length > 0) {
         return {
@@ -164,7 +164,7 @@ export const CheckingsComponent: FC<IProps> = ({
               case IQuestionTypes.FILE:
                 return {
                   ...item,
-                  ...(typeof value !== "number" && typeof value !== "string" && { file: value })
+                  ...(typeof value !== "number" && typeof value !== "string" && { file: value ? value.map(item => item) : undefined })
                 }
             }
           })

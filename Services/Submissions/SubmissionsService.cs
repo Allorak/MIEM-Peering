@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using patools.Dtos.Answer;
 using patools.Dtos.Submission;
@@ -12,13 +16,16 @@ using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
+using patools.Services.Files;
 
 namespace patools.Services.Submissions
 {
     public class SubmissionsService : ServiceBase, ISubmissionsService
     {
-        public SubmissionsService(PAToolsContext context, IMapper mapper) : base(context, mapper)
+        private readonly IFilesService _filesService;
+        public SubmissionsService(PAToolsContext context, IMapper mapper, IFilesService filesService) : base(context, mapper)
         {
+            _filesService = filesService;
         }
         
         public async Task<Response<GetNewSubmissionDtoResponse>> AddSubmission(AddSubmissionDto submission)
@@ -59,6 +66,7 @@ namespace patools.Services.Submissions
                 .Where(q => q.PeeringTask == task && q.RespondentType == RespondentTypes.Author)
                 .ToListAsync();
             var newAnswers = new List<Answer>();
+            var fileIndex = 0;
             foreach (var answer in submission.Answers)
             {
                 var question = questions.FirstOrDefault(q => q.ID == answer.QuestionId);
@@ -78,9 +86,13 @@ namespace patools.Services.Submissions
                         case QuestionTypes.Select when answer.Value<question.MinValue || answer.Value>question.MaxValue:
                             return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
                                 "Answer for a select question is out of range");
+                        case QuestionTypes.File when answer.FileIds == null || !answer.FileIds.Any():
+                            return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                                "There is no answer for a required question");
                     }
                 }
-                newAnswers.Add(new Answer
+
+                var newAnswer = new Answer
                 {
                     ID = Guid.NewGuid(),
                     Submission = newSubmission,
@@ -88,7 +100,51 @@ namespace patools.Services.Submissions
                     Response = answer.Response,
                     Value = answer.Value,
                     Review = null
-                });
+                };
+                newAnswers.Add(newAnswer);
+
+                if (newAnswer.Question.Type == QuestionTypes.File)
+                {
+                    var directory = Directory.GetCurrentDirectory();
+                    var path = Path.Combine(directory, "AnswerFiles",task.ID.ToString(),"Submissions",newSubmission.ID.ToString());
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+
+                    if (answer.FileIds != null)
+                    {
+                        foreach (var fileId in answer.FileIds)
+                        {
+                            var file = submission.Files.FirstOrDefault(f => f.FileName == fileId);
+                            if (file == null)
+                                return new BadRequestDataResponse<GetNewSubmissionDtoResponse>(
+                                    "The filename in answer is incorrect");
+
+                            var dateTime = DateTime.Now;
+                            var dateTimeString =
+                                $"{dateTime.Year:d4}-{dateTime.Month:d2}-{dateTime.Day:d2} {dateTime.Hour:d2}:{dateTime.Minute:d2}:{dateTime.Second:d2}:{dateTime.Millisecond:d3}";
+                            var extension = fileId.Split('.').Last();
+                            var exposedFilename = $"Peering File #{++fileIndex} [{dateTimeString}].{extension}";
+                            var storedFilename = $"#{fileIndex} - {file.FileName}";
+
+                            var filepath = Path.Combine(path, storedFilename);
+                            await using (var fileStream = new FileStream(filepath, FileMode.Create, FileAccess.Write))
+                            {
+                                await file.CopyToAsync(fileStream);
+                                await fileStream.DisposeAsync();
+                            }
+
+                            var answerFile = new AnswerFile()
+                            {
+                                Answer = newAnswer,
+                                FilePath = filepath,
+                                FileName = exposedFilename
+                            };
+                            Context.AnswerFiles.Add(answerFile);
+                        }
+                    }
+                }
 
                 questions.Remove(question);
             }
@@ -449,6 +505,7 @@ namespace patools.Services.Submissions
                 .Include(a => a.Question)
                 .Where(a => 
                     a.Submission == submission && a.Question.RespondentType == RespondentTypes.Author)
+                .OrderBy(a => a.Question.Order)
                 .ToListAsync();
 
             return await GetResponsesByAnswers(answers);
@@ -463,12 +520,14 @@ namespace patools.Services.Submissions
                 resultAnswer.QuestionId = answer.Question.ID;
                 resultAnswer.Value = answer.Value;
                 resultAnswer.Response = answer.Response;
+                resultAnswer.Files = await _filesService.GetFilesByAnswer(answer);
                 resultAnswer.Responses = await GetVariants(answer.Question);
                 resultAnswers.Add(resultAnswer);
             }
 
             return resultAnswers;
         }
+        
         private async Task<IEnumerable<GetVariantDtoResponse>> GetVariants(Question question)
         {
             return await Context.Variants

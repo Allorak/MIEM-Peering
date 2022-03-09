@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,11 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGeneration.DotNet;
 using patools.Dtos.Answer;
 using patools.Dtos.Review;
+using patools.Dtos.Submission;
 using patools.Dtos.Task;
 using patools.Dtos.Variants;
 using patools.Enums;
 using patools.Errors;
 using patools.Models;
+using patools.Services.Files;
 using patools.Services.PeeringTasks;
 
 namespace patools.Services.Reviews
@@ -20,10 +23,12 @@ namespace patools.Services.Reviews
     public class ReviewsService : ServiceBase,IReviewsService
     {
         private readonly IPeeringTasksService _peeringTasksService;
+        private readonly IFilesService _filesService;
 
-        public ReviewsService(PAToolsContext context, IMapper mapper, IPeeringTasksService peeringTasksService) : base (context, mapper)
+        public ReviewsService(PAToolsContext context, IMapper mapper, IPeeringTasksService peeringTasksService,IFilesService filesService) : base (context, mapper)
         {
             _peeringTasksService = peeringTasksService;
+            _filesService = filesService;
         }
 
         public async Task<Response<GetNewReviewDtoResponse>> AddReview(AddReviewDto review)
@@ -69,6 +74,7 @@ namespace patools.Services.Reviews
             var questions = await GetPeerQuestions(task);
             var answers = new List<Answer>();
             var grades = new List<float>();
+            var fileIndex = 0;
             foreach (var answer in review.Answers)
             {
                 var question = questions.FirstOrDefault(q => q.ID == answer.QuestionId);
@@ -89,9 +95,22 @@ namespace patools.Services.Reviews
                             when answer.Value < question.MinValue || answer.Value > question.MaxValue:
                             return new BadRequestDataResponse<GetNewReviewDtoResponse>(
                                 "Answer for a select question is out of range");
+                        case QuestionTypes.File when answer.FileIds == null || !answer.FileIds.Any():
+                            return new BadRequestDataResponse<GetNewReviewDtoResponse>(
+                                "There is no answer for a required question");
                     }
                 }
 
+                var newAnswer = new Answer()
+                {
+                    ID = Guid.NewGuid(),
+                    Review = newReview,
+                    Question = question,
+                    Response = answer.Response,
+                    Value = answer.Value,
+                    Submission = null
+                };
+                
                 if (question.Type == QuestionTypes.Select)
                 {
                     const int maxGrade = 10;
@@ -105,16 +124,50 @@ namespace patools.Services.Reviews
                             "there is an error in database (Coefficient Percentage for required select question is null)");
                     grades.Add(weightedValue.Value);
                 }
-
-                answers.Add(new Answer()
+                else if (question.Type == QuestionTypes.File)
                 {
-                    ID = Guid.NewGuid(),
-                    Review = newReview,
-                    Question = question,
-                    Response = answer.Response,
-                    Value = answer.Value,
-                    Submission = null
-                });
+                    var directory = Directory.GetCurrentDirectory();
+                    var path = Path.Combine(directory, "AnswerFiles",task.ID.ToString(),"Reviews",newReview.ID.ToString());
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+
+                    if (answer.FileIds != null)
+                    {
+                        foreach (var fileId in answer.FileIds)
+                        {
+                            var file = review.Files.FirstOrDefault(f => f.FileName == fileId);
+                            if (file == null)
+                                return new BadRequestDataResponse<GetNewReviewDtoResponse>(
+                                    "The filename in answer is incorrect");
+
+                            var dateTime = DateTime.Now;
+                            var dateTimeString =
+                                $"{dateTime.Year:d4}-{dateTime.Month:d2}-{dateTime.Day:d2} {dateTime.Hour:d2}:{dateTime.Minute:d2}:{dateTime.Second:d2}:{dateTime.Millisecond:d3}";
+                            var extension = fileId.Split('.').Last();
+                            var exposedFilename = $"Peering File #{++fileIndex} [{dateTimeString}].{extension}";
+                            var storedFilename = $"#{fileIndex} - {file.FileName}";
+
+                            var filepath = Path.Combine(path, storedFilename);
+                            await using (var fileStream = new FileStream(filepath, FileMode.Create, FileAccess.Write))
+                            {
+                                await file.CopyToAsync(fileStream);
+                                await fileStream.DisposeAsync();
+                            }
+
+                            var answerFile = new AnswerFile()
+                            {
+                                Answer = newAnswer,
+                                FilePath = filepath,
+                                FileName = exposedFilename
+                            };
+                            Context.AnswerFiles.Add(answerFile);
+                        }
+                    }
+                }
+
+                answers.Add(newAnswer);
 
                 questions.Remove(question);
             }
@@ -197,8 +250,10 @@ namespace patools.Services.Reviews
                     e => e.User == peer &&
                          e.PeeringTask == task);
 
-                var resultReview = new GetReviewDtoResponse();
-                resultReview.ReviewerName = peer.Fullname;
+                var resultReview = new GetReviewDtoResponse
+                {
+                    ReviewerName = peer.Fullname
+                };
                 switch (peer.Role)
                 {
                     case { } when expert != null:
@@ -224,6 +279,7 @@ namespace patools.Services.Reviews
                 var answers = await Context.Answers
                     .Include(a => a.Question)
                     .Where(a => a.Review == review)
+                    .OrderBy(a => a.Question.Order)
                     .ToListAsync();
 
                 var resultAnswers = new List<GetAnswerDtoResponse>();
@@ -266,6 +322,9 @@ namespace patools.Services.Reviews
                                 .OrderBy(v => v.Id)
                                 .ToListAsync();
                             resultAnswer.Responses = responses;
+                            break;
+                        case QuestionTypes.File:
+                            resultAnswer.Files =await _filesService.GetFilesByAnswer(answer);
                             break;
                     }
 
@@ -372,6 +431,7 @@ namespace patools.Services.Reviews
                 var answers = await Context.Answers
                     .Include(a => a.Question)
                     .Where(a => a.Review == review)
+                    .OrderBy(a => a.Question.Order)
                     .ToListAsync();
 
                 var resultAnswers = new List<GetAnswerDtoResponse>();
@@ -411,6 +471,9 @@ namespace patools.Services.Reviews
                                 .OrderBy(v => v.Id)
                                 .ToListAsync();
                             resultAnswer.Responses = responses;
+                            break;
+                        case QuestionTypes.File:
+                            resultAnswer.Files = await _filesService.GetFilesByAnswer(answer);
                             break;
                     }
 
