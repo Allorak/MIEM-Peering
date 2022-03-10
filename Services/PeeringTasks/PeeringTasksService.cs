@@ -1229,8 +1229,6 @@ namespace patools.Services.PeeringTasks
             var confidenceFactor = await CountNextConfidenceFactor(taskUser,submission) ?? taskUser.PreviousConfidenceFactor;
             courseUser.ConfidenceFactor = confidenceFactor;
             taskUser.NextConfidenceFactor = confidenceFactor;
-            Console.WriteLine($"Confidence factor before task: {taskUser.PreviousConfidenceFactor}");
-            Console.WriteLine($"Confidence factor after task: {taskUser.NextConfidenceFactor}");
             return true;
         }
         public async Task<Response<GetPerformanceTableDtoResponse>> GetPerformanceTable(GetPerformanceTableDtoRequest taskInfo)
@@ -1313,15 +1311,15 @@ namespace patools.Services.PeeringTasks
             return studentInfo;
         }
 
-        private async Task<ConfidenceFactorQualities?> GetReviewQuality(PeeringTask task, IEnumerable<Review> reviews)
+        private async Task<ConfidenceFactorQualities> GetReviewQuality(PeeringTask task, IEnumerable<Review> reviews)
         {
             var confidenceFactorsSum = 0f;
             var reviewersAmount = 0;
-            if (!reviews.Any())
-                return null;
-            foreach (var review in reviews)
+            var reviewsList = reviews.ToList();
+            if (!reviewsList.Any())
+                return ConfidenceFactorQualities.NotReviewed;
+            foreach (var peer in reviewsList.Select(review => review.SubmissionPeerAssignment.Peer))
             {
-                var peer = review.SubmissionPeerAssignment.Peer;
                 var taskUser = await Context.TaskUsers.FirstOrDefaultAsync(
                     tu => tu.Student == peer && tu.PeeringTask == task);
                 reviewersAmount++;
