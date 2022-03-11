@@ -47,6 +47,9 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
+        /// <summary>
+        /// Получает обзор задачи.
+        /// </summary>
         [HttpGet("overview/task={taskId:guid}")]
         public async Task<ActionResult<GetPeeringTaskOverviewDtoResponse>> GetTaskOverview(Guid taskId)
         {
@@ -91,6 +94,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает форму автора.
+        /// </summary>
         [HttpGet("author-form/task={taskId:guid}")]
         public async Task<ActionResult<GetAuthorFormDtoResponse>> GetAuthorForm(Guid taskId)
         {
@@ -113,6 +119,9 @@ namespace patools.Controllers.v1
             return Ok(await _peeringTasksService.GetAuthorForm(taskInfo));
         }
 
+        /// <summary>
+        /// Получает форму сверстника.
+        /// </summary>
         [HttpGet("peer-form/task={taskId:guid}")]
         public async Task<ActionResult<GetPeerFormDtoResponse>> GetPeerForm(Guid taskId)
         {
@@ -135,6 +144,9 @@ namespace patools.Controllers.v1
             return Ok(await _peeringTasksService.GetPeerForm(taskInfo));
         }
 
+        /// <summary>
+        /// Добавляет новую задачу.
+        /// </summary>
         [HttpPost("add")]
         public async Task<ActionResult<GetNewPeeringTaskDtoResponse>> AddTask(AddPeeringTaskDto peeringTask)
         {
@@ -157,6 +169,9 @@ namespace patools.Controllers.v1
             return Ok(await _peeringTasksService.AddTask(peeringTask));
         }
 
+        /// <summary>
+        /// Получает задания курса.
+        /// </summary>
         [HttpGet("get/course={courseId:guid}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetCourseTasks([FromRoute] Guid courseId)
         {
@@ -187,6 +202,9 @@ namespace patools.Controllers.v1
             return Ok(new InvalidJwtTokenResponse());
         }
 
+        /// <summary>
+        /// Получает дедлайн подачи.
+        /// </summary>
         [HttpGet("submission-deadline/task={taskId:guid}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetSubmissionDeadline([FromRoute] Guid taskId)
         {
@@ -209,6 +227,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает дедлайн проверки.
+        /// </summary>
         [HttpGet("review-deadline/task={taskId:guid}")]
         public async Task<ActionResult<GetCourseTasksDtoResponse>> GetReviewDeadline([FromRoute] Guid taskId)
         {
@@ -231,6 +252,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает таблицу успеваемости.
+        /// </summary>
         [HttpGet("get-performance-table/task={taskId:guid}")]
         public async Task<ActionResult<GetPerformanceTableDtoResponse>> GetPerformanceTable(Guid taskId)
         {
@@ -256,6 +280,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Скачивает успеваемость Csv.
+        /// </summary>
         [HttpGet("download-csv/task={taskId:guid}")]
         public async Task<IActionResult> DownloadPerformanceCsv(Guid taskId)
         {
@@ -301,6 +328,9 @@ namespace patools.Controllers.v1
             return File(Encoding.UTF32.GetBytes(builder.ToString()), "text/csv", "PerformanceTable.csv");
         }
 
+        /// <summary>
+        /// Скачивает успеваемость Excel.
+        /// </summary>
         [HttpGet("download-excel/task={taskId:guid}")]
         public async Task<IActionResult> DownloadPerformanceExcel(Guid taskId)
         {

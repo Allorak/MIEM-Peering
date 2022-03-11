@@ -28,6 +28,9 @@ namespace patools.Controllers.v1
             _expertsService = expertsService;
         }
 
+        /// <summary>
+        /// Получает экспертов задачи.
+        /// </summary>
         [HttpGet("get/task={taskId}")]
         public async Task<ActionResult<IEnumerable<GetExpertDtoResponse>>> GetExperts(Guid taskId)
         {

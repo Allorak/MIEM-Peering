@@ -31,6 +31,9 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
+        /// <summary>
+        /// Получает курс по id.
+        /// </summary>
         // GET: api/v1/Courses/get/5
         [HttpGet("get/{id:guid}")]
         public async Task<ActionResult<GetCourseDtoResponse>> GetCourse(Guid id)
@@ -41,6 +44,9 @@ namespace patools.Controllers.v1
             return Ok(await _coursesService.GetCourseById(id));
         }
 
+        /// <summary>
+        /// Обновляет курс.
+        /// </summary>
         // PUT: api/v1/Courses/put/courseId
         [HttpPut("put/course={courseId}")]
         public async Task<IActionResult> PutCourse(Guid courseId, PutCourseDto updateCourse)
@@ -65,6 +71,9 @@ namespace patools.Controllers.v1
             return Ok(await _coursesService.PutCourse(teacherId, courseId, updateCourse));
         }
 
+        /// <summary>
+        /// Получает все курсы пользователя.
+        /// </summary>
         // GET: api/v1/Courses/get
         [HttpGet("get")]
         public async Task<ActionResult<List<GetCourseDtoResponse>>> GetCourses()
@@ -90,6 +99,9 @@ namespace patools.Controllers.v1
             return Ok(new InvalidJwtTokenResponse());
         }
 
+        /// <summary>
+        /// Добавляет новый курс.
+        /// </summary>
         // POST: api/v1/Courses/add
         [HttpPost("add")]
         public async Task<ActionResult<GetCourseDtoResponse>> PostCourse(AddCourseDto course)
@@ -115,6 +127,9 @@ namespace patools.Controllers.v1
             return Ok(await _coursesService.AddCourse(course));
         }
 
+        /// <summary>
+        /// Удаляет курс.
+        /// </summary>
         // DELETE: api/v1/courses/{courseId}
         [HttpDelete("{courseId}")]
         public async Task<IActionResult> DeleteCourse(Guid courseId)
@@ -143,7 +158,9 @@ namespace patools.Controllers.v1
             }));
         }
 
-
+        /// <summary>
+        /// Проверяет второй шаг.
+        /// </summary>
         [HttpGet("second-step-available/course={courseId}")]
         public async Task<ActionResult<string>> CheckForSecondStep(Guid courseId)
         {

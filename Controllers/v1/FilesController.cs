@@ -24,6 +24,9 @@ namespace patools.Controllers.v1
             _filesService = filesService;
         }
         
+        /// <summary>
+        /// Получает файл ответов.
+        /// </summary>
         [HttpGet("answer-file/file={fileId:guid}")]
         public async Task<IActionResult> GetAnswerFile(Guid fileId)
         {

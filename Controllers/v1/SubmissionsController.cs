@@ -38,6 +38,9 @@ namespace patools.Controllers.v1
             _filesService = filesService;
         }
 
+        /// <summary>
+        /// Добавляет новое подчинение.
+        /// </summary>
         [HttpPost("add")]
         public async Task<ActionResult<GetNewSubmissionDtoResponse>> AddSubmission([FromForm] Guid taskId, [FromForm] [ModelBinder(BinderType = typeof(JsonModelBinder))] AddAnswerDto[] answers,  [FromForm] IList<IFormFile> files)
         {
@@ -67,6 +70,9 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.AddSubmission(submission));
         }
 
+        /// <summary>
+        /// Получает информацию о подчинении.
+        /// </summary>
         [HttpGet("get/task={taskId:guid}")]
         public async Task<ActionResult<GetAllSubmissionsMainInfoDtoResponse>> GetSubmissionsInfo(Guid taskId)
         {
@@ -89,6 +95,9 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.GetSubmissions(taskInfo));
         }
 
+        /// <summary>
+        /// Получает id подчинения.
+        /// </summary>
         [HttpGet("get-id/task={taskId:guid}")]
         public async Task<ActionResult<GetSubmissionIdDtoResponse>> GetSubmissionId(Guid taskId)
         {
@@ -115,6 +124,9 @@ namespace patools.Controllers.v1
             return Ok(await _submissionsService.GetSubmissionIdForStudents(taskInfo));
         }
 
+        /// <summary>
+        /// Получает подчинение.
+        /// </summary>
         [HttpGet("get/submission={submissionId:guid}")]
         public async Task<ActionResult<GetSubmissionDtoResponse>> GetSubmission([FromRoute] Guid submissionId)
         {
@@ -136,6 +148,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает статус подчинения.
+        /// </summary>
         [HttpGet("get-status/task={taskId:guid}")]
         public async Task<ActionResult<SubmissionStatus>> GetSubmissionStatus(Guid taskId)
         {
@@ -161,6 +176,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает каталог проверок.
+        /// </summary>
         [HttpGet("get-checks-catalog/task={taskId:guid}")]
         public async Task<ActionResult<IEnumerable<GetSubmissionToCheckDtoResponse>>> GetChecksCatalog([FromRoute] Guid taskId)
         {
@@ -181,6 +199,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает метаданные подчинения.
+        /// </summary>
         [HttpGet("get-metadata/submission={submissionId:guid}")]
         public async Task<ActionResult<GetSubmissionMetadataDtoResponse>> GetSubmissionMetadata(Guid submissionId)
         {

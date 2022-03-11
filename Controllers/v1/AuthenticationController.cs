@@ -32,6 +32,9 @@ namespace patools.Controllers.v1
             _authenticationService = authenticationService;
         }
 
+        /// <summary>
+        /// Получает токен Jwt.
+        /// </summary>
         [HttpGet("get-jwt-token")]
         public async Task<ActionResult<Response<GetJwtTokenDtoResponse>>> GetJwtToken([FromBody]GetJwtByGoogleDtoRequest userInfo)
         {
@@ -50,6 +53,9 @@ namespace patools.Controllers.v1
             }
         }
 
+        /// <summary>
+        /// Проверяет аутентификацию по электронной почте Google.
+        /// </summary>
         [HttpPost("google")]
         public async Task<ActionResult<Response<GetGoogleRegisteredUserDtoResponse>>> GoogleAuth([FromBody]GetJwtByGoogleDtoRequest tokenInfo)
         {
@@ -67,6 +73,9 @@ namespace patools.Controllers.v1
             }
         }
 
+        /// <summary>
+        /// Выдает результат аутентификации.
+        /// </summary>
         [HttpPost("lti/{taskId}")]
         public async Task<RedirectResult> LtiAuth([FromRoute] Guid taskId, [FromForm]GetJwtByLtiRequest tokenInfo)
         {

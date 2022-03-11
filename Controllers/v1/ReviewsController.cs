@@ -28,6 +28,9 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
+        /// <summary>
+        /// Добавляет новый отзыв.
+        /// </summary>
         [HttpPost("add")]
         public async Task<ActionResult<GetNewReviewDtoResponse>> AddReview([FromForm] Guid submissionId, [FromForm] [ModelBinder(BinderType = typeof(JsonModelBinder))] AddAnswerDto[] answers,  [FromForm] IList<IFormFile> files)
         {
@@ -52,6 +55,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает все отзывы о задаче.
+        /// </summary>
         [HttpGet("get-all/task={taskId}")]
         public async Task<ActionResult<GetReviewDtoResponse>> GetAllReviews(Guid taskId)
         {
@@ -77,6 +83,9 @@ namespace patools.Controllers.v1
             }));
         }
 
+        /// <summary>
+        /// Получает все отзывы пользователей о задаче.
+        /// </summary>
         [HttpGet("get-all-my/task={taskId}")]
         public async Task<ActionResult<GetMyReviewDtoResponse>> GetAllMyReviews(Guid taskId)
         {
