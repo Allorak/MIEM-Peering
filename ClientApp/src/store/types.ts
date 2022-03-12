@@ -340,7 +340,6 @@ export enum IMenuTitles {
   CHECKINGS = 'Проверки',
   EXPERTS = 'Эксперты',
   GRADES = 'Успеваемость',
-  EXPORT = 'Экспорт',
   AUTHORFORM = 'Сдать работу',
   WORK = 'Моя работа',
   MENU_3 = 'Меню 3'
@@ -588,7 +587,8 @@ export enum DeadlineStatus {
 export enum ReviewQualities {
   BAD = "Bad",
   DECENT = "Decent",
-  GOOD = "Good"
+  GOOD = "Good",
+  NOT_REVIEWED = "NotReviewed"
 }
 
 export interface IGrades {
@@ -607,4 +607,6 @@ export interface IGrades {
   gradeComment?: string,
   reviewGrade?: number,
   submissionGrade?: number,
+  joinedByLti: boolean,
+  receivedLtiGrade: boolean
 }

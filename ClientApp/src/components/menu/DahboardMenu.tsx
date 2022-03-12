@@ -10,7 +10,8 @@ import { Grades } from "../icons/Grades";
 import { Work } from "../icons/Work";
 import { Authorform } from "../icons/Authorform";
 import { Checkings } from "../icons/Checkings";
-import { Export } from "../icons/Export";
+
+import Zoom from '@mui/material/Zoom';
 
 import { IMenu, IMenuTitles } from "../../store/types";
 import { palette } from "../../theme/colors";
@@ -76,8 +77,6 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean, status: boolean }> = ({
         return (<Grades svgColor={isActive ? "white" : "#A4ADC8"} />)
       case IMenuTitles.CHECKINGS:
         return (<Checkings svgColor={isActive ? "white" : "#A4ADC8"} />)
-      case IMenuTitles.EXPORT:
-        return (<Export svgColor={isActive ? "white" : "#A4ADC8"} />)
       default: return null
     }
   }
@@ -91,7 +90,10 @@ const MenuItem: FC<{ item: IMenu, isActive: boolean, status: boolean }> = ({
       <Tooltip
         title={!status && matches ? item.title : ""}
         placement={"right"}
+        enterDelay={0}
+        leaveDelay={0}
         arrow
+        TransitionComponent={Zoom}
       >
         <Box sx={{ ...styles.generalMenu, ...(isActive ? styles.activeMenu : styles.unActiveMenu) }}>
           <Box sx={styles.iconContainer}>

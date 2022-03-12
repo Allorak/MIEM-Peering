@@ -71,7 +71,7 @@ export const TaskMainOverview: FC<IProps> = ({
             color={"#0F1B41"}
           >
             {"Tool URL: "}
-            
+
             <Typography
               variant="body1"
               component={"span"}
@@ -103,7 +103,7 @@ export const TaskMainOverview: FC<IProps> = ({
             fontWeight={700}
           >
             {"Shared secret: "}
-            
+
             <Typography
               variant="body1"
               component={"span"}
@@ -129,7 +129,7 @@ export const TaskMainOverview: FC<IProps> = ({
               component={'a'}
               color={"primary.main"}
               target={"_blank"}
-              href={"https://wiki.miem.hse.ru/"}
+              href={"https://wiki.miem.hse.ru/ru/Projects/401/docs/lti"}
             >
               {"Инструкция по подключению"}
             </Typography>

@@ -1,6 +1,8 @@
 import { FC, useMemo } from "react";
 import { Box, TableBody, TableHead, Tooltip, Typography } from "@mui/material";
-import { style, SxProps, Theme } from "@mui/system";
+import { SxProps, Theme } from "@mui/system";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import Zoom from '@mui/material/Zoom';
 
 import { Table, TableBodyCell, TableBodyCellUser, TableBodyRow, TableHeadCell, TableHeadRow } from "../../../../../components/table";
 
@@ -136,6 +138,8 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
         name={studentItem.fullname}
         img={studentItem.imageUrl}
         email={studentItem.email}
+        receivedLtiGrade={studentItem.receivedLtiGrade}
+        joinedByLti={studentItem.joinedByLti}
       />
 
       <TableBodyCell isCentered>
@@ -148,13 +152,30 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       {flags.submissionGrade && (
         <TableBodyCell isCentered>
           {typeof studentItem.submissionGrade === 'number' ? (
-            <Typography
-              variant={"body1"}
-              color={"success.main"}
-              fontWeight={400}
-            >
-              {studentItem.submissionGrade.toFixed(1)}
-            </Typography>
+            <>
+              {studentItem.reviewQuality !== ReviewQualities.NOT_REVIEWED ? (
+                <Typography
+                  variant={"body1"}
+                  color={"success.main"}
+                  fontWeight={400}
+                >
+                  {studentItem.submissionGrade.toFixed(1)}
+                </Typography>
+              ) : (
+                <Tooltip
+                  title={<span style={{ whiteSpace: 'pre-line' }}>{"К сожалению, данную работу не проверил ни один пир из тех, кому она была назначена.\n\nНеобходима проверка преподавателя!"}</span>}
+                  placeholder={"top"}
+                  arrow
+                  enterDelay={0}
+                  leaveDelay={0}
+                  TransitionComponent={Zoom}
+                >
+                  <Box color={'error.main'}>
+                    <InfoOutlinedIcon color={'inherit'} />
+                  </Box>
+                </Tooltip>
+              )}
+            </>
           ) : "---"}
         </TableBodyCell>
       )}
@@ -176,27 +197,48 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       {flags.finalGrade && (
         <TableBodyCell isCentered>
           {typeof studentItem.finalGrade === 'number' ? (
-            <Typography
-              variant={"body1"}
-              color={"primary.main"}
-              fontWeight={700}
-              sx={{ textDecoration: "underline" }}
-            >
-              {studentItem.gradeComment ? (
+            <>
+              {studentItem.reviewQuality !== ReviewQualities.NOT_REVIEWED ? (
+                <Typography
+                  variant={"body1"}
+                  color={"primary.main"}
+                  fontWeight={700}
+                  sx={{ textDecoration: "underline" }}
+                >
+                  {studentItem.gradeComment ? (
+                    <Tooltip
+                      title={<span style={{ whiteSpace: 'pre-line' }}>{studentItem.gradeComment}</span>}
+                      placeholder={"top"}
+                      arrow
+                      enterDelay={0}
+                      leaveDelay={0}
+                      TransitionComponent={Zoom}
+                    >
+                      <Box>
+                        {studentItem.finalGrade.toFixed(1)}
+                      </Box>
+                    </Tooltip>
+                  ) : (
+                    <>{studentItem.finalGrade.toFixed(1)}</>
+                  )}
+
+                </Typography>
+              ) : (
                 <Tooltip
-                  title={<span style={{ whiteSpace: 'pre-line' }}>{studentItem.gradeComment}</span>}
+                  title={<span style={{ whiteSpace: 'pre-line' }}>{"К сожалению, данную работу не проверил ни один пир из тех, кому она была назначена.\n\nНеобходима проверка преподавателя!"}</span>}
                   placeholder={"top"}
                   arrow
+                  enterDelay={0}
+                  leaveDelay={0}
+                  TransitionComponent={Zoom}
                 >
-                  <Box>
-                    {studentItem.finalGrade.toFixed(1)}
+                  <Box color={'error.main'}>
+                    <InfoOutlinedIcon color={'inherit'} />
                   </Box>
                 </Tooltip>
-              ) : (
-                <>{studentItem.finalGrade.toFixed(1)}</>
               )}
+            </>
 
-            </Typography>
           ) : "---"}
         </TableBodyCell>
       )}
@@ -211,10 +253,19 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       {flags.reviewQuality && (
         <TableBodyCell isCentered>
           {studentItem.reviewQuality && (
-            <DecoratedText
-              type={studentItem.reviewQuality === ReviewQualities.GOOD ? "success" : studentItem.reviewQuality === ReviewQualities.DECENT ? "warning" : "error"}
-              label={studentItem.reviewQuality === ReviewQualities.GOOD ? "Лучшая" : studentItem.reviewQuality === ReviewQualities.DECENT ? "Средняя" : "Плохая"}
-            />
+            <>
+              {studentItem.reviewQuality !== ReviewQualities.NOT_REVIEWED ? (
+                <DecoratedText
+                  type={studentItem.reviewQuality === ReviewQualities.GOOD ? "success" : studentItem.reviewQuality === ReviewQualities.DECENT ? "warning" : "error"}
+                  label={studentItem.reviewQuality === ReviewQualities.GOOD ? "Лучшая" : studentItem.reviewQuality === ReviewQualities.DECENT ? "Средняя" : "Плохая"}
+                />
+              ) : (
+                <>
+                  {"--"}
+                </>
+              )}
+            </>
+
           )}
         </TableBodyCell>
       )}
@@ -244,27 +295,47 @@ const GradeRow: FC<IPropsRow> = ({ studentItem, flags }) => {
       {flags.nextConfidenceFactor && (
         <TableBodyCell isCentered>
           {typeof studentItem.nextConfidenceFactor === 'number' && (
-            <Typography
-              variant={"body1"}
-              color={"secondary.main"}
-              fontWeight={700}
-              sx={{ textDecoration: "underline" }}
-            >
-              {studentItem.confidenceComment ? (
+            <>
+              {studentItem.reviewQuality !== ReviewQualities.NOT_REVIEWED ? (
+                <Typography
+                  variant={"body1"}
+                  color={"secondary.main"}
+                  fontWeight={700}
+                  sx={{ textDecoration: "underline" }}
+                >
+                  {studentItem.confidenceComment ? (
+                    <Tooltip
+                      title={<span style={{ whiteSpace: 'pre-line' }}>{studentItem.confidenceComment}</span>}
+                      placeholder={"top"}
+                      arrow
+                      enterDelay={0}
+                      leaveDelay={0}
+                      TransitionComponent={Zoom}
+                    >
+                      <Box>
+
+                        {studentItem.nextConfidenceFactor.toFixed(2)}
+                      </Box>
+                    </Tooltip>
+                  ) : (
+                    <>{studentItem.nextConfidenceFactor.toFixed(2)}</>
+                  )}
+                </Typography>
+              ) : (
                 <Tooltip
-                  title={<span style={{ whiteSpace: 'pre-line' }}>{studentItem.confidenceComment}</span>}
+                  title={<span style={{ whiteSpace: 'pre-line' }}>{"К сожалению, данную работу не проверил ни один пир из тех, кому она была назначена.\n\nНеобходима проверка преподавателя!"}</span>}
                   placeholder={"top"}
                   arrow
+                  enterDelay={0}
+                  leaveDelay={0}
+                  TransitionComponent={Zoom}
                 >
-                  <Box>
-
-                    {studentItem.nextConfidenceFactor.toFixed(2)}
+                  <Box color={'error.main'}>
+                    <InfoOutlinedIcon color={'inherit'} />
                   </Box>
                 </Tooltip>
-              ) : (
-                <>{studentItem.nextConfidenceFactor.toFixed(2)}</>
               )}
-            </Typography>
+            </>
           )}
         </TableBodyCell>
       )}

@@ -14,7 +14,6 @@ import { Overview } from './Overview';
 import { Works } from './works';
 import { Experts } from './experts';
 import { Checkings } from './checkings';
-import { ExportGrades } from './exportGrades';
 import { Router404 } from '../../../../components/router404';
 
 
@@ -82,7 +81,6 @@ export const Dashboard: FC = () => {
         <Route path={paths.teacher.dashboard.grades} element={<Grades />} />
         <Route path={paths.teacher.dashboard.works} element={<Works />} />
         <Route path={paths.teacher.dashboard.checkings} element={<Checkings />} />
-        <Route path={paths.teacher.dashboard.export} element={<ExportGrades />} />
 
         {isExpertsRoute && (
           <Route path={paths.teacher.dashboard.experts} element={<Experts />} />
@@ -114,9 +112,5 @@ const menuItems = [
   {
     title: IMenuTitles.GRADES,
     path: paths.teacher.dashboard.grades
-  },
-  {
-    title: IMenuTitles.EXPORT,
-    path: paths.teacher.dashboard.export
-  },
+  }
 ] as IMenu[]
