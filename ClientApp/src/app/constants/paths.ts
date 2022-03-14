@@ -20,7 +20,6 @@ export const paths = {
     dashboard: {
       overview: '/t/task/:taskId/overview',
       grades: '/t/task/:taskId/grades',
-      export: '/t/task/:taskId/export',
       experts: '/t/task/:taskId/experts',
       works: '/t/task/:taskId/works',
       checkings: '/t/task/:taskId/checkings'
