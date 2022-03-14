@@ -34,6 +34,9 @@ namespace patools.Controllers.v1
             _context = context;
         }
 
+        /// <summary>
+        /// Получает пользователей курса.
+        /// </summary>
         // GET: api/v1/CourseUsers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CourseUser>>> GetCourseUsers()
@@ -48,6 +51,9 @@ namespace patools.Controllers.v1
             return Ok(course);
         }
         
+        /// <summary>
+        /// Добавляет нового пользователя курса.
+        /// </summary>
         // POST: api/v1/CourseUsers/add
         [HttpPost("add")]
         public async Task<ActionResult<string>> PostCourseUser(AddCourseUserDto courseUsersInfo)
@@ -98,6 +104,9 @@ namespace patools.Controllers.v1
         //     return Ok(await _courseUsersService.AddCourseUserStudent(courseUsersStudentInfo));
         // }
 
+        /// <summary>
+        /// Присоединяется к курсу по коду курса.
+        /// </summary>
         [HttpPost("join")]
         public async Task<ActionResult<string>> JoinToCourseByCode(AddCourseUserByCourseCodeDto courseUserInfo)
         {
@@ -122,6 +131,9 @@ namespace patools.Controllers.v1
             return Ok(await _courseUsersService.JoinByCourseCode(courseUserInfo));
         }
 
+        /// <summary>
+        /// Получает пользователя курса.
+        /// </summary>
         // GET: api/CourseUsers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CourseUser>> GetCourseUser(Guid id)
@@ -136,6 +148,9 @@ namespace patools.Controllers.v1
             return courseUser;
         }
 
+        /// <summary>
+        /// Изменяет пользователя курса.
+        /// </summary>
         // PUT: api/CourseUsers/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCourseUser(Guid id, CourseUser courseUser)
@@ -166,6 +181,9 @@ namespace patools.Controllers.v1
             return NoContent();
         }
         
+        /// <summary>
+        /// Удаляет пользователя курса.
+        /// </summary>
         // DELETE: api/CourseUsers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourseUser(Guid id)

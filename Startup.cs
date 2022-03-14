@@ -28,6 +28,9 @@ using patools.Services.Submissions;
 using patools.Services.Users;
 using patools.Services.PeeringTasks;
 using patools.Services.Reviews;
+using System.Reflection;
+using System.IO;
+using Microsoft.OpenApi.Models;
 
 namespace patools
 {
@@ -68,6 +71,34 @@ namespace patools
             services.AddScoped<IExpertsService, ExpertsService>();
             services.AddScoped<IReviewsService, ReviewsService>();
             services.AddScoped<IFilesService, FilesService>();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "MIEM Peering",
+                    Description = "Платформа для интеграции экспертной самостоятельной и пиринговой оценки эссе"
+                    /*
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Shayne Boyer",
+                        Email = string.Empty,
+                        Url = new Uri("https://twitter.com/spboyer"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under LICX",
+                        Url = new Uri("https://example.com/license"),
+                    }
+                    */
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -75,6 +106,11 @@ namespace patools
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MIEM Peering");
+                });
             }
             else
             {

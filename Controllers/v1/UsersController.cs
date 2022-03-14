@@ -29,6 +29,9 @@ namespace patools.Controllers.v1
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Добавляет пользователя Google.
+        /// </summary>
         [HttpPost("add-google")]
         public async Task<ActionResult<GetNewUserDtoResponse>> AddGoogleUser(AddGoogleUserDTO newUser)
         {
@@ -55,6 +58,9 @@ namespace patools.Controllers.v1
             }
         }
 
+        /// <summary>
+        /// Получает профиль пользователя.
+        /// </summary>
         [HttpGet("get")]
         public async Task<ActionResult<GetRegisteredUserDtoResponse>> GetUserProfile()
         {
@@ -73,6 +79,9 @@ namespace patools.Controllers.v1
             return Ok(await _usersService.GetUserProfile(userId));
         }
 
+        /// <summary>
+        /// Получает роль пользователя.
+        /// </summary>
         [HttpGet("get-role/task={taskId}")]
         public async Task<ActionResult<GetUserRoleDtoResponse>> GetUserRole(Guid taskId)
         {
