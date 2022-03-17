@@ -112,7 +112,6 @@ namespace patools.Services.PeeringTasks
             }
 
             await Context.Tasks.AddAsync(newTask);
-            //TODO: Feature should be changed later
 
             var students = await Context.CourseUsers
                 .Where(cu => cu.Course == course)
@@ -133,7 +132,6 @@ namespace patools.Services.PeeringTasks
                 };
                 await Context.TaskUsers.AddAsync(taskUser);
             }
-            // END of TODO
             
             if (await AddQuestions(peeringTask.AuthorForm.Rubrics, newTask,RespondentTypes.Author) == false)
                 return new OperationErrorResponse<GetNewPeeringTaskDtoResponse>();
@@ -1305,13 +1303,13 @@ namespace patools.Services.PeeringTasks
             
             if (taskUser.PeeringTask.TaskType != TaskTypes.Common) 
                 return studentInfo;
-
-            if (taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
+            
+            if (studentInfo.Submitted && taskUser.PeeringTask.ReviewEndDateTime < DateTime.Now)
                 studentInfo.ReviewQuality = await GetReviewQuality(taskUser.PeeringTask, reviews);
             return studentInfo;
         }
 
-        private async Task<ConfidenceFactorQualities> GetReviewQuality(PeeringTask task, IEnumerable<Review> reviews)
+        private async Task<ConfidenceFactorQualities?> GetReviewQuality(PeeringTask task, IEnumerable<Review> reviews)
         {
             var confidenceFactorsSum = 0f;
             var reviewersAmount = 0;
@@ -1477,8 +1475,12 @@ namespace patools.Services.PeeringTasks
                         submissionGrade += review.Grade * peerConfidenceFactor.Value;
                         confidenceFactorsSum += peerConfidenceFactor.Value;
                     }
-                } 
-                submissionGrade /= confidenceFactorsSum;
+                }
+
+                if (confidenceFactorsSum != 0)
+                    submissionGrade /= confidenceFactorsSum;
+                else
+                    submissionGrade /= reviews.Count;
             }
             var reviewGrade = await GetReviewedPercentage(taskUser) * 10;
             var finalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade, reviewGrade);
