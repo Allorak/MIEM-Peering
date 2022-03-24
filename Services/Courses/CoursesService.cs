@@ -193,8 +193,9 @@ namespace patools.Services.Courses
                 _context.Questions.RemoveRange(questions);
                 
                 
-                var reviewFilesDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "AnswerFiles",task.ID.ToString());
-                Directory.Delete(reviewFilesDirectoryPath,true);
+                var taskFilesDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "AnswerFiles",task.ID.ToString());
+                if(Directory.Exists(taskFilesDirectoryPath))
+                    Directory.Delete(taskFilesDirectoryPath,true);
 
             }
 

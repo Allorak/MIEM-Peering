@@ -236,7 +236,7 @@ app.db-shm
 app.db-wal
 
 .idea
-.idea/
+/.idea
 hangfire.db
 hangfire.db-shm
 hangfire.db-wal
