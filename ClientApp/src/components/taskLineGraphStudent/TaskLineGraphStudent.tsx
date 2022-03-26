@@ -1,92 +1,160 @@
 import { FC, useMemo } from "react";
-import {
-  HorizontalGridLines,
-  LineMarkSeries,
-  LineSeries,
-  LineSeriesPoint,
-  VerticalGridLines,
-  XAxis,
-  XYPlot,
-  YAxis
-} from "react-vis";
+import { Line, LineConfig } from '@ant-design/plots'
+import { Datum } from "@ant-design/charts";
 import { Box, Theme, Typography } from "@mui/material";
 import { SxProps } from "@mui/system";
 
 import { palette } from "../../theme/colors";
 
-import { IStudentSubmissionGrades, IWorkReviewСoordinates, Reviewers } from "../../store/types";
-
-import * as globalStyles from "../../const/styles";
+import { IFinalGradeItemOverview, IStudentSubmissionGrades, IWorkReviewСoordinates, Reviewers } from "../../store/types";
 
 interface IProps {
   graphProps: IStudentSubmissionGrades
 }
 
 export const TaskLineGraphStudent: FC<IProps> = ({ graphProps }) => {
-  const teacherGraph = useMemo(() => {
-    return graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.TEACHER)
-  }, [graphProps])
+  const teacherData = useMemo((): IFinalGradeItemOverview | undefined => {
+    const filterData: IWorkReviewСoordinates[] = JSON.parse(JSON.stringify(graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.TEACHER)))
 
-  const expertGraph = useMemo(() => {
-    return graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.EXPERT)
-  }, [graphProps])
-
-  const peersGraph = useMemo(() => {
-    return graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.PEER)
-  }, [graphProps])
-
-  const dataLength = useMemo(() => {
-    return peersGraph.length > 1 ? peersGraph.length : 2
-  }, [peersGraph])
-
-  const teacherData = useMemo((): LineSeriesPoint[] | undefined => {
-    if (teacherGraph.length > 0) {
-      const graphData: LineSeriesPoint[] = []
-      for (let i = 0; i < dataLength; i++) {
-        graphData.push({
-          y: teacherGraph[0].value,
-          x: i
-        })
+    if (filterData.length > 0) {
+      return {
+        value: filterData[0].value,
+        student: filterData[0].name
       }
-
-      return graphData
     }
-  }, [teacherGraph, dataLength])
+    return
+  }, [graphProps])
 
-  const expertData = useMemo((): LineSeriesPoint[] | undefined => {
-    if (expertGraph.length > 0) {
-      const graphData: LineSeriesPoint[] = []
-      for (let i = 0; i < dataLength; i++) {
-        graphData.push({
-          y: expertGraph[0].value,
-          x: i
-        })
+  const expertData = useMemo((): IFinalGradeItemOverview | undefined => {
+    const filterData: IWorkReviewСoordinates[] = JSON.parse(JSON.stringify(graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.EXPERT)))
+
+    if (filterData.length > 0) {
+      return {
+        value: filterData[0].value,
+        student: filterData[0].name
       }
-
-      return graphData
     }
-  }, [expertGraph, dataLength])
+    return
+  }, [graphProps])
 
-  const peersData = useMemo((): LineSeriesPoint[] | undefined => {
-    if (peersGraph.length > 0) {
-      const clonePeersGraph: IWorkReviewСoordinates[] = JSON.parse(JSON.stringify(peersGraph))
-      return clonePeersGraph.map((item, index) => (
+  const peersData = useMemo((): IFinalGradeItemOverview[] => {
+    const filterData: IWorkReviewСoordinates[] = JSON.parse(JSON.stringify(graphProps.coordinates.filter(coordinate => coordinate.reviewer === Reviewers.PEER)))
+    return filterData.map(item => ({
+      student: item.name,
+      value: item.value
+    }))
+  }, [graphProps])
+
+
+  const expertAnnotation = useMemo((): LineConfig['annotations'] => {
+    if (expertData) {
+      return [
         {
-          y: item.value,
-          x: index
-        }
-      ))
+          type: 'text',
+          position: ['min', expertData.value.toString()],
+          content: `${expertData.student} (эксперт): ${expertData.value}`,
+          offsetY: -4,
+          style: {
+            textBaseline: 'bottom',
+            fontSize: 14,
+          },
+        },
+        {
+          type: 'line',
+          start: ['min', expertData.value.toString()],
+          end: ['max', expertData.value.toString()],
+          style: {
+            stroke: palette.fill.success,
+            lineWidth: 3
+          },
+        },
+      ]
     }
-  }, [peersGraph, dataLength])
+    return []
+  }, [expertData])
 
-  const teacherColor = palette.hover.danger
-  const expertColor = palette.hover.success
-  const peersColor = palette.hover.info
+  const teacherAnnotation = useMemo((): LineConfig['annotations'] => {
+    if (teacherData) {
+      return [
+        {
+          type: 'text',
+          position: ['min', teacherData.value.toString()],
+          content: `${teacherData.student} (преподаватель): ${teacherData.value}`,
+          offsetY: expertData && expertData.value === teacherData.value ? -24 : -4,
+          style: {
+            textBaseline: 'bottom',
+            fontSize: 14,
+            fontWeight: 700,
+          },
+        },
+        {
+          type: 'line',
+          start: ['min', teacherData.value.toString()],
+          end: ['max', teacherData.value.toString()],
+          style: {
+            stroke: palette.fill.danger,
+            lineWidth: 3
+          },
+        },
+      ]
+    }
+    return []
+  }, [teacherData, expertData])
+
+  const config = useMemo((): LineConfig => ({
+    data: peersData.length > 0 ? peersData : teacherData ? [teacherData] : expertData ? [expertData] : [],
+    animation: {
+      appear: {
+        duration: 3000
+      }
+    },
+    color: palette.active.info,
+    xField: "student",
+    yField: "value",
+    xAxis: {
+      tickCount: 5,
+      range: [0, 1],
+      label: {
+        style: {
+          fontSize: 14
+        }
+      },
+    },
+    yAxis: {
+      min: graphProps.minGrade,
+      max: graphProps.maxGrade,
+    },
+    point: {
+      shape: 'circle',
+      color: palette.fill.info,
+      size: 6
+    },
+    lineStyle: {
+      stroke: palette.fill.info,
+      lineWidth: 3
+    },
+    tooltip: {
+      formatter: (datum: Datum) => {
+        return { name: "Итоговая оценка", value: `${datum.value}` };
+      },
+    },
+    area: {
+      style: {
+        fill: `l(270) 0:#ffffff 0.5:#7ec2f3 1:#1890ff`
+      }
+    },
+    ...((teacherAnnotation || expertAnnotation) && {
+      ...(expertAnnotation && teacherAnnotation ? {
+        annotations: [...teacherAnnotation, ...expertAnnotation]
+      } : {
+        annotations: expertAnnotation ?? teacherAnnotation
+      })
+
+    })
+  }), [peersData, teacherAnnotation, expertAnnotation, peersData, expertData, graphProps])
 
   return (
-    <Box sx={styles.graphBox}
-      onTouchMove={(e) => e.preventDefault()}
-    >
+    <Box sx={styles.wrapper}>
       <Box>
         <Typography
           variant={"h6"}
@@ -95,166 +163,33 @@ export const TaskLineGraphStudent: FC<IProps> = ({ graphProps }) => {
         >
           {"Результаты проверки"}
         </Typography>
+
         <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center"
-          }}
+          sx={styles.graphContainer}
         >
-          <Box
-            sx={{
-              height: "355px",
-              overflowY: "auto",
-              ...globalStyles.scrollStyles
-            }}
-          >
-
-            <XYPlot
-              height={300}
-              width={980}
-              xType="linear"
-              onTouchMove={(e) => e.preventDefault()}
-              yDomain={[graphProps.minGrade, graphProps.maxGrade]}
-            >
-              <HorizontalGridLines />
-              <VerticalGridLines />
-              <YAxis title="Оценки" />
-              <XAxis />
-
-              {teacherData && (
-                <LineSeries
-                  style={{
-                    strokeWidth: '2px'
-                  }}
-                  color={teacherColor}
-                  data={teacherData}
-                  animation={{ damping: 20, stiffness: 80 }}
-                />
-              )}
-
-              {expertData && (
-                <LineSeries
-                  style={{
-                    strokeWidth: '2px',
-                    opacity: 0.8
-                  }}
-                  color={expertColor}
-                  data={expertData}
-                  animation={{ damping: 10, stiffness: 40 }}
-                />
-              )}
-
-              {peersData && (
-                <LineMarkSeries
-                  style={{
-                    strokeWidth: '2px'
-                  }}
-                  lineStyle={{ stroke: peersColor, opacity: 0.8 }}
-                  markStyle={{ fill: peersColor, strokeWidth: "0px" }}
-                  data={peersData}
-                  animation={{ damping: 10, stiffness: 20 }}
-                />
-              )}
-            </XYPlot>
-          </Box>
+          <Line {...config} />
         </Box>
-      </Box>
-
-      <Box sx={styles.graphDescriptionsWrapper}>
-        {teacherGraph.length > 0 && (
-          <Box sx={styles.graphDescriptionContainer}>
-            <Box sx={{ ...styles.graphMark, backgroundColor: teacherColor }} />
-            <Typography variant={"body1"}>
-              {'-- Преподаватель: '}
-
-              <Typography
-                variant={"h6"}
-                color={'inherit'}
-                component={'span'}
-              >
-                {teacherGraph[0].name}
-              </Typography>
-            </Typography>
-          </Box>
-        )}
-
-        {expertGraph.length > 0 && (
-          <Box sx={styles.graphDescriptionContainer}>
-            <Box sx={{ ...styles.graphMark, backgroundColor: expertColor }} />
-            <Typography variant={"body1"}>
-              {'-- Экспертная проверка: '}
-
-              <Typography
-                variant={"h6"}
-                color={'inherit'}
-                component={'span'}
-              >
-                {expertGraph[0].name}
-              </Typography>
-            </Typography>
-          </Box>
-        )}
-
-        {peersGraph.length > 0 && (
-          <Box sx={styles.graphDescriptionContainer}>
-            <Box sx={{ ...styles.graphMark, backgroundColor: peersColor }} />
-            <Typography variant={"body1"}>
-              {'-- Пиринговая проверка: '}
-              {peersGraph.map((peer, index) => (
-                <Typography
-                  variant={"h6"}
-                  color={'inherit'}
-                  component={'span'}
-                  key={index}
-                >
-                  {`${index + 1}-${peer.name}; `}
-                </Typography>
-              ))}
-            </Typography>
-          </Box>
-        )}
       </Box>
     </Box>
   )
 }
 
 const styles = {
-  graphBox: {
-    display: "flex",
-    flexDirection: "column",
-    flexBasis: "calc(75% - 23px)",
-    flexGrow: 0,
-    flexShrink: 0,
-    padding: "10px",
-    boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)',
+  wrapper: {
     backgroundColor: 'common.white',
+    boxSizing: 'border-box',
+    maxHeight: '100%',
     borderRadius: '4px',
-    overflowX: "auto",
-    overflowY: "hidden",
-    '@media (max-width: 1321px)': {
-      boxSizing: "border-box",
-      flexBasis: "100%",
-      flexGrow: 0,
-      flexShrink: 0,
-    }
+    padding: "15px",
+    boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)'
   } as SxProps<Theme>,
   graphContainer: {
-    overflow: "auto",
-    ...globalStyles.scrollStyles
-  } as SxProps<Theme>,
-  graphDescriptionsWrapper: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px",
-    justifyContent: "center",
-  } as SxProps<Theme>,
-  graphDescriptionContainer: {
-    display: "inline-flex",
-    gap: "5px",
-    alignItems: "center"
-  } as SxProps<Theme>,
-  graphMark: {
-    width: "10px",
-    height: "10px"
-  } as SxProps<Theme>,
+    m: "20px",
+    "@media (max-width: 1200px)": {
+      m: "15px",
+    },
+    "@media (max-width: 900px)": {
+      m: "10px",
+    }
+  } as SxProps<Theme>
 }

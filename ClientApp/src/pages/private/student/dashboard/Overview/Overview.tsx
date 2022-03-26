@@ -16,6 +16,7 @@ import { usePrivatePathStDashboard } from "../../../../../app/hooks/usePrivatePa
 
 import { fetchOverviewStudent } from "../../../../../store/overviewStudent";
 import { TaskMainOverview } from "../../../../../components/taskMainOverview";
+import { IStudentSubmissionGrades, Reviewers } from "../../../../../store/types";
 
 
 export const Overview: FC = () => {
@@ -106,7 +107,6 @@ export const Overview: FC = () => {
               <TaskLineGraphStudent graphProps={payload.studentGrades} />
             </Grid>
           )}
-
 
         </Grid>
       )}

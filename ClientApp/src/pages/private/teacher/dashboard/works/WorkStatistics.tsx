@@ -1,12 +1,12 @@
 import { FC, useCallback, useState } from "react";
-import { Box, Tab, Theme } from "@mui/material";
+import { Box, Grid, Tab, Theme } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import { SxProps } from "@mui/system";
 
 import { WorkForms } from "./components/WorkForms";
 import { WorkLineGraph } from "./components/WorkLineGraph";
 
-import { IWorkGraph, IWorkReviewerForm, IWorkStatistics, WorkStatisticsTypes } from "../../../../../store/types";
+import { IWorkGraph, IWorkReviewerForm, IWorkStatistics, WorkGraphTypes, WorkStatisticsTypes } from "../../../../../store/types";
 
 
 interface IProps {
@@ -47,11 +47,13 @@ export const WorkStatistics: FC<IProps> = ({ workStatistics }) => {
       <Box sx={styles.wrapper}>
         {graphs.length > 0 && (
           <TabPanel value={currentTab} index={0}>
-            <Box sx={styles.graphWrapper}>
+            <Grid container spacing={"10px"} boxSizing={'border-box'}>
               {graphs.map((graphProps, index) => (
-                <WorkLineGraph key={index} graphProps={graphProps} />
+                <Grid item xs={12} lg={graphProps.graphType === WorkGraphTypes.FINAL ? 12 : 6}>
+                  <WorkLineGraph key={index} graphProps={graphProps} />
+                </Grid>
               ))}
-            </Box>
+            </Grid>
           </TabPanel>
         )}
 

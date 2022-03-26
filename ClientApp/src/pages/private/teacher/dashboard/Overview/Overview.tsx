@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react";
-import { Box, Divider, Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 
 import { DashboardWorkBox } from "../../../../../components/dashboardWorkBox";
 import { TaskTypeBlock } from "../../../../../components/taskTypeBlock";
@@ -7,7 +7,7 @@ import { StepCheckBlock } from "../../../../../components/stepCheckBlock";
 import { DonutChart } from "../../../../../components/donutChart";
 import { Deadlines } from "../../../../../components/deadlines"
 
-import { FinalGradesGraph, Formula, СoefficientsFactorGraph } from "./components";
+import { FinalGradesGraph, Formula, СoefficientsFactorGraph, GradeColumnChart } from "./components";
 
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
@@ -83,9 +83,20 @@ export const Overview: FC = () => {
           )}
 
           {payload.grades && payload.grades.length > 0 && (
-            <Grid item xs={12} lg={9} >
-              <FinalGradesGraph grades={payload.grades} />
-            </Grid>
+            <>
+              <Grid item xs={12} lg={9} >
+                <FinalGradesGraph
+                  grades={payload.grades}
+                />
+              </Grid>
+
+              <Grid item xs={12} lg={3} >
+                <GradeColumnChart
+                  grades={payload.grades}
+                />
+              </Grid>
+            </>
+
           )}
 
           {((payload.confidenceFactors && payload.confidenceFactors.length > 0) || (payload.currentConfidenceFactors && payload.currentConfidenceFactors.length > 0)) && (

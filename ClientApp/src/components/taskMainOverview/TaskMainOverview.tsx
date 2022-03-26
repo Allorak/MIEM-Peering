@@ -55,7 +55,7 @@ export const TaskMainOverview: FC<IProps> = ({
           <Typography
             variant="h6"
           >
-            {"Подключения к LMS и МООС системам"}
+            {"Подключение к LMS и МООС системам"}
           </Typography>
 
           <Typography

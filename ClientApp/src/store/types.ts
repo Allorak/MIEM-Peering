@@ -357,13 +357,22 @@ export type IStatusTask = {
   reviewedSubmissions: number
 }
 
+export interface IFinalGradeItemOverview {
+  student: string,
+  value: number
+}
+
+export interface IConfidenceFactorItemOverview extends IFinalGradeItemOverview {
+  category: string
+}
+
 export type IOverview = {
   statistics: IStatusBar,
   deadlines: IDeadlines,
-  grades?: number[],
+  grades?: IFinalGradeItemOverview[],
   reviewType: PeerTaskTypes,
-  confidenceFactors?: number[],
-  currentConfidenceFactors?: number[],
+  confidenceFactors?: IFinalGradeItemOverview[],
+  currentConfidenceFactors?: IFinalGradeItemOverview[],
   taskType: PeerSteps,
   submissionWeight: number,
   reviewWeight: number,

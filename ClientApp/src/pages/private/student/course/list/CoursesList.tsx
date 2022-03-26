@@ -93,7 +93,7 @@ export const STCourseList: FC = () => {
 
                     {courses && (courses.length === 0) && (
                         <NoData
-                            label={"Курсы не найдены. Вы можете присоедениться по коду курса"}
+                            label={"Курсы не найдены. Вы можете присоединиться по коду курса"}
                         />
                     )}
                 </WorkBox>

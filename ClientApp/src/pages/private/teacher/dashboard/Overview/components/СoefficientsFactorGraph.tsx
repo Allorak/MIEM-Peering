@@ -1,59 +1,101 @@
-import { FC, useMemo } from "react";
-import {
-  XYPlot,
-  XAxis,
-  YAxis,
-  VerticalGridLines,
-  LineMarkSeries,
-  DiscreteColorLegend
-} from 'react-vis';
+import { FC, useMemo } from "react"
+import { Line, LineConfig } from '@ant-design/plots'
 import { Typography, Box, Theme } from "@mui/material"
-import { SxProps } from "@mui/system";
+import { SxProps } from "@mui/system"
 
 import { palette } from "../../../../../../theme/colors"
 
-import * as globalStyles from "../../../../../../const/styles"
+import { IConfidenceFactorItemOverview, IFinalGradeItemOverview } from "../../../../../../store/types";
 
 
 interface IProps {
-  confidenceFactors?: number[]
-  currentConfidenceFactors?: number[]
+  confidenceFactors?: IFinalGradeItemOverview[]
+  currentConfidenceFactors?: IFinalGradeItemOverview[]
 }
 
 export const СoefficientsFactorGraph: FC<IProps> = ({ confidenceFactors, currentConfidenceFactors }) => {
+  const isFullConfidence = useMemo(() => (
+    confidenceFactors && confidenceFactors.length > 0 && currentConfidenceFactors && currentConfidenceFactors.length > 0 ? 0 :
+      confidenceFactors && confidenceFactors.length > 0 ? 1 : -1
+  ), [currentConfidenceFactors, confidenceFactors])
 
-  const graphData = useMemo(() => ({
-    current: currentConfidenceFactors?.map((grade, index) => ({ x: index, y: grade })),
-    new: confidenceFactors?.map((grade, index) => ({ x: index, y: grade }))
-  }), [confidenceFactors, currentConfidenceFactors])
+  const data = useMemo((): IConfidenceFactorItemOverview[] | IFinalGradeItemOverview[] => {
+    if (confidenceFactors && confidenceFactors.length > 0 && currentConfidenceFactors && currentConfidenceFactors.length > 0) {
+      const currentData: IConfidenceFactorItemOverview[] = currentConfidenceFactors.map(item => ({
+        category: legends.current,
+        ...item
+      }))
 
-  const legendItems = useMemo(() => {
-    const legends = []
+      const newData: IConfidenceFactorItemOverview[] = confidenceFactors.map(item => ({
+        category: legends.new,
+        ...item
+      }))
 
-    if (graphData.current) {
-      legends.push({
-        title: 'Текущий коэффициент',
-        color: palette.fill.primary,
-        strokeWidth: 3
-      })
+      return JSON.parse(JSON.stringify(currentData.concat(newData)))
     }
 
-    if (graphData.new) {
-      legends.push({
-        title: 'Вычисленный коэффициент',
-        color: palette.fill.secondary,
-        strokeWidth: 3
-      })
+    if (confidenceFactors && confidenceFactors.length > 0) {
+      return JSON.parse(JSON.stringify(confidenceFactors))
     }
 
-    return legends
-  }, [graphData])
+    if (currentConfidenceFactors && currentConfidenceFactors.length > 0) {
+      return JSON.parse(JSON.stringify(currentConfidenceFactors))
+    }
+
+    return []
+  }, [confidenceFactors, currentConfidenceFactors])
+
+  const config = useMemo((): LineConfig => ({
+    data,
+    animation: {
+      appear: {
+        duration: 3000
+      }
+    },
+    color: isFullConfidence === 0 ? [palette.fill.primary, palette.fill.secondary] : isFullConfidence === -1 ? palette.fill.primary : palette.fill.secondary,
+    xField: 'student',
+    yField: 'value',
+    xAxis: {
+      tickCount: 5,
+      range: [0, 1]
+    },
+    yAxis: {
+      min: 0,
+      max: 1,
+    },
+    point: {
+      shape: 'circle',
+      size: 6
+    },
+    lineStyle: {
+      lineWidth: 3
+    },
+    ...(isFullConfidence !== 0 && {
+      tooltip: {
+        formatter: (datum) => {
+          if (isFullConfidence === -1)
+            return { name: legends.current, value: `${datum.value}` }
+          return { name: legends.new, value: `${datum.value}` }
+        },
+      },
+    }),
+    ...(isFullConfidence === 0 && {
+      seriesField: 'category',
+      legend: {
+        position: "bottom",
+        itemName: {
+          style: {
+            fill: '#000',
+            fontSize: 14
+          },
+          formatter: (name) => name,
+        },
+      },
+    })
+  }), [isFullConfidence, data])
 
   return (
-    <Box
-      onTouchMove={(e) => e.preventDefault()}
-      sx={styles.wrapper}
-    >
+    <Box sx={styles.wrapper}>
       <Typography
         variant={"h6"}
         margin={"0px 0px 10px 0px"}
@@ -62,56 +104,8 @@ export const СoefficientsFactorGraph: FC<IProps> = ({ confidenceFactors, curren
         {"График коэффициентов доверия"}
       </Typography>
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center"
-        }}
-      >
-        <Box
-          sx={{
-            height: "355px",
-            overflowY: "auto",
-            ...globalStyles.scrollStyles
-          }}
-        >
-          <XYPlot
-            height={300}
-            width={970}
-            xType="linear"
-            onTouchMove={(e) => e.preventDefault()}
-            yDomain={[0, 1]}
-          >
-            <VerticalGridLines />
-            <YAxis title="- коэффициент" />
-            <XAxis title="- № участника" tickFormat={val => Math.round(val) === val ? val : ""} />
-
-            {graphData.new && (
-              <LineMarkSeries
-                style={{
-                  strokeWidth: '2px'
-                }}
-                lineStyle={{ stroke: palette.fill.secondary }}
-                markStyle={{ fill: palette.fill.secondary, strokeWidth: "0px" }}
-                data={graphData.new}
-              />
-            )}
-
-            {graphData.current && (
-              <LineMarkSeries
-                style={{
-                  strokeWidth: '2px'
-                }}
-                className="linemark-series-example-2"
-                lineStyle={{ stroke: palette.fill.primary }}
-                markStyle={{ fill: palette.fill.primary, strokeWidth: "0px" }}
-                data={graphData.current}
-              />
-            )}
-
-            <DiscreteColorLegend items={legendItems} orientation="horizontal" />
-          </XYPlot>
-        </Box>
+      <Box sx={styles.graphContainer}>
+        <Line {...config} />
       </Box>
     </Box>
   )
@@ -121,9 +115,23 @@ const styles = {
   wrapper: {
     backgroundColor: 'common.white',
     boxSizing: 'border-box',
-    height: '100%',
+    maxHeight: '100%',
     borderRadius: '4px',
     padding: "15px",
     boxShadow: '0px 2px 6px 0px rgba(34, 60, 80, 0.2)'
   } as SxProps<Theme>,
+  graphContainer: {
+    m: "20px",
+    "@media (max-width: 1200px)": {
+      m: "15px",
+    },
+    "@media (max-width: 900px)": {
+      m: "10px",
+    }
+  } as SxProps<Theme>,
+}
+
+const legends = {
+  current: "Текущий коэффициент",
+  new: "Вычисленный коэффициент"
 }

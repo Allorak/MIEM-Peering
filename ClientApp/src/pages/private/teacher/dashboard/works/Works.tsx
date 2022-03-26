@@ -19,7 +19,7 @@ import { WorksList } from "../../../../../components/workList";
 
 import { useAppSelector } from "../../../../../app/hooks";
 import { usePrivatePathTDashboard } from "../../../../../app/hooks/usePrivatePathTDashboard";
-import { IError, IStudentWork, IWorkItem, IWorks, IWorkStatistics } from "../../../../../store/types";
+import { IError, IStudentWork, IWorkItem, IWorks, IWorkStatistics, Reviewers, WorkGraphTypes, WorkStatisticsTypes } from "../../../../../store/types";
 
 import * as globalStyles from "../../../../../const/styles";
 
