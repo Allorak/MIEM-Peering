@@ -141,7 +141,8 @@ namespace patools.Services.Courses
                                 .ToListAsync();
                             foreach (var file in answerFiles)
                             {
-                                File.Delete(file.FilePath);
+                                if(File.Exists(file.FilePath))
+                                    File.Delete(file.FilePath);
                             }
                             _context.AnswerFiles.RemoveRange(answerFiles);
                         }

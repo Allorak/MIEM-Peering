@@ -1119,16 +1119,29 @@ namespace patools.Services.PeeringTasks
 
         private async Task<bool> TryCalculateInitialTaskResults(PeeringTaskUser taskUser, CourseUser courseUser)
         {
-            var expertReview = await GetExpertReview(taskUser);
-            var teacherReview = await GetTeacherReview(taskUser);
-            if (expertReview == null && teacherReview == null)
-                return false;
             var submission = await GetSubmission(taskUser);
-            var submissionGrade = submission != null
-                ? teacherReview?.Grade ?? expertReview.Grade
-                : 0;
-            var reviewGrade = await GetReviewedPercentage(taskUser) * MaxPossibleGrade;
+            var submissionGrade = 0f;
+            
+            if (submission is not null)
+            {
+                var expertReview = await GetExpertReview(taskUser);
+                var teacherReview = await GetTeacherReview(taskUser);
+                if (expertReview == null && teacherReview == null)
+                    return false;
+                submissionGrade = teacherReview?.Grade ?? expertReview.Grade;
+            }
+            
+            var reviewedPercentage = await GetReviewedPercentage(taskUser);
+            var reviewGrade =  reviewedPercentage * MaxPossibleGrade;
+            
+            taskUser.SubmissionGrade = submissionGrade;
+            taskUser.ReviewGrade = reviewGrade;
+            taskUser.FinalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade,reviewGrade);
+            
+                
             var confidenceFactor = await CountInitialConfidenceFactor(taskUser, submissionGrade);
+            if (submissionGrade == 0 && reviewedPercentage == 0)
+                confidenceFactor = 0;
             
             if (confidenceFactor == null)
             {
@@ -1138,9 +1151,6 @@ namespace patools.Services.PeeringTasks
             
             courseUser.ConfidenceFactor = confidenceFactor.Value;
             taskUser.NextConfidenceFactor = confidenceFactor.Value;
-            taskUser.SubmissionGrade = submissionGrade;
-            taskUser.ReviewGrade = reviewGrade;
-            taskUser.FinalGrade = CalculateResultGrade(taskUser.PeeringTask, submissionGrade,reviewGrade);
        
             return true;
         }
