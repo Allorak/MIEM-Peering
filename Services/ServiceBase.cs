@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using patools.Dtos.Task;
 using patools.Enums;
 using patools.Models;
 
@@ -286,17 +287,29 @@ namespace patools.Services
             var submissionPeer = await GetSubmissionPeer(submission, peer);
             return submissionPeer != null ? await GetReview(submissionPeer) : null;
         }
-        protected static List<float?> GetFinalGrades(IEnumerable<PeeringTaskUser> taskUsers)
+        protected static List<NumericValueWithStudentName?> GetFinalGrades(IEnumerable<PeeringTaskUser> taskUsers)
         {
-            return taskUsers.Select(tu => tu.FinalGrade).ToList();
+            return taskUsers.Select(tu => new NumericValueWithStudentName()
+            {
+                Student = tu.Student.Fullname,
+                Value = tu.FinalGrade
+            }).ToList();
         }
-        protected static List<float> GetPreviousConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
+        protected static List<NumericValueWithStudentName> GetPreviousConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
         {
-            return taskUsers.Select(tu => tu.PreviousConfidenceFactor).ToList();
+            return taskUsers.Select(tu => new NumericValueWithStudentName()
+            {
+                Student = tu.Student.Fullname,
+                Value = tu.PreviousConfidenceFactor
+            }).ToList();
         }
-        protected static List<float?> GetNextConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
+        protected static List<NumericValueWithStudentName?> GetNextConfidenceFactors(IEnumerable<PeeringTaskUser> taskUsers)
         {
-            return taskUsers.Select(tu => tu.NextConfidenceFactor).ToList();
+            return taskUsers.Select(tu => new NumericValueWithStudentName()
+            {
+                Student = tu.Student.Fullname,
+                Value = tu.NextConfidenceFactor
+            }).ToList();
         }
 
         protected async Task<List<User>> GetExpertUsersForTask(PeeringTask task)

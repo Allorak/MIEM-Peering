@@ -112,11 +112,17 @@ namespace patools.Services.Authentication
                     });
                 }
 
-                var assignedTasks = await Context.TaskUsers
+                var assignedTaskUsers = await Context.TaskUsers
                     .Where(tu => tu.PeeringTask.Course == course && tu.Student == user)
-                    .Select(tu => tu.PeeringTask)
                     .ToListAsync();
 
+                var assignedTasks = assignedTaskUsers.Select(tu => tu.PeeringTask).ToList();
+                
+                foreach (var taskUser in assignedTaskUsers)
+                {
+                    taskUser.JoinedByLti = true;
+                }
+                    
                 var tasksWithoutAccess = await Context.Tasks
                     .Where(t => t.Course == course && !assignedTasks.Contains(t))
                     .ToListAsync();
