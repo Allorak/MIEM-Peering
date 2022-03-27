@@ -11,5 +11,6 @@ namespace patools.Services.Users
         Task<Response<GetRegisteredUserDtoResponse>> GetUserProfile(Guid userId);
 
         Task<Response<GetUserRoleDtoResponse>> GetUserRole(GetUserRoleDtoRequest userInfo);
+        Task<Response<string>> AddNativeUser(AddNativeUserDto newUser);
     }
 }

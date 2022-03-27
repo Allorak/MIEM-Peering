@@ -11,6 +11,8 @@ using AutoMapper.Configuration;
 using patools.Errors;
 using Microsoft.Extensions.Configuration;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using BrunoZell.ModelBinding;
 
 namespace patools.Controllers.v1
 {
@@ -104,6 +106,12 @@ namespace patools.Controllers.v1
             };
 
             return Ok(await _usersService.GetUserRole(userInfo));
+        }
+
+        [HttpPost("add-native")]
+        public async Task<ActionResult<Response<string>>> AddNativeUser ([FromForm] AddNativeUserDto newUser)
+        {
+            return Ok(await _usersService.AddNativeUser(newUser));
         }
         
     }
