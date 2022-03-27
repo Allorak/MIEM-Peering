@@ -202,6 +202,24 @@ namespace patools.Services.Authentication
             });
         }
 
+        public async Task<Response<GetNativeRegisteredUserDtoResponse>> Login(GetNativeRegisteredUserDtoRequest userInfo)
+        {
+            var user = await GetUserByEmail(userInfo.Email);
+            if (user is null)
+                return new UnauthorizedUserResponse<GetNativeRegisteredUserDtoResponse>("User is not registered");
+
+            if (!user.RegisteredNatively)
+                return new UnauthorizedUserResponse<GetNativeRegisteredUserDtoResponse>(
+                    "User is not registered natively");
+            if (VerifyPasswordHash(userInfo.Pass, user.PasswordHash, user.PasswordSalt))
+                return new SuccessfulResponse<GetNativeRegisteredUserDtoResponse>(
+                    new GetNativeRegisteredUserDtoResponse()
+                    {
+                        AccessToken = CreateJwtFromUser(user)
+                    });
+            return new UnauthorizedUserResponse<GetNativeRegisteredUserDtoResponse>("Incorrect password");
+        }
+
         private static byte[] FromBase64Url(string base64Url)
         {
             var padded = base64Url.Length % 4 == 0
@@ -274,6 +292,28 @@ namespace patools.Services.Authentication
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+        
+        
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using var hmac = new System.Security.Cryptography.HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        }
+
+        private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt);
+            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            if (computedHash.Length != passwordHash.Length)
+                return false;
+            for (var i = 0; i < computedHash.Length; i++)
+            {
+                if (computedHash[i] != passwordHash[i])
+                    return false;
+            }
+            return true;
         }
     }
 }

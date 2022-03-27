@@ -106,5 +106,14 @@ namespace patools.Controllers.v1
             Response.Cookies.Append("JWT", "");
             return Redirect("~/not-found");
         }
+
+        /// <summary>
+        /// Осуществляет вход по почте и паролю
+        /// </summary>
+        [HttpPost("login")]
+        public async Task<ActionResult<Response<GetNativeRegisteredUserDtoResponse>>> Login(GetNativeRegisteredUserDtoRequest userInfo)
+        {
+            return Ok(await _authenticationService.Login(userInfo));
+        }
     }
 }
