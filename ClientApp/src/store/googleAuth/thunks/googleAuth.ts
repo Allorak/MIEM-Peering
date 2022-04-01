@@ -8,6 +8,7 @@ import { AppThunk } from "../../../app/store";
 
 
 import { GoogleAuthStatus, IErrorCode } from "../../types";
+import { auth } from "../../auth/thunks/auth";
 
 
 export const fetchGAuth = (googleToken: string): AppThunk => async (dispatch) => {
@@ -32,7 +33,7 @@ export const fetchGAuth = (googleToken: string): AppThunk => async (dispatch) =>
 
         if (response.payload.status === GoogleAuthStatus.registeredUser) {
             dispatch(userProfileActions.userProfileSuccess(response.payload.user))
-            dispatch(authActions.authSuccess(response.payload.accessToken))
+            dispatch(auth(response.payload.accessToken))
         }
 
         dispatch(actions.authSuccess(response.payload))

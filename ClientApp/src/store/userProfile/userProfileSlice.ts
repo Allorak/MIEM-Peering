@@ -10,7 +10,7 @@ export interface IUserProfileState {
 
 const initialState: IUserProfileState = {
   isLoading: false,
-  error: undefined,  
+  error: undefined,
   payload: undefined
 };
 
@@ -37,7 +37,7 @@ export const userProfileSlice = createSlice({
     userProfileRemove: (state) => {
       state.isLoading = false
       state.error = undefined
-      state.payload = {} as IUserProfile
+      state.payload = undefined
     }
   },
 });

@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation, matchPath, generatePath, useNavigate } from 'react-router-dom'
 import { Box, SxProps, Theme } from '@mui/system'
 import { CircularProgress, Typography } from '@mui/material'
+import Cookies from 'universal-cookie';
 
 import { PrivateHeader } from '../../components/header'
 import { Router404 } from '../../components/router404'
@@ -18,6 +19,7 @@ import { ICookiesToken, IRole } from '../../store/types'
 import * as globalStyles from "../../const/styles"
 import { Dashboard as TeacherDashboard } from './teacher/dashboard/Dashboard'
 import { TaskAdd } from './teacher/task/add'
+import { Landing } from '../landing'
 import { CourseMain as TeacherCourseMain } from './teacher/course/main'
 import { TCourseList as TeacherCourseList } from './teacher/course/list'
 import { CourseMain as StudentCourseMain } from './student/course/main'
@@ -28,7 +30,6 @@ import { fetchDashboard, actions as DashboardActions } from '../../store/dashboa
 import { actions as authActions } from '../../store/auth'
 import { fetchCourses } from '../../store/courses/thunks/courses'
 
-import Cookies from 'universal-cookie';
 
 export function Private() {
   const cookies = new Cookies();
@@ -50,11 +51,11 @@ export function Private() {
   const role = path?.params?.role
   const taskId = path?.params?.taskId
 
-  const accessTokenFromCookies = cookies.get(ICookiesToken.key)  
+  const accessTokenFromCookies = cookies.get(ICookiesToken.key)
 
-  if (!accessTokenFromCookies && accessToken && accessToken !== undefined) {
-    cookies.set(ICookiesToken.key, accessToken)
-  }
+  // if (!accessTokenFromCookies && accessToken && accessToken !== undefined) {
+  //   cookies.set(ICookiesToken.key, accessToken)
+  // }
 
   useEffect(() => {
     if (!accessToken && accessTokenFromCookies && !userProfilePayload) {
@@ -63,7 +64,7 @@ export function Private() {
         dispatch(fetchCourses())
       }
     }
-  }, [dispatch, accessToken])
+  }, [dispatch, accessToken, accessTokenFromCookies])
 
   useEffect(() => {
     if (accessToken && !userProfilePayload) {
@@ -87,13 +88,18 @@ export function Private() {
 
   if ((!isAuthorized || !accessToken) && !registrationToken && !accessTokenFromCookies) {
     return (
-      <Navigate
-        to={paths.login}
-        replace
-        state={{
-          from: location
-        }}
-      />
+      <>
+        <Routes>
+          <Route path={paths.root} element={<Landing />} />
+        </Routes>
+
+        {location.pathname !== paths.root && (
+          <Navigate
+            to={paths.root}
+            replace
+          />
+        )}
+      </>
     )
   }
 
@@ -186,6 +192,15 @@ export function Private() {
   }
 
   if (userProfilePayload && userProfilePayload.role === IRole.teacher) {
+    if (location.pathname === paths.root) {
+      return (
+        <Navigate
+          to={paths.teacher.main}
+          replace
+        />
+      )
+    }
+
     return (
       <Box sx={styles.wrapper}>
         <PrivateHeader />
@@ -195,7 +210,6 @@ export function Private() {
             <Route path={paths.teacher.main} element={<TeacherCourseList />} />
             <Route path={paths.teacher.courses.course} element={<TeacherCourseMain />} />
             <Route path={paths.teacher.task.add} element={<TaskAdd />} />
-            <Route path={paths.root} element={<TeacherCourseList />} />
             <Route path={'*'} element={<Router404 />} />
           </Routes>
         </Box>
@@ -204,6 +218,14 @@ export function Private() {
   }
 
   if (userProfilePayload && userProfilePayload.role === IRole.student) {
+    if (location.pathname === paths.root) {
+      return (
+        <Navigate
+          to={paths.student.main}
+          replace
+        />
+      )
+    }
     return (
       <Box sx={styles.wrapper}>
         <PrivateHeader />
@@ -212,7 +234,6 @@ export function Private() {
           <Routes>
             <Route path={paths.student.main} element={<StudentCourseList />} />
             <Route path={paths.student.courses.course} element={<StudentCourseMain />} />
-            <Route path={paths.root} element={<StudentCourseList />} />
             <Route path={"*"} element={<Router404 />} />
           </Routes>
         </Box>

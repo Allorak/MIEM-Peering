@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { IAuthResponse, IError } from '../types';
+import { IError } from '../types';
 
 
 export interface IAuthState {
@@ -29,12 +29,6 @@ export const authSlice = createSlice({
       state.isAuthorizing = false
       state.isAuthorized = true
       state.accessToken = payload
-    },
-
-    authFailed: (state, { payload }: PayloadAction<IError>) => {
-      state.isAuthorizing = false
-      state.isAuthorized = false
-      state.error = payload
     },
 
     unauth: (state) => {

@@ -37,6 +37,13 @@ export const googleAuthSlice = createSlice({
       state.isAuthorized = false
       state.error = payload
     },
+
+    reset: (state) => {
+      state.isAuthorized = false
+      state.isAuthorizing = false
+      state.error = undefined
+      state.payload = undefined
+    }
   },
 });
 

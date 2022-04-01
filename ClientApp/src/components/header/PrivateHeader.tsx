@@ -12,6 +12,7 @@ import { Logo } from "../logo";
 import { Navbar } from "../navbar";
 import { UserAcc } from "../userIco";
 
+
 export const PrivateHeader: FC = () => {
     const history = useNavigate()
 
@@ -37,9 +38,7 @@ export const PrivateHeader: FC = () => {
                     </Box>
                 </Box>
                 <Box sx={styles.rightItem}>
-                    <Box>
-                        <UserAcc />
-                    </Box>
+                    <UserAcc />
                 </Box>
             </Box>
         </Box>

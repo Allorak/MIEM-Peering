@@ -44,6 +44,14 @@ export const registrationSlice = createSlice({
       state.isRegistering = false
       state.isRegistered = false
       state.googleToken = payload
+    },
+
+    reset: (state) => {
+      state.error = undefined
+      state.isRegistering = false
+      state.isRegistered = false
+      state.googleToken = undefined
+      state.error = undefined
     }
   },
 });
