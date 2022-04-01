@@ -1,8 +1,9 @@
-import { FC } from 'react';
-import { Navigate } from "react-router-dom"
+import { FC, useEffect } from 'react';
+import { Navigate, useNavigate } from "react-router-dom"
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { Button, Checkbox, TextField, Typography } from '@mui/material';
 import { Box, Theme, SxProps } from '@mui/system';
+import Cookies from 'universal-cookie';
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 
@@ -18,17 +19,27 @@ import { GoogleAuthStatus, ICookiesToken, IRole } from '../../store/types';
 
 import clientID from '../../secret/GoogleClientID';
 
-import Cookies from 'universal-cookie';
 
 export const Login: FC = () => {
     const cookies = new Cookies();
     const dispatch = useAppDispatch()
 
-    const isAuthorized = useAppSelector(state => state.gAuth.isAuthorized)
-    const isAuthorizing = useAppSelector(state => state.gAuth.isAuthorizing)
+    const history = useNavigate()
+
     const payload = useAppSelector(state => state.gAuth.payload)
     const userProfile = useAppSelector(state => state.userProfile.payload)
     const accessToken = useAppSelector(state => state.auth.accessToken)
+
+    useEffect(() => {
+        const tokenByCookies = cookies.get(ICookiesToken.key)
+
+        if (tokenByCookies) {
+            history(paths.root, {
+                replace: true
+            })
+        }
+    }, [])
+
 
     if (payload && payload.status === GoogleAuthStatus.newUser) {
         return (
@@ -50,7 +61,6 @@ export const Login: FC = () => {
 
     const onGoogleLoginSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ('accessToken' in response) {
-            cookies.remove(ICookiesToken.key)
             dispatch(fetchGAuth(response.tokenId))
         }
     }
@@ -59,6 +69,7 @@ export const Login: FC = () => {
         alert('Google Auth Error')
         console.log('Google login fail:', e.error)
     }
+
 
     return (
         <Box sx={styles.container}>

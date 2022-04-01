@@ -1,33 +1,17 @@
+import Cookies from "universal-cookie";
+
 import { actions } from "..";
-import { postAuth } from "../../../api/postAuth";
+import { paths } from "../../../app/constants/paths";
 import { AppThunk } from "../../../app/store";
 
+import { ICookiesToken } from "../../types";
 
-import { IErrorCode, IAuthRequest } from "../../types";
 
-
-export const auth = (payload: IAuthRequest): AppThunk => async (dispatch) => {
+export const auth = (payload: string): AppThunk => async (dispatch) => {
     dispatch(actions.authStarted())
-    try {
-        const response = await postAuth(payload)
-        if (!response) {
-            dispatch(actions.authFailed({
-                code: IErrorCode.RESPONSE,
-                message: 'Некорректный ответ сервера', // TODO: i18n
-            }))
-            return
-        }
-        if (!response.success) {
-            dispatch(actions.authFailed(response.error))
-            return
-        }
+    const cookies = new Cookies()
+    cookies.remove(ICookiesToken.key, { path: paths.root })
+    cookies.set(ICookiesToken.key, payload, { path: paths.root })
 
-        dispatch(actions.authSuccess("asjas"))
-
-    } catch (error) {
-        dispatch(actions.authFailed({
-            code: IErrorCode.REQUEST,
-            message: 'Не удалось выполнить запрос'
-        }));
-    }
+    dispatch(actions.authSuccess(payload))
 }

@@ -1,16 +1,22 @@
+import Cookies from "universal-cookie";
+
 import { actions } from "..";
 import { AppThunk } from "../../../app/store";
-import { IErrorCode } from "../../types";
+import { actions as googleAuthActions } from "../../googleAuth";
+import { actions as regActions } from "../../registretion"
+import { actions as userProfileActions } from "../../userProfile"
+import { ICookiesToken, IErrorCode } from "../../types";
+import { paths } from "../../../app/constants/paths";
 
 
 export const unauthorize = (): AppThunk => async (dispatch) => {
-  try {
-    dispatch(actions.unauth())
 
-  } catch (error) {
-    dispatch(actions.authFailed({
-      code: IErrorCode.REQUEST,
-      message: 'Wrong...'
-    }));
-  }
+  const cookies = new Cookies()
+  cookies.remove(ICookiesToken.key, { path: paths.root })
+
+  dispatch(actions.unauth())
+
+  dispatch(googleAuthActions.reset())
+  dispatch(regActions.reset())
+  dispatch(userProfileActions.userProfileRemove())
 }
