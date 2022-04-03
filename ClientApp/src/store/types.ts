@@ -92,6 +92,44 @@ export type IRegistrationResponse = {
 }
 
 /** User Profile */
+export type   IUserRegistration = {
+  email: string,
+  password: string,
+  confirmPassword: string,
+  firstname: string,
+  surname: string,
+  role: IRole.teacher | IRole.student
+  img?: File
+}
+
+export type IUserRegistrationResponse = {
+  success: boolean,
+  error?: IError
+}
+
+export type IUserRegistrationRequest = {
+  email: string,
+  password: string,
+  fullname: string,
+  role: IRole.teacher | IRole.student
+  img?: File
+}
+
+export type IUserAuthorization = {
+  email: string,
+  pass: string
+}
+
+export type IAuthorizationUserResponse = {
+  accessToken: string
+}
+
+export type IUserAuthorizationRequest = IUserAuthorization
+
+export type IUserAuthorizationResponse = {
+  success: boolean,
+  error?: IError,
+}
 
 export type IUserProfile = {
   id: string,

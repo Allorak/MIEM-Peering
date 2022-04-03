@@ -150,7 +150,6 @@ namespace patools.Services.Users
             if (newUser.Img is not null)
             {
                 var directory = Directory.GetCurrentDirectory();
-                Console.WriteLine("The current directory is ", directory.ToString());
                 var path = Path.Combine(directory, "UserImages");
                 if (!Directory.Exists(path))
                 {
@@ -166,7 +165,8 @@ namespace patools.Services.Users
                     await fileStream.DisposeAsync();
                 }
 
-                user.ImageUrl = "file:///" + filepath;
+                //user.ImageUrl = "file:///" + filepath;
+                user.ImageUrl = "/api/v1/users/img/" + storedFilename;
             }
 
             await _context.Users.AddAsync(user);

@@ -16,13 +16,17 @@ import { reducer as authorForm } from '../store/authorformStudent'
 import { reducer as dashboard } from '../store/dashboard'
 import { reducer as myWork } from '../store/myWork'
 import { reducer as grades } from '../store/grades'
+import {reducer as registrationUser} from '../store/registrationUser'
+import {reducer as authorizationUser} from '../store/authorizationUser'
 
 
 export const store = configureStore({
   reducer: {
     auth,
     gAuth,
+    authorizationUser,
     userProfile,
+    registrationUser,
     registration,
     dashboard,
     courses,

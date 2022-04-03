@@ -118,6 +118,22 @@ const theme = createTheme({
         }
     },
     components: {
+        MuiToggleButton: {
+            defaultProps: {
+                disableRipple: true,
+            },
+            styleOverrides: {
+                root: {
+                    "&.Mui-selected": {
+                        color: palette.fill.white,
+                        backgroundColor: palette.fill.primary,
+                        ":hover": {
+                            backgroundColor: palette.hover.primary
+                        }
+                    }
+                }
+            }
+        },
         MuiButton: {
             defaultProps: {
                 disableRipple: true
