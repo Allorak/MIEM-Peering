@@ -4,11 +4,11 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { Button, Typography } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
 
+import { paths } from "../../../../app/constants/paths";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 
 import { registretion } from "../../../../store/registretion";
 import { IRole } from "../../../../store/types";
-import { paths } from "../../../../app/constants/paths";
 
 import { TeacherImg } from "../../../../components/icons/Teacher";
 import { StudentImg } from "../../../../components/icons/Student";

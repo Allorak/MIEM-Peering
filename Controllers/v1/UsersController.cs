@@ -13,6 +13,10 @@ using Microsoft.Extensions.Configuration;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using BrunoZell.ModelBinding;
+using Microsoft.AspNetCore.StaticFiles;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Configuration;
 
 namespace patools.Controllers.v1
 {
@@ -112,6 +116,22 @@ namespace patools.Controllers.v1
         public async Task<ActionResult<Response<string>>> AddNativeUser ([FromForm] AddNativeUserDto newUser)
         {
             return Ok(await _usersService.AddNativeUser(newUser));
+        }
+
+        [HttpGet("img/{imageId}")]
+        public async Task<IActionResult> GetUserImage(Guid imageId)
+        {
+            bool user = _context.Users.Any(u => u.ID == imageId);
+            if (user == false)
+                return new NoContentResult();
+
+            var storedFilename = imageId.ToString();
+
+            Byte[] b;
+            var directory = Directory.GetCurrentDirectory();
+            b = await System.IO.File.ReadAllBytesAsync(Path.Combine(directory, "UserImages", $"{storedFilename}"));
+            
+            return File(b, "image/jpeg");
         }
         
     }
