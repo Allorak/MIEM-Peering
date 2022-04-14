@@ -1353,8 +1353,10 @@ namespace patools.Services.PeeringTasks
                 return null;
             }
 
-            var submissionWeight = taskUser.PeeringTask.SubmissionWeight / 100f;
-            var reviewWeight = taskUser.PeeringTask.ReviewWeight / 100f;
+            //var submissionWeight = taskUser.PeeringTask.SubmissionWeight / 100f;
+            //var reviewWeight = taskUser.PeeringTask.ReviewWeight / 100f;
+            var submissionWeight = 0.2f;
+            var reviewWeight = 0.8f;
             var reviewConfidence = (1 - reviewsError.Value) * MaxPossibleGrade * reviewWeight;
             var submissionConfidence = grade * submissionWeight;
             var resultConfidenceFactor = await GetReviewedPercentage(taskUser)*(reviewConfidence + submissionConfidence)/(MaxPossibleGrade);
