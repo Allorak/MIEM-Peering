@@ -37,7 +37,6 @@ namespace patools.Controllers.v1
         /// <summary>
         /// Получает пользователей курса.
         /// </summary>
-        // GET: api/v1/CourseUsers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CourseUser>>> GetCourseUsers()
         {
@@ -54,7 +53,6 @@ namespace patools.Controllers.v1
         /// <summary>
         /// Добавляет нового пользователя курса.
         /// </summary>
-        // POST: api/v1/CourseUsers/add
         [HttpPost("add")]
         public async Task<ActionResult<string>> PostCourseUser(AddCourseUserDto courseUsersInfo)
         {
@@ -134,7 +132,6 @@ namespace patools.Controllers.v1
         /// <summary>
         /// Получает пользователя курса.
         /// </summary>
-        // GET: api/CourseUsers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CourseUser>> GetCourseUser(Guid id)
         {
@@ -151,7 +148,6 @@ namespace patools.Controllers.v1
         /// <summary>
         /// Изменяет пользователя курса.
         /// </summary>
-        // PUT: api/CourseUsers/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCourseUser(Guid id, CourseUser courseUser)
         {
@@ -180,24 +176,35 @@ namespace patools.Controllers.v1
 
             return NoContent();
         }
-        
+
         /// <summary>
         /// Удаляет пользователя курса.
         /// </summary>
-        // DELETE: api/CourseUsers/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourseUser(Guid id)
+        [HttpDelete("{courseId}")]
+        public async Task<IActionResult> DeleteCourseUser(Guid courseId)
         {
-            var courseUser = await _context.CourseUsers.FindAsync(id);
-            if (courseUser == null)
+            //The user is not authenticated (there is no token provided or the token is incorrect)
+            if(!User.Identity.IsAuthenticated)
+                return Ok(new UnauthorizedUserResponse());
+
+            //The user's role is incorrect for this request
+            if(!User.IsInRole(UserRoles.Student.ToString()))
+                return Ok(new IncorrectUserRoleResponse());
+
+            //The user has no id Claim
+            var studentIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(studentIdClaim == null)
+                return Ok(new InvalidJwtTokenResponse());
+
+            //The id stored in Claim is not Guid
+            if(!Guid.TryParse(studentIdClaim.Value, out var studentId))
+                return Ok(new InvalidJwtTokenResponse());
+
+            return Ok(await _courseUsersService.DeleteCourseUser(new DeleteCourseUserDto()
             {
-                return NotFound();
-            }
-
-            _context.CourseUsers.Remove(courseUser);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                CourseId = courseId,
+                StudentId = studentId
+            }));
         }
 
         private bool CourseUserExists(Guid id)

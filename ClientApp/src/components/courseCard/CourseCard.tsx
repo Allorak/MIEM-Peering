@@ -12,6 +12,7 @@ interface IProps {
     course: ICourses
     onCourseSelect(id: string): void
     onCourseSettings?: (course: ICourses) => void
+    onCourseDelete?: (course: ICourses) => void
     setting?: boolean
 }
 
@@ -19,9 +20,9 @@ export const CourseCard: FC<IProps> = ({
     course,
     onCourseSelect,
     onCourseSettings,
+    onCourseDelete,
     setting
 }) => {
-
     const userProfile = useAppSelector(state => state.userProfile.payload)
 
     const onSettings = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -31,6 +32,7 @@ export const CourseCard: FC<IProps> = ({
 
     const onDelete = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         event.stopPropagation()
+        if (onCourseDelete) onCourseDelete(course)
     }, [course])
 
     return (

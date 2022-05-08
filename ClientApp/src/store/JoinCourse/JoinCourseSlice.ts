@@ -5,13 +5,15 @@ import { IError } from '../types';
 export interface INewCourseState {
   isLoading: boolean,
   error: IError | undefined,
-  joinStatus: boolean | undefined
+  joinStatus: boolean | undefined,
+  deleteStatus: boolean | undefined
 }
 
 const initialState: INewCourseState = {
   isLoading: false,
   error: undefined,
   joinStatus: undefined,
+  deleteStatus: undefined
 };
 
 export const joinCourseSlice = createSlice({
@@ -37,6 +39,12 @@ export const joinCourseSlice = createSlice({
       state.isLoading =  false
       state.error = undefined
       state.joinStatus = undefined
+      state.deleteStatus = undefined
+    },
+
+    courseDeleteSuccess: (state) => {
+      state.isLoading = false
+      state.deleteStatus = true
     }
   },
 });

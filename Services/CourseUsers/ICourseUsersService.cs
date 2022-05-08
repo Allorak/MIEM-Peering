@@ -15,5 +15,6 @@ namespace patools.Services.CourseUsers
         Task<Response<string>> AddCourseUser(AddCourseUserDto newCourseUser);
         Task<Response<string>> AddCourseUserStudent(AddCourseUserStudentDto newCourseUserStudent);
         Task<Response<string>> JoinByCourseCode(AddCourseUserByCourseCodeDto info);
+        Task<Response<string>> DeleteCourseUser(DeleteCourseUserDto courseUserInfo);
     }
 }

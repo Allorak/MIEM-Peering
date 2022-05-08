@@ -156,5 +156,28 @@ namespace patools.Services.CourseUsers
 
             return new SuccessfulResponse<string>("User joined successfully");
         }
+
+        public async Task<Response<string>> DeleteCourseUser(DeleteCourseUserDto courseUserInfo)
+        {
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.ID == courseUserInfo.CourseId);
+            if (course == null)
+                return new InvalidGuidIdResponse<string>();
+
+            var student =
+                await _context.Users.FirstOrDefaultAsync(u => u.ID == courseUserInfo.StudentId && u.Role == UserRoles.Student);
+            if (student == null)
+                return new BadRequestDataResponse<string>("Invalid student id");
+
+            var courseUser = await _context.CourseUsers
+                .FirstOrDefaultAsync(cu => cu.User == student && cu.Course == course);
+            if (courseUser == null)
+                return new NoAccessResponse<string>("User is not assigned to this course");
+
+            _context.CourseUsers.Remove(courseUser);
+
+            await _context.SaveChangesAsync();
+
+            return new SuccessfulResponse<string>("The student was unbinded from the course");
+        }
     }
 }
