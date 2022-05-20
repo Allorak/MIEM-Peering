@@ -31,6 +31,7 @@ namespace patools.Models
         [DataType(DataType.ImageUrl)]
         public string ImageUrl { get; set; }
 
+        //For native registration
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
         public bool RegisteredNatively { get; set; }
