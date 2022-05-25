@@ -167,7 +167,7 @@ namespace patools.Controllers.v1
             //The user is not authenticated (there is no token provided or the token is incorrect)
             if(!User.Identity.IsAuthenticated)
                 return Ok(new UnauthorizedUserResponse());
-
+            //
             //The user's role is incorrect for this request
             if(!User.IsInRole(UserRoles.Teacher.ToString()))
                 return Ok(new IncorrectUserRoleResponse());
